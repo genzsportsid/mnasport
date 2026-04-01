@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>MNA FC | Database & Skuad</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-blue': '#2563eb',
+                        'brand-blue-dark': '#1e40af',
+                        'brand-gold': '#d7b67d',
+                        'brand-green': '#009A44',
+                        'brand-black': '#111111',
+                        'brand-dark-bg': '#09090b',
+                        'brand-dark-surface': '#18181b',
+                        'brand-dark-border': '#27272a',
+                        'brand-dark-muted': '#a1a1aa'
+                    },
+                    fontFamily: {
+                        heading: ['"Noto Sans"', 'sans-serif'],
+                        body: ['"Noto Sans"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-nav { background: rgba(24, 24, 27, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        .shadow-glow-blue { box-shadow: 0 0 20px rgba(37, 99, 235, 0.2); }
+    </style>
+</head>
+<body class="font-body bg-[#F9FAFB] dark:bg-brand-dark-bg text-brand-black dark:text-white antialiased overflow-x-hidden selection:bg-brand-blue selection:text-white pb-[100px] transition-colors duration-500">
+
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-brand-blue/20 blur-[100px] rounded-full"></div>
+    </div>
+
+    <header class="sticky top-0 z-50 glass-nav border-b border-gray-200 dark:border-brand-dark-border pt-safe">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-white/5 bg-black/5 dark:bg-white/5">
+            <span class="text-[9px] font-bold text-gray-500 dark:text-brand-dark-muted uppercase tracking-widest">MNA Ecosystem</span>
+            <div class="flex gap-2">
+                <a href="/" class="text-[9px] font-bold uppercase tracking-widest bg-brand-gold/10 text-brand-gold hover:bg-brand-gold hover:text-brand-dark-bg px-2 py-1 rounded transition-colors">Operator</a>
+                <a href="/tsl/" class="text-[9px] font-bold uppercase tracking-widest bg-brand-green/10 text-brand-green hover:bg-brand-green hover:text-white px-2 py-1 rounded transition-colors">TSL Liga</a>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between px-4 py-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-brand-blue to-blue-400 rounded-xl flex items-center justify-center shadow-glow-blue">
+                    <i data-lucide="shield" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-heading font-black text-lg uppercase tracking-wide leading-none">MNA FC</h1>
+                    <p class="text-[10px] text-brand-blue font-bold uppercase tracking-widest mt-0.5">Database Center</p>
+                </div>
+            </div>
+            <div class="relative">
+                <i data-lucide="bell" class="w-5 h-5 text-gray-500 dark:text-gray-400"></i>
+                <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-brand-dark-bg"></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-5xl mx-auto px-4 mt-6">
+        
+        <div class="bg-gradient-to-r from-brand-blue-dark to-brand-blue rounded-3xl p-6 mb-6 text-white shadow-lg shadow-brand-blue/20 relative overflow-hidden">
+            <div class="absolute right-0 top-0 opacity-10 transform scale-150 translate-x-1/4 -translate-y-1/4">
+                <i data-lucide="shield" class="w-48 h-48"></i>
+            </div>
+            <div class="relative z-10">
+                <span class="text-[10px] font-bold uppercase tracking-widest bg-white/20 px-2 py-1 rounded-md backdrop-blur-sm">Musim 2024/25</span>
+                <h2 class="font-heading font-bold text-2xl md:text-3xl mt-3 mb-1">Dashboard Tim</h2>
+                <p class="text-xs md:text-sm text-blue-100 font-medium max-w-sm">Pantau performa skuad utama dan perkembangan akademi secara real-time.</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white dark:bg-brand-dark-surface p-4 rounded-2xl border border-gray-100 dark:border-brand-dark-border shadow-sm">
+                <div class="flex items-center gap-2 text-brand-blue mb-2">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Total Skuad</span>
+                </div>
+                <div class="text-2xl font-heading font-black">42</div>
+            </div>
+            <div class="bg-white dark:bg-brand-dark-surface p-4 rounded-2xl border border-gray-100 dark:border-brand-dark-border shadow-sm">
+                <div class="flex items-center gap-2 text-green-500 mb-2">
+                    <i data-lucide="trophy" class="w-4 h-4"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Win Rate</span>
+                </div>
+                <div class="text-2xl font-heading font-black">68%</div>
+            </div>
+            <div class="bg-white dark:bg-brand-dark-surface p-4 rounded-2xl border border-gray-100 dark:border-brand-dark-border shadow-sm">
+                <div class="flex items-center gap-2 text-brand-gold mb-2">
+                    <i data-lucide="target" class="w-4 h-4"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Total Gol</span>
+                </div>
+                <div class="text-2xl font-heading font-black">57</div>
+            </div>
+            <div class="bg-white dark:bg-brand-dark-surface p-4 rounded-2xl border border-gray-100 dark:border-brand-dark-border shadow-sm">
+                <div class="flex items-center gap-2 text-purple-500 mb-2">
+                    <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Promosi</span>
+                </div>
+                <div class="text-2xl font-heading font-black">12</div>
+            </div>
+        </div>
+
+        <h3 class="font-heading font-bold text-sm uppercase tracking-widest text-gray-400 mb-3">Pemain Kunci Skuad Utama</h3>
+        <div class="bg-white dark:bg-brand-dark-surface rounded-3xl border border-gray-100 dark:border-brand-dark-border overflow-hidden shadow-sm">
+            <div class="flex items-center p-4 border-b border-gray-50 dark:border-white/5 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-brand-blue flex items-center justify-center font-bold text-xs shrink-0">MO</div>
+                <div class="flex-1 ml-3">
+                    <h4 class="font-bold text-sm">Marcus Okafor</h4>
+                    <span class="text-[10px] text-gray-500 font-bold tracking-widest">Striker (ST) • 24 Thn</span>
+                </div>
+                <div class="text-right">
+                    <div class="font-bold text-brand-blue">12 Gol</div>
+                    <span class="text-[9px] font-bold uppercase tracking-widest text-green-500 bg-green-500/10 px-2 py-0.5 rounded">Fit</span>
+                </div>
+            </div>
+            <div class="flex items-center p-4 border-b border-gray-50 dark:border-white/5 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-brand-blue flex items-center justify-center font-bold text-xs shrink-0">YB</div>
+                <div class="flex-1 ml-3">
+                    <h4 class="font-bold text-sm">Yusuf Balogun</h4>
+                    <span class="text-[10px] text-gray-500 font-bold tracking-widest">Winger (LW) • 21 Thn</span>
+                </div>
+                <div class="text-right">
+                    <div class="font-bold text-brand-blue">8 Gol</div>
+                    <span class="text-[9px] font-bold uppercase tracking-widest text-green-500 bg-green-500/10 px-2 py-0.5 rounded">Fit</span>
+                </div>
+            </div>
+            <div class="flex items-center p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-brand-blue flex items-center justify-center font-bold text-xs shrink-0">DM</div>
+                <div class="flex-1 ml-3">
+                    <h4 class="font-bold text-sm">Daniel Mensah</h4>
+                    <span class="text-[10px] text-gray-500 font-bold tracking-widest">Bek (CB) • 29 Thn</span>
+                </div>
+                <div class="text-right">
+                    <div class="font-bold text-brand-blue">1 Gol</div>
+                    <span class="text-[9px] font-bold uppercase tracking-widest text-red-500 bg-red-500/10 px-2 py-0.5 rounded">Cedera</span>
+                </div>
+            </div>
+            
+            <a href="#" class="block w-full text-center py-3 bg-gray-50 dark:bg-brand-dark-bg text-xs font-bold text-brand-blue uppercase tracking-widest hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Lihat Semua Database</a>
+        </div>
+
+    </main>
+
+    <nav class="fixed bottom-0 w-full z-50 glass-nav border-t border-gray-200 dark:border-brand-dark-border pb-safe">
+        <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
+            <button class="flex flex-col items-center justify-center w-full h-full text-brand-blue">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Dash</span>
+            </button>
+            <button class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-blue transition-colors">
+                <i data-lucide="users" class="w-5 h-5 mb-1"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Skuad</span>
+            </button>
+            <button class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-blue transition-colors">
+                <i data-lucide="calendar" class="w-5 h-5 mb-1"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Jadwal</span>
+            </button>
+            <button class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-blue transition-colors">
+                <i data-lucide="settings" class="w-5 h-5 mb-1"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Set</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
