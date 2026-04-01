@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MNA Sport Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { 'brand-green': '#009A44', 'brand-dark': '#09090b', 'brand-surface': '#18181b' },
+                    fontFamily: { sans: ['"Noto Sans"', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-brand-dark text-gray-900 dark:text-white font-sans antialiased min-h-screen flex flex-col items-center justify-center p-4 selection:bg-brand-green selection:text-white transition-colors duration-300">
+
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-brand-green/10 blur-[120px] rounded-full"></div>
+    </div>
+
+    <main class="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center text-center">
+        <div class="mb-12">
+            <h1 class="text-4xl md:text-6xl font-extrabold uppercase tracking-tight mb-2">
+                MNA <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-green to-emerald-400">Sport Mgt.</span>
+            </h1>
+            <p class="text-gray-500 dark:text-gray-400 text-sm md:text-base font-semibold tracking-widest uppercase">Professional Sports & League Operator</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl px-4">
+            
+            <a href="/tsl/" class="group relative bg-white dark:bg-brand-surface rounded-3xl p-8 shadow-lg border border-gray-200 dark:border-gray-800 hover:border-brand-green dark:hover:border-brand-green transition-all duration-300 hover:-translate-y-2 overflow-hidden text-left flex flex-col h-full">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-brand-green/5 rounded-bl-full -z-10 group-hover:bg-brand-green/20 transition-colors"></div>
+                <div class="w-12 h-12 bg-gray-100 dark:bg-black rounded-xl flex items-center justify-center mb-6 shadow-inner border border-gray-200 dark:border-gray-800">
+                    <span class="text-2xl">🏆</span>
+                </div>
+                <h2 class="text-2xl font-bold uppercase mb-2 group-hover:text-brand-green transition-colors">Trenggalek Student League</h2>
+                <p class="text-gray-500 dark:text-gray-400 text-sm mb-6 flex-1">Portal resmi jadwal, hasil pertandingan, dan statistik liga pelajar TSL Musim 2026.</p>
+                <div class="inline-flex items-center text-xs font-bold uppercase tracking-widest text-brand-green">
+                    Buka Aplikasi <svg class="w-4 h-4 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </div>
+            </a>
+
+            <a href="/mna-fc/" class="group relative bg-white dark:bg-brand-surface rounded-3xl p-8 shadow-lg border border-gray-200 dark:border-gray-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 overflow-hidden text-left flex flex-col h-full">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-bl-full -z-10 group-hover:bg-blue-500/20 transition-colors"></div>
+                <div class="w-12 h-12 bg-gray-100 dark:bg-black rounded-xl flex items-center justify-center mb-6 shadow-inner border border-gray-200 dark:border-gray-800">
+                    <span class="text-2xl">⚽</span>
+                </div>
+                <h2 class="text-2xl font-bold uppercase mb-2 group-hover:text-blue-500 transition-colors">MNA Football Club</h2>
+                <p class="text-gray-500 dark:text-gray-400 text-sm mb-6 flex-1">Sistem manajemen database internal, performa pemain, dan administrasi skuad MNA FC.</p>
+                <div class="inline-flex items-center text-xs font-bold uppercase tracking-widest text-blue-500">
+                    Buka Database <svg class="w-4 h-4 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </div>
+            </a>
+
+        </div>
+        
+        <footer class="mt-16 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+            &copy; 2026 MNA Sport Management
+        </footer>
+    </main>
+</body>
+</html>
