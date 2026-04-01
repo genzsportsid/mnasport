@@ -71,6 +71,11 @@
             </div>
         </div>
     </header>
+    <div class="sticky top-16 z-40 bg-[#F9FAFB]/90 dark:bg-brand-dark-bg/90 backdrop-blur-md py-3 px-4 flex gap-3 overflow-x-auto hide-scroll transition-colors">
+        <button class="px-5 py-2 rounded-full bg-brand-blue text-white text-[10px] font-bold uppercase tracking-widest whitespace-nowrap shadow-sm">Dashboard</button>
+        <button class="px-5 py-2 rounded-full bg-white dark:bg-brand-dark-surface text-gray-500 dark:text-brand-dark-muted border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Skuad Utama</button>
+        <button class="px-5 py-2 rounded-full bg-white dark:bg-brand-dark-surface text-gray-500 dark:text-brand-dark-muted border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Akademi</button>
+    </div>
 
     <main class="relative z-10 max-w-5xl mx-auto px-4 mt-6">
         
@@ -157,24 +162,24 @@
 
     </main>
 
-    <nav class="fixed bottom-0 w-full z-50 glass-nav border-t border-gray-200 dark:border-brand-dark-border pb-safe">
+    <nav class="fixed bottom-0 w-full z-[100] bg-white/90 dark:bg-[#18181b]/90 backdrop-blur-xl border-t border-gray-200 dark:border-brand-dark-border pb-safe transition-colors">
         <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
-            <button class="flex flex-col items-center justify-center w-full h-full text-brand-blue">
+            <a href="/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-gold transition-colors">
                 <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Dash</span>
+                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">Operator</span>
+            </a>
+            <a href="/tsl/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-green transition-colors">
+                <i data-lucide="trophy" class="w-5 h-5 mb-1"></i>
+                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">TSL Liga</span>
+            </a>
+            <button class="flex flex-col items-center justify-center w-full h-full text-brand-blue transition-colors">
+                <i data-lucide="shield" class="w-5 h-5 mb-1"></i>
+                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">MNA FC</span>
             </button>
-            <button class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-blue transition-colors">
-                <i data-lucide="users" class="w-5 h-5 mb-1"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Skuad</span>
-            </button>
-            <button class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-blue transition-colors">
-                <i data-lucide="calendar" class="w-5 h-5 mb-1"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Jadwal</span>
-            </button>
-            <button class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-blue transition-colors">
-                <i data-lucide="settings" class="w-5 h-5 mb-1"></i>
-                <span class="text-[9px] font-bold uppercase tracking-widest">Set</span>
-            </button>
+            <a href="/tsl/#pencarian" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-black dark:hover:text-white transition-colors">
+                <i data-lucide="search" class="w-5 h-5 mb-1"></i>
+                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">Cari</span>
+            </a>
         </div>
     </nav>
 
