@@ -774,6 +774,14 @@
             initIosPrompt(); 
             checkFirstInstall(); // Memicu kotak Welcome secara otomatis
             initBannerSwipe(); 
+            
+            // DETEKSI NAVIGASI DARI WEBSITE LAIN (Contoh: #pencarian)
+            setTimeout(() => {
+                const hash = window.location.hash.replace('#', '');
+                if (['jadwal', 'klasemen', 'statistik', 'pencarian'].includes(hash)) {
+                    switchTab(hash, hash.charAt(0).toUpperCase() + hash.slice(1));
+                }
+            }, 500);
         });
 
         // SMOOTH SCROLL FOTMOB HEADER
@@ -1016,20 +1024,32 @@
         }
 
         function switchTab(tabId, titleText) {
-            document.querySelectorAll('#view-home .tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('block'); });
+            // 1. OTOMATIS TUTUP HALAMAN MATCH/TEAM AGAR TIDAK NGEBLANK
+            document.getElementById('view-match').classList.add('hidden');
+            document.getElementById('view-team').classList.add('hidden');
+            
+            // 2. Tampilkan kembali kontainer utama Beranda
+            document.getElementById('view-home').classList.remove('hidden');
+            document.getElementById('main-bottom-nav').classList.remove('hidden');
+
+            // 3. Ganti konten Tab
+            document.querySelectorAll('#view-home .tab-content').forEach(el => { 
+                el.classList.add('hidden'); el.classList.remove('block'); 
+            });
             const target = document.getElementById('tab-' + tabId);
             if(target) { target.classList.remove('hidden'); target.classList.add('block'); }
+            
             setActiveNav(tabId);
 
-            const minHeader = document.getElementById('minimal-header');
+            // 4. Manajemen Header Atas
             const topTabs = document.getElementById('tsl-top-tabs');
+            const minHeader = document.getElementById('minimal-header'); // Jika masih dipakai
             
             if(tabId === 'beranda') { 
-                minHeader.classList.add('hidden'); minHeader.classList.remove('flex');
-                topTabs.classList.add('hidden'); // Sembunyikan di Hero Beranda agar bersih
+                if(topTabs) topTabs.classList.add('hidden');
             } else { 
-                minHeader.classList.add('hidden'); // Kita matikan header lama, ganti murni dengan Top Tabs
-                topTabs.classList.remove('hidden');
+                if(topTabs) topTabs.classList.remove('hidden');
+                if(minHeader) minHeader.classList.add('hidden');
             }
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
