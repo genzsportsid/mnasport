@@ -1,5 +1,12 @@
 <!DOCTYPE html>
 <html lang="id" class="dark scroll-smooth">
+<script>
+        if (localStorage.getItem('mna_theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -46,7 +53,62 @@
     </style>
 </head>
 <body class="font-body bg-[#000000] text-white antialiased overflow-x-hidden selection:bg-brand-gold selection:text-brand-dark-bg pb-[100px]">
+    <div id="global-menu-overlay" class="fixed inset-0 z-[110] hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="toggleGlobalMenu()"></div>
+        
+        <div id="global-menu-panel" class="absolute right-0 top-0 bottom-0 w-72 bg-[#09090b] border-l border-white/10 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col pt-safe">
+            
+            <div class="p-5 border-b border-white/5 flex justify-between items-center">
+                <h3 class="font-heading font-bold text-white tracking-widest uppercase text-xs">Pengaturan Global</h3>
+                <button onclick="toggleGlobalMenu()" class="text-gray-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            
+            <div class="p-5 flex-1 flex flex-col gap-6 overflow-y-auto hide-scroll">
+                <div>
+                    <span class="text-[9px] font-bold text-brand-gold uppercase tracking-widest mb-3 block">Tampilan Ekosistem</span>
+                    <button onclick="toggleGlobalTheme()" class="w-full flex items-center justify-between bg-white/5 border border-white/5 rounded-xl p-3 hover:bg-white/10 transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="moon" id="theme-icon" class="w-4 h-4 text-gray-400 group-hover:text-brand-gold transition-colors"></i>
+                            <span class="text-xs font-bold text-gray-200" id="theme-text">Tema Gelap</span>
+                        </div>
+                        <div class="w-8 h-4 bg-brand-gold rounded-full relative transition-colors" id="theme-toggle-bg">
+                            <div class="absolute right-1 top-0.5 w-3 h-3 bg-[#09090b] rounded-full transition-transform" id="theme-toggle-dot"></div>
+                        </div>
+                    </button>
+                </div>
 
+                <div>
+                    <span class="text-[9px] font-bold text-brand-gold uppercase tracking-widest mb-3 block">Sistem</span>
+                    <button onclick="requestGlobalNotification()" class="w-full flex items-center justify-between bg-white/5 border border-white/5 rounded-xl p-3 hover:bg-white/10 transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="bell-ring" class="w-4 h-4 text-gray-400 group-hover:text-brand-green transition-colors"></i>
+                            <span class="text-xs font-bold text-gray-200" id="notif-text">Aktifkan Notifikasi</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500"></i>
+                    </button>
+                </div>
+
+                <div>
+                    <span class="text-[9px] font-bold text-brand-gold uppercase tracking-widest mb-3 block">Media Sosial Kami</span>
+                    <div class="flex flex-col gap-2">
+                        <a href="https://instagram.com/mnafootballclub" target="_blank" class="flex items-center gap-3 text-xs font-medium text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-brand-blue/20 group">
+                            <i data-lucide="instagram" class="w-4 h-4 text-brand-blue group-hover:scale-110 transition-transform"></i> @mnafootballclub
+                        </a>
+                        <a href="https://instagram.com/trenggalekstudentleague" target="_blank" class="flex items-center gap-3 text-xs font-medium text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-brand-green/20 group">
+                            <i data-lucide="instagram" class="w-4 h-4 text-brand-green group-hover:scale-110 transition-transform"></i> @trenggalekstudentleague
+                        </a>
+                        <a href="https://instagram.com/mnasportmanagement" target="_blank" class="flex items-center gap-3 text-xs font-medium text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-brand-gold/20 group">
+                            <i data-lucide="instagram" class="w-4 h-4 text-brand-gold group-hover:scale-110 transition-transform"></i> @mnasportmanagement
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-5 border-t border-white/5 text-center">
+                <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">MNA Super App v1.0.0</span>
+            </div>
+        </div>
+    </div>
     <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden flex items-start justify-center">
         <div class="w-[600px] h-[400px] bg-brand-gold-dark/15 blur-[120px] rounded-full mt-[-100px]"></div>
     </div>
@@ -62,8 +124,8 @@
                     <p class="text-[9px] text-brand-gold font-bold uppercase tracking-widest mt-0.5">Ecosystem Operator</p>
                 </div>
             </div>
-            <button class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors">
-                <i data-lucide="bell" class="w-4 h-4 text-brand-gold"></i>
+            <button onclick="toggleGlobalMenu()" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors">
+                <i data-lucide="menu" class="w-4 h-4 text-brand-gold"></i>
             </button>
         </div>
     </header>
@@ -537,6 +599,75 @@
 
         // Jalankan Radar Otomatis Setiap 30 Detik (Background Polling)
         setInterval(tarikDataPreview, 30000);
+
+        // ==========================================
+        // SISTEM GLOBAL MENU & PENGATURAN
+        // ==========================================
+        function toggleGlobalMenu() {
+            const overlay = document.getElementById('global-menu-overlay');
+            const panel = document.getElementById('global-menu-panel');
+            if (overlay.classList.contains('hidden')) {
+                overlay.classList.remove('hidden');
+                setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+            } else {
+                panel.classList.add('translate-x-full');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        function syncThemeUI() {
+            const isDark = localStorage.getItem('mna_theme') !== 'light';
+            const html = document.documentElement;
+            const tText = document.getElementById('theme-text');
+            const tIcon = document.getElementById('theme-icon');
+            const tDot = document.getElementById('theme-toggle-dot');
+            const tBg = document.getElementById('theme-toggle-bg');
+
+            if (isDark) {
+                html.classList.add('dark');
+                if(tText) tText.innerText = 'Tema Gelap';
+                if(tIcon) tIcon.setAttribute('data-lucide', 'moon');
+                if(tDot) tDot.classList.replace('translate-x-[-16px]', 'translate-x-0');
+                if(tBg) tBg.classList.replace('bg-gray-500', 'bg-brand-gold');
+            } else {
+                html.classList.remove('dark');
+                if(tText) tText.innerText = 'Tema Terang';
+                if(tIcon) tIcon.setAttribute('data-lucide', 'sun');
+                if(tDot) { tDot.classList.remove('translate-x-0'); tDot.classList.add('translate-x-[-16px]'); }
+                if(tBg) { tBg.classList.remove('bg-brand-gold'); tBg.classList.add('bg-gray-500'); }
+            }
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function toggleGlobalTheme() {
+            const isDark = localStorage.getItem('mna_theme') !== 'light';
+            localStorage.setItem('mna_theme', isDark ? 'light' : 'dark');
+            syncThemeUI();
+        }
+
+        function requestGlobalNotification() {
+            if (!("Notification" in window)) {
+                alert("Browser Anda tidak mendukung notifikasi."); return;
+            }
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    alert("Notifikasi GOL & Kartu Aktif!");
+                    document.getElementById('notif-text').innerText = 'Notifikasi Aktif';
+                    document.getElementById('notif-text').classList.add('text-brand-green');
+                } else {
+                    alert("Izin notifikasi ditolak.");
+                }
+            });
+        }
+
+        // Jalankan Sinkronisasi saat web dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            syncThemeUI();
+            if(Notification.permission === 'granted' && document.getElementById('notif-text')) {
+                document.getElementById('notif-text').innerText = 'Notifikasi Aktif';
+                document.getElementById('notif-text').classList.add('text-brand-green');
+            }
+        });
     </script>
 </body>
 </html>
