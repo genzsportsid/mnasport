@@ -451,7 +451,7 @@
         }
 
         // ==========================================
-        // 3. MESIN PENYEDOT DATA (CACHE-FIRST / STALE-WHILE-REVALIDATE)
+        // 3. MESIN PENYEDOT DATA (CACHE-FIRST FULL SPEED)
         // ==========================================
         async function tarikDataPreview() {
             // LANGKAH 1: BACA CACHE LOKAL & TAMPILKAN INSTAN (0 Detik)
@@ -463,19 +463,17 @@
                     const parsedJadwal = JSON.parse(cacheJadwal);
                     const parsedKlasemen = JSON.parse(cacheKlasemen);
                     
-                    // Render Jadwal dari Cache
+                    // Render Jadwal instan dari cache
                     renderJadwalTerdekat(parsedJadwal);
                     
-                    // Render Klasemen dari Cache (Cek tombol divisi mana yang sedang aktif)
+                    // Render Klasemen instan dari cache
                     globalKlasemenCache = parsedKlasemen;
-                    let activeDivisi = 'SMA';
+                    let activeDivisi = 'SMA'; // Default
                     const btnSma = document.getElementById('btn-mini-sma');
                     if (btnSma && !btnSma.classList.contains('bg-brand-gold')) activeDivisi = 'SMP';
                     
-                    // Cetak jika area tabel masih kosong/loading
-                    if (document.getElementById('mini-klasemen-list').innerHTML.includes('Memuat')) {
-                        renderMiniKlasemen(activeDivisi);
-                    }
+                    // PERBAIKAN: Lepas kunci syarat, langsung cetak cache ke layar!
+                    renderMiniKlasemen(activeDivisi);
                 } catch(e) { console.error("Gagal membaca cache:", e); }
             }
 
@@ -498,24 +496,27 @@
                 localStorage.setItem('mna_cache_jadwal', JSON.stringify(dataJadwal));
                 localStorage.setItem('mna_cache_klasemen', JSON.stringify(dataKlasemen));
 
-                // RENDER ULANG LAYAR DENGAN DATA FRESH
+                // RENDER ULANG LAYAR DENGAN DATA FRESH DARI INTERNET
                 renderJadwalTerdekat(dataJadwal);
                 
                 if (Array.isArray(dataKlasemen)) {
                     globalKlasemenCache = dataKlasemen;
-                    // Cek divisi yang sedang dilihat user agar tidak pindah ke SMA tiba-tiba
                     let activeDivisi = 'SMA';
                     const btnSma = document.getElementById('btn-mini-sma');
                     if (btnSma && !btnSma.classList.contains('bg-brand-gold')) activeDivisi = 'SMP';
+                    
+                    // PERBAIKAN: Selalu render ulang agar perubahan poin langsung terlihat mulus
                     renderMiniKlasemen(activeDivisi); 
                 }
 
             } catch (error) {
                 console.error("Gagal menyinkronkan data background:", error);
-                // Jika tidak ada cache dan internet mati, baru tampilkan pesan error
+                // Tampilkan error hanya jika Cache benar-benar kosong dan internet mati
                 if (!cacheJadwal) {
-                    document.getElementById('mini-jadwal-list').innerHTML = '<div class="text-center text-red-500 text-[10px] py-4 font-bold uppercase tracking-widest">Gagal menyinkronkan data</div>';
-                    document.getElementById('mini-klasemen-list').innerHTML = '<tr><td colspan="4" class="text-center text-red-500 text-[10px] py-4 font-bold uppercase tracking-widest">Gagal menyinkronkan data</td></tr>';
+                    const jWadah = document.getElementById('mini-jadwal-list');
+                    const kWadah = document.getElementById('mini-klasemen-list');
+                    if(jWadah) jWadah.innerHTML = '<div class="text-center text-red-500 text-[10px] py-4 font-bold uppercase tracking-widest">Gagal menyinkronkan data</div>';
+                    if(kWadah) kWadah.innerHTML = '<tr><td colspan="4" class="text-center text-red-500 text-[10px] py-4 font-bold uppercase tracking-widest">Gagal menyinkronkan data</td></tr>';
                 }
             }
         }
