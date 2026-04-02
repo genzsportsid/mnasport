@@ -222,13 +222,41 @@
         lucide.createIcons();
 
         // ==========================================
+        // ALGORITMA WAKTU & TANGGAL (Kloning dari TSL)
+        // ==========================================
+        function parseIndoDate(waktuStr) {
+            try {
+                if(!waktuStr) return 0; let w = String(waktuStr).trim(); let dObj = new Date(w);
+                if (!isNaN(dObj.getTime()) && (w.includes('-') || w.includes('/'))) return dObj.getTime();
+                const parts = w.split(" - "); if(parts.length < 2) return 0;
+                const dateParts = parts[0].toLowerCase().replace(',', '').split(" "); const timeStr = parts[1].trim();
+                const bulanIndo = { "januari":"01", "februari":"02", "maret":"03", "april":"04", "mei":"05", "juni":"06", "juli":"07", "agustus":"08", "september":"09", "oktober":"10", "november":"11", "desember":"12" };
+                let hari = dateParts.find(x => !isNaN(x) && x.length <= 2);
+                let bln = Object.keys(bulanIndo).find(k => dateParts.includes(k));
+                let thn = dateParts.find(x => !isNaN(x) && x.length === 4);
+                if(hari && bln && thn) return new Date(`${thn}-${bulanIndo[bln]}-${hari.padStart(2, '0')}T${timeStr}:00`).getTime();
+                return 0;
+            } catch(e) { return 0; }
+        }
+
+        function getRelativeDayLabel(timestamp) {
+            if(!timestamp) return "TBA";
+            let today = new Date(); today.setHours(0,0,0,0); 
+            let target = new Date(timestamp); target.setHours(0,0,0,0);
+            let diffDays = Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+            if (diffDays === 0) return "HARI INI"; 
+            if (diffDays === 1) return "BESOK"; 
+            const blnIndo = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+            return `${target.getDate()} ${blnIndo[target.getMonth()]}`;
+        }
+
+        // ==========================================
         // MESIN INTEGRASI DATA REAL-TIME TSL
         // ==========================================
         const TSL_API_URL = 'https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec'; 
 
         async function tarikDataPreview() {
             try {
-                // Tarik data Jadwal dan Klasemen secara bersamaan (Parallel Fetch)
                 const [resJadwal, resKlasemen] = await Promise.all([
                     fetch(`${TSL_API_URL}?sheet=Jadwal&t=${Date.now()}`),
                     fetch(`${TSL_API_URL}?sheet=Klasemen&t=${Date.now()}`)
@@ -237,43 +265,53 @@
                 const dataJadwal = await resJadwal.json();
                 const dataKlasemen = await resKlasemen.json();
 
-                // 1. RENDER JADWAL (Ambil 2 pertandingan teratas)
+                // 1. RENDER JADWAL (4 Pertandingan Mendatang Terdekat)
                 const jadwalWadah = document.getElementById('mini-jadwal-list');
                 jadwalWadah.innerHTML = ''; 
                 
                 if (Array.isArray(dataJadwal) && dataJadwal.length > 0) {
-                    const jadwalTerdekat = dataJadwal.slice(0, 2);
+                    // FILTER: Buang laga yang sudah FT (Full Time)
+                    let upcomingMatches = dataJadwal.filter(m => !String(m.status || '').toUpperCase().includes('FT'));
                     
-                    jadwalTerdekat.forEach(match => {
-                        // Sinkronisasi dengan properti Google Sheets TSL Anda
-                        const timKandang = match.tim_kiri || 'Tim A';
-                        const timTandang = match.tim_kanan || 'Tim B';
-                        const status = String(match.status || '').toUpperCase();
-                        
-                        // Ekstrak Jam (Logika murni dari kode TSL Anda)
-                        let w = String(match.waktu || ''); let timeOnly = "TBA";
-                        if (w.includes("T")) { 
-                            let dObj = new Date(w); 
-                            if(!isNaN(dObj.getTime())) timeOnly = String(dObj.getHours()).padStart(2, '0') + ":" + String(dObj.getMinutes()).padStart(2, '0'); 
-                        } else { 
-                            timeOnly = w.split(" - ")[1] || w || "TBA"; 
-                        }
+                    // SORTING: Urutkan dari waktu yang paling dekat ke hari ini
+                    upcomingMatches.sort((a, b) => parseIndoDate(a.waktu) - parseIndoDate(b.waktu));
+                    
+                    // AMBIL: Tepat 4 pertandingan teratas setelah disortir
+                    const jadwalTerdekat = upcomingMatches.slice(0, 4);
+                    
+                    if (jadwalTerdekat.length > 0) {
+                        jadwalTerdekat.forEach(match => {
+                            const timKandang = match.tim_kiri || 'Tim A';
+                            const timTandang = match.tim_kanan || 'Tim B';
+                            const status = String(match.status || '').toUpperCase();
+                            const timestamp = parseIndoDate(match.waktu);
+                            const dayLabel = getRelativeDayLabel(timestamp);
+                            
+                            let w = String(match.waktu || ''); let timeOnly = "TBA";
+                            if (w.includes("T")) { 
+                                let dObj = new Date(w); 
+                                if(!isNaN(dObj.getTime())) timeOnly = String(dObj.getHours()).padStart(2, '0') + ":" + String(dObj.getMinutes()).padStart(2, '0'); 
+                            } else { 
+                                timeOnly = w.split(" - ")[1] || w || "TBA"; 
+                            }
 
-                        // Indikator Warna Status
-                        let isPast = status.includes('FT'); 
-                        let isLive = status.includes('LIVE') || status.includes('HT');
-                        let displayStatus = isPast ? 'FT' : (isLive ? 'LIVE' : timeOnly);
-                        let statusColor = isLive ? 'text-brand-red animate-pulse' : (isPast ? 'text-gray-500' : 'text-brand-green');
+                            let isLive = status.includes('LIVE') || status.includes('HT');
+                            let displayStatus = isLive ? 'LIVE' : timeOnly;
+                            let statusColor = isLive ? 'text-brand-red animate-pulse' : 'text-brand-gold';
 
-                        jadwalWadah.innerHTML += `
-                        <div class="bg-white/5 border border-white/5 rounded-xl p-3 flex items-center justify-between hover:bg-white/10 transition-colors">
-                            <div class="flex-1 text-right truncate pr-2"><span class="font-bold text-[11px] text-white">${timKandang}</span></div>
-                            <div class="px-2 text-center shrink-0">
-                                <span class="block text-[10px] font-bold ${statusColor}">${displayStatus}</span>
-                            </div>
-                            <div class="flex-1 text-left truncate pl-2"><span class="font-bold text-[11px] text-white">${timTandang}</span></div>
-                        </div>`;
-                    });
+                            jadwalWadah.innerHTML += `
+                            <div class="bg-white/5 border border-white/5 rounded-xl py-2 px-3 flex items-center justify-between hover:bg-white/10 transition-colors">
+                                <div class="flex-1 text-right truncate pr-2"><span class="font-bold text-[11px] text-white">${timKandang}</span></div>
+                                <div class="px-2 text-center shrink-0">
+                                    <span class="block text-[10px] font-bold ${statusColor}">${displayStatus}</span>
+                                    <span class="block text-[8px] text-gray-500 uppercase tracking-widest mt-0.5">${isLive ? 'SEKARANG' : dayLabel}</span>
+                                </div>
+                                <div class="flex-1 text-left truncate pl-2"><span class="font-bold text-[11px] text-white">${timTandang}</span></div>
+                            </div>`;
+                        });
+                    } else {
+                        jadwalWadah.innerHTML = '<div class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Semua jadwal telah selesai</div>';
+                    }
                 } else {
                     jadwalWadah.innerHTML = '<div class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Belum ada jadwal</div>';
                 }
@@ -283,15 +321,12 @@
                 klasemenWadah.innerHTML = '';
 
                 if (Array.isArray(dataKlasemen) && dataKlasemen.length > 0) {
-                    // Sortir otomatis dari poin terbesar, ambil 3 teratas
                     const topTiga = dataKlasemen.sort((a,b) => (parseInt(b.poin) || 0) - (parseInt(a.poin) || 0)).slice(0, 3);
                     
                     topTiga.forEach((klub, idx) => {
-                        // Sinkronisasi dengan properti Google Sheets TSL Anda
                         const namaKlub = klub.klub || 'Nama Klub';
                         const main = klub.main || 0;
                         const poin = klub.poin || 0;
-                        
                         const colorPos = idx === 0 ? 'text-brand-gold' : 'text-white';
 
                         klasemenWadah.innerHTML += `
@@ -313,9 +348,7 @@
             }
         }
 
-        // Jalankan mesin penyedot data saat website selesai dimuat
         window.addEventListener('DOMContentLoaded', tarikDataPreview);
-
     </script>
 </body>
 </html>
