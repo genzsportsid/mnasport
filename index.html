@@ -144,7 +144,7 @@
                     </div>
                 </div>
 
-                <div class="flex-1 bg-white/5 border border-white/5 rounded-xl p-3 mb-4">
+                <div id="klasemen-container" class="flex-1 bg-white/5 border border-white/5 rounded-xl p-3 mb-4 overflow-hidden">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b border-white/10 text-[9px] text-gray-500 uppercase tracking-widest">
@@ -155,10 +155,7 @@
                             </tr>
                         </thead>
                         <tbody id="mini-klasemen-list" class="text-xs font-bold text-gray-300">
-                            <tr>
-                                <td colspan="4" class="py-6 text-center text-[10px] text-brand-gold font-bold uppercase tracking-widest animate-pulse">Memuat Klasemen...</td>
-                            </tr>
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
 
@@ -307,44 +304,72 @@
             const klasemenWadah = document.getElementById('mini-klasemen-list');
             if(!klasemenWadah) return;
 
+            // Update UI Tombol Toggle
             const btnSmp = document.getElementById('btn-mini-smp');
             const btnSma = document.getElementById('btn-mini-sma');
             if (btnSmp && btnSma) {
-                if (jenjang === 'SMA') {
-                    btnSma.className = "px-3 py-1 text-[9px] font-bold rounded bg-brand-gold text-brand-black uppercase transition-all shadow-sm";
-                    btnSmp.className = "px-3 py-1 text-[9px] font-bold rounded text-gray-400 hover:text-white uppercase transition-all bg-transparent";
-                } else {
-                    btnSmp.className = "px-3 py-1 text-[9px] font-bold rounded bg-brand-gold text-brand-black uppercase transition-all shadow-sm";
-                    btnSma.className = "px-3 py-1 text-[9px] font-bold rounded text-gray-400 hover:text-white uppercase transition-all bg-transparent";
-                }
+                const isActive = "px-3 py-1 text-[9px] font-bold rounded bg-brand-gold text-brand-black uppercase transition-all shadow-sm";
+                const isInactive = "px-3 py-1 text-[9px] font-bold rounded text-gray-400 hover:text-white uppercase transition-all bg-transparent";
+                btnSma.className = (jenjang === 'SMA') ? isActive : isInactive;
+                btnSmp.className = (jenjang === 'SMP') ? isActive : isInactive;
             }
 
             klasemenWadah.innerHTML = '';
 
             if (Array.isArray(globalKlasemenCache) && globalKlasemenCache.length > 0) {
-                let filteredData = globalKlasemenCache.filter(k => String(k.Jenjang || k.Liga || 'SMA').toUpperCase().trim() === jenjang);
+                // 1. Filter berdasarkan Jenjang
+                let filteredData = globalKlasemenCache.filter(k => 
+                    String(k.Jenjang || k.Liga || 'SMA').toUpperCase().trim() === jenjang
+                );
 
-                if (filteredData.length > 0) {
-                    const topTiga = filteredData.sort((a,b) => (parseInt(b.poin) || 0) - (parseInt(a.poin) || 0)).slice(0, 3);
-                    topTiga.forEach((klub, idx) => {
-                        const namaKlub = klub.klub || 'Nama Klub';
-                        const main = klub.main || 0;
-                        const poin = klub.poin || 0;
-                        const colorPos = idx === 0 ? 'text-brand-gold' : 'text-white';
+                // 2. Kelompokkan berdasarkan Grup (A, B, dst)
+                const grupMap = {};
+                filteredData.forEach(item => {
+                    const g = String(item.grup || item.group || 'UTAMA').toUpperCase().trim();
+                    if (!grupMap[g]) grupMap[g] = [];
+                    grupMap[g].push(item);
+                });
 
-                        klasemenWadah.innerHTML += `
-                        <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                            <td class="py-2.5 text-center font-black ${colorPos}">${idx + 1}</td>
-                            <td class="py-2.5 text-white truncate max-w-[120px] md:max-w-[150px] font-medium">${namaKlub}</td>
-                            <td class="py-2.5 text-center text-gray-500 font-medium">${main}</td>
-                            <td class="py-2.5 text-center text-brand-green font-bold bg-brand-green/10 rounded-lg">${poin}</td>
-                        </tr>`;
+                const groupKeys = Object.keys(grupMap).sort();
+
+                if (groupKeys.length > 0) {
+                    groupKeys.forEach(key => {
+                        // Tampilkan header grup jika lebih dari satu grup
+                        if (groupKeys.length > 1) {
+                            klasemenWadah.innerHTML += `
+                                <tr class="bg-white/5">
+                                    <td colspan="4" class="py-1.5 px-2 text-[9px] font-black text-brand-gold tracking-[0.2em] uppercase border-b border-white/5">
+                                        GRUP ${key}
+                                    </td>
+                                </tr>`;
+                        }
+
+                        // Sortir per grup dan ambil Top 3
+                        const sortedGrup = grupMap[key].sort((a,b) => (parseInt(b.poin) || 0) - (parseInt(a.poin) || 0)).slice(0, 3);
+                        
+                        sortedGrup.forEach((klub, idx) => {
+                            const namaKlub = klub.klub || 'Tim';
+                            const main = klub.main || 0;
+                            const poin = klub.poin || 0;
+                            const colorPos = idx === 0 ? 'text-brand-gold' : 'text-white';
+
+                            klasemenWadah.innerHTML += `
+                            <tr class="border-b border-white/5 hover:bg-white/10 transition-colors">
+                                <td class="py-2 text-center font-black ${colorPos}">${idx + 1}</td>
+                                <td class="py-2 text-white truncate max-w-[110px] font-medium">${namaKlub}</td>
+                                <td class="py-2 text-center text-gray-500 font-medium">${main}</td>
+                                <td class="py-2 text-center text-brand-green font-bold">${poin}</td>
+                            </tr>`;
+                        });
+                        
+                        // Beri jarak antar grup
+                        if (groupKeys.length > 1) {
+                            klasemenWadah.innerHTML += `<tr class="h-2"></tr>`;
+                        }
                     });
                 } else {
-                    klasemenWadah.innerHTML = `<tr><td colspan="4" class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Klasemen ${jenjang} Belum Tersedia</td></tr>`;
+                    klasemenWadah.innerHTML = `<tr><td colspan="4" class="text-center text-[10px] text-gray-500 py-6 uppercase font-bold tracking-widest">Klasemen ${jenjang} Belum Tersedia</td></tr>`;
                 }
-            } else {
-                klasemenWadah.innerHTML = '<tr><td colspan="4" class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Data belum tersedia</td></tr>';
             }
         }
 
