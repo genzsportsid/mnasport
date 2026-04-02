@@ -224,78 +224,92 @@
         // ==========================================
         // MESIN INTEGRASI DATA REAL-TIME TSL
         // ==========================================
-        // MASUKKAN URL GOOGLE APPS SCRIPT TSL ANDA DI BAWAH INI:
-        const TSL_API_URL = 'https://script.google.com/macros/s/AKfycb.../exec'; 
+        const TSL_API_URL = 'https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec'; 
 
         async function tarikDataPreview() {
             try {
-                const response = await fetch(TSL_API_URL);
-                const data = await response.json();
+                // Tarik data Jadwal dan Klasemen secara bersamaan (Parallel Fetch)
+                const [resJadwal, resKlasemen] = await Promise.all([
+                    fetch(`${TSL_API_URL}?sheet=Jadwal&t=${Date.now()}`),
+                    fetch(`${TSL_API_URL}?sheet=Klasemen&t=${Date.now()}`)
+                ]);
 
-                // 1. RENDER JADWAL (Ambil 2 pertandingan pertama)
+                const dataJadwal = await resJadwal.json();
+                const dataKlasemen = await resKlasemen.json();
+
+                // 1. RENDER JADWAL (Ambil 2 pertandingan teratas)
                 const jadwalWadah = document.getElementById('mini-jadwal-list');
                 jadwalWadah.innerHTML = ''; 
                 
-                // Pastikan 'data.jadwal' sesuai dengan nama array JSON dari Google Sheet Anda
-                if (data.jadwal && data.jadwal.length > 0) {
-                    // Ambil 2 data teratas
-                    const jadwalTerdekat = data.jadwal.slice(0, 2);
+                if (Array.isArray(dataJadwal) && dataJadwal.length > 0) {
+                    const jadwalTerdekat = dataJadwal.slice(0, 2);
                     
                     jadwalTerdekat.forEach(match => {
-                        // Sesuaikan 'match.timA', 'match.waktu' dll dengan struktur JSON API Anda!
-                        const timKandang = match.timA || match.tim_kandang || 'Tim A';
-                        const timTandang = match.timB || match.tim_tandang || 'Tim B';
-                        const waktu = match.waktu || match.jam || 'TBD';
-                        const status = match.status || 'HARI INI';
+                        // Sinkronisasi dengan properti Google Sheets TSL Anda
+                        const timKandang = match.tim_kiri || 'Tim A';
+                        const timTandang = match.tim_kanan || 'Tim B';
+                        const status = String(match.status || '').toUpperCase();
                         
-                        const statusColor = status.toUpperCase() === 'LIVE' ? 'text-brand-green animate-pulse' : 'text-brand-gold';
+                        // Ekstrak Jam (Logika murni dari kode TSL Anda)
+                        let w = String(match.waktu || ''); let timeOnly = "TBA";
+                        if (w.includes("T")) { 
+                            let dObj = new Date(w); 
+                            if(!isNaN(dObj.getTime())) timeOnly = String(dObj.getHours()).padStart(2, '0') + ":" + String(dObj.getMinutes()).padStart(2, '0'); 
+                        } else { 
+                            timeOnly = w.split(" - ")[1] || w || "TBA"; 
+                        }
+
+                        // Indikator Warna Status
+                        let isPast = status.includes('FT'); 
+                        let isLive = status.includes('LIVE') || status.includes('HT');
+                        let displayStatus = isPast ? 'FT' : (isLive ? 'LIVE' : timeOnly);
+                        let statusColor = isLive ? 'text-brand-red animate-pulse' : (isPast ? 'text-gray-500' : 'text-brand-green');
 
                         jadwalWadah.innerHTML += `
                         <div class="bg-white/5 border border-white/5 rounded-xl p-3 flex items-center justify-between hover:bg-white/10 transition-colors">
-                            <div class="flex-1 text-right truncate"><span class="font-bold text-[11px] text-white">${timKandang}</span></div>
-                            <div class="px-3 text-center shrink-0">
-                                <span class="block text-[10px] font-bold ${statusColor}">${waktu}</span>
-                                <span class="block text-[8px] text-gray-500 uppercase tracking-widest mt-0.5">${status}</span>
+                            <div class="flex-1 text-right truncate pr-2"><span class="font-bold text-[11px] text-white">${timKandang}</span></div>
+                            <div class="px-2 text-center shrink-0">
+                                <span class="block text-[10px] font-bold ${statusColor}">${displayStatus}</span>
                             </div>
-                            <div class="flex-1 text-left truncate"><span class="font-bold text-[11px] text-white">${timTandang}</span></div>
+                            <div class="flex-1 text-left truncate pl-2"><span class="font-bold text-[11px] text-white">${timTandang}</span></div>
                         </div>`;
                     });
                 } else {
-                    jadwalWadah.innerHTML = '<div class="text-center text-[10px] text-gray-500 py-4">Belum ada jadwal</div>';
+                    jadwalWadah.innerHTML = '<div class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Belum ada jadwal</div>';
                 }
 
-                // 2. RENDER KLASEMEN (Ambil 3 peringkat teratas)
+                // 2. RENDER KLASEMEN (Ambil 3 Peringkat Teratas Berdasarkan Poin)
                 const klasemenWadah = document.getElementById('mini-klasemen-list');
                 klasemenWadah.innerHTML = '';
 
-                // Pastikan 'data.klasemen' sesuai dengan nama array JSON dari Google Sheet Anda
-                if (data.klasemen && data.klasemen.length > 0) {
-                    const topTiga = data.klasemen.slice(0, 3);
+                if (Array.isArray(dataKlasemen) && dataKlasemen.length > 0) {
+                    // Sortir otomatis dari poin terbesar, ambil 3 teratas
+                    const topTiga = dataKlasemen.sort((a,b) => (parseInt(b.poin) || 0) - (parseInt(a.poin) || 0)).slice(0, 3);
                     
                     topTiga.forEach((klub, idx) => {
-                        // Sesuaikan 'klub.nama', 'klub.main', 'klub.poin' dengan struktur JSON API Anda!
-                        const namaKlub = klub.nama || klub.klub || klub.tim || 'Tim';
-                        const main = klub.main || klub.p || 0;
-                        const poin = klub.poin || klub.pts || 0;
+                        // Sinkronisasi dengan properti Google Sheets TSL Anda
+                        const namaKlub = klub.klub || 'Nama Klub';
+                        const main = klub.main || 0;
+                        const poin = klub.poin || 0;
                         
                         const colorPos = idx === 0 ? 'text-brand-gold' : 'text-white';
 
                         klasemenWadah.innerHTML += `
                         <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
                             <td class="py-2.5 text-center font-black ${colorPos}">${idx + 1}</td>
-                            <td class="py-2.5 text-white truncate max-w-[120px]">${namaKlub}</td>
-                            <td class="py-2.5 text-center text-gray-500">${main}</td>
-                            <td class="py-2.5 text-center text-brand-green">${poin}</td>
+                            <td class="py-2.5 text-white truncate max-w-[120px] md:max-w-[150px] font-medium">${namaKlub}</td>
+                            <td class="py-2.5 text-center text-gray-500 font-medium">${main}</td>
+                            <td class="py-2.5 text-center text-brand-green font-bold bg-brand-green/10 rounded-lg">${poin}</td>
                         </tr>`;
                     });
                 } else {
-                    klasemenWadah.innerHTML = '<tr><td colspan="4" class="text-center text-[10px] text-gray-500 py-4">Data belum tersedia</td></tr>';
+                    klasemenWadah.innerHTML = '<tr><td colspan="4" class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Data belum tersedia</td></tr>';
                 }
 
             } catch (error) {
                 console.error("Gagal menarik data TSL:", error);
-                document.getElementById('mini-jadwal-list').innerHTML = '<div class="text-center text-red-500 text-[10px] py-4">Gagal menyinkronkan data</div>';
-                document.getElementById('mini-klasemen-list').innerHTML = '<tr><td colspan="4" class="text-center text-red-500 text-[10px] py-4">Gagal menyinkronkan data</td></tr>';
+                document.getElementById('mini-jadwal-list').innerHTML = '<div class="text-center text-red-500 text-[10px] py-4 font-bold uppercase tracking-widest">Gagal menyinkronkan data</div>';
+                document.getElementById('mini-klasemen-list').innerHTML = '<tr><td colspan="4" class="text-center text-red-500 text-[10px] py-4 font-bold uppercase tracking-widest">Gagal menyinkronkan data</td></tr>';
             }
         }
 
