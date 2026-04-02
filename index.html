@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MNA Sport Management | Command Center</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MNA Sport">
+    <link rel="apple-touch-icon" href="/tsl/icon-192.png">
     
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -255,19 +261,50 @@
             return `${target.getDate()} ${blnIndo[target.getMonth()]}`;
         }
 
-        // ==========================================
-        // MESIN INTEGRASI DATA REAL-TIME TSL
-        // ==========================================
         const TSL_API_URL = 'https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec'; 
-        
-        let globalKlasemenCache = []; // Memori penyimpanan Klasemen
+        let globalKlasemenCache = [];
 
-        // Fungsi Khusus Merender Klasemen Berdasarkan Jenjang
+        // 1. MESIN PENDETEKSI GOL & KARTU (GLOBAL RADAR)
+        function cekNotifikasiBaru(dataEventBaru) {
+            if (!("Notification" in window) || Notification.permission !== "granted") return;
+            if (!dataEventBaru || dataEventBaru.length === 0) return;
+
+            let lastCount = parseInt(localStorage.getItem('tsl_event_count') || '0');
+            let currentCount = dataEventBaru.length;
+
+            if (currentCount > lastCount && lastCount > 0) {
+                for (let i = lastCount; i < currentCount; i++) {
+                    let ev = dataEventBaru[i];
+                    let jenis = String(ev.jenis || '').toUpperCase();
+                    let icon = jenis === 'GOL' ? '⚽' : (jenis === 'KUNING' ? '🟨' : '🟥');
+                    let judul = `${icon} ${jenis} - ${ev.tim || ''}`;
+                    let pesan = `${ev.pemain || ''} (${ev.menit || ''}')`;
+                    
+                    let notifOptions = { 
+                        body: pesan, 
+                        icon: "/tsl/icon-192.png", 
+                        vibrate: [200, 100, 200]
+                    };
+                    
+                    if ('serviceWorker' in navigator) {
+                        navigator.serviceWorker.ready.then(function(registration) {
+                            registration.showNotification(judul, notifOptions);
+                        }).catch(function() { 
+                            new Notification(judul, notifOptions); 
+                        });
+                    } else {
+                        new Notification(judul, notifOptions);
+                    }
+                }
+            }
+            localStorage.setItem('tsl_event_count', currentCount.toString());
+        }
+
+        // 2. MESIN RENDER KLASEMEN MINI
         function renderMiniKlasemen(jenjang) {
             const klasemenWadah = document.getElementById('mini-klasemen-list');
             if(!klasemenWadah) return;
 
-            // 1. Ganti Warna Tombol Toggle
             const btnSmp = document.getElementById('btn-mini-smp');
             const btnSma = document.getElementById('btn-mini-sma');
             if (btnSmp && btnSma) {
@@ -282,17 +319,11 @@
 
             klasemenWadah.innerHTML = '';
 
-            // 2. Filter, Sortir, dan Tampilkan Data
             if (Array.isArray(globalKlasemenCache) && globalKlasemenCache.length > 0) {
-                // Saring berdasarkan Jenjang/Liga (Mengabaikan huruf besar kecil)
-                let filteredData = globalKlasemenCache.filter(k => {
-                    let j = String(k.Jenjang || k.Liga || 'SMA').toUpperCase().trim();
-                    return j === jenjang;
-                });
+                let filteredData = globalKlasemenCache.filter(k => String(k.Jenjang || k.Liga || 'SMA').toUpperCase().trim() === jenjang);
 
                 if (filteredData.length > 0) {
                     const topTiga = filteredData.sort((a,b) => (parseInt(b.poin) || 0) - (parseInt(a.poin) || 0)).slice(0, 3);
-                    
                     topTiga.forEach((klub, idx) => {
                         const namaKlub = klub.klub || 'Nama Klub';
                         const main = klub.main || 0;
@@ -315,26 +346,31 @@
             }
         }
 
+        // 3. MESIN PENYEDOT DATA (JADWAL, KLASEMEN, & EVENT)
         async function tarikDataPreview() {
             try {
-                const [resJadwal, resKlasemen] = await Promise.all([
+                const [resJadwal, resKlasemen, resEvent] = await Promise.all([
                     fetch(`${TSL_API_URL}?sheet=Jadwal&t=${Date.now()}`),
-                    fetch(`${TSL_API_URL}?sheet=Klasemen&t=${Date.now()}`)
+                    fetch(`${TSL_API_URL}?sheet=Klasemen&t=${Date.now()}`),
+                    fetch(`${TSL_API_URL}?sheet=Event_Match&t=${Date.now()}`)
                 ]);
 
                 const dataJadwal = await resJadwal.json();
                 const dataKlasemen = await resKlasemen.json();
+                const dataEvent = await resEvent.json();
 
-                // RENDER JADWAL MENDATANG
+                // Picu Radar Notifikasi
+                if (Array.isArray(dataEvent)) cekNotifikasiBaru(dataEvent);
+
+                // Render Jadwal
                 const jadwalWadah = document.getElementById('mini-jadwal-list');
-                jadwalWadah.innerHTML = ''; 
-                
                 if (Array.isArray(dataJadwal) && dataJadwal.length > 0) {
                     let upcomingMatches = dataJadwal.filter(m => !String(m.status || '').toUpperCase().includes('FT'));
                     upcomingMatches.sort((a, b) => parseIndoDate(a.waktu) - parseIndoDate(b.waktu));
                     const jadwalTerdekat = upcomingMatches.slice(0, 4);
                     
                     if (jadwalTerdekat.length > 0) {
+                        jadwalWadah.innerHTML = '';
                         jadwalTerdekat.forEach(match => {
                             const timKandang = match.tim_kiri || 'Tim A';
                             const timTandang = match.tim_kanan || 'Tim B';
@@ -353,7 +389,7 @@
                             let statusColor = isLive ? 'text-brand-red animate-pulse' : 'text-brand-gold';
 
                             jadwalWadah.innerHTML += `
-                            <div class="bg-white/5 border border-white/5 rounded-xl py-2 px-3 flex items-center justify-between hover:bg-white/10 transition-colors">
+                            <div class="bg-white/5 border border-white/5 rounded-xl py-2 px-3 flex items-center justify-between hover:bg-white/10 transition-colors mb-2">
                                 <div class="flex-1 text-right truncate pr-2"><span class="font-bold text-[11px] text-white">${timKandang}</span></div>
                                 <div class="px-2 text-center shrink-0">
                                     <span class="block text-[10px] font-bold ${statusColor}">${displayStatus}</span>
@@ -365,24 +401,37 @@
                     } else {
                         jadwalWadah.innerHTML = '<div class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Semua jadwal telah selesai</div>';
                     }
-                } else {
-                    jadwalWadah.innerHTML = '<div class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Belum ada jadwal</div>';
                 }
 
-                // RENDER KLASEMEN (Panggil Fungsi Baru)
+                // Render Klasemen
                 if (Array.isArray(dataKlasemen)) {
                     globalKlasemenCache = dataKlasemen;
-                    renderMiniKlasemen('SMA'); // <- Default tampilan saat pertama kali website dibuka
+                    if (document.getElementById('mini-klasemen-list').innerHTML.includes('Data belum tersedia') || document.getElementById('mini-klasemen-list').innerHTML.includes('Memuat')) {
+                        renderMiniKlasemen('SMA'); 
+                    }
                 }
 
             } catch (error) {
                 console.error("Gagal menarik data TSL:", error);
-                document.getElementById('mini-jadwal-list').innerHTML = '<div class="text-center text-red-500 text-[10px] py-4 font-bold uppercase tracking-widest">Gagal menyinkronkan data</div>';
-                document.getElementById('mini-klasemen-list').innerHTML = '<tr><td colspan="4" class="text-center text-red-500 text-[10px] py-4 font-bold uppercase tracking-widest">Gagal menyinkronkan data</td></tr>';
             }
         }
 
+        // 4. REGISTRASI PWA SERVICE WORKER
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then((registration) => {
+                    console.log('MNA Super App Service Worker aktif dengan scope:', registration.scope);
+                }).catch((error) => {
+                    console.error('Registrasi Service Worker gagal:', error);
+                });
+            });
+        }
+
+        // Jalankan saat pertama dibuka
         window.addEventListener('DOMContentLoaded', tarikDataPreview);
+
+        // Jalankan Radar Otomatis Setiap 30 Detik (Background Polling)
+        setInterval(tarikDataPreview, 30000);
     </script>
 </body>
 </html>
