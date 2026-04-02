@@ -41,6 +41,8 @@
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
         .glass-header { background: rgba(9, 9, 11, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(215, 182, 125, 0.1); }
         .glass-card { background: linear-gradient(145deg, rgba(24, 24, 27, 0.9) 0%, rgba(24, 24, 27, 0.4) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .pt-safe { padding-top: max(env(safe-area-inset-top), 20px) !important; }
+        .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 16px) !important; }
     </style>
 </head>
 <body class="font-body bg-[#000000] text-white antialiased overflow-x-hidden selection:bg-brand-gold selection:text-brand-dark-bg pb-[100px]">
