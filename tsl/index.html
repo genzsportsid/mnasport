@@ -366,7 +366,7 @@
             </div>
         </div>
 
-        <div id="view-search" class="hidden min-h-screen bg-[#F9FAFB] dark:bg-brand-dark-bg pb-24 z-[55] absolute top-0 left-0 w-full page-enter transition-colors duration-500">
+        </div> <div id="view-search" class="hidden min-h-screen bg-[#F9FAFB] dark:bg-brand-dark-bg pb-24 z-[55] absolute top-0 left-0 w-full page-enter transition-colors duration-500">
         
         <div class="bg-brand-black dark:bg-[#09090b] text-white safe-header sticky top-0 z-50 transition-colors shadow-md border-b border-[#d7b67d]/30">
             <div class="px-4 md:px-8 flex items-center relative h-12">
@@ -1039,9 +1039,10 @@
             }
         }
 
+        // --- 1. OTAK NAVIGASI UTAMA ---
         function switchTab(tabId, titleText) {
             try {
-                // 1. TUTUP SEMUA OVERLAY (Match, Tim, Search)
+                // A. Tutup semua layar overlay
                 const viewMatch = document.getElementById('view-match'); if(viewMatch) viewMatch.classList.add('hidden');
                 const viewTeam = document.getElementById('view-team'); if(viewTeam) viewTeam.classList.add('hidden');
                 const viewSearch = document.getElementById('view-search'); if(viewSearch) viewSearch.classList.add('hidden');
@@ -1049,22 +1050,34 @@
                 const viewHome = document.getElementById('view-home');
                 const topTabs = document.getElementById('tsl-top-tabs');
                 const bNav = document.getElementById('main-bottom-nav');
-                
                 if(bNav) bNav.classList.remove('hidden');
 
-                // 2. LOGIKA JIKA MEMBUKA PENCARIAN GLOBAL (Isolated View)
+                // Tangkap Tombol Navigasi Bawah
+                const bnavTsl = document.querySelector('#main-bottom-nav button[onclick*="beranda"]');
+                const bnavCari = document.querySelector('#main-bottom-nav button[onclick*="pencarian"]');
+
+                // B. LOGIKA JIKA MEMBUKA PENCARIAN GLOBAL
                 if(tabId === 'pencarian') {
-                    if(viewHome) viewHome.classList.add('hidden'); // Matikan total website TSL
-                    if(topTabs) topTabs.classList.add('hidden'); // Matikan navigasi atas liga
-                    if(viewSearch) viewSearch.classList.remove('hidden'); // Nyalakan mesin pencari
+                    if(viewHome) viewHome.classList.add('hidden'); // Matikan isi Liga
+                    if(topTabs) topTabs.classList.add('hidden');   // Matikan menu atas Liga
+                    if(viewSearch) viewSearch.classList.remove('hidden'); // Nyalakan layar Cari
+                    
+                    // Pindah Warna Navigasi Bawah ke "Cari"
+                    if(bnavTsl) { bnavTsl.classList.remove('text-brand-green'); bnavTsl.classList.add('text-gray-400', 'dark:text-gray-500'); }
+                    if(bnavCari) { bnavCari.classList.remove('text-gray-400', 'dark:text-gray-500'); bnavCari.classList.add('text-brand-black', 'dark:text-white'); }
+                    
                     setActiveNav('pencarian');
                     window.scrollTo({top: 0, behavior: 'smooth'});
                     return; 
                 }
 
-                // 3. LOGIKA JIKA MEMBUKA TAB LIGA (Beranda, Jadwal, dll)
+                // C. LOGIKA JIKA MEMBUKA TAB LIGA (Beranda, Jadwal, dll)
                 if(viewHome) viewHome.classList.remove('hidden');
-                if(topTabs) topTabs.classList.remove('hidden'); // Navigasi atas selalu muncul di Liga
+                if(topTabs) topTabs.classList.remove('hidden'); // Menu atas liga kembali
+                
+                // Kembalikan Warna Navigasi Bawah ke "TSL Liga"
+                if(bnavTsl) { bnavTsl.classList.add('text-brand-green'); bnavTsl.classList.remove('text-gray-400', 'dark:text-gray-500'); }
+                if(bnavCari) { bnavCari.classList.add('text-gray-400', 'dark:text-gray-500'); bnavCari.classList.remove('text-brand-black', 'dark:text-white'); }
 
                 document.querySelectorAll('#view-home .tab-content').forEach(el => { 
                     el.classList.add('hidden'); el.classList.remove('block'); 
@@ -1074,7 +1087,9 @@
                 
                 setActiveNav(tabId);
                 window.scrollTo({top: 0, behavior: 'smooth'});
-            } catch(e) { console.error("Navigasi Error:", e); }
+            } catch(e) { 
+                console.error("Navigasi Error:", e); 
+            }
         }
 
         function setSearchFilter(filter) {
