@@ -136,11 +136,11 @@
     <main class="relative z-10 pt-28 px-5 max-w-3xl mx-auto">
         
         <div class="mb-8">
-            <h2 class="text-3xl md:text-4xl font-heading font-black tracking-tight leading-tight">
+            <h2 class="text-3xl md:text-4xl font-heading font-black tracking-tight leading-tight text-brand-black dark:text-white transition-colors">
                 Pusat Komando <br/>
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-black dark:to-white">Ekosistem MNA.</span>
             </h2>
-            <p class="text-xs text-gray-400 mt-2 font-medium max-w-md leading-relaxed">
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 font-medium max-w-md leading-relaxed transition-colors">
                 Akses cepat seluruh layanan manajemen olahraga, liga pelajar, dan database klub.
             </p>
         </div>
@@ -153,15 +153,15 @@
             <div class="flex gap-3 overflow-x-auto hide-scroll pb-2">
                 <a href="/tsl/#jadwal" class="flex-shrink-0 flex items-center gap-2.5 px-4 py-2.5 rounded-full glass-card hover:border-brand-green/50 transition-all group">
                     <i data-lucide="calendar" class="w-4 h-4 text-brand-green group-hover:scale-110 transition-transform"></i>
-                    <span class="text-xs font-bold text-gray-200 uppercase tracking-wide">Jadwal TSL</span>
+                    <span class="text-xs font-bold text-brand-black dark:text-gray-200 uppercase tracking-wide transition-colors">Jadwal TSL</span>
                 </a>
                 <a href="/tsl/#klasemen" class="flex-shrink-0 flex items-center gap-2.5 px-4 py-2.5 rounded-full glass-card hover:border-brand-gold/50 transition-all group">
                     <i data-lucide="bar-chart-2" class="w-4 h-4 text-brand-gold group-hover:scale-110 transition-transform"></i>
-                    <span class="text-xs font-bold text-gray-200 uppercase tracking-wide">Klasemen</span>
+                    <span class="text-xs font-bold text-brand-black dark:text-gray-200 uppercase tracking-wide transition-colors">Klasemen</span>
                 </a>
                 <a href="/mnafc/" class="flex-shrink-0 flex items-center gap-2.5 px-4 py-2.5 rounded-full glass-card hover:border-brand-blue/50 transition-all group">
                     <i data-lucide="users" class="w-4 h-4 text-brand-blue group-hover:scale-110 transition-transform"></i>
-                    <span class="text-xs font-bold text-gray-200 uppercase tracking-wide">Data Skuad</span>
+                    <span class="text-xs font-bold text-brand-black dark:text-gray-200 uppercase tracking-wide transition-colors">Data Skuad</span>
                 </a>
             </div>
         </div>
@@ -176,7 +176,7 @@
                         <div class="w-8 h-8 rounded-full bg-brand-green/10 flex items-center justify-center">
                             <i data-lucide="calendar-clock" class="w-4 h-4 text-brand-green"></i>
                         </div>
-                        <h3 class="font-heading font-bold text-sm text-white">Jadwal Terdekat</h3>
+                        <h3 class="font-heading font-bold text-sm text-brand-black dark:text-white transition-colors">Jadwal Terdekat</h3>
                     </div>
                     <span class="text-[9px] font-bold uppercase tracking-widest text-brand-green bg-brand-green/10 px-2 py-0.5 rounded animate-pulse">TSL Live</span>
                 </div>
@@ -187,7 +187,7 @@
                     </div>
                 </div>
 
-                <a href="/tsl/#jadwal" class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-brand-green hover:text-black border border-white/10 flex items-center justify-center gap-2 transition-all group/btn text-[10px] font-bold uppercase tracking-widest text-gray-300">
+                <a href="/tsl/#jadwal" class="w-full py-2.5 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-brand-green hover:text-white dark:hover:text-black border border-gray-100 dark:border-white/10 flex items-center justify-center gap-2 transition-all group/btn text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-300">
                     Selengkapnya <i data-lucide="arrow-right" class="w-3 h-3 group-hover/btn:translate-x-1 transition-transform"></i>
                 </a>
             </div>
@@ -200,31 +200,31 @@
                         <div class="w-8 h-8 rounded-full bg-brand-gold/10 flex items-center justify-center shrink-0">
                             <i data-lucide="bar-chart-2" class="w-4 h-4 text-brand-gold"></i>
                         </div>
-                        <h3 class="font-heading font-bold text-sm text-white truncate">Papan Atas</h3>
+                        <h3 class="font-heading font-bold text-sm text-brand-black dark:text-white truncate transition-colors">Papan Atas</h3>
                     </div>
                     
-                    <div class="flex bg-white/5 rounded-lg p-0.5 shadow-inner border border-white/5 shrink-0">
-                        <button onclick="renderMiniKlasemen('SMP')" id="btn-mini-smp" class="px-3 py-1 text-[9px] font-bold rounded text-gray-400 hover:text-white uppercase transition-all bg-transparent">SMP</button>
+                    <div class="flex bg-gray-100 dark:bg-white/5 rounded-lg p-0.5 shadow-inner border border-gray-200 dark:border-white/5 shrink-0 transition-colors">
+                        <button onclick="renderMiniKlasemen('SMP')" id="btn-mini-smp" class="px-3 py-1 text-[9px] font-bold rounded text-gray-500 dark:text-gray-400 hover:text-brand-black dark:hover:text-white uppercase transition-all bg-transparent">SMP</button>
                         <button onclick="renderMiniKlasemen('SMA')" id="btn-mini-sma" class="px-3 py-1 text-[9px] font-bold rounded bg-brand-gold text-brand-black uppercase transition-all shadow-sm">SMA</button>
                     </div>
                 </div>
 
-                <div id="klasemen-container" class="flex-1 bg-white/5 border border-white/5 rounded-xl p-3 mb-4 overflow-hidden">
+                <div id="klasemen-container" class="flex-1 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-xl p-3 mb-4 overflow-hidden transition-colors">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="border-b border-white/10 text-[9px] text-gray-500 uppercase tracking-widest">
+                            <tr class="border-b border-gray-200 dark:border-white/10 text-[9px] text-gray-500 uppercase tracking-widest transition-colors">
                                 <th class="pb-2 font-medium w-8 text-center">Pos</th>
                                 <th class="pb-2 font-medium">Tim</th>
                                 <th class="pb-2 font-medium text-center w-8">P</th>
                                 <th class="pb-2 font-medium text-center w-8">Pts</th>
                             </tr>
                         </thead>
-                        <tbody id="mini-klasemen-list" class="text-xs font-bold text-gray-300">
-                            </tbody>
+                        <tbody id="mini-klasemen-list" class="text-xs font-bold text-gray-600 dark:text-gray-300">
+                        </tbody>
                     </table>
                 </div>
 
-                <a href="/tsl/#klasemen" class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-brand-gold hover:text-black border border-white/10 flex items-center justify-center gap-2 transition-all group/btn text-[10px] font-bold uppercase tracking-widest text-gray-300">
+                <a href="/tsl/#klasemen" class="w-full py-2.5 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-brand-gold hover:text-white dark:hover:text-black border border-gray-100 dark:border-white/10 flex items-center justify-center gap-2 transition-all group/btn text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-300">
                     Klasemen Lengkap <i data-lucide="arrow-right" class="w-3 h-3 group-hover/btn:translate-x-1 transition-transform"></i>
                 </a>
             </div>
@@ -238,16 +238,16 @@
             <a href="/tsl/" class="group relative overflow-hidden rounded-[1.5rem] glass-card p-5 flex items-center gap-4 hover:border-brand-green/40 transition-all duration-300">
                 <div class="absolute right-0 top-0 w-32 h-32 bg-brand-green/10 rounded-full blur-2xl -z-10 group-hover:bg-brand-green/20 transition-all"></div>
                 
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#111] to-[#222] border border-white/5 flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-transform">
+                <div class="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gradient-to-br dark:from-[#111] dark:to-[#222] border border-gray-200 dark:border-white/5 flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-all">
                     <span class="text-2xl">🏆</span>
                 </div>
                 
                 <div class="flex-1 min-w-0">
-                    <h4 class="font-heading font-bold text-base md:text-lg text-white group-hover:text-brand-green transition-colors truncate">TSL Match Center</h4>
-                    <p class="text-[11px] text-gray-400 mt-0.5 leading-tight line-clamp-2">Aplikasi ofisial liga pelajar. Live score, jadwal lengkap, & statistik.</p>
+                    <h4 class="font-heading font-bold text-base md:text-lg text-brand-black dark:text-white group-hover:text-brand-green transition-colors truncate">TSL Match Center</h4>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 leading-tight line-clamp-2 transition-colors">Aplikasi ofisial liga pelajar. Live score, jadwal lengkap, & statistik.</p>
                 </div>
                 
-                <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-brand-green group-hover:text-black transition-colors">
+                <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-brand-green group-hover:text-white transition-colors text-gray-400 dark:text-gray-300">
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </div>
             </a>
@@ -255,23 +255,23 @@
             <a href="/mnafc/" class="group relative overflow-hidden rounded-[1.5rem] glass-card p-5 flex items-center gap-4 hover:border-brand-blue/40 transition-all duration-300">
                 <div class="absolute right-0 top-0 w-32 h-32 bg-brand-blue/10 rounded-full blur-2xl -z-10 group-hover:bg-brand-blue/20 transition-all"></div>
                 
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#111] to-[#222] border border-white/5 flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-transform">
+                <div class="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gradient-to-br dark:from-[#111] dark:to-[#222] border border-gray-200 dark:border-white/5 flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-all">
                     <span class="text-2xl">🛡️</span>
                 </div>
                 
                 <div class="flex-1 min-w-0">
-                    <h4 class="font-heading font-bold text-base md:text-lg text-white group-hover:text-brand-blue transition-colors truncate">MNA Football Club</h4>
-                    <p class="text-[11px] text-gray-400 mt-0.5 leading-tight line-clamp-2">Database internal klub. Manajemen skuad, akademi, dan performa pemain.</p>
+                    <h4 class="font-heading font-bold text-base md:text-lg text-brand-black dark:text-white group-hover:text-brand-blue transition-colors truncate">MNA Football Club</h4>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 leading-tight line-clamp-2 transition-colors">Database internal klub. Manajemen skuad, akademi, dan performa pemain.</p>
                 </div>
                 
-                <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-brand-blue group-hover:text-white transition-colors">
+                <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-brand-blue group-hover:text-white transition-colors text-gray-400 dark:text-gray-300">
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </div>
             </a>
 
         </div>
     </main>
-
+        
     <nav id="main-bottom-nav" class="fixed bottom-0 w-full z-[100] bg-[#09090b]/90 backdrop-blur-xl border-t border-white/10 pb-safe transition-colors">
         <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
             <button class="flex flex-col items-center justify-center w-full h-full text-brand-gold transition-colors">
@@ -369,12 +369,12 @@
             const klasemenWadah = document.getElementById('mini-klasemen-list');
             if(!klasemenWadah) return;
 
-            // Update UI Tombol Toggle
+            // Update UI Tombol Toggle Adaptif
             const btnSmp = document.getElementById('btn-mini-smp');
             const btnSma = document.getElementById('btn-mini-sma');
             if (btnSmp && btnSma) {
                 const isActive = "px-3 py-1 text-[9px] font-bold rounded bg-brand-gold text-brand-black uppercase transition-all shadow-sm";
-                const isInactive = "px-3 py-1 text-[9px] font-bold rounded text-gray-400 hover:text-white uppercase transition-all bg-transparent";
+                const isInactive = "px-3 py-1 text-[9px] font-bold rounded text-gray-500 dark:text-gray-400 hover:text-brand-black dark:hover:text-white uppercase transition-all bg-transparent";
                 btnSma.className = (jenjang === 'SMA') ? isActive : isInactive;
                 btnSmp.className = (jenjang === 'SMP') ? isActive : isInactive;
             }
@@ -382,26 +382,18 @@
             klasemenWadah.innerHTML = '';
 
             if (Array.isArray(globalKlasemenCache) && globalKlasemenCache.length > 0) {
-                // 1. Filter Jenjang (Pencarian Key Otomatis)
                 let filteredData = globalKlasemenCache.filter(item => {
                     let j = 'SMA';
-                    for (let key in item) {
-                        if (key.toLowerCase().trim() === 'jenjang' || key.toLowerCase().trim() === 'liga') {
-                            j = String(item[key]).toUpperCase().trim();
-                        }
-                    }
+                    for (let key in item) { if (key.toLowerCase().trim() === 'jenjang' || key.toLowerCase().trim() === 'liga') j = String(item[key]).toUpperCase().trim(); }
                     return j === jenjang;
                 });
 
-                // 2. Kelompokkan Berdasarkan Grup (Pencarian Key Otomatis)
                 const grupMap = {};
                 filteredData.forEach(item => {
-                    let g = 'UTAMA'; // Default jika tidak menemukan kolom grup
+                    let g = 'UTAMA';
                     for (let key in item) {
                         let lowerKey = key.toLowerCase().trim();
-                        if (lowerKey === 'grup' || lowerKey === 'group') {
-                            if (item[key]) g = String(item[key]).toUpperCase().trim();
-                        }
+                        if (lowerKey === 'grup' || lowerKey === 'group') if (item[key]) g = String(item[key]).toUpperCase().trim();
                     }
                     if (!grupMap[g]) grupMap[g] = [];
                     grupMap[g].push(item);
@@ -411,18 +403,16 @@
 
                 if (groupKeys.length > 0) {
                     groupKeys.forEach(key => {
-                        // Tampilkan header grup jika ada lebih dari 1 grup ATAU nama grup bukan 'UTAMA'
                         if (groupKeys.length > 1 || key !== 'UTAMA') {
                             let namaHeader = key === 'UTAMA' ? 'KLASEMEN' : `GRUP ${key}`;
                             klasemenWadah.innerHTML += `
-                                <tr class="bg-white/5">
-                                    <td colspan="4" class="py-1.5 px-2 text-[9px] font-black text-brand-gold tracking-[0.2em] uppercase border-b border-white/5">
+                                <tr class="bg-gray-100/50 dark:bg-white/5 transition-colors">
+                                    <td colspan="4" class="py-1.5 px-2 text-[9px] font-black text-brand-gold tracking-[0.2em] uppercase border-b border-gray-200 dark:border-white/5">
                                         ${namaHeader}
                                     </td>
                                 </tr>`;
                         }
 
-                        // Sortir berdasarkan poin dan ambil Top 3
                         const sortedGrup = grupMap[key].sort((a,b) => {
                             let poinA = 0; let poinB = 0;
                             for (let k in a) { if(k.toLowerCase().trim() === 'poin' || k.toLowerCase().trim() === 'pts') poinA = parseInt(a[k]) || 0; }
@@ -432,30 +422,25 @@
                         
                         sortedGrup.forEach((klub, idx) => {
                             let namaKlub = 'Tim'; let main = 0; let poin = 0;
-                            
-                            // Ekstrak data dengan aman
                             for (let k in klub) {
                                 let lowerK = k.toLowerCase().trim();
                                 if (lowerK === 'klub' || lowerK === 'tim') namaKlub = klub[k];
                                 if (lowerK === 'main' || lowerK === 'p') main = klub[k];
                                 if (lowerK === 'poin' || lowerK === 'pts') poin = klub[k];
                             }
-
-                            const colorPos = idx === 0 ? 'text-brand-gold' : 'text-white';
+                            
+                            // Pewarnaan teks adaptif, Posisi ke-1 tetap Emas. Sisanya Hitam/Putih.
+                            const colorPos = idx === 0 ? 'text-brand-gold' : 'text-brand-black dark:text-white';
 
                             klasemenWadah.innerHTML += `
-                            <tr class="border-b border-white/5 hover:bg-white/10 transition-colors">
-                                <td class="py-2 text-center font-black ${colorPos}">${idx + 1}</td>
-                                <td class="py-2 text-white truncate max-w-[110px] font-medium">${namaKlub}</td>
-                                <td class="py-2 text-center text-gray-500 font-medium">${main}</td>
-                                <td class="py-2 text-center text-brand-green font-bold">${poin}</td>
+                            <tr class="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors">
+                                <td class="py-2 text-center font-black ${colorPos} transition-colors">${idx + 1}</td>
+                                <td class="py-2 text-brand-black dark:text-white truncate max-w-[110px] font-medium transition-colors">${namaKlub}</td>
+                                <td class="py-2 text-center text-gray-500 font-medium transition-colors">${main}</td>
+                                <td class="py-2 text-center text-brand-green font-bold transition-colors">${poin}</td>
                             </tr>`;
                         });
-                        
-                        // Beri jarak visual antar grup
-                        if (groupKeys.length > 1) {
-                            klasemenWadah.innerHTML += `<tr class="h-2"></tr>`;
-                        }
+                        if (groupKeys.length > 1) klasemenWadah.innerHTML += `<tr class="h-2"></tr>`;
                     });
                 } else {
                     klasemenWadah.innerHTML = `<tr><td colspan="4" class="text-center text-[10px] text-gray-500 py-6 uppercase font-bold tracking-widest">Klasemen ${jenjang} Belum Tersedia</td></tr>`;
@@ -465,10 +450,7 @@
             }
         }
 
-        // 3. MESIN PENYEDOT DATA (JADWAL, KLASEMEN, & EVENT)
-        // ==========================================
         // FUNGSI RENDER JADWAL (DIPISAH AGAR BISA DIPANGGIL CACHE)
-        // ==========================================
         function renderJadwalTerdekat(dataJadwal) {
             const jadwalWadah = document.getElementById('mini-jadwal-list');
             if (!jadwalWadah) return;
@@ -498,13 +480,13 @@
                         let statusColor = isLive ? 'text-brand-red animate-pulse' : 'text-brand-gold';
 
                         jadwalWadah.innerHTML += `
-                        <div class="bg-white/5 border border-white/5 rounded-xl py-2 px-3 flex items-center justify-between hover:bg-white/10 transition-colors mb-2">
-                            <div class="flex-1 text-right truncate pr-2"><span class="font-bold text-[11px] text-white">${timKandang}</span></div>
+                        <div class="bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-xl py-2 px-3 flex items-center justify-between hover:bg-white dark:hover:bg-white/10 transition-colors mb-2 shadow-sm dark:shadow-none">
+                            <div class="flex-1 text-right truncate pr-2"><span class="font-bold text-[11px] text-brand-black dark:text-white transition-colors">${timKandang}</span></div>
                             <div class="px-2 text-center shrink-0">
                                 <span class="block text-[10px] font-bold ${statusColor}">${displayStatus}</span>
                                 <span class="block text-[8px] text-gray-500 uppercase tracking-widest mt-0.5">${isLive ? 'SEKARANG' : dayLabel}</span>
                             </div>
-                            <div class="flex-1 text-left truncate pl-2"><span class="font-bold text-[11px] text-white">${timTandang}</span></div>
+                            <div class="flex-1 text-left truncate pl-2"><span class="font-bold text-[11px] text-brand-black dark:text-white transition-colors">${timTandang}</span></div>
                         </div>`;
                     });
                 } else {
