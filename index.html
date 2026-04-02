@@ -349,7 +349,85 @@
         }
 
         // 3. MESIN PENYEDOT DATA (JADWAL, KLASEMEN, & EVENT)
+        // ==========================================
+        // FUNGSI RENDER JADWAL (DIPISAH AGAR BISA DIPANGGIL CACHE)
+        // ==========================================
+        function renderJadwalTerdekat(dataJadwal) {
+            const jadwalWadah = document.getElementById('mini-jadwal-list');
+            if (!jadwalWadah) return;
+
+            if (Array.isArray(dataJadwal) && dataJadwal.length > 0) {
+                let upcomingMatches = dataJadwal.filter(m => !String(m.status || '').toUpperCase().includes('FT'));
+                upcomingMatches.sort((a, b) => parseIndoDate(a.waktu) - parseIndoDate(b.waktu));
+                const jadwalTerdekat = upcomingMatches.slice(0, 4);
+                
+                if (jadwalTerdekat.length > 0) {
+                    jadwalWadah.innerHTML = '';
+                    jadwalTerdekat.forEach(match => {
+                        const timKandang = match.tim_kiri || 'Tim A';
+                        const timTandang = match.tim_kanan || 'Tim B';
+                        const status = String(match.status || '').toUpperCase();
+                        const timestamp = parseIndoDate(match.waktu);
+                        const dayLabel = getRelativeDayLabel(timestamp);
+                        
+                        let w = String(match.waktu || ''); let timeOnly = "TBA";
+                        if (w.includes("T")) { 
+                            let dObj = new Date(w); 
+                            if(!isNaN(dObj.getTime())) timeOnly = String(dObj.getHours()).padStart(2, '0') + ":" + String(dObj.getMinutes()).padStart(2, '0'); 
+                        } else { timeOnly = w.split(" - ")[1] || w || "TBA"; }
+
+                        let isLive = status.includes('LIVE') || status.includes('HT');
+                        let displayStatus = isLive ? 'LIVE' : timeOnly;
+                        let statusColor = isLive ? 'text-brand-red animate-pulse' : 'text-brand-gold';
+
+                        jadwalWadah.innerHTML += `
+                        <div class="bg-white/5 border border-white/5 rounded-xl py-2 px-3 flex items-center justify-between hover:bg-white/10 transition-colors mb-2">
+                            <div class="flex-1 text-right truncate pr-2"><span class="font-bold text-[11px] text-white">${timKandang}</span></div>
+                            <div class="px-2 text-center shrink-0">
+                                <span class="block text-[10px] font-bold ${statusColor}">${displayStatus}</span>
+                                <span class="block text-[8px] text-gray-500 uppercase tracking-widest mt-0.5">${isLive ? 'SEKARANG' : dayLabel}</span>
+                            </div>
+                            <div class="flex-1 text-left truncate pl-2"><span class="font-bold text-[11px] text-white">${timTandang}</span></div>
+                        </div>`;
+                    });
+                } else {
+                    jadwalWadah.innerHTML = '<div class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Semua jadwal telah selesai</div>';
+                }
+            } else {
+                jadwalWadah.innerHTML = '<div class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Belum ada jadwal</div>';
+            }
+        }
+
+        // ==========================================
+        // 3. MESIN PENYEDOT DATA (CACHE-FIRST / STALE-WHILE-REVALIDATE)
+        // ==========================================
         async function tarikDataPreview() {
+            // LANGKAH 1: BACA CACHE LOKAL & TAMPILKAN INSTAN (0 Detik)
+            const cacheJadwal = localStorage.getItem('mna_cache_jadwal');
+            const cacheKlasemen = localStorage.getItem('mna_cache_klasemen');
+            
+            if (cacheJadwal && cacheKlasemen) {
+                try {
+                    const parsedJadwal = JSON.parse(cacheJadwal);
+                    const parsedKlasemen = JSON.parse(cacheKlasemen);
+                    
+                    // Render Jadwal dari Cache
+                    renderJadwalTerdekat(parsedJadwal);
+                    
+                    // Render Klasemen dari Cache (Cek tombol divisi mana yang sedang aktif)
+                    globalKlasemenCache = parsedKlasemen;
+                    let activeDivisi = 'SMA';
+                    const btnSma = document.getElementById('btn-mini-sma');
+                    if (btnSma && !btnSma.classList.contains('bg-brand-gold')) activeDivisi = 'SMP';
+                    
+                    // Cetak jika area tabel masih kosong/loading
+                    if (document.getElementById('mini-klasemen-list').innerHTML.includes('Memuat')) {
+                        renderMiniKlasemen(activeDivisi);
+                    }
+                } catch(e) { console.error("Gagal membaca cache:", e); }
+            }
+
+            // LANGKAH 2: TARIK DATA BARU DI LATAR BELAKANG (SILENT FETCH)
             try {
                 const [resJadwal, resKlasemen, resEvent] = await Promise.all([
                     fetch(`${TSL_API_URL}?sheet=Jadwal&t=${Date.now()}`),
@@ -364,57 +442,29 @@
                 // Picu Radar Notifikasi
                 if (Array.isArray(dataEvent)) cekNotifikasiBaru(dataEvent);
 
-                // Render Jadwal
-                const jadwalWadah = document.getElementById('mini-jadwal-list');
-                if (Array.isArray(dataJadwal) && dataJadwal.length > 0) {
-                    let upcomingMatches = dataJadwal.filter(m => !String(m.status || '').toUpperCase().includes('FT'));
-                    upcomingMatches.sort((a, b) => parseIndoDate(a.waktu) - parseIndoDate(b.waktu));
-                    const jadwalTerdekat = upcomingMatches.slice(0, 4);
-                    
-                    if (jadwalTerdekat.length > 0) {
-                        jadwalWadah.innerHTML = '';
-                        jadwalTerdekat.forEach(match => {
-                            const timKandang = match.tim_kiri || 'Tim A';
-                            const timTandang = match.tim_kanan || 'Tim B';
-                            const status = String(match.status || '').toUpperCase();
-                            const timestamp = parseIndoDate(match.waktu);
-                            const dayLabel = getRelativeDayLabel(timestamp);
-                            
-                            let w = String(match.waktu || ''); let timeOnly = "TBA";
-                            if (w.includes("T")) { 
-                                let dObj = new Date(w); 
-                                if(!isNaN(dObj.getTime())) timeOnly = String(dObj.getHours()).padStart(2, '0') + ":" + String(dObj.getMinutes()).padStart(2, '0'); 
-                            } else { timeOnly = w.split(" - ")[1] || w || "TBA"; }
+                // SIMPAN DATA BARU KE CACHE
+                localStorage.setItem('mna_cache_jadwal', JSON.stringify(dataJadwal));
+                localStorage.setItem('mna_cache_klasemen', JSON.stringify(dataKlasemen));
 
-                            let isLive = status.includes('LIVE') || status.includes('HT');
-                            let displayStatus = isLive ? 'LIVE' : timeOnly;
-                            let statusColor = isLive ? 'text-brand-red animate-pulse' : 'text-brand-gold';
-
-                            jadwalWadah.innerHTML += `
-                            <div class="bg-white/5 border border-white/5 rounded-xl py-2 px-3 flex items-center justify-between hover:bg-white/10 transition-colors mb-2">
-                                <div class="flex-1 text-right truncate pr-2"><span class="font-bold text-[11px] text-white">${timKandang}</span></div>
-                                <div class="px-2 text-center shrink-0">
-                                    <span class="block text-[10px] font-bold ${statusColor}">${displayStatus}</span>
-                                    <span class="block text-[8px] text-gray-500 uppercase tracking-widest mt-0.5">${isLive ? 'SEKARANG' : dayLabel}</span>
-                                </div>
-                                <div class="flex-1 text-left truncate pl-2"><span class="font-bold text-[11px] text-white">${timTandang}</span></div>
-                            </div>`;
-                        });
-                    } else {
-                        jadwalWadah.innerHTML = '<div class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Semua jadwal telah selesai</div>';
-                    }
-                }
-
-                // Render Klasemen
+                // RENDER ULANG LAYAR DENGAN DATA FRESH
+                renderJadwalTerdekat(dataJadwal);
+                
                 if (Array.isArray(dataKlasemen)) {
                     globalKlasemenCache = dataKlasemen;
-                    if (document.getElementById('mini-klasemen-list').innerHTML.includes('Data belum tersedia') || document.getElementById('mini-klasemen-list').innerHTML.includes('Memuat')) {
-                        renderMiniKlasemen('SMA'); 
-                    }
+                    // Cek divisi yang sedang dilihat user agar tidak pindah ke SMA tiba-tiba
+                    let activeDivisi = 'SMA';
+                    const btnSma = document.getElementById('btn-mini-sma');
+                    if (btnSma && !btnSma.classList.contains('bg-brand-gold')) activeDivisi = 'SMP';
+                    renderMiniKlasemen(activeDivisi); 
                 }
 
             } catch (error) {
-                console.error("Gagal menarik data TSL:", error);
+                console.error("Gagal menyinkronkan data background:", error);
+                // Jika tidak ada cache dan internet mati, baru tampilkan pesan error
+                if (!cacheJadwal) {
+                    document.getElementById('mini-jadwal-list').innerHTML = '<div class="text-center text-red-500 text-[10px] py-4 font-bold uppercase tracking-widest">Gagal menyinkronkan data</div>';
+                    document.getElementById('mini-klasemen-list').innerHTML = '<tr><td colspan="4" class="text-center text-red-500 text-[10px] py-4 font-bold uppercase tracking-widest">Gagal menyinkronkan data</td></tr>';
+                }
             }
         }
 
