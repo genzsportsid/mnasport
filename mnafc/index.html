@@ -38,6 +38,8 @@
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
         .glass-nav { background: rgba(24, 24, 27, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
         .shadow-glow-blue { box-shadow: 0 0 20px rgba(37, 99, 235, 0.2); }
+        .pt-safe { padding-top: max(env(safe-area-inset-top), 20px) !important; }
+        .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 16px) !important; }
     </style>
 </head>
 <body class="font-body bg-[#F9FAFB] dark:bg-brand-dark-bg text-brand-black dark:text-white antialiased overflow-x-hidden selection:bg-brand-blue selection:text-white pb-[100px] transition-colors duration-500">
