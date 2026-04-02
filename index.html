@@ -124,10 +124,15 @@
                 
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-brand-gold/10 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded-full bg-brand-gold/10 flex items-center justify-center shrink-0">
                             <i data-lucide="bar-chart-2" class="w-4 h-4 text-brand-gold"></i>
                         </div>
-                        <h3 class="font-heading font-bold text-sm text-white">Papan Atas TSL</h3>
+                        <h3 class="font-heading font-bold text-sm text-white truncate">Papan Atas</h3>
+                    </div>
+                    
+                    <div class="flex bg-white/5 rounded-lg p-0.5 shadow-inner border border-white/5 shrink-0">
+                        <button onclick="renderMiniKlasemen('SMP')" id="btn-mini-smp" class="px-3 py-1 text-[9px] font-bold rounded text-gray-400 hover:text-white uppercase transition-all bg-transparent">SMP</button>
+                        <button onclick="renderMiniKlasemen('SMA')" id="btn-mini-sma" class="px-3 py-1 text-[9px] font-bold rounded bg-brand-gold text-brand-black uppercase transition-all shadow-sm">SMA</button>
                     </div>
                 </div>
 
@@ -222,7 +227,7 @@
         lucide.createIcons();
 
         // ==========================================
-        // ALGORITMA WAKTU & TANGGAL (Kloning dari TSL)
+        // ALGORITMA WAKTU & TANGGAL
         // ==========================================
         function parseIndoDate(waktuStr) {
             try {
@@ -254,6 +259,61 @@
         // MESIN INTEGRASI DATA REAL-TIME TSL
         // ==========================================
         const TSL_API_URL = 'https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec'; 
+        
+        let globalKlasemenCache = []; // Memori penyimpanan Klasemen
+
+        // Fungsi Khusus Merender Klasemen Berdasarkan Jenjang
+        function renderMiniKlasemen(jenjang) {
+            const klasemenWadah = document.getElementById('mini-klasemen-list');
+            if(!klasemenWadah) return;
+
+            // 1. Ganti Warna Tombol Toggle
+            const btnSmp = document.getElementById('btn-mini-smp');
+            const btnSma = document.getElementById('btn-mini-sma');
+            if (btnSmp && btnSma) {
+                if (jenjang === 'SMA') {
+                    btnSma.className = "px-3 py-1 text-[9px] font-bold rounded bg-brand-gold text-brand-black uppercase transition-all shadow-sm";
+                    btnSmp.className = "px-3 py-1 text-[9px] font-bold rounded text-gray-400 hover:text-white uppercase transition-all bg-transparent";
+                } else {
+                    btnSmp.className = "px-3 py-1 text-[9px] font-bold rounded bg-brand-gold text-brand-black uppercase transition-all shadow-sm";
+                    btnSma.className = "px-3 py-1 text-[9px] font-bold rounded text-gray-400 hover:text-white uppercase transition-all bg-transparent";
+                }
+            }
+
+            klasemenWadah.innerHTML = '';
+
+            // 2. Filter, Sortir, dan Tampilkan Data
+            if (Array.isArray(globalKlasemenCache) && globalKlasemenCache.length > 0) {
+                // Saring berdasarkan Jenjang/Liga (Mengabaikan huruf besar kecil)
+                let filteredData = globalKlasemenCache.filter(k => {
+                    let j = String(k.Jenjang || k.Liga || 'SMA').toUpperCase().trim();
+                    return j === jenjang;
+                });
+
+                if (filteredData.length > 0) {
+                    const topTiga = filteredData.sort((a,b) => (parseInt(b.poin) || 0) - (parseInt(a.poin) || 0)).slice(0, 3);
+                    
+                    topTiga.forEach((klub, idx) => {
+                        const namaKlub = klub.klub || 'Nama Klub';
+                        const main = klub.main || 0;
+                        const poin = klub.poin || 0;
+                        const colorPos = idx === 0 ? 'text-brand-gold' : 'text-white';
+
+                        klasemenWadah.innerHTML += `
+                        <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                            <td class="py-2.5 text-center font-black ${colorPos}">${idx + 1}</td>
+                            <td class="py-2.5 text-white truncate max-w-[120px] md:max-w-[150px] font-medium">${namaKlub}</td>
+                            <td class="py-2.5 text-center text-gray-500 font-medium">${main}</td>
+                            <td class="py-2.5 text-center text-brand-green font-bold bg-brand-green/10 rounded-lg">${poin}</td>
+                        </tr>`;
+                    });
+                } else {
+                    klasemenWadah.innerHTML = `<tr><td colspan="4" class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Klasemen ${jenjang} Belum Tersedia</td></tr>`;
+                }
+            } else {
+                klasemenWadah.innerHTML = '<tr><td colspan="4" class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Data belum tersedia</td></tr>';
+            }
+        }
 
         async function tarikDataPreview() {
             try {
@@ -265,18 +325,13 @@
                 const dataJadwal = await resJadwal.json();
                 const dataKlasemen = await resKlasemen.json();
 
-                // 1. RENDER JADWAL (4 Pertandingan Mendatang Terdekat)
+                // RENDER JADWAL MENDATANG
                 const jadwalWadah = document.getElementById('mini-jadwal-list');
                 jadwalWadah.innerHTML = ''; 
                 
                 if (Array.isArray(dataJadwal) && dataJadwal.length > 0) {
-                    // FILTER: Buang laga yang sudah FT (Full Time)
                     let upcomingMatches = dataJadwal.filter(m => !String(m.status || '').toUpperCase().includes('FT'));
-                    
-                    // SORTING: Urutkan dari waktu yang paling dekat ke hari ini
                     upcomingMatches.sort((a, b) => parseIndoDate(a.waktu) - parseIndoDate(b.waktu));
-                    
-                    // AMBIL: Tepat 4 pertandingan teratas setelah disortir
                     const jadwalTerdekat = upcomingMatches.slice(0, 4);
                     
                     if (jadwalTerdekat.length > 0) {
@@ -291,9 +346,7 @@
                             if (w.includes("T")) { 
                                 let dObj = new Date(w); 
                                 if(!isNaN(dObj.getTime())) timeOnly = String(dObj.getHours()).padStart(2, '0') + ":" + String(dObj.getMinutes()).padStart(2, '0'); 
-                            } else { 
-                                timeOnly = w.split(" - ")[1] || w || "TBA"; 
-                            }
+                            } else { timeOnly = w.split(" - ")[1] || w || "TBA"; }
 
                             let isLive = status.includes('LIVE') || status.includes('HT');
                             let displayStatus = isLive ? 'LIVE' : timeOnly;
@@ -316,29 +369,10 @@
                     jadwalWadah.innerHTML = '<div class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Belum ada jadwal</div>';
                 }
 
-                // 2. RENDER KLASEMEN (Ambil 3 Peringkat Teratas Berdasarkan Poin)
-                const klasemenWadah = document.getElementById('mini-klasemen-list');
-                klasemenWadah.innerHTML = '';
-
-                if (Array.isArray(dataKlasemen) && dataKlasemen.length > 0) {
-                    const topTiga = dataKlasemen.sort((a,b) => (parseInt(b.poin) || 0) - (parseInt(a.poin) || 0)).slice(0, 3);
-                    
-                    topTiga.forEach((klub, idx) => {
-                        const namaKlub = klub.klub || 'Nama Klub';
-                        const main = klub.main || 0;
-                        const poin = klub.poin || 0;
-                        const colorPos = idx === 0 ? 'text-brand-gold' : 'text-white';
-
-                        klasemenWadah.innerHTML += `
-                        <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                            <td class="py-2.5 text-center font-black ${colorPos}">${idx + 1}</td>
-                            <td class="py-2.5 text-white truncate max-w-[120px] md:max-w-[150px] font-medium">${namaKlub}</td>
-                            <td class="py-2.5 text-center text-gray-500 font-medium">${main}</td>
-                            <td class="py-2.5 text-center text-brand-green font-bold bg-brand-green/10 rounded-lg">${poin}</td>
-                        </tr>`;
-                    });
-                } else {
-                    klasemenWadah.innerHTML = '<tr><td colspan="4" class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Data belum tersedia</td></tr>';
+                // RENDER KLASEMEN (Panggil Fungsi Baru)
+                if (Array.isArray(dataKlasemen)) {
+                    globalKlasemenCache = dataKlasemen;
+                    renderMiniKlasemen('SMA'); // <- Default tampilan saat pertama kali website dibuka
                 }
 
             } catch (error) {
