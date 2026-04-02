@@ -161,6 +161,9 @@
 
         /* Class khusus agar teks HTML2Canvas tidak terpotong */
         .export-safe-text { text-overflow: clip !important; white-space: normal !important; line-height: normal !important; }
+        .safe-header { padding-top: max(env(safe-area-inset-top), 16px) !important; }
+        .pt-safe { padding-top: max(env(safe-area-inset-top), 20px) !important; }
+        .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 16px) !important; }
     </style>
     <script>
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { 
