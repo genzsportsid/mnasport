@@ -46,13 +46,16 @@
     <style>
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        .glass-header { background: rgba(9, 9, 11, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(215, 182, 125, 0.1); }
-        .glass-card { background: linear-gradient(145deg, rgba(24, 24, 27, 0.9) 0%, rgba(24, 24, 27, 0.4) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+        html.dark .glass-header { background: rgba(9, 9, 11, 0.85); border-bottom: 1px solid rgba(215, 182, 125, 0.1); }
+        
+        .glass-card { background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.4) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(0, 0, 0, 0.05); }
+        html.dark .glass-card { background: linear-gradient(145deg, rgba(24, 24, 27, 0.9) 0%, rgba(24, 24, 27, 0.4) 100%); border: 1px solid rgba(255, 255, 255, 0.05); }
         .pt-safe { padding-top: max(env(safe-area-inset-top), 20px) !important; }
         .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 16px) !important; }
     </style>
 </head>
-<body class="font-body bg-[#000000] text-white antialiased overflow-x-hidden selection:bg-brand-gold selection:text-brand-dark-bg pb-[100px]">
+<body class="font-body bg-[#F9FAFB] dark:bg-[#000000] text-brand-black dark:text-white antialiased overflow-x-hidden selection:bg-brand-gold selection:text-brand-dark-bg pb-[100px] transition-colors duration-500">
     <div id="global-menu-overlay" class="fixed inset-0 z-[110] hidden">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="toggleGlobalMenu()"></div>
         
@@ -135,7 +138,7 @@
         <div class="mb-8">
             <h2 class="text-3xl md:text-4xl font-heading font-black tracking-tight leading-tight">
                 Pusat Komando <br/>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-white">Ekosistem MNA.</span>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-black dark:to-white">Ekosistem MNA.</span>
             </h2>
             <p class="text-xs text-gray-400 mt-2 font-medium max-w-md leading-relaxed">
                 Akses cepat seluruh layanan manajemen olahraga, liga pelajar, dan database klub.
