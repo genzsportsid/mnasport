@@ -172,13 +172,7 @@
         .pt-safe { padding-top: max(env(safe-area-inset-top), 20px) !important; }
         .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 16px) !important; }
     </style>
-    <script>
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { 
-            document.documentElement.classList.add('dark'); 
-        } else { 
-            document.documentElement.classList.remove('dark'); 
-        }
-    </script>
+   
 </head>
 <body class="font-body text-brand-black dark:text-white bg-[#F9FAFB] dark:bg-brand-dark-bg antialiased overflow-x-hidden selection:bg-brand-green selection:text-white pb-[150px] transition-colors duration-500">
 <div id="modal-onboarding" class="fixed inset-0 z-[200] hidden items-center justify-center p-4 bg-brand-black/80 backdrop-blur-md">
@@ -850,12 +844,13 @@
 
         // THEME & PWA
         function initTheme() {
-            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { 
-                document.documentElement.classList.add('dark'); document.getElementById('meta-theme-color').content = '#09090b'; 
+            if (localStorage.getItem('mna_theme') === 'light') { 
+                document.documentElement.classList.remove('dark'); 
+                document.getElementById('meta-theme-color').content = '#F9FAFB'; 
             } else { 
-                document.documentElement.classList.remove('dark'); document.getElementById('meta-theme-color').content = '#F9FAFB'; 
+                document.documentElement.classList.add('dark'); 
+                document.getElementById('meta-theme-color').content = '#09090b'; 
             }
-            updateSettingsUI();
         }
         
         function setTheme(mode) {
