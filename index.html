@@ -59,53 +59,59 @@
     <div id="global-menu-overlay" class="fixed inset-0 z-[110] hidden">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="toggleGlobalMenu()"></div>
         
-        <div id="global-menu-panel" class="absolute right-0 top-0 bottom-0 w-72 bg-[#09090b] border-l border-white/10 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col pt-safe">
+        <div id="global-menu-panel" class="absolute right-0 top-0 bottom-0 w-72 bg-white dark:bg-[#09090b] border-l border-gray-200 dark:border-white/10 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col pt-safe transition-colors">
             
-            <div class="p-5 border-b border-white/5 flex justify-between items-center">
-                <h3 class="font-heading font-bold text-white tracking-widest uppercase text-xs">Pengaturan Global</h3>
-                <button onclick="toggleGlobalMenu()" class="text-gray-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            <div class="p-5 border-b border-gray-100 dark:border-white/5 flex justify-between items-center transition-colors">
+                <h3 class="font-heading font-bold text-brand-black dark:text-white tracking-widest uppercase text-xs transition-colors">Pengaturan Global</h3>
+                <button onclick="toggleGlobalMenu()" class="text-gray-500 dark:text-gray-400 hover:text-brand-black dark:hover:text-white bg-gray-100 dark:bg-white/5 p-1.5 rounded-lg transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             
             <div class="p-5 flex-1 flex flex-col gap-6 overflow-y-auto hide-scroll">
                 <div>
                     <span class="text-[9px] font-bold text-brand-gold uppercase tracking-widest mb-3 block">Tampilan Ekosistem</span>
-                    <button onclick="toggleGlobalTheme()" class="w-full flex items-center justify-between bg-white/5 border border-white/5 rounded-xl p-3 hover:bg-white/10 transition-colors group">
+                    <button onclick="toggleGlobalTheme()" class="w-full flex items-center justify-between bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-xl p-3 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors group">
                         <div class="flex items-center gap-3">
-                            <i data-lucide="moon" id="theme-icon" class="w-4 h-4 text-gray-400 group-hover:text-brand-gold transition-colors"></i>
-                            <span class="text-xs font-bold text-gray-200" id="theme-text">Tema Gelap</span>
+                            <i data-lucide="moon" id="theme-icon" class="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-brand-gold transition-colors"></i>
+                            <span class="text-xs font-bold text-brand-black dark:text-gray-200 transition-colors" id="theme-text">Tema Gelap</span>
                         </div>
                         <div class="w-8 h-4 bg-brand-gold rounded-full relative transition-colors" id="theme-toggle-bg">
-                            <div class="absolute right-1 top-0.5 w-3 h-3 bg-[#09090b] rounded-full transition-transform" id="theme-toggle-dot"></div>
+                            <div class="absolute right-1 top-0.5 w-3 h-3 bg-white dark:bg-[#09090b] rounded-full transition-transform" id="theme-toggle-dot"></div>
                         </div>
                     </button>
                 </div>
 
                 <div>
                     <span class="text-[9px] font-bold text-brand-gold uppercase tracking-widest mb-3 block">Sistem</span>
-                    <button onclick="requestGlobalNotification()" class="w-full flex items-center justify-between bg-white/5 border border-white/5 rounded-xl p-3 hover:bg-white/10 transition-colors group">
+                    <button onclick="requestGlobalNotification()" class="w-full flex items-center justify-between bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-xl p-3 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors group">
                         <div class="flex items-center gap-3">
-                            <i data-lucide="bell-ring" class="w-4 h-4 text-gray-400 group-hover:text-brand-green transition-colors"></i>
-                            <span class="text-xs font-bold text-gray-200" id="notif-text">Aktifkan Notifikasi</span>
+                            <i data-lucide="bell-ring" class="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-brand-green transition-colors"></i>
+                            <span class="text-xs font-bold text-brand-black dark:text-gray-200 transition-colors" id="notif-text">Aktifkan Notifikasi</span>
                         </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500"></i>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 dark:text-gray-500"></i>
                     </button>
                 </div>
 
                 <div>
                     <span class="text-[9px] font-bold text-brand-gold uppercase tracking-widest mb-3 block">Media Sosial Kami</span>
                     <div class="flex flex-col gap-2">
-                        <a href="https://instagram.com/mnafootballclub" target="_blank" class="flex items-center gap-3 text-xs font-medium text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-brand-blue/20 group">
+                        <a href="https://instagram.com/mnafootballclub" target="_blank" class="flex items-center gap-3 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-brand-blue dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-brand-blue/10 dark:hover:bg-brand-blue/20 group">
                             <i data-lucide="instagram" class="w-4 h-4 text-brand-blue group-hover:scale-110 transition-transform"></i> @mnafootballclub
                         </a>
-                        <a href="https://instagram.com/trenggalekstudentleague" target="_blank" class="flex items-center gap-3 text-xs font-medium text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-brand-green/20 group">
+                        <a href="https://instagram.com/trenggalekstudentleague" target="_blank" class="flex items-center gap-3 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-brand-green dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-brand-green/10 dark:hover:bg-brand-green/20 group">
                             <i data-lucide="instagram" class="w-4 h-4 text-brand-green group-hover:scale-110 transition-transform"></i> @trenggalekstudentleague
                         </a>
-                        <a href="https://instagram.com/mnasportmanagement" target="_blank" class="flex items-center gap-3 text-xs font-medium text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-brand-gold/20 group">
+                        <a href="https://instagram.com/mnasportmanagement" target="_blank" class="flex items-center gap-3 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-brand-gold dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-brand-gold/10 dark:hover:bg-brand-gold/20 group">
                             <i data-lucide="instagram" class="w-4 h-4 text-brand-gold group-hover:scale-110 transition-transform"></i> @mnasportmanagement
                         </a>
                     </div>
                 </div>
             </div>
+
+            <div class="p-5 border-t border-gray-100 dark:border-white/5 text-center transition-colors">
+                <span class="text-[8px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">MNA Super App v1.0.0</span>
+            </div>
+        </div>
+    </div>
 
             <div class="p-5 border-t border-white/5 text-center">
                 <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">MNA Super App v1.0.0</span>
@@ -272,21 +278,21 @@
         </div>
     </main>
         
-    <nav id="main-bottom-nav" class="fixed bottom-0 w-full z-[100] bg-[#09090b]/90 backdrop-blur-xl border-t border-white/10 pb-safe transition-colors">
+    <nav id="main-bottom-nav" class="fixed bottom-0 w-full z-[100] bg-white/90 dark:bg-[#09090b]/90 backdrop-blur-xl border-t border-gray-200 dark:border-white/10 pb-safe transition-colors">
         <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
             <button class="flex flex-col items-center justify-center w-full h-full text-brand-gold transition-colors">
                 <i data-lucide="layout-dashboard" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
                 <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">Operator</span>
             </button>
-            <a href="/tsl/" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-brand-green transition-colors">
+            <a href="/tsl/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-green transition-colors">
                 <i data-lucide="trophy" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
                 <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">TSL Liga</span>
             </a>
-            <a href="/mnafc/" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-brand-blue transition-colors">
+            <a href="/mnafc/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-blue transition-colors">
                 <i data-lucide="shield" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
                 <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">MNA FC</span>
             </a>
-            <a href="/tsl/#pencarian" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-white transition-colors">
+            <a href="/tsl/#pencarian" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-black dark:hover:text-white transition-colors">
                 <i data-lucide="search" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
                 <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">Cari</span>
             </a>
@@ -612,18 +618,18 @@
                 html.classList.add('dark');
                 if(tText) tText.innerText = 'Tema Gelap';
                 if(tIcon) tIcon.setAttribute('data-lucide', 'moon');
-                if(tDot) tDot.classList.replace('translate-x-[-16px]', 'translate-x-0');
-                if(tBg) tBg.classList.replace('bg-gray-500', 'bg-brand-gold');
+                if(tDot) { tDot.classList.remove('translate-x-[-16px]'); tDot.classList.add('translate-x-0'); }
+                if(tBg) { tBg.classList.remove('bg-gray-300'); tBg.classList.add('bg-brand-gold'); }
             } else {
                 html.classList.remove('dark');
                 if(tText) tText.innerText = 'Tema Terang';
                 if(tIcon) tIcon.setAttribute('data-lucide', 'sun');
                 if(tDot) { tDot.classList.remove('translate-x-0'); tDot.classList.add('translate-x-[-16px]'); }
-                if(tBg) { tBg.classList.remove('bg-brand-gold'); tBg.classList.add('bg-gray-500'); }
+                if(tBg) { tBg.classList.remove('bg-brand-gold'); tBg.classList.add('bg-gray-300'); }
             }
             if(typeof lucide !== 'undefined') lucide.createIcons();
         }
-
+            
         function toggleGlobalTheme() {
             const isDark = localStorage.getItem('mna_theme') !== 'light';
             localStorage.setItem('mna_theme', isDark ? 'light' : 'dark');
