@@ -299,7 +299,7 @@
             localStorage.setItem('tsl_event_count', currentCount.toString());
         }
 
-        // 2. MESIN RENDER KLASEMEN MINI
+        // 2. MESIN RENDER KLASEMEN MINI (MULTI-GRUP TAHAN BANTING)
         function renderMiniKlasemen(jenjang) {
             const klasemenWadah = document.getElementById('mini-klasemen-list');
             if(!klasemenWadah) return;
@@ -317,15 +317,27 @@
             klasemenWadah.innerHTML = '';
 
             if (Array.isArray(globalKlasemenCache) && globalKlasemenCache.length > 0) {
-                // 1. Filter berdasarkan Jenjang
-                let filteredData = globalKlasemenCache.filter(k => 
-                    String(k.Jenjang || k.Liga || 'SMA').toUpperCase().trim() === jenjang
-                );
+                // 1. Filter Jenjang (Pencarian Key Otomatis)
+                let filteredData = globalKlasemenCache.filter(item => {
+                    let j = 'SMA';
+                    for (let key in item) {
+                        if (key.toLowerCase().trim() === 'jenjang' || key.toLowerCase().trim() === 'liga') {
+                            j = String(item[key]).toUpperCase().trim();
+                        }
+                    }
+                    return j === jenjang;
+                });
 
-                // 2. Kelompokkan berdasarkan Grup (A, B, dst)
+                // 2. Kelompokkan Berdasarkan Grup (Pencarian Key Otomatis)
                 const grupMap = {};
                 filteredData.forEach(item => {
-                    const g = String(item.grup || item.group || 'UTAMA').toUpperCase().trim();
+                    let g = 'UTAMA'; // Default jika tidak menemukan kolom grup
+                    for (let key in item) {
+                        let lowerKey = key.toLowerCase().trim();
+                        if (lowerKey === 'grup' || lowerKey === 'group') {
+                            if (item[key]) g = String(item[key]).toUpperCase().trim();
+                        }
+                    }
                     if (!grupMap[g]) grupMap[g] = [];
                     grupMap[g].push(item);
                 });
@@ -334,23 +346,36 @@
 
                 if (groupKeys.length > 0) {
                     groupKeys.forEach(key => {
-                        // Tampilkan header grup jika lebih dari satu grup
-                        if (groupKeys.length > 1) {
+                        // Tampilkan header grup jika ada lebih dari 1 grup ATAU nama grup bukan 'UTAMA'
+                        if (groupKeys.length > 1 || key !== 'UTAMA') {
+                            let namaHeader = key === 'UTAMA' ? 'KLASEMEN' : `GRUP ${key}`;
                             klasemenWadah.innerHTML += `
                                 <tr class="bg-white/5">
                                     <td colspan="4" class="py-1.5 px-2 text-[9px] font-black text-brand-gold tracking-[0.2em] uppercase border-b border-white/5">
-                                        GRUP ${key}
+                                        ${namaHeader}
                                     </td>
                                 </tr>`;
                         }
 
-                        // Sortir per grup dan ambil Top 3
-                        const sortedGrup = grupMap[key].sort((a,b) => (parseInt(b.poin) || 0) - (parseInt(a.poin) || 0)).slice(0, 3);
+                        // Sortir berdasarkan poin dan ambil Top 3
+                        const sortedGrup = grupMap[key].sort((a,b) => {
+                            let poinA = 0; let poinB = 0;
+                            for (let k in a) { if(k.toLowerCase().trim() === 'poin' || k.toLowerCase().trim() === 'pts') poinA = parseInt(a[k]) || 0; }
+                            for (let k in b) { if(k.toLowerCase().trim() === 'poin' || k.toLowerCase().trim() === 'pts') poinB = parseInt(b[k]) || 0; }
+                            return poinB - poinA;
+                        }).slice(0, 3);
                         
                         sortedGrup.forEach((klub, idx) => {
-                            const namaKlub = klub.klub || 'Tim';
-                            const main = klub.main || 0;
-                            const poin = klub.poin || 0;
+                            let namaKlub = 'Tim'; let main = 0; let poin = 0;
+                            
+                            // Ekstrak data dengan aman
+                            for (let k in klub) {
+                                let lowerK = k.toLowerCase().trim();
+                                if (lowerK === 'klub' || lowerK === 'tim') namaKlub = klub[k];
+                                if (lowerK === 'main' || lowerK === 'p') main = klub[k];
+                                if (lowerK === 'poin' || lowerK === 'pts') poin = klub[k];
+                            }
+
                             const colorPos = idx === 0 ? 'text-brand-gold' : 'text-white';
 
                             klasemenWadah.innerHTML += `
@@ -362,7 +387,7 @@
                             </tr>`;
                         });
                         
-                        // Beri jarak antar grup
+                        // Beri jarak visual antar grup
                         if (groupKeys.length > 1) {
                             klasemenWadah.innerHTML += `<tr class="h-2"></tr>`;
                         }
@@ -370,6 +395,8 @@
                 } else {
                     klasemenWadah.innerHTML = `<tr><td colspan="4" class="text-center text-[10px] text-gray-500 py-6 uppercase font-bold tracking-widest">Klasemen ${jenjang} Belum Tersedia</td></tr>`;
                 }
+            } else {
+                 klasemenWadah.innerHTML = `<tr><td colspan="4" class="text-center text-[10px] text-gray-500 py-6 uppercase font-bold tracking-widest">Data belum tersedia</td></tr>`;
             }
         }
 
