@@ -393,7 +393,7 @@
             </div>
         </div>
 
-        </div> <div id="view-search" class="hidden min-h-screen bg-[#F9FAFB] dark:bg-brand-dark-bg pb-24 z-[55] absolute top-0 left-0 w-full page-enter transition-colors duration-500">
+        </div> <div id="view-search" class="hidden min-h-screen bg-[#F9FAFB] dark:bg-brand-dark-bg pb-24 z-[90] absolute top-0 left-0 w-full page-enter transition-colors duration-500">
         
         <div class="bg-brand-black dark:bg-[#09090b] text-white safe-header sticky top-0 z-50 transition-colors shadow-md border-b border-[#d7b67d]/30">
             <div class="px-4 md:px-8 flex items-center relative h-12">
@@ -637,7 +637,7 @@
         </div>
     </div>
 
-    <div class="fixed bottom-0 w-full z-[70] flex flex-col transition-colors duration-500">
+    <div class="fixed bottom-0 w-full z-[110] flex flex-col transition-colors duration-500">
         <div id="sponsor-bar" class="w-full bg-white/95 dark:bg-brand-dark-surface/95 backdrop-blur-xl border-t border-gray-200 dark:border-brand-dark-border py-2 px-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] hidden">
             <div class="max-w-7xl mx-auto flex items-center justify-center gap-6 overflow-x-auto hide-scroll" id="sponsor-track">
                 </div>
@@ -1134,12 +1134,18 @@
                     if(bnavTsl) { bnavTsl.classList.remove('text-brand-green'); bnavTsl.classList.add('text-gray-400', 'dark:text-gray-500'); }
                     if(bnavCari) { bnavCari.classList.remove('text-gray-400', 'dark:text-gray-500'); bnavCari.classList.add('text-brand-black', 'dark:text-white'); }
                     
+                    // FIX: Buka kembali kunci scroll khusus untuk Layar Pencarian!
+                    document.body.style.overflow = '';
+                    
                     setActiveNav('pencarian');
                     window.scrollTo({top: 0, behavior: 'smooth'});
                     return; 
                 }
 
                 // C. LOGIKA JIKA MEMBUKA TAB LIGA (Beranda, Jadwal, dll)
+                // FIX: Gembok kembali scroll jika Liga sedang mode OFF/Countdown
+                if (!CONFIG_LIGA_AKTIF) document.body.style.overflow = 'hidden'; 
+                
                 if(viewHome) viewHome.classList.remove('hidden');
                 if(topTabs) topTabs.classList.remove('hidden'); // Menu atas liga kembali
                 
