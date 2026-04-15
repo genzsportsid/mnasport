@@ -171,7 +171,17 @@
         .safe-header { padding-top: max(env(safe-area-inset-top), 16px) !important; }
         .pt-safe { padding-top: max(env(safe-area-inset-top), 20px) !important; }
         .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 16px) !important; }
+        
+        /* 🛡️ ANTI-FLASH PENCARIAN (0 DETIK) */
+        html.direct-search #tsl-lock-screen { display: none !important; }
+        html.direct-search #view-search { display: block !important; opacity: 1 !important; z-index: 999 !important; }
     </style>
+    
+    <script>
+        if (window.location.hash.includes('pencarian')) {
+            document.documentElement.classList.add('direct-search');
+        }
+    </script>
    
 </head>
 <body class="font-body text-brand-black dark:text-white bg-[#F9FAFB] dark:bg-brand-dark-bg antialiased overflow-x-hidden selection:bg-brand-green selection:text-white pb-[150px] transition-colors duration-500">
@@ -1137,6 +1147,12 @@
 
                 // B. LOGIKA JIKA MEMBUKA PENCARIAN GLOBAL
                 if(tabId === 'pencarian') {
+                    // Lepas gembok CSS awal agar JS mengambil alih dengan mulus
+                    document.documentElement.classList.remove('direct-search'); 
+                    
+                    const lockScreen = document.getElementById('tsl-lock-screen');
+                    if(lockScreen) lockScreen.classList.add('hidden'); // MATIKAN LOCK SCREEN MUTLAK
+
                     if(viewHome) viewHome.classList.add('hidden'); // Matikan isi Liga
                     if(topTabs) topTabs.classList.add('hidden');   // Matikan menu atas Liga
                     if(viewSearch) viewSearch.classList.remove('hidden'); // Nyalakan layar Cari
@@ -1146,16 +1162,21 @@
                     
                     document.body.style.overflow = ''; // Bebaskan scroll untuk menu pencarian
                     setActiveNav('pencarian');
-                    window.scrollTo({top: 0, behavior: 'instant'}); // Pindah Instan 0 detik
+                    window.scrollTo({top: 0, behavior: 'instant'}); // Pindah Instan 0 Detik
                     return; 
                 }
 
                 // C. LOGIKA JIKA MEMBUKA TAB LIGA (Beranda, Jadwal, dll)
+                document.documentElement.classList.remove('direct-search');
+                const lockScreen = document.getElementById('tsl-lock-screen');
+
                 if (!CONFIG_LIGA_AKTIF) {
+                    if(lockScreen) lockScreen.classList.remove('hidden'); // MUNCULKAN KEMBALI LOCK SCREEN
                     document.body.style.overflow = 'hidden'; // Gembok scroll
-                    if(viewHome) viewHome.classList.add('hidden'); // Paksa mati
-                    if(topTabs) topTabs.classList.add('hidden');   // Paksa mati
+                    if(viewHome) viewHome.classList.add('hidden'); 
+                    if(topTabs) topTabs.classList.add('hidden');   
                 } else {
+                    if(lockScreen) lockScreen.classList.add('hidden');
                     document.body.style.overflow = '';
                     if(viewHome) viewHome.classList.remove('hidden');
                     if(topTabs) topTabs.classList.remove('hidden');
