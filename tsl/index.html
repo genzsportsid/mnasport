@@ -786,20 +786,20 @@
 
         window.addEventListener('DOMContentLoaded', () => { 
             initTheme(); 
-            tarikDataGaib(); 
-            initIosPrompt(); 
-            checkFirstInstall(); // Memicu kotak Welcome secara otomatis
-            initBannerSwipe(); 
             
-            // DETEKSI NAVIGASI DARI WEBSITE LAIN (Contoh: #pencarian)
-            setTimeout(() => {
-                const hash = window.location.hash.replace('#', '');
-                if (['jadwal', 'klasemen', 'statistik', 'pencarian'].includes(hash)) {
-                    switchTab(hash, hash.charAt(0).toUpperCase() + hash.slice(1));
-                }
-            }, 500);
-        });
+            // 1. PINDAH TAB SECARA INSTAN TANPA JEDA (0 Detik)
+            const hash = window.location.hash.replace('#', '');
+            if (['jadwal', 'klasemen', 'statistik', 'pencarian'].includes(hash)) {
+                switchTab(hash, hash.charAt(0).toUpperCase() + hash.slice(1));
+            }
 
+            // 2. BARU LOAD DATA BERAT LAINNYA DI LATAR BELAKANG
+            if (typeof tarikDataGaib === 'function') tarikDataGaib(); 
+            if (typeof initIosPrompt === 'function') initIosPrompt(); 
+            if (typeof checkFirstInstall === 'function') checkFirstInstall(); 
+            if (typeof initBannerSwipe === 'function') initBannerSwipe(); 
+        });
+        
         // SMOOTH SCROLL FOTMOB HEADER
         window.addEventListener('scroll', () => {
             let scrollY = window.scrollY;
