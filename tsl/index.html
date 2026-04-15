@@ -175,7 +175,7 @@
    
 </head>
 <body class="font-body text-brand-black dark:text-white bg-[#F9FAFB] dark:bg-brand-dark-bg antialiased overflow-x-hidden selection:bg-brand-green selection:text-white pb-[150px] transition-colors duration-500">
-        <div id="tsl-lock-screen" class="fixed inset-0 z-[80] bg-[#09090b] flex flex-col items-center justify-center p-6 text-center hidden transition-opacity duration-500">
+        <div id="tsl-lock-screen" class="fixed inset-0 z-[80] bg-[#09090b] flex flex-col items-center justify-center p-6 text-center">
             <div class="absolute inset-0 opacity-20 pointer-events-none" 
                  style="background-image: radial-gradient(circle at 50% 50%, #009A44 0%, transparent 70%);"></div>
             
@@ -247,13 +247,13 @@
             </button>
         </div>
     </div>
-    <div id="tsl-top-tabs" class="fixed top-0 left-0 w-full z-[45] bg-white/90 dark:bg-brand-dark-surface/95 backdrop-blur-xl border-b border-gray-200 dark:border-brand-dark-border py-3 px-4 flex gap-3 overflow-x-auto hide-scroll safe-header transition-colors duration-500">
+    <div id="tsl-top-tabs" class="hidden fixed top-0 left-0 w-full z-[45] bg-white/90 dark:bg-brand-dark-surface/95 backdrop-blur-xl border-b border-gray-200 dark:border-brand-dark-border py-3 px-4 flex gap-3 overflow-x-auto hide-scroll safe-header transition-colors duration-500">
         <button onclick="switchTab('beranda', 'Beranda')" id="tab-btn-beranda" class="top-tab-btn active px-5 py-2 rounded-full bg-brand-green text-white text-[10px] font-bold uppercase tracking-widest whitespace-nowrap shadow-sm transition-all">Beranda</button>
         <button onclick="switchTab('jadwal', 'Jadwal Pertandingan')" id="tab-btn-jadwal" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Jadwal</button>
         <button onclick="switchTab('klasemen', 'Papan Klasemen')" id="tab-btn-klasemen" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Klasemen</button>
         <button onclick="switchTab('statistik', 'Statistik Pemain')" id="tab-btn-statistik" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Statistik</button>
     </div>
-    <div id="view-home" class="block opacity-100 transition-opacity duration-300">
+    <div id="view-home" class="hidden opacity-100 transition-opacity duration-300">
         
         <div id="tab-beranda" class="tab-content block min-h-[100dvh]">
             <header class="bg-brand-black dark:bg-black relative overflow-hidden pb-12 lg:pb-0 border-b-[4px] border-brand-green safe-hero">
@@ -393,7 +393,7 @@
             </div>
         </div>
 
-        </div> <div id="view-search" class="hidden min-h-screen bg-[#F9FAFB] dark:bg-brand-dark-bg pb-24 z-[90] absolute top-0 left-0 w-full page-enter transition-colors duration-500">
+        </div> <div id="view-search" class="hidden min-h-screen bg-[#F9FAFB] dark:bg-brand-dark-bg pb-24 z-[90] absolute top-0 left-0 w-full transition-colors duration-500">
         
         <div class="bg-brand-black dark:bg-[#09090b] text-white safe-header sticky top-0 z-50 transition-colors shadow-md border-b border-[#d7b67d]/30">
             <div class="px-4 md:px-8 flex items-center relative h-12">
@@ -824,13 +824,24 @@
 
         function cekStatusAkses() {
             const lockScreen = document.getElementById('tsl-lock-screen');
+            const viewHome = document.getElementById('view-home');
+            const topTabs = document.getElementById('tsl-top-tabs');
+            
             if (!CONFIG_LIGA_AKTIF) {
-                lockScreen.classList.remove('hidden');
+                if(lockScreen) lockScreen.classList.remove('hidden');
                 jalankanCountdown();
-                document.body.style.overflow = 'hidden'; // Matikan fungsi scroll layar
+                document.body.style.overflow = 'hidden'; 
+                
+                // Matikan data rahasia sampai ke akar
+                if(viewHome) viewHome.classList.add('hidden');
+                if(topTabs) topTabs.classList.add('hidden');
             } else {
-                lockScreen.classList.add('hidden');
-                document.body.style.overflow = ''; // Nyalakan fungsi scroll layar
+                if(lockScreen) lockScreen.classList.add('hidden');
+                document.body.style.overflow = ''; 
+                
+                // Nyalakan liga jika sakelar TRUE
+                if(viewHome) viewHome.classList.remove('hidden');
+                if(topTabs) topTabs.classList.remove('hidden');
             }
         }
         const BASE_API = "https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec";
@@ -1130,24 +1141,25 @@
                     if(topTabs) topTabs.classList.add('hidden');   // Matikan menu atas Liga
                     if(viewSearch) viewSearch.classList.remove('hidden'); // Nyalakan layar Cari
                     
-                    // Pindah Warna Navigasi Bawah ke "Cari"
                     if(bnavTsl) { bnavTsl.classList.remove('text-brand-green'); bnavTsl.classList.add('text-gray-400', 'dark:text-gray-500'); }
                     if(bnavCari) { bnavCari.classList.remove('text-gray-400', 'dark:text-gray-500'); bnavCari.classList.add('text-brand-black', 'dark:text-white'); }
                     
-                    // FIX: Buka kembali kunci scroll khusus untuk Layar Pencarian!
-                    document.body.style.overflow = '';
-                    
+                    document.body.style.overflow = ''; // Bebaskan scroll untuk menu pencarian
                     setActiveNav('pencarian');
-                    window.scrollTo({top: 0, behavior: 'smooth'});
+                    window.scrollTo({top: 0, behavior: 'instant'}); // Pindah Instan 0 detik
                     return; 
                 }
 
                 // C. LOGIKA JIKA MEMBUKA TAB LIGA (Beranda, Jadwal, dll)
-                // FIX: Gembok kembali scroll jika Liga sedang mode OFF/Countdown
-                if (!CONFIG_LIGA_AKTIF) document.body.style.overflow = 'hidden'; 
-                
-                if(viewHome) viewHome.classList.remove('hidden');
-                if(topTabs) topTabs.classList.remove('hidden'); // Menu atas liga kembali
+                if (!CONFIG_LIGA_AKTIF) {
+                    document.body.style.overflow = 'hidden'; // Gembok scroll
+                    if(viewHome) viewHome.classList.add('hidden'); // Paksa mati
+                    if(topTabs) topTabs.classList.add('hidden');   // Paksa mati
+                } else {
+                    document.body.style.overflow = '';
+                    if(viewHome) viewHome.classList.remove('hidden');
+                    if(topTabs) topTabs.classList.remove('hidden');
+                }
                 
                 // Kembalikan Warna Navigasi Bawah ke "TSL Liga"
                 if(bnavTsl) { bnavTsl.classList.add('text-brand-green'); bnavTsl.classList.remove('text-gray-400', 'dark:text-gray-500'); }
