@@ -859,9 +859,13 @@
 
             // 2. BARU LOAD DATA BERAT LAINNYA DI LATAR BELAKANG
             if (typeof tarikDataGaib === 'function') tarikDataGaib(); 
-            if (typeof initIosPrompt === 'function') initIosPrompt(); 
-            if (typeof checkFirstInstall === 'function') checkFirstInstall(); 
             if (typeof initBannerSwipe === 'function') initBannerSwipe(); 
+            
+            // Matikan Pop-up Onboarding & Install jika Liga masih dikunci
+            if (CONFIG_LIGA_AKTIF) {
+                if (typeof initIosPrompt === 'function') initIosPrompt(); 
+                if (typeof checkFirstInstall === 'function') checkFirstInstall(); 
+            } 
         });
         
         // SMOOTH SCROLL FOTMOB HEADER
