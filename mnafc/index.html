@@ -68,6 +68,27 @@
             </div>
     </main>
 
+    <nav id="main-bottom-nav" class="fixed bottom-0 w-full z-[110] bg-white/90 dark:bg-[#09090b]/90 backdrop-blur-xl border-t border-gray-200 dark:border-white/10 pb-safe transition-colors duration-500">
+        <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
+            <a href="/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-gold transition-colors">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
+                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">Operator</span>
+            </a>
+            <a href="/tsl/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-green transition-colors">
+                <i data-lucide="trophy" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
+                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">TSL Liga</span>
+            </a>
+            <button class="flex flex-col items-center justify-center w-full h-full text-brand-blue transition-colors">
+                <i data-lucide="shield" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
+                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">MNA FC</span>
+            </button>
+            <a href="/tsl/#pencarian" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-black dark:hover:text-white transition-colors">
+                <i data-lucide="search" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
+                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">Cari</span>
+            </a>
+        </div>
+    </nav>
+
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbzZsFD9aNzjzBY5AT9wZnc3wMFVoQ60FTjUGyNCxC08H3gGa17GO3MHtI63MNP0JBAkvg/exec';
         let squadData = { pemain: [], statistik: {} };
