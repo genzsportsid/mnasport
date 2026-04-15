@@ -2,8 +2,8 @@
 <html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MNA FC | Database Skuad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>MNA FC | Official Database</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
     <script>
@@ -11,144 +11,140 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    colors: {
-                        'brand-blue': '#2563eb',
-                        'brand-gold': '#d7b67d',
-                        'brand-dark-bg': '#09090b',
-                    }
+                    colors: { 'brand-blue': '#2563eb', 'brand-dark': '#09090b' }
                 }
             }
         }
     </script>
     <style>
-        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        html:not(.dark) .glass-card { background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.05); }
+        .glass-main { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
+        .glass-card:hover { background: rgba(255, 255, 255, 0.1); border-color: #2563eb; transform: translateY(-5px); }
         .hide-scroll::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="bg-white dark:bg-brand-dark-bg text-gray-900 dark:text-white transition-colors duration-500 pb-24">
+<body class="bg-brand-dark text-white selection:bg-brand-blue pb-20">
 
-    <header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-brand-dark-bg/80 backdrop-blur-md border-b border-gray-200 dark:border-white/10 pt-safe">
-        <div class="max-w-3xl mx-auto px-5 h-16 flex items-center justify-between">
-            <h1 class="font-black text-xl tracking-tighter uppercase italic">MNA <span class="text-brand-blue">FC</span></h1>
-            <div class="flex items-center gap-2">
-                <span class="text-[10px] font-bold py-1 px-2 bg-brand-blue/10 text-brand-blue rounded-full uppercase tracking-widest">Database Skuad</span>
+    <div class="relative h-64 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-brand-blue/20 to-brand-dark z-10"></div>
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2000')] bg-cover bg-center opacity-30"></div>
+        <div class="relative z-20 pt-safe px-5 max-w-3xl mx-auto h-full flex flex-col justify-center">
+            <h1 class="text-4xl font-black italic tracking-tighter uppercase">MNA <span class="text-brand-blue">FOOTBALL CLUB</span></h1>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-[0.4em] mt-1">Official Squad Database</p>
+        </div>
+    </div>
+
+    <main class="relative z-30 -mt-10 px-5 max-w-3xl mx-auto">
+        
+        <div id="team-stats" class="glass-main rounded-[2rem] p-6 mb-8 grid grid-cols-3 gap-4">
+            <div class="text-center">
+                <p id="win-rate" class="text-2xl font-black text-brand-blue">0%</p>
+                <p class="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Win Rate</p>
+            </div>
+            <div class="text-center border-x border-white/10">
+                <p id="match-record" class="text-2xl font-black text-white">0-0-0</p>
+                <p class="text-[8px] font-bold text-gray-500 uppercase tracking-widest">W - D - L</p>
+            </div>
+            <div class="text-center">
+                <p id="goal-diff" class="text-2xl font-black text-brand-gold">+0</p>
+                <p class="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Goal Diff</p>
             </div>
         </div>
-    </header>
 
-    <main class="pt-28 px-5 max-w-3xl mx-auto">
-        <div class="mb-8 sticky top-24 z-40 bg-white dark:bg-brand-dark-bg/95 py-2">
-            <div class="relative mb-4">
-                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
-                <input type="text" id="playerSearch" placeholder="Cari nama pemain atau sekolah..." 
-                    class="w-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-brand-blue transition-all">
-            </div>
+        <div class="mb-6 sticky top-20 z-40 bg-brand-dark/80 backdrop-blur-md py-4">
+            <input type="text" id="playerSearch" placeholder="Cari pemain, nomor, atau sekolah..." 
+                class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-5 text-sm mb-4 focus:ring-2 focus:ring-brand-blue outline-none transition-all">
             
-            <div class="flex gap-2 overflow-x-auto hide-scroll pb-2" id="posFilter">
-                <button onclick="filterPos('ALL')" class="pos-btn active px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-brand-blue text-white shadow-lg shadow-brand-blue/20">ALL</button>
-                <button onclick="filterPos('GK')" class="pos-btn px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-gray-100 dark:bg-white/5 text-gray-500">GK</button>
-                <button onclick="filterPos('DEF')" class="pos-btn px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-gray-100 dark:bg-white/5 text-gray-500">DEF</button>
-                <button onclick="filterPos('MID')" class="pos-btn px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-gray-100 dark:bg-white/5 text-gray-500">MID</button>
-                <button onclick="filterPos('FWD')" class="pos-btn px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-gray-100 dark:bg-white/5 text-gray-500">FWD</button>
+            <div class="flex gap-2 overflow-x-auto hide-scroll pb-2">
+                <button onclick="filterPos('ALL')" class="pos-btn bg-brand-blue px-5 py-2 rounded-xl text-[10px] font-black uppercase">All Squad</button>
+                <button onclick="filterPos('GK')" class="pos-btn bg-white/5 px-5 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400">GK</button>
+                <button onclick="filterPos('DEF')" class="pos-btn bg-white/5 px-5 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400">DEF</button>
+                <button onclick="filterPos('MID')" class="pos-btn bg-white/5 px-5 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400">MID</button>
+                <button onclick="filterPos('FWD')" class="pos-btn bg-white/5 px-5 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400">FWD</button>
             </div>
         </div>
 
         <div id="playerGrid" class="grid grid-cols-1 gap-4">
-            <div class="py-20 text-center animate-pulse">
-                <i data-lucide="refresh-cw" class="w-8 h-8 mx-auto text-gray-400 animate-spin mb-4"></i>
-                <p class="text-xs font-bold uppercase tracking-widest text-gray-500">Mengunduh Database...</p>
             </div>
-        </div>
     </main>
 
-    <nav class="fixed bottom-0 w-full z-50 bg-white/90 dark:bg-[#09090b]/90 backdrop-blur-xl border-t border-gray-200 dark:border-white/10 pb-safe">
-        <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
-            <a href="/" class="flex flex-col items-center text-gray-400">
-                <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i>
-                <span class="text-[8px] font-bold uppercase">Operator</span>
-            </a>
-            <div class="flex flex-col items-center text-brand-blue">
-                <i data-lucide="shield" class="w-5 h-5 mb-1"></i>
-                <span class="text-[8px] font-bold uppercase">MNA FC</span>
-            </div>
-        </div>
-    </nav>
-
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbyM8vOysl4XypFzfmRSzvtb2MyZbtXzqXIaA_Av_vXrzJvyoniiRa5s3DCS965Tbt6nmQ/exec';
-        let allPlayers = [];
+        const API_URL = 'URL_WEB_APP_ANDA';
+        let squadData = { pemain: [], statistik: {} };
 
-        async function initDatabase() {
+        async function init() {
             try {
                 const res = await fetch(API_URL);
-                allPlayers = await res.json();
-                renderPlayers(allPlayers);
-            } catch (err) {
-                document.getElementById('playerGrid').innerHTML = `<p class="text-center py-10 text-red-500 font-bold text-xs uppercase">Gagal Memuat Data</p>`;
-            }
+                squadData = await res.json();
+                updateTeamDashboard(squadData.statistik);
+                renderPlayers(squadData.pemain);
+            } catch (e) { console.error(e); }
             lucide.createIcons();
         }
 
-        function renderPlayers(players) {
+        function updateTeamDashboard(s) {
+            const total = s.menang + s.seri + s.kalah;
+            const wr = total > 0 ? Math.round((s.menang / total) * 100) : 0;
+            document.getElementById('win-rate').innerText = wr + '%';
+            document.getElementById('match-record').innerText = `${s.menang}-${s.seri}-${s.kalah}`;
+            document.getElementById('goal-diff').innerText = (s.gol_masuk - s.gol_kemasukan >= 0 ? '+' : '') + (s.gol_masuk - s.gol_kemasukan);
+        }
+
+        function renderPlayers(list) {
             const grid = document.getElementById('playerGrid');
-            grid.innerHTML = players.map(p => `
-                <div class="glass-card rounded-[2rem] p-5 flex items-center gap-5 hover:scale-[1.02] transition-transform">
-                    <div class="relative shrink-0">
-                        <div class="w-20 h-20 rounded-2xl overflow-hidden bg-gray-200 dark:bg-white/10">
-                            <img src="${p.link_foto || 'https://via.placeholder.com/150'}" class="w-full h-full object-cover">
-                        </div>
-                        <div class="absolute -bottom-2 -right-2 bg-brand-blue text-white w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm border-2 border-white dark:border-brand-dark-bg">
-                            ${p.nomor || '0'}
-                        </div>
+            grid.innerHTML = list.map(p => `
+                <div class="glass-card rounded-[2.5rem] p-5 flex items-center gap-5 relative overflow-hidden group">
+                    <div class="absolute -right-4 -bottom-4 text-7xl font-black text-white/5 italic group-hover:text-brand-blue/10 transition-colors">${p.nomor}</div>
+                    
+                    <div class="w-24 h-24 rounded-3xl overflow-hidden bg-white/10 shrink-0 border border-white/10">
+                        <img src="${p.link_foto || 'https://via.placeholder.com/200'}" class="w-full h-full object-cover">
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start mb-1">
+
+                    <div class="flex-1 min-w-0 z-10">
+                        <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-black text-base uppercase leading-tight truncate">${p.nama}</h4>
-                                <p class="text-[10px] font-bold text-brand-blue uppercase tracking-widest">${p.posisi} ${p.posisi_alt ? '• '+p.posisi_alt : ''}</p>
+                                <h4 class="text-lg font-black uppercase tracking-tighter truncate">${p.nama}</h4>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[9px] font-bold bg-brand-blue/20 text-brand-blue px-2 py-0.5 rounded-full uppercase">${p.posisi}</span>
+                                    <span class="text-[9px] text-gray-500 font-bold uppercase">${p.kategori}</span>
+                                </div>
                             </div>
-                            <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">${p.kategori}</span>
+                            <div class="text-right">
+                                <p class="text-[14px] font-black text-brand-gold">${p.gol} GOL</p>
+                            </div>
                         </div>
-                        <div class="flex gap-4 mt-3 pt-3 border-t border-gray-100 dark:border-white/5">
-                            <div class="text-center"><p class="text-[8px] text-gray-500 font-bold uppercase">Kaki</p><p class="text-xs font-black uppercase">${p.kaki}</p></div>
-                            <div class="text-center"><p class="text-[8px] text-gray-500 font-bold uppercase">Tinggi</p><p class="text-xs font-black">${p.tinggi}cm</p></div>
-                            <div class="text-center"><p class="text-[8px] text-gray-500 font-bold uppercase">Gol</p><p class="text-xs font-black text-brand-gold">${p.gol}</p></div>
+                        
+                        <div class="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-white/5">
+                            <div><p class="text-[7px] text-gray-500 uppercase font-bold">Kaki</p><p class="text-[10px] font-bold uppercase">${p.kaki}</p></div>
+                            <div><p class="text-[7px] text-gray-500 uppercase font-bold">Tinggi</p><p class="text-[10px] font-bold">${p.tinggi}cm</p></div>
+                            <div><p class="text-[7px] text-gray-500 uppercase font-bold">Sekolah</p><p class="text-[10px] font-bold truncate">${p.sekolah}</p></div>
                         </div>
                     </div>
                 </div>
             `).join('');
-            if(players.length === 0) grid.innerHTML = `<p class="text-center py-20 text-gray-500 font-bold text-xs uppercase">Pemain Tidak Ditemukan</p>`;
             lucide.createIcons();
         }
 
-        // Filter & Search Logic
-        let activePos = 'ALL';
-        const searchInput = document.getElementById('playerSearch');
-
+        // Logic Filter & Search (Sama seperti sebelumnya namun lebih clean)
         function filterPos(pos) {
-            activePos = pos;
-            document.querySelectorAll('.pos-btn').forEach(btn => {
-                btn.classList.remove('bg-brand-blue', 'text-white', 'shadow-lg');
-                btn.classList.add('bg-gray-100', 'dark:bg-white/5', 'text-gray-500');
-            });
-            event.target.classList.replace('bg-gray-100', 'bg-brand-blue');
-            event.target.classList.replace('text-gray-500', 'text-white');
-            applyFilters();
-        }
-
-        function applyFilters() {
-            const query = searchInput.value.toLowerCase();
-            const filtered = allPlayers.filter(p => {
-                const matchSearch = p.nama.toLowerCase().includes(query) || p.sekolah.toLowerCase().includes(query);
-                const matchPos = activePos === 'ALL' || p.posisi === activePos;
-                return matchSearch && matchPos;
+            const query = document.getElementById('playerSearch').value.toLowerCase();
+            const filtered = squadData.pemain.filter(p => {
+                const mSearch = p.nama.toLowerCase().includes(query) || p.sekolah.toLowerCase().includes(query);
+                const mPos = pos === 'ALL' || p.posisi === pos;
+                return mSearch && mPos;
             });
             renderPlayers(filtered);
+            
+            // Update Active State Button
+            document.querySelectorAll('.pos-btn').forEach(b => {
+                b.classList.remove('bg-brand-blue', 'text-white');
+                b.classList.add('bg-white/5', 'text-gray-400');
+            });
+            event.target.classList.add('bg-brand-blue', 'text-white');
         }
 
-        searchInput.addEventListener('input', applyFilters);
-        window.addEventListener('DOMContentLoaded', initDatabase);
+        document.getElementById('playerSearch').addEventListener('input', () => filterPos('ALL'));
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
