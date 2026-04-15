@@ -194,20 +194,25 @@
                 <h2 class="font-heading font-black text-3xl text-white uppercase tracking-tighter">Trenggalek <br/> Student League</h2>
                 <p class="text-[#009A44] font-bold text-[10px] uppercase tracking-[0.3em] mt-2 mb-10">Coming Soon 2026</p>
                 
-                <div class="flex gap-3 justify-center mb-10">
-                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 min-w-[70px]">
-                        <span id="cd-days" class="block text-2xl font-black text-white">00</span>
-                        <span class="text-[8px] text-gray-500 uppercase font-bold">Hari</span>
-                    </div>
-                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 min-w-[70px]">
-                        <span id="cd-hours" class="block text-2xl font-black text-white">00</span>
-                        <span class="text-[8px] text-gray-500 uppercase font-bold">Jam</span>
-                    </div>
-                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 min-w-[70px]">
-                        <span id="cd-mins" class="block text-2xl font-black text-white">00</span>
-                        <span class="text-[8px] text-gray-500 uppercase font-bold">Menit</span>
-                    </div>
+                <div class="flex gap-2 md:gap-3 justify-center mb-10 w-full px-4">
+                <div class="flex-1 max-w-[80px] bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col items-center justify-center">
+                    <span id="cd-days" class="block text-xl md:text-2xl font-black text-white">00</span>
+                    <span class="text-[8px] text-gray-500 uppercase font-bold mt-0.5">Hari</span>
                 </div>
+                <div class="flex-1 max-w-[80px] bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col items-center justify-center">
+                    <span id="cd-hours" class="block text-xl md:text-2xl font-black text-white">00</span>
+                    <span class="text-[8px] text-gray-500 uppercase font-bold mt-0.5">Jam</span>
+                </div>
+                <div class="flex-1 max-w-[80px] bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col items-center justify-center">
+                    <span id="cd-mins" class="block text-xl md:text-2xl font-black text-white">00</span>
+                    <span class="text-[8px] text-gray-500 uppercase font-bold mt-0.5">Menit</span>
+                </div>
+                <div class="flex-1 max-w-[80px] bg-brand-green/10 border border-brand-green/20 rounded-2xl p-3 flex flex-col items-center justify-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-brand-green/5 animate-pulse"></div>
+                    <span id="cd-secs" class="block text-xl md:text-2xl font-black text-brand-green relative z-10">00</span>
+                    <span class="text-[8px] text-brand-green/70 uppercase font-bold mt-0.5 relative z-10">Detik</span>
+                </div>
+            </div>
                 
                 <p class="text-xs text-gray-400 max-w-xs mx-auto italic">"Membangun generasi juara dari bangku sekolah."</p>
             </div>
@@ -826,10 +831,24 @@
                     return;
                 }
                 
-                document.getElementById('cd-days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
-                document.getElementById('cd-hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
-                document.getElementById('cd-mins').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-            }, 1000);
+                // Rumus Matematika Waktu
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                // Lempar data ke layar (dengan pengisi angka 0 di depan jika di bawah 10)
+                const elDays = document.getElementById('cd-days');
+                const elHours = document.getElementById('cd-hours');
+                const elMins = document.getElementById('cd-mins');
+                const elSecs = document.getElementById('cd-secs');
+
+                if(elDays) elDays.innerText = d.toString().padStart(2, '0');
+                if(elHours) elHours.innerText = h.toString().padStart(2, '0');
+                if(elMins) elMins.innerText = m.toString().padStart(2, '0');
+                if(elSecs) elSecs.innerText = s.toString().padStart(2, '0');
+                
+            }, 1000); // Sistem berdetak setiap 1000 milidetik (1 detik)
         }
 
         function cekStatusAkses() {
