@@ -243,7 +243,7 @@
                     <i data-lucide="timer" class="w-8 h-8 text-brand-gold"></i>
                 </div>
                 <h3 class="font-heading font-bold text-xl text-brand-black dark:text-white transition-colors">Liga Belum Dimulai</h3>
-                <p class="text-xs text-gray-500 mt-2 transition-colors">Sistem jadwal dan klasemen akan otomatis aktif saat turnamen resmi dibuka.</p>
+                <p class="text-xs text-gray-500 mt-2 transition-colors">Sistem jadwal dan klasemen akan otomatis aktif saat turnamen resmi dibuka (26 Juli 2026).</p>
             </div>
         </div>
         <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Portal Aplikasi Utama</h3>
@@ -679,9 +679,33 @@
             });
         }
 
+        // ==========================================
+        // SAKELAR MASTER (MASTER SWITCH)
+        // Ubah ke 'true' jika liga dimulai, 'false' jika liga belum dimulai
+        // ==========================================
+        const CONFIG_LIGA_AKTIF = false; 
+
+        function updateTampilanLiga() {
+            const sectionOn = document.getElementById('section-liga-aktif');
+            const sectionOff = document.getElementById('banner-liga-off');
+            
+            if (CONFIG_LIGA_AKTIF) {
+                if(sectionOn) sectionOn.classList.remove('hidden');
+                if(sectionOff) sectionOff.classList.add('hidden');
+            } else {
+                if(sectionOn) sectionOn.classList.add('hidden');
+                if(sectionOff) sectionOff.classList.remove('hidden');
+            }
+        }
+
         // Jalankan Sinkronisasi saat web dimuat
         window.addEventListener('DOMContentLoaded', () => {
+            updateTampilanLiga(); // Jalankan sakelar
             syncThemeUI();
+            
+            // Pastikan data tetap di-fetch di latar belakang
+            if (typeof tarikDataPreview === 'function') tarikDataPreview();
+            
             if(Notification.permission === 'granted' && document.getElementById('notif-text')) {
                 document.getElementById('notif-text').innerText = 'Notifikasi Aktif';
                 document.getElementById('notif-text').classList.add('text-brand-green');
