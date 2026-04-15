@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="id" class="dark scroll-smooth">
-<script>
+<head>
+    <script>
         if (localStorage.getItem('mna_theme') === 'light') {
             document.documentElement.classList.remove('dark');
         } else {
             document.documentElement.classList.add('dark');
         }
     </script>
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MNA Sport Management | Command Center</title>
@@ -56,6 +56,7 @@
     </style>
 </head>
 <body class="font-body bg-[#F9FAFB] dark:bg-[#000000] text-brand-black dark:text-white antialiased overflow-x-hidden selection:bg-brand-gold selection:text-brand-dark-bg pb-[100px] transition-colors duration-500">
+    
     <div id="global-menu-overlay" class="fixed inset-0 z-[110] hidden">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="toggleGlobalMenu()"></div>
         
@@ -112,12 +113,6 @@
             </div>
         </div>
     </div>
-
-            <div class="p-5 border-t border-white/5 text-center">
-                <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">MNA Super App v1.0.0</span>
-            </div>
-        </div>
-    </div>
     <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden flex items-start justify-center">
         <div class="w-[600px] h-[400px] bg-brand-gold-dark/15 blur-[120px] rounded-full mt-[-100px]"></div>
     </div>
@@ -133,7 +128,7 @@
                     <p class="text-[9px] text-brand-gold font-bold uppercase tracking-widest mt-0.5">Ecosystem Operator</p>
                 </div>
             </div>
-            <button onclick="toggleGlobalMenu()" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors">
+            <button onclick="toggleGlobalMenu()" class="w-8 h-8 flex items-center justify-center rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/5 dark:border-white/10 transition-colors">
                 <i data-lucide="menu" class="w-4 h-4 text-brand-gold"></i>
             </button>
         </div>
@@ -246,6 +241,7 @@
                 <p class="text-xs text-gray-500 mt-2 transition-colors">Sistem jadwal dan klasemen akan otomatis aktif saat turnamen resmi dibuka (26 Juli 2026).</p>
             </div>
         </div>
+
         <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Portal Aplikasi Utama</h3>
         
         <div class="flex flex-col gap-4">
@@ -342,6 +338,7 @@
 
         const TSL_API_URL = 'https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec'; 
         let globalKlasemenCache = [];
+
         // ==========================================
         // SAKELAR MASTER (MASTER SWITCH)
         // Ubah ke 'true' jika liga dimulai, 'false' jika liga belum dimulai
@@ -360,7 +357,7 @@
                 if(sectionOff) sectionOff.classList.remove('hidden');
             }
         }
-        // 1. MESIN PENDETEKSI GOL & KARTU (GLOBAL RADAR)
+
         function cekNotifikasiBaru(dataEventBaru) {
             if (!("Notification" in window) || Notification.permission !== "granted") return;
             if (!dataEventBaru || dataEventBaru.length === 0) return;
@@ -396,12 +393,10 @@
             localStorage.setItem('tsl_event_count', currentCount.toString());
         }
 
-        // 2. MESIN RENDER KLASEMEN MINI (MULTI-GRUP TAHAN BANTING)
         function renderMiniKlasemen(jenjang) {
             const klasemenWadah = document.getElementById('mini-klasemen-list');
             if(!klasemenWadah) return;
 
-            // Update UI Tombol Toggle Adaptif
             const btnSmp = document.getElementById('btn-mini-smp');
             const btnSma = document.getElementById('btn-mini-sma');
             if (btnSmp && btnSma) {
@@ -461,7 +456,6 @@
                                 if (lowerK === 'poin' || lowerK === 'pts') poin = klub[k];
                             }
                             
-                            // Pewarnaan teks adaptif, Posisi ke-1 tetap Emas. Sisanya Hitam/Putih.
                             const colorPos = idx === 0 ? 'text-brand-gold' : 'text-brand-black dark:text-white';
 
                             klasemenWadah.innerHTML += `
@@ -482,7 +476,6 @@
             }
         }
 
-        // FUNGSI RENDER JADWAL (DIPISAH AGAR BISA DIPANGGIL CACHE)
         function renderJadwalTerdekat(dataJadwal) {
             const jadwalWadah = document.getElementById('mini-jadwal-list');
             if (!jadwalWadah) return;
@@ -529,11 +522,7 @@
             }
         }
 
-        // ==========================================
-        // 3. MESIN PENYEDOT DATA (CACHE-FIRST FULL SPEED)
-        // ==========================================
         async function tarikDataPreview() {
-            // LANGKAH 1: BACA CACHE LOKAL & TAMPILKAN INSTAN (0 Detik)
             const cacheJadwal = localStorage.getItem('mna_cache_jadwal');
             const cacheKlasemen = localStorage.getItem('mna_cache_klasemen');
             
@@ -541,22 +530,15 @@
                 try {
                     const parsedJadwal = JSON.parse(cacheJadwal);
                     const parsedKlasemen = JSON.parse(cacheKlasemen);
-                    
-                    // Render Jadwal instan dari cache
                     renderJadwalTerdekat(parsedJadwal);
-                    
-                    // Render Klasemen instan dari cache
                     globalKlasemenCache = parsedKlasemen;
-                    let activeDivisi = 'SMA'; // Default
+                    let activeDivisi = 'SMA';
                     const btnSma = document.getElementById('btn-mini-sma');
                     if (btnSma && !btnSma.classList.contains('bg-brand-gold')) activeDivisi = 'SMP';
-                    
-                    // PERBAIKAN: Lepas kunci syarat, langsung cetak cache ke layar!
                     renderMiniKlasemen(activeDivisi);
                 } catch(e) { console.error("Gagal membaca cache:", e); }
             }
 
-            // LANGKAH 2: TARIK DATA BARU DI LATAR BELAKANG (SILENT FETCH)
             try {
                 const [resJadwal, resKlasemen, resEvent] = await Promise.all([
                     fetch(`${TSL_API_URL}?sheet=Jadwal&t=${Date.now()}`),
@@ -568,14 +550,11 @@
                 const dataKlasemen = await resKlasemen.json();
                 const dataEvent = await resEvent.json();
 
-                // Picu Radar Notifikasi
                 if (Array.isArray(dataEvent)) cekNotifikasiBaru(dataEvent);
 
-                // SIMPAN DATA BARU KE CACHE
                 localStorage.setItem('mna_cache_jadwal', JSON.stringify(dataJadwal));
                 localStorage.setItem('mna_cache_klasemen', JSON.stringify(dataKlasemen));
 
-                // RENDER ULANG LAYAR DENGAN DATA FRESH DARI INTERNET
                 renderJadwalTerdekat(dataJadwal);
                 
                 if (Array.isArray(dataKlasemen)) {
@@ -583,14 +562,11 @@
                     let activeDivisi = 'SMA';
                     const btnSma = document.getElementById('btn-mini-sma');
                     if (btnSma && !btnSma.classList.contains('bg-brand-gold')) activeDivisi = 'SMP';
-                    
-                    // PERBAIKAN: Selalu render ulang agar perubahan poin langsung terlihat mulus
                     renderMiniKlasemen(activeDivisi); 
                 }
 
             } catch (error) {
                 console.error("Gagal menyinkronkan data background:", error);
-                // Tampilkan error hanya jika Cache benar-benar kosong dan internet mati
                 if (!cacheJadwal) {
                     const jWadah = document.getElementById('mini-jadwal-list');
                     const kWadah = document.getElementById('mini-klasemen-list');
@@ -600,7 +576,6 @@
             }
         }
 
-        // 4. REGISTRASI PWA SERVICE WORKER
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js').then((registration) => {
@@ -611,17 +586,6 @@
             });
         }
 
-        // Jalankan saat pertama dibuka
-        window.addEventListener('DOMContentLoaded', () => {
-         updateTampilanLiga();
-         tarikDataPreview();
-     });
-        // Jalankan Radar Otomatis Setiap 30 Detik (Background Polling)
-        setInterval(tarikDataPreview, 30000);
-
-        // ==========================================
-        // SISTEM GLOBAL MENU & PENGATURAN
-        // ==========================================
         function toggleGlobalMenu() {
             const overlay = document.getElementById('global-menu-overlay');
             const panel = document.getElementById('global-menu-panel');
@@ -680,30 +644,12 @@
         }
 
         // ==========================================
-        // SAKELAR MASTER (MASTER SWITCH)
-        // Ubah ke 'true' jika liga dimulai, 'false' jika liga belum dimulai
+        // INISIALISASI SAAT WEBSITE DIMUAT
         // ==========================================
-        const CONFIG_LIGA_AKTIF = false; 
-
-        function updateTampilanLiga() {
-            const sectionOn = document.getElementById('section-liga-aktif');
-            const sectionOff = document.getElementById('banner-liga-off');
-            
-            if (CONFIG_LIGA_AKTIF) {
-                if(sectionOn) sectionOn.classList.remove('hidden');
-                if(sectionOff) sectionOff.classList.add('hidden');
-            } else {
-                if(sectionOn) sectionOn.classList.add('hidden');
-                if(sectionOff) sectionOff.classList.remove('hidden');
-            }
-        }
-
-        // Jalankan Sinkronisasi saat web dimuat
         window.addEventListener('DOMContentLoaded', () => {
-            updateTampilanLiga(); // Jalankan sakelar
+            updateTampilanLiga();
             syncThemeUI();
             
-            // Pastikan data tetap di-fetch di latar belakang
             if (typeof tarikDataPreview === 'function') tarikDataPreview();
             
             if(Notification.permission === 'granted' && document.getElementById('notif-text')) {
@@ -711,6 +657,10 @@
                 document.getElementById('notif-text').classList.add('text-brand-green');
             }
         });
+
+        // Polling Data Background
+        setInterval(tarikDataPreview, 30000);
+
     </script>
 </body>
 </html>
