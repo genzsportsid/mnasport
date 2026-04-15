@@ -172,7 +172,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+        <div id="section-liga-aktif" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10 transition-all duration-500">
             
             <div class="glass-card rounded-[1.5rem] p-5 flex flex-col relative overflow-hidden group">
                 <div class="absolute right-0 top-0 w-32 h-32 bg-brand-green/10 rounded-full blur-2xl -z-10 group-hover:bg-brand-green/20 transition-all duration-500"></div>
@@ -236,7 +236,16 @@
             </div>
 
         </div>
-
+        
+        <div id="banner-liga-off" class="hidden mb-10">
+            <div class="glass-card rounded-[1.5rem] p-8 text-center border-dashed border-brand-gold/30">
+                <div class="w-16 h-16 bg-brand-gold/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="timer" class="w-8 h-8 text-brand-gold"></i>
+                </div>
+                <h3 class="font-heading font-bold text-xl text-brand-black dark:text-white transition-colors">Liga Belum Dimulai</h3>
+                <p class="text-xs text-gray-500 mt-2 transition-colors">Sistem jadwal dan klasemen akan otomatis aktif saat turnamen resmi dibuka.</p>
+            </div>
+        </div>
         <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Portal Aplikasi Utama</h3>
         
         <div class="flex flex-col gap-4">
@@ -333,7 +342,24 @@
 
         const TSL_API_URL = 'https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec'; 
         let globalKlasemenCache = [];
+        // ==========================================
+        // SAKELAR MASTER (MASTER SWITCH)
+        // Ubah ke 'true' jika liga dimulai, 'false' jika liga belum dimulai
+        // ==========================================
+        const CONFIG_LIGA_AKTIF = false; 
 
+        function updateTampilanLiga() {
+            const sectionOn = document.getElementById('section-liga-aktif');
+            const sectionOff = document.getElementById('banner-liga-off');
+            
+            if (CONFIG_LIGA_AKTIF) {
+                if(sectionOn) sectionOn.classList.remove('hidden');
+                if(sectionOff) sectionOff.classList.add('hidden');
+            } else {
+                if(sectionOn) sectionOn.classList.add('hidden');
+                if(sectionOff) sectionOff.classList.remove('hidden');
+            }
+        }
         // 1. MESIN PENDETEKSI GOL & KARTU (GLOBAL RADAR)
         function cekNotifikasiBaru(dataEventBaru) {
             if (!("Notification" in window) || Notification.permission !== "granted") return;
@@ -586,8 +612,10 @@
         }
 
         // Jalankan saat pertama dibuka
-        window.addEventListener('DOMContentLoaded', tarikDataPreview);
-
+        window.addEventListener('DOMContentLoaded', () => {
+         updateTampilanLiga();
+         tarikDataPreview();
+     });
         // Jalankan Radar Otomatis Setiap 30 Detik (Background Polling)
         setInterval(tarikDataPreview, 30000);
 
