@@ -175,6 +175,33 @@
    
 </head>
 <body class="font-body text-brand-black dark:text-white bg-[#F9FAFB] dark:bg-brand-dark-bg antialiased overflow-x-hidden selection:bg-brand-green selection:text-white pb-[150px] transition-colors duration-500">
+<div id="tsl-lock-screen" class="fixed inset-0 z-[999] bg-[#09090b] flex flex-col items-center justify-center p-6 text-center hidden transition-opacity duration-500">
+        <div class="absolute inset-0 opacity-20 pointer-events-none" 
+             style="background-image: radial-gradient(circle at 50% 50%, #009A44 0%, transparent 70%);"></div>
+        
+        <div class="relative z-10">
+            <img src="./logo-tsl.png" class="w-24 h-24 mx-auto mb-6 drop-shadow-[0_0_15px_rgba(0,154,68,0.4)]">
+            <h2 class="font-heading font-black text-3xl text-white uppercase tracking-tighter">Trenggalek <br/> Student League</h2>
+            <p class="text-[#009A44] font-bold text-[10px] uppercase tracking-[0.3em] mt-2 mb-10">Coming Soon 2026</p>
+            
+            <div class="flex gap-3 justify-center mb-10">
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-4 min-w-[70px]">
+                    <span id="cd-days" class="block text-2xl font-black text-white">00</span>
+                    <span class="text-[8px] text-gray-500 uppercase font-bold">Hari</span>
+                </div>
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-4 min-w-[70px]">
+                    <span id="cd-hours" class="block text-2xl font-black text-white">00</span>
+                    <span class="text-[8px] text-gray-500 uppercase font-bold">Jam</span>
+                </div>
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-4 min-w-[70px]">
+                    <span id="cd-mins" class="block text-2xl font-black text-white">00</span>
+                    <span class="text-[8px] text-gray-500 uppercase font-bold">Menit</span>
+                </div>
+            </div>
+            
+            <p class="text-xs text-gray-400 max-w-xs mx-auto italic">"Membangun generasi juara dari bangku sekolah."</p>
+        </div>
+    </div>
 <div id="modal-onboarding" class="fixed inset-0 z-[200] hidden items-center justify-center p-4 bg-brand-black/80 backdrop-blur-md">
         <div class="relative w-full max-w-sm bg-white dark:bg-brand-dark-surface rounded-3xl shadow-2xl modal-enter border border-gray-200 dark:border-brand-dark-border p-6 md:p-8 text-center overflow-hidden">
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-green/20 rounded-full blur-2xl pointer-events-none"></div>
@@ -771,6 +798,42 @@
     </div>
 
     <script>
+        // ==========================================
+        // SAKELAR MASTER LIGA & COUNTDOWN (TSL)
+        // Ubah 'false' menjadi 'true' jika liga sudah dimulai
+        // ==========================================
+        const CONFIG_LIGA_AKTIF = false; 
+        const TANGGAL_MULAI = "2026-07-01T08:00:00"; // Ganti dengan jadwal kick-off asli Anda (Tahun-Bulan-Hari T Jam:Menit:Detik)
+
+        function jalankanCountdown() {
+            const target = new Date(TANGGAL_MULAI).getTime();
+            
+            const timer = setInterval(() => {
+                const now = new Date().getTime();
+                const diff = target - now;
+                
+                if (diff <= 0) {
+                    clearInterval(timer);
+                    return;
+                }
+                
+                document.getElementById('cd-days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+                document.getElementById('cd-hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+                document.getElementById('cd-mins').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+            }, 1000);
+        }
+
+        function cekStatusAkses() {
+            const lockScreen = document.getElementById('tsl-lock-screen');
+            if (!CONFIG_LIGA_AKTIF) {
+                lockScreen.classList.remove('hidden');
+                jalankanCountdown();
+                document.body.style.overflow = 'hidden'; // Matikan fungsi scroll layar
+            } else {
+                lockScreen.classList.add('hidden');
+                document.body.style.overflow = ''; // Nyalakan fungsi scroll layar
+            }
+        }
         const BASE_API = "https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec";
         
         let rawData = { Klasemen: [], Pemain: [], Jadwal: [], TopSkor: [], Lineup: [], Event_Match: [], Stat_Match: [] };
@@ -784,7 +847,8 @@
         const safeStr = (val) => String(val || "").replace(/'/g, "\\'").replace(/"/g, "&quot;");
         const getAvatar = (nama, isTim = false) => { if(!nama) nama = "Unknown"; let b = isTim ? '111' : 'F3F4F6'; let c = isTim ? 'fff' : '9CA3AF'; return `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=${b}&color=${c}&bold=true&format=svg`; };
 
-        window.addEventListener('DOMContentLoaded', () => { 
+        window.addEventListener('DOMContentLoaded', () => {
+                cekStatusAkses();
             initTheme(); 
             
             // 1. PINDAH TAB SECARA INSTAN TANPA JEDA (0 Detik)
