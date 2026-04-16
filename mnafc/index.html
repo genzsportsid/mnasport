@@ -70,25 +70,23 @@
         <div id="playerGrid" class="grid grid-cols-1 gap-4"></div>
     </main>
 
-    <div id="playerModal" class="fixed inset-0 z-[150] hidden flex items-center justify-center p-5">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal()"></div>
-        <div id="modalContent" class="glass-modal w-full max-w-sm rounded-[2.5rem] overflow-hidden relative z-10 modal-enter">
-            </div>
-    </div>
-
-    <nav id="main-bottom-nav" class="fixed bottom-0 w-full z-[100] bg-white/90 dark:bg-[#09090b]/90 backdrop-blur-xl border-t border-gray-200 dark:border-white/10 pb-safe transition-colors">
+    <nav id="main-bottom-nav" class="fixed bottom-0 w-full z-[110] bg-white/90 dark:bg-[#09090b]/90 backdrop-blur-xl border-t border-gray-200 dark:border-white/10 pb-safe transition-colors duration-500">
         <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
             <a href="/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-gold transition-colors">
-                <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i>
-                <span class="text-[8px] font-bold uppercase">Operator</span>
+                <i data-lucide="layout-dashboard" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
+                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">Operator</span>
+            </a>
+            <a href="/tsl/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-green transition-colors">
+                <i data-lucide="trophy" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
+                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">TSL Liga</span>
             </a>
             <button class="flex flex-col items-center justify-center w-full h-full text-brand-blue transition-colors">
-                <i data-lucide="shield" class="w-5 h-5 mb-1"></i>
-                <span class="text-[8px] font-bold uppercase">MNA FC</span>
+                <i data-lucide="shield" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
+                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">MNA FC</span>
             </button>
             <a href="/tsl/#pencarian" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-black dark:hover:text-white transition-colors">
-                <i data-lucide="search" class="w-5 h-5 mb-1"></i>
-                <span class="text-[8px] font-bold uppercase">Cari</span>
+                <i data-lucide="search" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
+                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">Cari</span>
             </a>
         </div>
     </nav>
@@ -98,12 +96,36 @@
         let squadData = { pemain: [], statistik: {} };
 
         async function init() {
+            // 1. LOAD DARI CACHE (INSTAN 0 DETIK)
+            const cacheData = localStorage.getItem('mnafc_cache_squad');
+            if (cacheData) {
+                try {
+                    squadData = JSON.parse(cacheData);
+                    updateTeamDashboard(squadData.statistik);
+                    renderPlayers(squadData.pemain);
+                } catch (e) { console.error("Gagal membaca cache:", e); }
+            }
+
+            // 2. AMBIL DATA BARU DI LATAR BELAKANG (SILENT UPDATE)
             try {
-                const res = await fetch(API_URL);
-                squadData = await res.json();
+                const res = await fetch(`${API_URL}?t=${Date.now()}`); // Tambah timestamp agar tidak kena cache browser
+                const newData = await res.json();
+                
+                // Simpan data terbaru ke memori HP
+                localStorage.setItem('mnafc_cache_squad', JSON.stringify(newData));
+                
+                // Perbarui tampilan dengan data fresh tanpa reload
+                squadData = newData;
                 updateTeamDashboard(squadData.statistik);
                 renderPlayers(squadData.pemain);
-            } catch (e) { console.error(e); }
+                
+            } catch (err) {
+                console.error("Gagal menyinkronkan data terbaru:", err);
+                // Jika cache kosong dan internet mati, baru tampilkan error
+                if (!cacheData) {
+                    document.getElementById('playerGrid').innerHTML = `<p class="text-center py-10 text-red-500 font-bold text-xs uppercase">Gagal Memuat Data</p>`;
+                }
+            }
             lucide.createIcons();
         }
 
