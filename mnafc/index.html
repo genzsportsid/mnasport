@@ -215,13 +215,32 @@
 
         function filterPos(pos) {
             const query = document.getElementById('playerSearch').value.toLowerCase();
+            
+            // MESIN PEMETAAN POSISI (Berdasarkan Standar Tim Profesional MNA)
+            const getBroadPos = (detailedPos) => {
+                let p = String(detailedPos).toUpperCase().replace(/\s+/g, '');
+                // 1. Goalkeeper
+                if(['GK','KIPER'].includes(p)) return 'GK';
+                // 2. Defender (CB, RB, LB, RWB, LWB)
+                if(['CB','RB','LB','RWB','LWB','DEF','BEK'].includes(p)) return 'DEF';
+                // 3. Midfielder (CDM, CM, CAM, RM, LM)
+                if(['CM','CDM','CAM','RM','LM','MID','TENGAH'].includes(p)) return 'MID';
+                // 4. Forward / Penyerang (ST, CF, SS, RW, LW)
+                if(['ST','CF','SS','RW','LW','FWD','DEPAN','PENYERANG'].includes(p)) return 'FWD';
+                
+                return 'LAINNYA';
+            };
+
             const filtered = squadData.pemain.filter(p => {
                 const mSearch = p.nama.toLowerCase().includes(query) || p.sekolah.toLowerCase().includes(query);
-                const mPos = pos === 'ALL' || p.posisi === pos;
+                // Bandingkan posisi yang sudah dibungkus dengan tombol filter yang ditekan
+                const mPos = pos === 'ALL' || getBroadPos(p.posisi) === pos;
                 return mSearch && mPos;
             });
+            
             renderPlayers(filtered);
             
+            // Perbarui visual tombol yang aktif
             document.querySelectorAll('.pos-btn').forEach(b => {
                 b.classList.remove('bg-brand-blue', 'text-white');
                 b.classList.add('bg-gray-100', 'dark:bg-white/5', 'text-gray-400');
