@@ -37,37 +37,61 @@
         .stagger-item { animation: fadeUp 0.5s ease forwards; opacity: 0; transform: translateY(10px); }
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
-        /* Tactical Pitch Design */
-        .pitch-container { position: relative; width: 100%; height: 180px; background: rgba(59, 130, 246, 0.05); border: 1.5px solid rgba(59, 130, 246, 0.2); border-radius: 12px; overflow: hidden; }
-        .pitch-container.large { height: 250px; border-radius: 24px; }
-        .pitch-line { position: absolute; border: 1px solid rgba(59, 130, 246, 0.15); }
-        .pitch-half { top: 0; left: 0; width: 100%; height: 50%; border-bottom: 1px solid rgba(59, 130, 246, 0.2); }
-        .pitch-circle { top: 50%; left: 50%; width: 50px; height: 50px; border-radius: 50%; transform: translate(-50%, -50%); }
-        .pitch-penalty { top: 0; left: 25%; width: 50%; height: 20%; border: 1px solid rgba(59, 130, 246, 0.2); border-top: 0; }
-        .pitch-penalty-bottom { bottom: 0; left: 25%; width: 50%; height: 20%; border: 1px solid rgba(59, 130, 246, 0.2); border-bottom: 0; }
+        /* Tactical Pitch Design - FIXED ASPECT RATIO (TIDAK GEPENG) */
+        .pitch-container { 
+            position: relative; 
+            width: 100%; 
+            background: rgba(59, 130, 246, 0.05); 
+            border: 1.5px solid rgba(59, 130, 246, 0.2); 
+            overflow: hidden; 
+            margin: 0 auto;
+        }
+        .pitch-container.small { height: 180px; border-radius: 12px; }
+        .pitch-container.large { 
+            aspect-ratio: 2 / 3; /* Rasio presisi lapangan bola */
+            height: auto;
+            max-height: 420px;
+            max-width: 280px;
+            border-radius: 16px; 
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
+        }
+        
+        /* Garis Lapangan */
+        .pitch-line { position: absolute; border: 1.5px solid rgba(255, 255, 255, 0.15); }
+        .pitch-half { top: 0; left: 0; width: 100%; height: 50%; border-bottom: 1.5px solid rgba(255, 255, 255, 0.15); }
+        .pitch-circle { top: 50%; left: 50%; width: 60px; height: 60px; border-radius: 50%; transform: translate(-50%, -50%); }
+        .pitch-penalty { top: -1.5px; left: 20%; width: 60%; height: 18%; border-top: 0; }
+        .pitch-penalty-bottom { bottom: -1.5px; left: 20%; width: 60%; height: 18%; border-bottom: 0; }
         
         /* eFootball Style: Blok Zona Bermain */
         .position-zone {
             position: absolute;
             transform: translate(-50%, -50%);
-            border-radius: 8px; /* Sudut sedikit melengkung ala eFootball */
+            border-radius: 12px;
             pointer-events: none;
             z-index: 5;
             transition: all 1s ease;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.15);
+            opacity: 0.85;
         }
 
-        /* Marker Taktis (Warna dinamis lewat JS) */
+        /* Marker Taktis - FIXED TEXT CENTER */
         .player-marker { 
             position: absolute; 
-            width: 36px; height: 36px; 
-            border: 2px solid white; 
+            width: 38px; height: 38px; 
+            border: 2px solid rgba(255,255,255,0.9); 
             border-radius: 50%; 
             transform: translate(-50%, -50%); 
             transition: all 1s ease; 
-            display: flex; align-items: center; justify-content: center;
-            font-size: 10px; font-weight: 900; color: white; text-shadow: 0px 1px 2px rgba(0,0,0,0.8);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 11px; 
+            font-weight: 900; 
+            color: white; 
+            text-shadow: 0px 1px 3px rgba(0,0,0,0.9);
             z-index: 10;
+            line-height: 1; /* Mencegah teks turun ke bawah */
         }
 
         .page-slide-in { transform: translateX(0) !important; }
@@ -157,7 +181,7 @@
 
         const val = (data, fallback = "-") => (data === "" || data === null || data === undefined) ? fallback : data;
 
-        // MESIN ZONA EFOOTBALL & KOORDINAT
+        // MESIN ZONA EFOOTBALL & KOORDINAT PRESISI
         function getPosCoordsArray(pos) {
             const p = val(pos).toUpperCase().trim();
             
@@ -167,26 +191,29 @@
             const colorDEF = { bg: 'rgba(59, 130, 246, 0.45)', marker: '#3b82f6' }; // Biru
             const colorGK  = { bg: 'rgba(234, 179, 8, 0.45)', marker: '#eab308' }; // Kuning
 
+            // FIXED: Nilai "bottom" untuk FWD diturunkan agar tidak terpotong di atas lapangan
             const basePositions = {
-                'GK': { bottom: '8%', left: '50%', w: '40%', h: '16%', color: colorGK },
+                'GK': { bottom: '8%', left: '50%', w: '40%', h: '15%', color: colorGK },
                 
-                'CB': { bottom: '22%', left: '50%', w: '40%', h: '18%', color: colorDEF },
-                'LB': { bottom: '25%', left: '15%', w: '30%', h: '35%', color: colorDEF },
-                'RB': { bottom: '25%', left: '85%', w: '30%', h: '35%', color: colorDEF },
-                'LWB': { bottom: '38%', left: '15%', w: '30%', h: '30%', color: colorDEF },
-                'RWB': { bottom: '38%', left: '85%', w: '30%', h: '30%', color: colorDEF },
+                'CB': { bottom: '20%', left: '50%', w: '45%', h: '18%', color: colorDEF },
+                'LB': { bottom: '24%', left: '15%', w: '30%', h: '35%', color: colorDEF },
+                'RB': { bottom: '24%', left: '85%', w: '30%', h: '35%', color: colorDEF },
+                'LWB': { bottom: '35%', left: '15%', w: '30%', h: '30%', color: colorDEF },
+                'RWB': { bottom: '35%', left: '85%', w: '30%', h: '30%', color: colorDEF },
                 
-                'CDM': { bottom: '40%', left: '50%', w: '40%', h: '18%', color: colorMID },
-                'CM': { bottom: '52%', left: '50%', w: '40%', h: '18%', color: colorMID },
-                'LM': { bottom: '58%', left: '15%', w: '30%', h: '30%', color: colorMID },
-                'RM': { bottom: '58%', left: '85%', w: '30%', h: '30%', color: colorMID },
-                'CAM': { bottom: '66%', left: '50%', w: '40%', h: '15%', color: colorMID },
+                'CDM': { bottom: '40%', left: '50%', w: '45%', h: '18%', color: colorMID },
+                'CM': { bottom: '50%', left: '50%', w: '45%', h: '18%', color: colorMID },
+                'LM': { bottom: '55%', left: '15%', w: '30%', h: '30%', color: colorMID },
+                'RM': { bottom: '55%', left: '85%', w: '30%', h: '30%', color: colorMID },
+                'CAM': { bottom: '62%', left: '50%', w: '45%', h: '15%', color: colorMID },
                 
-                'SS': { bottom: '75%', left: '50%', w: '40%', h: '15%', color: colorFWD },
-                'LW': { bottom: '80%', left: '15%', w: '30%', h: '30%', color: colorFWD },
-                'RW': { bottom: '80%', left: '85%', w: '30%', h: '30%', color: colorFWD },
-                'CF': { bottom: '82%', left: '50%', w: '40%', h: '15%', color: colorFWD },
-                'ST': { bottom: '88%', left: '50%', w: '40%', h: '15%', color: colorFWD }
+                'SS': { bottom: '70%', left: '50%', w: '40%', h: '15%', color: colorFWD },
+                'LW': { bottom: '75%', left: '18%', w: '30%', h: '25%', color: colorFWD },
+                'LWG': { bottom: '75%', left: '18%', w: '30%', h: '25%', color: colorFWD },
+                'RW': { bottom: '75%', left: '82%', w: '30%', h: '25%', color: colorFWD },
+                'RWG': { bottom: '75%', left: '82%', w: '30%', h: '25%', color: colorFWD },
+                'CF': { bottom: '78%', left: '50%', w: '40%', h: '15%', color: colorFWD },
+                'ST': { bottom: '82%', left: '50%', w: '40%', h: '15%', color: colorFWD }
             };
 
             const parts = p.split('/').map(x => x.trim());
@@ -205,11 +232,9 @@
                 }
             });
             
-            // Failsafe jika singkatan tidak dikenali (Default ke Tengah Abu-abu)
             if (results.length === 0) {
                 results.push({ bottom: '50%', left: '50%', w: '40%', h: '20%', color: {bg: 'rgba(156,163,175,0.45)', marker: '#9ca3af'}, label: p });
             }
-            
             return results;
         }
 
@@ -286,7 +311,7 @@
                 if (posTxt.includes('GK')) bPos = 'GK';
                 else if (['CB','LB','RB','RWB','LWB'].some(x => posTxt.includes(x))) bPos = 'DEF';
                 else if (['CM','CDM','CAM','RM','LM'].some(x => posTxt.includes(x))) bPos = 'MID';
-                else if (['ST','CF','RW','LW','SS'].some(x => posTxt.includes(x))) bPos = 'FWD';
+                else if (['ST','CF','RW','LW','RWG','LWG','SS'].some(x => posTxt.includes(x))) bPos = 'FWD';
 
                 return matchTxt && (activePos === 'ALL' || bPos === activePos);
             });
@@ -302,7 +327,6 @@
             runFilter();
         }
 
-        // PREVIEW SINGKAT (Modal)
         function showPlayerDetail(idx) {
             const p = rawData.pemain[idx];
             document.getElementById('modalContent').innerHTML = `
@@ -343,15 +367,11 @@
             lucide.createIcons();
         }
 
-        // HALAMAN PROFIL PENUH + ZONA EFOOTBALL
         function bukaProfilPenuh(idx) {
             closeModal();
             const p = rawData.pemain[idx];
-            
-            // Mendapatkan Array Koordinat & Dimensi Zona
             const coordsArray = getPosCoordsArray(p.posisi);
             
-            // Mencetak elemen HTML Zona & Marker sesuai warna eFootball
             const pitchElementsHTML = coordsArray.map(c => `
                 <div class="position-zone" style="bottom: ${c.bottom}; left: ${c.left}; width: ${c.w}; height: ${c.h}; background: ${c.color.bg};"></div>
                 <div class="player-marker" style="bottom: ${c.bottom}; left: ${c.left}; background: ${c.color.marker}; box-shadow: 0 0 15px ${c.color.marker};">${c.label}</div>
@@ -382,14 +402,13 @@
                     
                     <div class="glass-panel p-6 rounded-[2rem] border border-white/5">
                         <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="crosshair" class="w-4 h-4 text-brand-neon"></i> Tactical Deployment</h3>
+                        
                         <div class="pitch-container large">
-                            <div class="pitch-half"></div>
+                            <div class="pitch-half pitch-line"></div>
                             <div class="pitch-circle pitch-line"></div>
                             <div class="pitch-penalty pitch-line"></div>
                             <div class="pitch-penalty-bottom pitch-line"></div>
-                            
                             ${pitchElementsHTML}
-                            
                         </div>
                     </div>
 
