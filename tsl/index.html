@@ -171,48 +171,33 @@
         .safe-header { padding-top: max(env(safe-area-inset-top), 16px) !important; }
         .pt-safe { padding-top: max(env(safe-area-inset-top), 20px) !important; }
         .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 16px) !important; }
-        
-        /* 🛡️ ANTI-FLASH PENCARIAN (0 DETIK) */
-        html.direct-search #tsl-lock-screen { display: none !important; }
-        html.direct-search #view-search { display: block !important; opacity: 1 !important; z-index: 999 !important; }
     </style>
-    
-    <script>
-        if (window.location.hash.includes('pencarian')) {
-            document.documentElement.classList.add('direct-search');
-        }
-    </script>
    
 </head>
 <body class="font-body text-brand-black dark:text-white bg-[#F9FAFB] dark:bg-brand-dark-bg antialiased overflow-x-hidden selection:bg-brand-green selection:text-white pb-[150px] transition-colors duration-500">
-        <div id="tsl-lock-screen" class="fixed inset-0 z-[80] bg-[#09090b] flex flex-col items-center justify-center p-6 text-center">
+        <div id="tsl-lock-screen" class="fixed inset-0 z-[80] bg-[#09090b] flex flex-col items-center justify-center p-6 text-center hidden transition-opacity duration-500">
             <div class="absolute inset-0 opacity-20 pointer-events-none" 
                  style="background-image: radial-gradient(circle at 50% 50%, #009A44 0%, transparent 70%);"></div>
             
             <div class="relative z-10">
-                <img src="./logo-tsl.png" class="h-28 w-auto object-contain mx-auto mb-6 drop-shadow-[0_0_15px_rgba(0,154,68,0.4)]">
+                <img src="./logo-tsl.png" class="w-24 h-24 mx-auto mb-6 drop-shadow-[0_0_15px_rgba(0,154,68,0.4)]">
                 <h2 class="font-heading font-black text-3xl text-white uppercase tracking-tighter">Trenggalek <br/> Student League</h2>
                 <p class="text-[#009A44] font-bold text-[10px] uppercase tracking-[0.3em] mt-2 mb-10">Coming Soon 2026</p>
                 
-                <div class="flex gap-2 md:gap-3 justify-center mb-10 w-full px-4">
-                <div class="flex-1 max-w-[80px] bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col items-center justify-center">
-                    <span id="cd-days" class="block text-xl md:text-2xl font-black text-white">00</span>
-                    <span class="text-[8px] text-gray-500 uppercase font-bold mt-0.5">Hari</span>
+                <div class="flex gap-3 justify-center mb-10">
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 min-w-[70px]">
+                        <span id="cd-days" class="block text-2xl font-black text-white">00</span>
+                        <span class="text-[8px] text-gray-500 uppercase font-bold">Hari</span>
+                    </div>
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 min-w-[70px]">
+                        <span id="cd-hours" class="block text-2xl font-black text-white">00</span>
+                        <span class="text-[8px] text-gray-500 uppercase font-bold">Jam</span>
+                    </div>
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 min-w-[70px]">
+                        <span id="cd-mins" class="block text-2xl font-black text-white">00</span>
+                        <span class="text-[8px] text-gray-500 uppercase font-bold">Menit</span>
+                    </div>
                 </div>
-                <div class="flex-1 max-w-[80px] bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col items-center justify-center">
-                    <span id="cd-hours" class="block text-xl md:text-2xl font-black text-white">00</span>
-                    <span class="text-[8px] text-gray-500 uppercase font-bold mt-0.5">Jam</span>
-                </div>
-                <div class="flex-1 max-w-[80px] bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col items-center justify-center">
-                    <span id="cd-mins" class="block text-xl md:text-2xl font-black text-white">00</span>
-                    <span class="text-[8px] text-gray-500 uppercase font-bold mt-0.5">Menit</span>
-                </div>
-                <div class="flex-1 max-w-[80px] bg-brand-green/10 border border-brand-green/20 rounded-2xl p-3 flex flex-col items-center justify-center relative overflow-hidden">
-                    <div class="absolute inset-0 bg-brand-green/5 animate-pulse"></div>
-                    <span id="cd-secs" class="block text-xl md:text-2xl font-black text-brand-green relative z-10">00</span>
-                    <span class="text-[8px] text-brand-green/70 uppercase font-bold mt-0.5 relative z-10">Detik</span>
-                </div>
-            </div>
                 
                 <p class="text-xs text-gray-400 max-w-xs mx-auto italic">"Membangun generasi juara dari bangku sekolah."</p>
             </div>
@@ -262,16 +247,13 @@
             </button>
         </div>
     </div>
-    <div id="tsl-top-tabs" class="hidden fixed top-0 left-0 w-full z-[45] bg-white/90 dark:bg-brand-dark-surface/95 backdrop-blur-xl border-b border-gray-200 dark:border-brand-dark-border py-3 px-4 flex gap-3 overflow-x-auto hide-scroll safe-header transition-colors duration-500">
+    <div id="tsl-top-tabs" class="fixed top-0 left-0 w-full z-[45] bg-white/90 dark:bg-brand-dark-surface/95 backdrop-blur-xl border-b border-gray-200 dark:border-brand-dark-border py-3 px-4 flex gap-3 overflow-x-auto hide-scroll safe-header transition-colors duration-500">
         <button onclick="switchTab('beranda', 'Beranda')" id="tab-btn-beranda" class="top-tab-btn active px-5 py-2 rounded-full bg-brand-green text-white text-[10px] font-bold uppercase tracking-widest whitespace-nowrap shadow-sm transition-all">Beranda</button>
         <button onclick="switchTab('jadwal', 'Jadwal Pertandingan')" id="tab-btn-jadwal" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Jadwal</button>
         <button onclick="switchTab('klasemen', 'Papan Klasemen')" id="tab-btn-klasemen" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Klasemen</button>
         <button onclick="switchTab('statistik', 'Statistik Pemain')" id="tab-btn-statistik" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Statistik</button>
-        <button onclick="switchTab('pencarian', 'Pencarian TSL')" id="tab-pencarian" class="tab-btn shrink-0 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 transition-colors flex items-center gap-2">
-        <i data-lucide="search" class="w-3 h-3"></i> CARI
-    </button>
     </div>
-    <div id="view-home" class="hidden opacity-100 transition-opacity duration-300">
+    <div id="view-home" class="block opacity-100 transition-opacity duration-300">
         
         <div id="tab-beranda" class="tab-content block min-h-[100dvh]">
             <header class="bg-brand-black dark:bg-black relative overflow-hidden pb-12 lg:pb-0 border-b-[4px] border-brand-green safe-hero">
@@ -411,30 +393,18 @@
             </div>
         </div>
 
-        </div> <div id="view-search" class="hidden min-h-screen bg-[#F9FAFB] dark:bg-[#09090b] pb-24 z-[90] absolute top-0 left-0 w-full transition-colors duration-500">
-            
-            <div class="px-5 pt-6 pb-4 sticky top-0 bg-[#F9FAFB]/90 dark:bg-[#09090b]/90 backdrop-blur-xl z-20 border-b border-gray-200 dark:border-white/10">
-                <div class="flex items-center gap-3 mb-4">
-                    <button onclick="switchTab('beranda', 'TSL Match Center')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center text-gray-500 hover:text-brand-green transition-colors">
-                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                    </button>
-                    <h2 class="font-heading font-black text-lg text-brand-black dark:text-white uppercase tracking-tighter">Pencarian <span class="text-brand-green">TSL</span></h2>
-                </div>
-                
-                <div class="relative">
-                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-green"></i>
-                    
-                    <input type="text" id="searchInput" placeholder="Cari tim, pemain, atau sekolah di TSL..." 
-                           class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-3 px-5 pl-12 text-sm outline-none focus:ring-2 focus:ring-brand-green transition-all text-brand-black dark:text-white placeholder-gray-400">
-                </div>
-            </div>
-            
-            <div id="searchResults" class="px-5 pt-4 space-y-4">
-                <div class="text-center py-20">
-                    <div class="w-16 h-16 bg-brand-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i data-lucide="search" class="w-8 h-8 text-brand-green/30"></i>
+        </div> <div id="view-search" class="hidden min-h-screen bg-[#F9FAFB] dark:bg-brand-dark-bg pb-24 z-[55] absolute top-0 left-0 w-full page-enter transition-colors duration-500">
+        
+        <div class="bg-brand-black dark:bg-[#09090b] text-white safe-header sticky top-0 z-50 transition-colors shadow-md border-b border-[#d7b67d]/30">
+            <div class="px-4 md:px-8 flex items-center relative h-12">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-[#b69152] to-[#d7b67d] rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(215,182,125,0.3)]">
+                        <span class="font-heading font-black text-[#09090b] text-sm">MNA</span>
                     </div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Ketik nama pemain untuk mencari data Liga</p>
+                    <div>
+                        <h1 class="font-heading font-bold text-sm tracking-widest uppercase text-white leading-none">Pencarian Global</h1>
+                        <p class="text-[8px] text-[#d7b67d] uppercase tracking-widest mt-0.5">Ekosistem MNA Sport</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -667,7 +637,7 @@
         </div>
     </div>
 
-    <div class="fixed bottom-0 w-full z-[110] flex flex-col transition-colors duration-500">
+    <div class="fixed bottom-0 w-full z-[70] flex flex-col transition-colors duration-500">
         <div id="sponsor-bar" class="w-full bg-white/95 dark:bg-brand-dark-surface/95 backdrop-blur-xl border-t border-gray-200 dark:border-brand-dark-border py-2 px-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] hidden">
             <div class="max-w-7xl mx-auto flex items-center justify-center gap-6 overflow-x-auto hide-scroll" id="sponsor-track">
                 </div>
@@ -687,6 +657,9 @@
                 <svg class="w-5 h-5 md:w-6 md:h-6 mb-1 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">MNA FC</span>
             </a>
+            <button onclick="switchTab('pencarian', 'Pencarian')" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-black dark:hover:text-white transition-colors">
+                <svg class="w-5 h-5 md:w-6 md:h-6 mb-1 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">Cari</span>
             </button>
         </div>
     </nav>
@@ -828,7 +801,7 @@
         // ==========================================
         // SAKELAR MASTER LIGA & COUNTDOWN (TSL)
         // ==========================================
-        const CONFIG_LIGA_AKTIF = true; 
+        const CONFIG_LIGA_AKTIF = false; 
         const TANGGAL_MULAI = "2026-07-26T08:00:00"; // TANGGAL DIUBAH KE 26 JULI
 
         function jalankanCountdown() {
@@ -843,46 +816,21 @@
                     return;
                 }
                 
-                // Rumus Matematika Waktu
-                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
-                
-                // Lempar data ke layar (dengan pengisi angka 0 di depan jika di bawah 10)
-                const elDays = document.getElementById('cd-days');
-                const elHours = document.getElementById('cd-hours');
-                const elMins = document.getElementById('cd-mins');
-                const elSecs = document.getElementById('cd-secs');
-
-                if(elDays) elDays.innerText = d.toString().padStart(2, '0');
-                if(elHours) elHours.innerText = h.toString().padStart(2, '0');
-                if(elMins) elMins.innerText = m.toString().padStart(2, '0');
-                if(elSecs) elSecs.innerText = s.toString().padStart(2, '0');
-                
-            }, 1000); // Sistem berdetak setiap 1000 milidetik (1 detik)
+                document.getElementById('cd-days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+                document.getElementById('cd-hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+                document.getElementById('cd-mins').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+            }, 1000);
         }
 
         function cekStatusAkses() {
             const lockScreen = document.getElementById('tsl-lock-screen');
-            const viewHome = document.getElementById('view-home');
-            const topTabs = document.getElementById('tsl-top-tabs');
-            
             if (!CONFIG_LIGA_AKTIF) {
-                if(lockScreen) lockScreen.classList.remove('hidden');
+                lockScreen.classList.remove('hidden');
                 jalankanCountdown();
-                document.body.style.overflow = 'hidden'; 
-                
-                // Matikan data rahasia sampai ke akar
-                if(viewHome) viewHome.classList.add('hidden');
-                if(topTabs) topTabs.classList.add('hidden');
+                document.body.style.overflow = 'hidden'; // Matikan fungsi scroll layar
             } else {
-                if(lockScreen) lockScreen.classList.add('hidden');
-                document.body.style.overflow = ''; 
-                
-                // Nyalakan liga jika sakelar TRUE
-                if(viewHome) viewHome.classList.remove('hidden');
-                if(topTabs) topTabs.classList.remove('hidden');
+                lockScreen.classList.add('hidden');
+                document.body.style.overflow = ''; // Nyalakan fungsi scroll layar
             }
         }
         const BASE_API = "https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec";
@@ -1117,32 +1065,33 @@
 
         // BATCH DATA FETCHING
         async function tarikDataGaib() {
-            try {
-                const [resJadwal, resKlasemen, resEvent, resPemain] = await Promise.all([
-                    fetch(`${API_URL}?sheet=Jadwal&t=${Date.now()}`),
-                    fetch(`${API_URL}?sheet=Klasemen&t=${Date.now()}`),
-                    fetch(`${API_URL}?sheet=Event_Match&t=${Date.now()}`),
-                    fetch(`${API_URL}?sheet=Pemain&t=${Date.now()}`) // WAJIB ADA INI
-                ]);
-        
-                const dataJadwal = await resJadwal.json();
-                const dataKlasemen = await resKlasemen.json();
-                const dataEvent = await resEvent.json();
-                const dataPemain = await resPemain.json(); // AMBIL DATA PEMAIN
-        
-                // SIMPAN DATA PEMAIN KE MEMORI PENCARIAN
-                globalPemainCache = dataPemain; 
-        
-                localStorage.setItem('tsl_cache_jadwal', JSON.stringify(dataJadwal));
-                localStorage.setItem('tsl_cache_klasemen', JSON.stringify(dataKlasemen));
-                localStorage.setItem('tsl_cache_pemain', JSON.stringify(dataPemain));
-        
-                renderJadwal(dataJadwal);
-                renderKlasemen(dataKlasemen);
-                if (Array.isArray(dataEvent)) cekNotifikasiBaru(dataEvent);
-        
-            } catch (error) {
-                console.error("Gagal sinkron data:", error);
+            const sheets = ['Jadwal', 'Klasemen', 'Pemain', 'Event_Match', 'Stat_Match', 'TopSkor', 'Lineup', 'Sponsor'];
+            sheets.forEach(s => { try { let c = localStorage.getItem('tyl_cache_' + s); if (c) rawData[s] = JSON.parse(c); } catch(e){} });
+            
+            if(rawData.Klasemen && rawData.Klasemen.length > 0 && currentTeamSelected === '' && document.getElementById('view-match').classList.contains('hidden')) renderAllData(); 
+            
+            for (let i = 0; i < sheets.length; i += 2) {
+                let batch = sheets.slice(i, i + 2);
+                await Promise.all(batch.map(async (s) => {
+                    try {
+                        const controller = new AbortController(); 
+                        const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 detik timeout
+                        let response = await fetch(`${BASE_API}?sheet=${s}&t=${Date.now()}`, { signal: controller.signal });
+                        clearTimeout(timeoutId); 
+                        let data = await response.json();
+                        if(Array.isArray(data)) { 
+                            rawData[s] = data; 
+                            localStorage.setItem('tyl_cache_' + s, JSON.stringify(data));
+                            
+                            // FIX: Picu cek notifikasi khusus saat data Event_Match berhasil ditarik
+                            if (s === 'Event_Match') {
+                                cekNotifikasiBaru(data);
+                            }
+                        }
+                    } catch(e) { console.warn('Gagal tarik lambat:', s); }
+                }));
+                
+                if(currentTeamSelected === '' && document.getElementById('view-match').classList.contains('hidden')) { renderAllData(); }
             }
         }
 
@@ -1177,40 +1126,22 @@
 
                 // B. LOGIKA JIKA MEMBUKA PENCARIAN GLOBAL
                 if(tabId === 'pencarian') {
-                    // Lepas gembok CSS awal agar JS mengambil alih dengan mulus
-                    document.documentElement.classList.remove('direct-search'); 
-                    
-                    const lockScreen = document.getElementById('tsl-lock-screen');
-                    if(lockScreen) lockScreen.classList.add('hidden'); // MATIKAN LOCK SCREEN MUTLAK
-
                     if(viewHome) viewHome.classList.add('hidden'); // Matikan isi Liga
                     if(topTabs) topTabs.classList.add('hidden');   // Matikan menu atas Liga
                     if(viewSearch) viewSearch.classList.remove('hidden'); // Nyalakan layar Cari
                     
+                    // Pindah Warna Navigasi Bawah ke "Cari"
                     if(bnavTsl) { bnavTsl.classList.remove('text-brand-green'); bnavTsl.classList.add('text-gray-400', 'dark:text-gray-500'); }
                     if(bnavCari) { bnavCari.classList.remove('text-gray-400', 'dark:text-gray-500'); bnavCari.classList.add('text-brand-black', 'dark:text-white'); }
                     
-                    document.body.style.overflow = ''; // Bebaskan scroll untuk menu pencarian
                     setActiveNav('pencarian');
-                    window.scrollTo({top: 0, behavior: 'instant'}); // Pindah Instan 0 Detik
+                    window.scrollTo({top: 0, behavior: 'smooth'});
                     return; 
                 }
 
                 // C. LOGIKA JIKA MEMBUKA TAB LIGA (Beranda, Jadwal, dll)
-                document.documentElement.classList.remove('direct-search');
-                const lockScreen = document.getElementById('tsl-lock-screen');
-
-                if (!CONFIG_LIGA_AKTIF) {
-                    if(lockScreen) lockScreen.classList.remove('hidden'); // MUNCULKAN KEMBALI LOCK SCREEN
-                    document.body.style.overflow = 'hidden'; // Gembok scroll
-                    if(viewHome) viewHome.classList.add('hidden'); 
-                    if(topTabs) topTabs.classList.add('hidden');   
-                } else {
-                    if(lockScreen) lockScreen.classList.add('hidden');
-                    document.body.style.overflow = '';
-                    if(viewHome) viewHome.classList.remove('hidden');
-                    if(topTabs) topTabs.classList.remove('hidden');
-                }
+                if(viewHome) viewHome.classList.remove('hidden');
+                if(topTabs) topTabs.classList.remove('hidden'); // Menu atas liga kembali
                 
                 // Kembalikan Warna Navigasi Bawah ke "TSL Liga"
                 if(bnavTsl) { bnavTsl.classList.add('text-brand-green'); bnavTsl.classList.remove('text-gray-400', 'dark:text-gray-500'); }
