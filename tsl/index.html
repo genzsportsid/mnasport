@@ -267,9 +267,7 @@
         <button onclick="switchTab('jadwal', 'Jadwal Pertandingan')" id="tab-btn-jadwal" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Jadwal</button>
         <button onclick="switchTab('klasemen', 'Papan Klasemen')" id="tab-btn-klasemen" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Klasemen</button>
         <button onclick="switchTab('statistik', 'Statistik Pemain')" id="tab-btn-statistik" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Statistik</button>
-        <button onclick="switchTab('pencarian', 'Pencarian TSL')" id="tab-pencarian" class="tab-btn shrink-0 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 transition-colors flex items-center gap-2">
-        <i data-lucide="search" class="w-3 h-3"></i> CARI
-    </button>
+        <button onclick="switchTab('pencarian', 'Pencarian TSL')" id="tab-btn-pencarian" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Cari</button>
     </div>
     <div id="view-home" class="hidden opacity-100 transition-opacity duration-300">
         
@@ -410,47 +408,37 @@
                 </div>
             </div>
         </div>
-
-        </div> <div id="view-search" class="hidden min-h-screen bg-[#F9FAFB] dark:bg-brand-dark-bg pb-24 z-[90] absolute top-0 left-0 w-full transition-colors duration-500">
-        
-        <div class="px-5 pt-6 pb-4 sticky top-0 bg-[#F9FAFB]/90 dark:bg-[#09090b]/90 backdrop-blur-xl z-20 border-b border-gray-200 dark:border-white/10">
-            <div class="flex items-center gap-3 mb-4">
-                <button onclick="switchTab('beranda', 'TSL Match Center')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center text-gray-500 hover:text-brand-green transition-colors">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                </button>
-                <h2 class="font-heading font-black text-lg text-brand-black dark:text-white uppercase tracking-tighter">Pencarian <span class="text-brand-green">TSL</span></h2>
-            </div>
+        <div id="tab-pencarian" class="tab-content hidden pt-[100px] px-4 md:px-8 max-w-3xl mx-auto page-enter min-h-[100dvh]">
             
-            <div class="relative">
-                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-green"></i>
-                <input type="text" id="searchInput" placeholder="Cari tim, pemain, atau sekolah di TSL..." 
-                       class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-3 px-5 pl-12 text-sm outline-none focus:ring-2 focus:ring-brand-green transition-all text-brand-black dark:text-white placeholder-gray-400">
-                <button id="clearSearch" class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 hover:text-brand-green hidden">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
+            <div class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-brand-dark-border pb-4 transition-colors">
+                <div class="w-1.5 h-6 bg-brand-green rounded-full shadow-[0_0_10px_#009A44]"></div>
+                <h2 class="font-heading font-bold text-2xl uppercase tracking-wide text-brand-black dark:text-white transition-colors">Pencarian TSL</h2>
             </div>
-        </div>
-            </div>
-        </div>
-        
-        <div class="px-4 md:px-8 max-w-3xl mx-auto pt-6">
-            <div class="relative w-full shadow-sm rounded-2xl overflow-hidden mb-4">
-                <svg class="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <input type="text" id="global-search" placeholder="Cari Tim, Pemain, atau Jadwal..." class="w-full pl-14 pr-5 py-4 bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#27272a] text-brand-black dark:text-white focus:ring-2 focus:ring-[#d7b67d] outline-none text-xs font-bold uppercase tracking-widest transition-all">
+
+            <div class="relative w-full shadow-sm rounded-2xl overflow-hidden mb-6">
+                <svg class="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                
+                <input type="text" id="global-search" placeholder="Cari Tim, Pemain, atau Jadwal di TSL..." class="w-full pl-14 pr-5 py-4 bg-white dark:bg-brand-dark-surface border border-gray-200 dark:border-brand-dark-border text-brand-black dark:text-white focus:ring-2 focus:ring-brand-green outline-none text-xs font-bold uppercase tracking-widest transition-all shadow-sm">
             </div>
             
             <div class="flex gap-2 overflow-x-auto hide-scroll pb-2" id="search-filters">
-                <button onclick="setSearchFilter('all')" id="filter-all" class="filter-btn active bg-[#d7b67d] text-brand-black px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full shadow-sm flex-shrink-0 transition-colors">Semua</button>
-                <button onclick="setSearchFilter('klub')" id="filter-klub" class="filter-btn bg-white dark:bg-[#18181b] text-gray-500 border border-gray-200 dark:border-[#27272a] hover:text-[#d7b67d] px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full flex-shrink-0 transition-colors">Klub</button>
-                <button onclick="setSearchFilter('pemain')" id="filter-pemain" class="filter-btn bg-white dark:bg-[#18181b] text-gray-500 border border-gray-200 dark:border-[#27272a] hover:text-[#d7b67d] px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full flex-shrink-0 transition-colors">Pemain</button>
-                <button onclick="setSearchFilter('jadwal')" id="filter-jadwal" class="filter-btn bg-white dark:bg-[#18181b] text-gray-500 border border-gray-200 dark:border-[#27272a] hover:text-[#d7b67d] px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full flex-shrink-0 transition-colors">Jadwal</button>
+                <button onclick="setSearchFilter('all')" id="filter-all" class="filter-btn active bg-brand-green text-white px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full shadow-sm flex-shrink-0 transition-colors">Semua</button>
+                <button onclick="setSearchFilter('klub')" id="filter-klub" class="filter-btn bg-white dark:bg-brand-dark-surface text-gray-500 border border-gray-200 dark:border-brand-dark-border hover:text-brand-green px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full flex-shrink-0 transition-colors">Klub</button>
+                <button onclick="setSearchFilter('pemain')" id="filter-pemain" class="filter-btn bg-white dark:bg-brand-dark-surface text-gray-500 border border-gray-200 dark:border-brand-dark-border hover:text-brand-green px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full flex-shrink-0 transition-colors">Pemain</button>
+                <button onclick="setSearchFilter('jadwal')" id="filter-jadwal" class="filter-btn bg-white dark:bg-brand-dark-surface text-gray-500 border border-gray-200 dark:border-brand-dark-border hover:text-brand-green px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full flex-shrink-0 transition-colors">Jadwal</button>
             </div>
             
             <div id="search-results" class="flex flex-col gap-3 pb-24 mt-4">
-                <div class="text-center p-10 text-gray-400 text-xs font-bold uppercase tracking-widest">Ketik minimal 2 huruf</div>
+                <div class="text-center p-10">
+                    <div class="w-16 h-16 bg-brand-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="search" class="w-8 h-8 text-brand-green/30"></i>
+                    </div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Ketik nama pemain untuk mencari data Liga</p>
+                </div>
             </div>
         </div>
-    </div>
+
+        </div> 
 
     <div id="view-team" class="hidden min-h-screen bg-gray-50 dark:bg-brand-dark-bg pb-10 z-[60] absolute top-0 left-0 w-full slide-in-right transition-colors duration-500">
         
@@ -1159,61 +1147,27 @@
         // --- 1. OTAK NAVIGASI UTAMA ---
         function switchTab(tabId, titleText) {
             try {
-                // A. Tutup semua layar overlay
+                // 1. Tutup layar pop-up
                 const viewMatch = document.getElementById('view-match'); if(viewMatch) viewMatch.classList.add('hidden');
                 const viewTeam = document.getElementById('view-team'); if(viewTeam) viewTeam.classList.add('hidden');
-                const viewSearch = document.getElementById('view-search'); if(viewSearch) viewSearch.classList.add('hidden');
                 
                 const viewHome = document.getElementById('view-home');
                 const topTabs = document.getElementById('tsl-top-tabs');
-                const bNav = document.getElementById('main-bottom-nav');
-                if(bNav) bNav.classList.remove('hidden');
-
-                // Tangkap Tombol Navigasi Bawah
-                const bnavTsl = document.querySelector('#main-bottom-nav button[onclick*="beranda"]');
-                const bnavCari = document.querySelector('#main-bottom-nav button[onclick*="pencarian"]');
-
-                // B. LOGIKA JIKA MEMBUKA PENCARIAN GLOBAL
-                if(tabId === 'pencarian') {
-                    // Lepas gembok CSS awal agar JS mengambil alih dengan mulus
-                    document.documentElement.classList.remove('direct-search'); 
-                    
-                    const lockScreen = document.getElementById('tsl-lock-screen');
-                    if(lockScreen) lockScreen.classList.add('hidden'); // MATIKAN LOCK SCREEN MUTLAK
-
-                    if(viewHome) viewHome.classList.add('hidden'); // Matikan isi Liga
-                    if(topTabs) topTabs.classList.add('hidden');   // Matikan menu atas Liga
-                    if(viewSearch) viewSearch.classList.remove('hidden'); // Nyalakan layar Cari
-                    
-                    if(bnavTsl) { bnavTsl.classList.remove('text-brand-green'); bnavTsl.classList.add('text-gray-400', 'dark:text-gray-500'); }
-                    if(bnavCari) { bnavCari.classList.remove('text-gray-400', 'dark:text-gray-500'); bnavCari.classList.add('text-brand-black', 'dark:text-white'); }
-                    
-                    document.body.style.overflow = ''; // Bebaskan scroll untuk menu pencarian
-                    setActiveNav('pencarian');
-                    window.scrollTo({top: 0, behavior: 'instant'}); // Pindah Instan 0 Detik
-                    return; 
-                }
-
-                // C. LOGIKA JIKA MEMBUKA TAB LIGA (Beranda, Jadwal, dll)
-                document.documentElement.classList.remove('direct-search');
-                const lockScreen = document.getElementById('tsl-lock-screen');
-
+                
+                // 2. Cek Sakelar Liga
                 if (!CONFIG_LIGA_AKTIF) {
-                    if(lockScreen) lockScreen.classList.remove('hidden'); // MUNCULKAN KEMBALI LOCK SCREEN
-                    document.body.style.overflow = 'hidden'; // Gembok scroll
+                    const lockScreen = document.getElementById('tsl-lock-screen');
+                    if(lockScreen) lockScreen.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
                     if(viewHome) viewHome.classList.add('hidden'); 
                     if(topTabs) topTabs.classList.add('hidden');   
                 } else {
-                    if(lockScreen) lockScreen.classList.add('hidden');
                     document.body.style.overflow = '';
                     if(viewHome) viewHome.classList.remove('hidden');
                     if(topTabs) topTabs.classList.remove('hidden');
                 }
-                
-                // Kembalikan Warna Navigasi Bawah ke "TSL Liga"
-                if(bnavTsl) { bnavTsl.classList.add('text-brand-green'); bnavTsl.classList.remove('text-gray-400', 'dark:text-gray-500'); }
-                if(bnavCari) { bnavCari.classList.add('text-gray-400', 'dark:text-gray-500'); bnavCari.classList.remove('text-brand-black', 'dark:text-white'); }
 
+                // 3. Sembunyikan semua Tab, lalu buka yang diklik (Termasuk Tab Pencarian)
                 document.querySelectorAll('#view-home .tab-content').forEach(el => { 
                     el.classList.add('hidden'); el.classList.remove('block'); 
                 });
@@ -1226,21 +1180,21 @@
                 console.error("Navigasi Error:", e); 
             }
         }
-
+            
         function setSearchFilter(filter) {
             globalSearchFilter = filter;
             document.querySelectorAll('#search-filters .filter-btn').forEach(b => {
-                b.classList.remove('bg-[#d7b67d]', 'text-[#09090b]', 'active');
-                b.classList.add('bg-white', 'dark:bg-[#18181b]', 'text-gray-500', 'dark:text-gray-400');
+                b.classList.remove('bg-brand-green', 'text-white', 'active');
+                b.classList.add('bg-white', 'dark:bg-brand-dark-surface', 'text-gray-500', 'dark:text-brand-dark-muted');
             });
             let actBtn = document.getElementById('filter-' + filter);
             if(actBtn) { 
-                actBtn.classList.add('bg-[#d7b67d]', 'text-[#09090b]', 'active'); 
-                actBtn.classList.remove('bg-white', 'dark:bg-[#18181b]', 'text-gray-500', 'dark:text-gray-400'); 
+                actBtn.classList.add('bg-brand-green', 'text-white', 'active'); 
+                actBtn.classList.remove('bg-white', 'dark:bg-brand-dark-surface', 'text-gray-500', 'dark:text-brand-dark-muted'); 
             }
             executeGlobalSearch();
         }
-
+        
         function switchLigaUI(liga) {
             ligaAktif = liga;
             const isDark = document.documentElement.classList.contains('dark');
