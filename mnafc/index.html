@@ -49,22 +49,19 @@
             box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
             overflow: hidden;
         }
-        
-        /* Memaksa rasio vertikal presisi (68:105) tanpa error di browser lama */
         .pitch-wrapper::before { content: ""; display: block; padding-top: 145%; }
         .pitch-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         
-        /* Garis Lapangan */
         .pitch-line { position: absolute; border: 1.5px solid rgba(255, 255, 255, 0.15); }
         .pitch-half { top: 0; left: 0; width: 100%; height: 50%; border-bottom: 1.5px solid rgba(255, 255, 255, 0.15); }
         .pitch-circle { top: 50%; left: 50%; width: 60px; height: 60px; border-radius: 50%; transform: translate(-50%, -50%); }
         .pitch-penalty { top: -1.5px; left: 20%; width: 60%; height: 18%; border-top: 0; }
         .pitch-penalty-bottom { bottom: -1.5px; left: 20%; width: 60%; height: 18%; border-bottom: 0; }
         
-        /* Blok Zona Bermain eFootball */
+        /* Zona Bermain eFootball */
         .position-zone {
             position: absolute;
-            transform: translate(-50%, 50%); /* FIXED: JANGKAR PUSAT 100% PRESISI */
+            transform: translate(-50%, 50%);
             border-radius: 12px;
             pointer-events: none;
             z-index: 5;
@@ -72,22 +69,32 @@
             opacity: 0.85;
         }
 
-        /* Marker Taktis (Lingkaran) */
+        /* Marker Taktis Utama */
         .player-marker { 
             position: absolute; 
             width: 38px; height: 38px; 
             border: 2px solid rgba(255,255,255,0.9); 
             border-radius: 50%; 
-            transform: translate(-50%, 50%); /* FIXED: JANGKAR PUSAT 100% PRESISI */
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
+            transform: translate(-50%, 50%); 
+            display: flex; align-items: center; justify-content: center;
             text-align: center;
-            font-size: 11px; 
-            font-weight: 900; 
-            color: white; 
+            font-size: 11px; font-weight: 900; color: white; 
             text-shadow: 0px 1px 3px rgba(0,0,0,0.9);
             z-index: 10;
+        }
+
+        /* Marker Taktis Alternatif (Muda & Transparan) */
+        .player-marker-alt {
+            position: absolute; 
+            width: 34px; height: 34px; /* Sedikit lebih kecil */
+            border: 2px dashed rgba(255,255,255,0.7); /* Garis putus-putus */
+            border-radius: 50%; 
+            transform: translate(-50%, 50%); 
+            display: flex; align-items: center; justify-content: center;
+            text-align: center;
+            font-size: 9px; font-weight: 800; color: rgba(255,255,255,0.8); 
+            z-index: 9;
+            opacity: 0.6; /* Warna lebih muda/transparan */
         }
 
         .page-slide-in { transform: translateX(0) !important; }
@@ -177,20 +184,17 @@
 
         const val = (data, fallback = "-") => (data === "" || data === null || data === undefined) ? fallback : data;
 
-        // MESIN ZONA EFOOTBALL & KOORDINAT PRESISI
         function getPosCoordsArray(pos) {
             const p = val(pos).toUpperCase().trim();
+            if (!p || p === '-' || p === '') return []; // Failsafe data kosong
             
-            // Kode Warna ala eFootball
-            const colorFWD = { bg: 'rgba(239, 68, 68, 0.45)', marker: '#ef4444' }; // Merah
-            const colorMID = { bg: 'rgba(34, 197, 94, 0.45)', marker: '#22c55e' }; // Hijau
-            const colorDEF = { bg: 'rgba(59, 130, 246, 0.45)', marker: '#3b82f6' }; // Biru
-            const colorGK  = { bg: 'rgba(234, 179, 8, 0.45)', marker: '#eab308' }; // Kuning
+            const colorFWD = { bg: 'rgba(239, 68, 68, 0.45)', marker: '#ef4444' };
+            const colorMID = { bg: 'rgba(34, 197, 94, 0.45)', marker: '#22c55e' };
+            const colorDEF = { bg: 'rgba(59, 130, 246, 0.45)', marker: '#3b82f6' };
+            const colorGK  = { bg: 'rgba(234, 179, 8, 0.45)', marker: '#eab308' };
 
-            // Penempatan koordinat taktis proporsional
             const basePositions = {
                 'GK': { bottom: '8%', left: '50%', w: '40%', h: '15%', color: colorGK },
-                
                 'CB': { bottom: '20%', left: '50%', w: '45%', h: '18%', color: colorDEF },
                 'LB': { bottom: '24%', left: '15%', w: '30%', h: '35%', color: colorDEF },
                 'RB': { bottom: '24%', left: '85%', w: '30%', h: '35%', color: colorDEF },
@@ -218,19 +222,12 @@
             parts.forEach(part => {
                 if (basePositions[part]) {
                     results.push({ 
-                        bottom: basePositions[part].bottom, 
-                        left: basePositions[part].left, 
-                        w: basePositions[part].w,
-                        h: basePositions[part].h,
-                        color: basePositions[part].color,
-                        label: part 
+                        bottom: basePositions[part].bottom, left: basePositions[part].left, 
+                        w: basePositions[part].w, h: basePositions[part].h,
+                        color: basePositions[part].color, label: part 
                     });
                 }
             });
-            
-            if (results.length === 0) {
-                results.push({ bottom: '50%', left: '50%', w: '40%', h: '20%', color: {bg: 'rgba(156,163,175,0.45)', marker: '#9ca3af'}, label: p });
-            }
             return results;
         }
 
@@ -298,7 +295,7 @@
         function runFilter() {
             const query = document.getElementById('playerSearch').value.toLowerCase();
             const filtered = rawData.pemain.filter(p => {
-                const searchStr = (val(p.nama) + val(p.sekolah) + val(p.posisi)).toLowerCase();
+                const searchStr = (val(p.nama) + val(p.sekolah) + val(p.posisi) + val(p.posisi_alt, '')).toLowerCase();
                 const matchTxt = searchStr.includes(query);
                 
                 const posTxt = val(p.posisi).toUpperCase();
@@ -363,17 +360,33 @@
             lucide.createIcons();
         }
 
-        // HALAMAN PROFIL PENUH + PITCH ANTI-GEPENG + MARKER CENTER FIX
+        // HALAMAN PROFIL PENUH: MENDUKUNG POSISI UTAMA & ALTERNATIF
         function bukaProfilPenuh(idx) {
             closeModal();
             const p = rawData.pemain[idx];
             
-            const coordsArray = getPosCoordsArray(p.posisi);
+            // 1. Ekstrak Koordinat Posisi Utama
+            const mainCoordsArray = getPosCoordsArray(p.posisi);
             
-            const pitchElementsHTML = coordsArray.map(c => `
+            // 2. Ekstrak Koordinat Posisi Alternatif (Jika ada)
+            const altPosRaw = val(p.posisi_alt, '');
+            const altCoordsArray = (altPosRaw && altPosRaw !== '-') ? getPosCoordsArray(altPosRaw) : [];
+
+            // 3. Render Marker Utama (Solid + Zone)
+            let pitchElementsHTML = mainCoordsArray.map(c => `
                 <div class="position-zone" style="bottom: ${c.bottom}; left: ${c.left}; width: ${c.w}; height: ${c.h}; background: ${c.color.bg};"></div>
                 <div class="player-marker" style="bottom: ${c.bottom}; left: ${c.left}; background: ${c.color.marker}; box-shadow: 0 0 15px ${c.color.marker};">${c.label}</div>
             `).join('');
+
+            // 4. Render Marker Alternatif (Lighter, Dashed, Opacity 60%, No Zone)
+            pitchElementsHTML += altCoordsArray.map(c => `
+                <div class="player-marker-alt" style="bottom: ${c.bottom}; left: ${c.left}; background: ${c.color.marker};">${c.label}</div>
+            `).join('');
+
+            // Label Alternatif di Header
+            const altBadgeHTML = (altPosRaw && altPosRaw !== '-') 
+                ? `<span class="text-xs font-black bg-white/5 text-gray-300 border border-white/10 px-4 py-1.5 rounded-lg uppercase shadow-sm">ALT: ${altPosRaw}</span>` 
+                : '';
 
             const page = document.getElementById('fullProfilePage');
             page.innerHTML = `
@@ -390,8 +403,9 @@
                         <img src="${val(p.link_foto, 'https://via.placeholder.com/300')}" class="w-full h-full object-cover">
                     </div>
                     <h2 class="relative z-10 text-3xl md:text-4xl font-black uppercase tracking-tighter text-white text-center leading-none">${val(p.nama)}</h2>
-                    <div class="relative z-10 flex gap-3 mt-4">
+                    <div class="relative z-10 flex flex-wrap justify-center gap-2 mt-4">
                         <span class="text-xs font-black bg-brand-neon/20 text-brand-neon border border-brand-neon/30 px-4 py-1.5 rounded-lg uppercase shadow-sm">POS: ${val(p.posisi)}</span>
+                        ${altBadgeHTML}
                         <span class="text-xs font-black bg-white/10 text-white border border-white/10 px-4 py-1.5 rounded-lg uppercase shadow-sm">#${val(p.nomor, '0')}</span>
                     </div>
                 </div>
