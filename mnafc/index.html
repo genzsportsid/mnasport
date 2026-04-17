@@ -58,7 +58,6 @@
         .pitch-penalty { top: -1.5px; left: 20%; width: 60%; height: 18%; border-top: 0; }
         .pitch-penalty-bottom { bottom: -1.5px; left: 20%; width: 60%; height: 18%; border-bottom: 0; }
         
-        /* Zona Bermain eFootball */
         .position-zone {
             position: absolute;
             transform: translate(-50%, 50%);
@@ -69,7 +68,6 @@
             opacity: 0.85;
         }
 
-        /* Marker Taktis Utama */
         .player-marker { 
             position: absolute; 
             width: 38px; height: 38px; 
@@ -83,18 +81,17 @@
             z-index: 10;
         }
 
-        /* Marker Taktis Alternatif (Muda & Transparan) */
         .player-marker-alt {
             position: absolute; 
-            width: 34px; height: 34px; /* Sedikit lebih kecil */
-            border: 2px dashed rgba(255,255,255,0.7); /* Garis putus-putus */
+            width: 34px; height: 34px; 
+            border: 2px dashed rgba(255,255,255,0.7); 
             border-radius: 50%; 
             transform: translate(-50%, 50%); 
             display: flex; align-items: center; justify-content: center;
             text-align: center;
             font-size: 9px; font-weight: 800; color: rgba(255,255,255,0.8); 
             z-index: 9;
-            opacity: 0.6; /* Warna lebih muda/transparan */
+            opacity: 0.6; 
         }
 
         .page-slide-in { transform: translateX(0) !important; }
@@ -184,9 +181,59 @@
 
         const val = (data, fallback = "-") => (data === "" || data === null || data === undefined) ? fallback : data;
 
+        // MESIN PENGHITUNG UMUR OTOMATIS & FORMAT TANGGAL LAHIR
+        function processPlayerData(players) {
+            return players.map(p => {
+                p.tanggal_lahir_format = '-';
+                p.umur_detail = '-';
+                p.kategori_auto = val(p.kategori, '-');
+
+                if (p.tanggal_lahir && p.tanggal_lahir !== '-' && p.tanggal_lahir !== '') {
+                    const birthDate = new Date(p.tanggal_lahir);
+                    if (!isNaN(birthDate)) {
+                        // 1. Format dd/mm/yy
+                        const dd = String(birthDate.getDate()).padStart(2, '0');
+                        const mm = String(birthDate.getMonth() + 1).padStart(2, '0');
+                        const yy = String(birthDate.getFullYear()).slice(-2);
+                        p.tanggal_lahir_format = `${dd}/${mm}/${yy}`;
+                        
+                        // 2. Kalkulasi Umur Presisi (Tahun, Bulan, Hari)
+                        const today = new Date();
+                        let years = today.getFullYear() - birthDate.getFullYear();
+                        let months = today.getMonth() - birthDate.getMonth();
+                        let days = today.getDate() - birthDate.getDate();
+                        
+                        if (days < 0) {
+                            months--;
+                            const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                            days += lastMonth.getDate();
+                        }
+                        if (months < 0) {
+                            years--;
+                            months += 12;
+                        }
+                        p.umur_detail = `${years}th ${months}bln ${days}hr`;
+                        
+                        // 3. Klasifikasi Kategori Tim
+                        if (years <= 15) {
+                            p.kategori_auto = 'U-15';
+                        } else if (years > 15 && years <= 17) {
+                            p.kategori_auto = 'U-17';
+                        } else {
+                            p.kategori_auto = 'SENIOR';
+                        }
+                    } else {
+                        // Failsafe jika format tanggal sheet salah/tidak dikenali
+                        p.tanggal_lahir_format = p.tanggal_lahir;
+                    }
+                }
+                return p;
+            });
+        }
+
         function getPosCoordsArray(pos) {
             const p = val(pos).toUpperCase().trim();
-            if (!p || p === '-' || p === '') return []; // Failsafe data kosong
+            if (!p || p === '-' || p === '') return []; 
             
             const colorFWD = { bg: 'rgba(239, 68, 68, 0.45)', marker: '#ef4444' };
             const colorMID = { bg: 'rgba(34, 197, 94, 0.45)', marker: '#22c55e' };
@@ -233,10 +280,15 @@
 
         async function init() {
             const cache = localStorage.getItem('mnafc_elite_final');
-            if (cache) { rawData = JSON.parse(cache); updateUI(); }
+            if (cache) { 
+                rawData = JSON.parse(cache); 
+                rawData.pemain = processPlayerData(rawData.pemain); // Eksekusi kalkulator umur ke cache
+                updateUI(); 
+            }
             try {
                 const res = await fetch(`${API_URL}?t=${Date.now()}`);
                 const data = await res.json();
+                data.pemain = processPlayerData(data.pemain); // Eksekusi kalkulator umur ke data server
                 rawData = data;
                 localStorage.setItem('mnafc_elite_final', JSON.stringify(data));
                 updateUI();
@@ -283,7 +335,7 @@
                             <span class="flex-shrink-0 text-center text-[10px] font-black bg-brand-neon/20 text-brand-neon px-2 py-1 rounded shadow-sm border border-brand-neon/20">${val(p.posisi, 'POS')}</span>
                         </div>
                         <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-white/5">
-                            <div><p class="text-[7px] text-gray-400 uppercase font-black tracking-widest">Kategori</p><p class="text-[11px] font-bold text-brand-dark dark:text-white uppercase">${val(p.kategori, '-')}</p></div>
+                            <div><p class="text-[7px] text-gray-400 uppercase font-black tracking-widest">Kategori</p><p class="text-[11px] font-bold text-brand-dark dark:text-white uppercase">${val(p.kategori_auto, '-')}</p></div>
                             <div><p class="text-[7px] text-gray-400 uppercase font-black tracking-widest">Gol / Poin</p><p class="text-[11px] font-black text-brand-gold">${val(p.gol, 0)}</p></div>
                         </div>
                     </div>
@@ -338,14 +390,15 @@
                         <h2 class="text-xl font-black uppercase tracking-tighter text-white leading-tight mb-4">${val(p.nama)}</h2>
                         <div class="grid grid-cols-3 gap-2 mb-6">
                             <div class="bg-white/5 rounded-xl p-2 border border-white/5 text-center">
-                                <p class="text-[8px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">Umur</p>
-                                <p class="text-[10px] font-black text-white">${val(p.kategori, '-')}</p>
+                                <p class="text-[8px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">Kategori / Umur</p>
+                                <p class="text-[10px] font-black text-white">${val(p.kategori_auto, '-')}</p>
+                                <p class="text-[7px] font-bold text-brand-neon mt-0.5">${val(p.umur_detail, '-')}</p>
                             </div>
-                            <div class="bg-white/5 rounded-xl p-2 border border-white/5 text-center">
+                            <div class="bg-white/5 rounded-xl p-2 border border-white/5 text-center flex flex-col justify-center">
                                 <p class="text-[8px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">Gol</p>
                                 <p class="text-[10px] font-black text-brand-gold">${val(p.gol, 0)}</p>
                             </div>
-                            <div class="bg-white/5 rounded-xl p-2 border border-white/5 text-center">
+                            <div class="bg-white/5 rounded-xl p-2 border border-white/5 text-center flex flex-col justify-center">
                                 <p class="text-[8px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">Kaki</p>
                                 <p class="text-[10px] font-black text-white uppercase">${val(p.kaki)}</p>
                             </div>
@@ -360,30 +413,23 @@
             lucide.createIcons();
         }
 
-        // HALAMAN PROFIL PENUH: MENDUKUNG POSISI UTAMA & ALTERNATIF
         function bukaProfilPenuh(idx) {
             closeModal();
             const p = rawData.pemain[idx];
             
-            // 1. Ekstrak Koordinat Posisi Utama
             const mainCoordsArray = getPosCoordsArray(p.posisi);
-            
-            // 2. Ekstrak Koordinat Posisi Alternatif (Jika ada)
             const altPosRaw = val(p.posisi_alt, '');
             const altCoordsArray = (altPosRaw && altPosRaw !== '-') ? getPosCoordsArray(altPosRaw) : [];
 
-            // 3. Render Marker Utama (Solid + Zone)
             let pitchElementsHTML = mainCoordsArray.map(c => `
                 <div class="position-zone" style="bottom: ${c.bottom}; left: ${c.left}; width: ${c.w}; height: ${c.h}; background: ${c.color.bg};"></div>
                 <div class="player-marker" style="bottom: ${c.bottom}; left: ${c.left}; background: ${c.color.marker}; box-shadow: 0 0 15px ${c.color.marker};">${c.label}</div>
             `).join('');
 
-            // 4. Render Marker Alternatif (Lighter, Dashed, Opacity 60%, No Zone)
             pitchElementsHTML += altCoordsArray.map(c => `
                 <div class="player-marker-alt" style="bottom: ${c.bottom}; left: ${c.left}; background: ${c.color.marker};">${c.label}</div>
             `).join('');
 
-            // Label Alternatif di Header
             const altBadgeHTML = (altPosRaw && altPosRaw !== '-') 
                 ? `<span class="text-xs font-black bg-white/5 text-gray-300 border border-white/10 px-4 py-1.5 rounded-lg uppercase shadow-sm">ALT: ${altPosRaw}</span>` 
                 : '';
@@ -430,12 +476,13 @@
                         <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4 text-brand-neon"></i> Biometrik & Fisik</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                                <p class="text-[9px] text-gray-500 uppercase font-bold mb-1">Tanggal Lahir</p>
-                                <p class="text-sm font-black text-white">${val(p.tanggal_lahir, '-')}</p>
+                                <p class="text-[9px] text-gray-500 uppercase font-bold mb-1">Tgl Lahir / Usia</p>
+                                <p class="text-sm font-black text-white">${val(p.tanggal_lahir_format, '-')}</p>
+                                <p class="text-[9px] font-bold text-brand-neon mt-1">${val(p.umur_detail, '-')}</p>
                             </div>
                             <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                                <p class="text-[9px] text-gray-500 uppercase font-bold mb-1">Kategori Umur</p>
-                                <p class="text-sm font-black text-white uppercase">${val(p.kategori, '-')}</p>
+                                <p class="text-[9px] text-gray-500 uppercase font-bold mb-1">Kategori Tim</p>
+                                <p class="text-sm font-black text-white uppercase">${val(p.kategori_auto, '-')}</p>
                             </div>
                             <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
                                 <p class="text-[9px] text-gray-500 uppercase font-bold mb-1">Tinggi / Berat</p>
