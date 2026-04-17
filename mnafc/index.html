@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MNA FC | Command Center</title>
+    <title>MNA FC | Elite Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
     <script>
@@ -17,93 +17,83 @@
                         'brand-gold': '#d7b67d',
                         'brand-dark': '#050505',
                         'brand-surface': '#111111',
-                        'pitch-green': '#2d5a27',
                     },
-                    fontFamily: {
-                        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
-        
-        body { background-color: #050505; color: #ffffff; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #050505; color: #ffffff; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
         .hide-scroll::-webkit-scrollbar { display: none; }
-        
         .glass-panel { background: rgba(17, 17, 17, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .player-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .player-card:hover { transform: translateY(-8px); border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 15px 30px -10px rgba(59, 130, 246, 0.2); z-index: 10;}
-        
-        /* Tactical Pitch Styles */
-        .mini-pitch { position: relative; width: 100%; height: 180px; background-color: #2d5a27; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; overflow: hidden; background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(0,0,0,0.05) 20px, rgba(0,0,0,0.05) 40px); }
-        .pitch-line { position: absolute; border: 1.5px solid rgba(255,255,255,0.3); }
-        .pitch-center-circle { top: 50%; left: 50%; width: 40px; height: 40px; border-radius: 50%; transform: translate(-50%, -50%); }
-        .pitch-center-line { top: 50%; left: 0; width: 100%; height: 1.5px; background: rgba(255,255,255,0.3); transform: translateY(-50%); }
-        .pitch-penalty-area { top: 0; left: 25%; width: 50%; height: 30px; border-top: none; }
-        .pitch-penalty-area-bot { bottom: 0; left: 25%; width: 50%; height: 30px; border-bottom: none; }
-        .player-dot { position: absolute; width: 12px; height: 12px; background: #3b82f6; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px #3b82f6; transform: translate(-50%, -50%); transition: all 0.5s ease; }
-
+        .player-card:hover { transform: translateY(-8px) scale(1.02); border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 15px 30px -10px rgba(59, 130, 246, 0.2); z-index: 10;}
         .modal-enter { animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes popIn { 0% { opacity: 0; transform: scale(0.95) translateY(10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        .stagger-item { animation: fadeUp 0.5s ease forwards; opacity: 0; transform: translateY(10px); }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* Tactical Pitch Design */
+        .pitch-container { position: relative; width: 100%; height: 180px; background: rgba(59, 130, 246, 0.05); border: 1.5px solid rgba(59, 130, 246, 0.2); border-radius: 12px; overflow: hidden; }
+        .pitch-line { position: absolute; border: 1px solid rgba(59, 130, 246, 0.15); }
+        .pitch-half { top: 0; left: 0; width: 100%; height: 50%; border-bottom: 1px solid rgba(59, 130, 246, 0.2); }
+        .pitch-circle { top: 50%; left: 50%; width: 50px; height: 50px; border-radius: 50%; transform: translate(-50%, -50%); }
+        .pitch-penalty { top: 0; left: 25%; width: 50%; height: 20%; border: 1px solid rgba(59, 130, 246, 0.2); border-top: 0; }
+        .pitch-penalty-bottom { bottom: 0; left: 25%; width: 50%; height: 20%; border: 1px solid rgba(59, 130, 246, 0.2); border-bottom: 0; }
+        .player-marker { position: absolute; width: 12px; height: 12px; background: #3b82f6; border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 15px #3b82f6; transition: all 1s ease; }
     </style>
 </head>
-<body class="bg-[#F9FAFB] dark:bg-brand-dark pb-32 font-sans transition-colors duration-500">
+<body class="bg-[#F9FAFB] dark:bg-brand-dark pb-32 transition-colors duration-500">
 
     <header class="fixed top-0 w-full z-50 glass-panel border-b border-gray-200 dark:border-white/5 pt-safe">
         <div class="max-w-4xl mx-auto px-5 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-blue to-brand-neon flex items-center justify-center">
-                    <span class="font-black text-white text-xs">FC</span>
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-blue to-brand-neon flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                    <span class="font-black text-white text-xs tracking-tighter">FC</span>
                 </div>
                 <h1 class="font-black text-xl italic tracking-tighter uppercase text-brand-dark dark:text-white">MNA <span class="text-brand-blue dark:text-brand-neon">SPORT</span></h1>
             </div>
             <div class="flex bg-gray-100 dark:bg-white/5 p-1 rounded-xl">
                 <button onclick="switchMode('squad')" id="tab-squad" class="px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg bg-white dark:bg-brand-surface text-brand-blue dark:text-white shadow-sm transition-all">Squad</button>
-                <button onclick="switchMode('gallery')" id="tab-gallery" class="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500 transition-all">Media</button>
+                <button onclick="switchMode('gallery')" id="tab-gallery" class="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-brand-dark dark:hover:text-white transition-all">Media</button>
             </div>
         </div>
     </header>
 
     <main class="pt-24 px-5 max-w-4xl mx-auto">
-        <div class="glass-panel rounded-3xl p-6 mb-8 relative overflow-hidden">
-            <div class="absolute -right-20 -top-20 w-64 h-64 bg-brand-blue/10 blur-[80px] rounded-full"></div>
-            <div class="grid grid-cols-3 gap-4 divide-x divide-white/10">
-                <div class="text-center">
-                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Win Rate</p>
-                    <p id="win-rate" class="text-3xl font-black text-brand-neon tracking-tighter">0%</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Rekor</p>
-                    <p id="match-record" class="text-3xl font-black text-white tracking-tighter">0-0-0</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">GD</p>
-                    <p id="goal-diff" class="text-3xl font-black text-brand-gold tracking-tighter">+0</p>
-                </div>
+        <div class="glass-panel rounded-3xl p-6 md:p-8 mb-8 border border-gray-200 dark:border-white/5 relative overflow-hidden">
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-brand-blue/20 blur-[80px] rounded-full pointer-events-none"></div>
+            <p class="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Tactical Stats
+            </p>
+            <div class="grid grid-cols-3 gap-4 md:gap-8 divide-x divide-gray-200 dark:divide-white/10">
+                <div><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Win Rate</p><p id="win-rate" class="text-3xl md:text-5xl font-black text-brand-neon tracking-tighter">0%</p></div>
+                <div class="pl-4 md:pl-8"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">W-S-K</p><p id="match-record" class="text-3xl md:text-5xl font-black text-brand-dark dark:text-white tracking-tighter">0-0-0</p></div>
+                <div class="pl-4 md:pl-8"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Goal Diff</p><p id="goal-diff" class="text-3xl md:text-5xl font-black text-brand-gold tracking-tighter">+0</p></div>
             </div>
         </div>
 
-        <div id="view-squad" class="block">
-            <div class="sticky top-16 z-40 bg-brand-dark/90 backdrop-blur-xl py-4 mb-4">
-                <div class="relative mb-4">
-                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
-                    <input type="text" id="playerSearch" oninput="runFilter()" placeholder="Cari nama atau instansi..." 
-                        class="w-full bg-brand-surface border border-white/10 rounded-2xl py-3 pl-12 text-sm text-white focus:ring-2 focus:ring-brand-neon outline-none transition-all">
+        <div id="view-squad" class="block animate-fade-in">
+            <div class="sticky top-16 z-40 bg-[#F9FAFB]/90 dark:bg-brand-dark/90 backdrop-blur-xl py-4 -mx-5 px-5 mb-4 border-b border-gray-100 dark:border-white/5">
+                <div class="relative flex-1 mb-4">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                    <input type="text" id="playerSearch" oninput="runFilter()" placeholder="Cari nama, posisi, atau sekolah..." 
+                        class="w-full bg-white dark:bg-brand-surface border border-gray-200 dark:border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm font-medium outline-none focus:border-brand-neon transition-colors shadow-sm text-brand-dark dark:text-white placeholder-gray-400">
                 </div>
-                <div class="flex gap-2 overflow-x-auto hide-scroll">
-                    <button onclick="setPosFilter('ALL', this)" class="pos-btn border-brand-neon text-brand-neon bg-brand-blue/10 px-5 py-2 rounded-xl text-[10px] font-black uppercase border transition-all">Semua</button>
-                    <button onclick="setPosFilter('GK', this)" class="pos-btn border-white/10 text-gray-500 bg-brand-surface px-5 py-2 rounded-xl text-[10px] font-bold uppercase border transition-all">GK</button>
-                    <button onclick="setPosFilter('DEF', this)" class="pos-btn border-white/10 text-gray-500 bg-brand-surface px-5 py-2 rounded-xl text-[10px] font-bold uppercase border transition-all">DEF</button>
-                    <button onclick="setPosFilter('MID', this)" class="pos-btn border-white/10 text-gray-500 bg-brand-surface px-5 py-2 rounded-xl text-[10px] font-bold uppercase border transition-all">MID</button>
-                    <button onclick="setPosFilter('FWD', this)" class="pos-btn border-white/10 text-gray-500 bg-brand-surface px-5 py-2 rounded-xl text-[10px] font-bold uppercase border transition-all">FWD</button>
+                <div class="flex gap-2 overflow-x-auto hide-scroll pb-1">
+                    <button onclick="setPosFilter('ALL', this)" class="pos-btn border-brand-neon text-brand-blue dark:text-brand-neon bg-blue-50 dark:bg-brand-blue/10 px-6 py-2 rounded-xl text-[10px] font-black uppercase border shadow-sm transition-all">Semua</button>
+                    <button onclick="setPosFilter('GK', this)" class="pos-btn border-gray-200 dark:border-white/10 text-gray-500 bg-white dark:bg-brand-surface px-6 py-2 rounded-xl text-[10px] font-bold uppercase border hover:border-gray-300 dark:hover:border-white/30 transition-all">GK</button>
+                    <button onclick="setPosFilter('DEF', this)" class="pos-btn border-gray-200 dark:border-white/10 text-gray-500 bg-white dark:bg-brand-surface px-6 py-2 rounded-xl text-[10px] font-bold uppercase border hover:border-gray-300 dark:hover:border-white/30 transition-all">DEF</button>
+                    <button onclick="setPosFilter('MID', this)" class="pos-btn border-gray-200 dark:border-white/10 text-gray-500 bg-white dark:bg-brand-surface px-6 py-2 rounded-xl text-[10px] font-bold uppercase border hover:border-gray-300 dark:hover:border-white/30 transition-all">MID</button>
+                    <button onclick="setPosFilter('FWD', this)" class="pos-btn border-gray-200 dark:border-white/10 text-gray-500 bg-white dark:bg-brand-surface px-6 py-2 rounded-xl text-[10px] font-bold uppercase border hover:border-gray-300 dark:hover:border-white/30 transition-all">FWD</button>
                 </div>
             </div>
             <div id="playerGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
         </div>
 
-        <div id="view-gallery" class="hidden">
+        <div id="view-gallery" class="hidden animate-fade-in">
             <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5"></div>
         </div>
     </main>
@@ -114,11 +104,20 @@
             </div>
     </div>
 
-    <nav class="fixed bottom-0 w-full z-[110] bg-brand-surface/95 backdrop-blur-2xl border-t border-white/5 pb-safe">
-        <div class="flex justify-around items-center h-16 max-w-md mx-auto">
-            <a href="/" class="flex flex-col items-center text-gray-500"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[9px] font-bold uppercase mt-1">Operator</span></a>
-            <a href="/tsl/" class="flex flex-col items-center text-gray-500"><i data-lucide="trophy" class="w-5 h-5"></i><span class="text-[9px] font-bold uppercase mt-1">TSL Liga</span></a>
-            <button class="flex flex-col items-center text-brand-neon"><i data-lucide="shield" class="w-5 h-5"></i><span class="text-[9px] font-bold uppercase mt-1">MNA FC</span></button>
+    <nav class="fixed bottom-0 w-full z-[110] bg-white/95 dark:bg-brand-surface/95 backdrop-blur-2xl border-t border-gray-200 dark:border-white/5 pb-safe transition-colors">
+        <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
+            <a href="/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-gold transition-colors">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">Operator</span>
+            </a>
+            <a href="/tsl/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-green-500 transition-colors">
+                <i data-lucide="trophy" class="w-5 h-5 mb-1"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">TSL Liga</span>
+            </a>
+            <button class="flex flex-col items-center justify-center w-full h-full text-brand-blue dark:text-brand-neon transition-colors">
+                <i data-lucide="shield" class="w-5 h-5 mb-1"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">MNA FC</span>
+            </button>
         </div>
     </nav>
 
@@ -129,16 +128,44 @@
 
         const val = (data, fallback = "-") => (data === "" || data === null || data === undefined) ? fallback : data;
 
+        // Koordinat Posisi di Lapangan (Visual Taktis)
+        function getPosCoords(pos) {
+            const p = pos.toUpperCase();
+            const positions = {
+                'GK': { bottom: '5%', left: '50%' },
+                'CB': { bottom: '20%', left: '50%' },
+                'LB': { bottom: '25%', left: '15%' },
+                'RB': { bottom: '25%', left: '85%' },
+                'LWB': { bottom: '35%', left: '10%' },
+                'RWB': { bottom: '35%', left: '90%' },
+                'RB/LB': { bottom: '25%', left: '50%' },
+                'RWB/LWB': { bottom: '35%', left: '50%' },
+                'CM': { bottom: '50%', left: '50%' },
+                'CDM': { bottom: '40%', left: '50%' },
+                'CAM': { bottom: '65%', left: '50%' },
+                'RM': { bottom: '55%', left: '85%' },
+                'LM': { bottom: '55%', left: '15%' },
+                'RM/LM': { bottom: '55%', left: '50%' },
+                'ST': { bottom: '85%', left: '50%' },
+                'CF': { bottom: '80%', left: '50%' },
+                'LW': { bottom: '80%', left: '15%' },
+                'RW': { bottom: '80%', left: '85%' },
+                'SS': { bottom: '75%', left: '50%' },
+                'RW/LW': { bottom: '80%', left: '50%' }
+            };
+            return positions[p] || { bottom: '50%', left: '50%' };
+        }
+
         async function init() {
-            const cache = localStorage.getItem('mnafc_hub_v3');
+            const cache = localStorage.getItem('mnafc_elite_cache');
             if (cache) { rawData = JSON.parse(cache); updateUI(); }
             try {
                 const res = await fetch(`${API_URL}?t=${Date.now()}`);
                 const data = await res.json();
                 rawData = data;
-                localStorage.setItem('mnafc_hub_v3', JSON.stringify(data));
+                localStorage.setItem('mnafc_elite_cache', JSON.stringify(data));
                 updateUI();
-            } catch (e) { console.error("Sync Error:", e); }
+            } catch (e) { console.error(e); }
             lucide.createIcons();
         }
 
@@ -155,24 +182,34 @@
             document.getElementById('win-rate').innerText = (total > 0 ? Math.round((m/total)*100) : 0) + '%';
             document.getElementById('match-record').innerText = `${m}-${s_}-${k}`;
             const diff = parseInt(val(s.gol_masuk, 0)) - parseInt(val(s.gol_kemasukan, 0));
-            document.getElementById('goal-diff').innerText = (diff >= 0 ? '+' : '') + diff;
+            document.getElementById('goal-diff').innerText = (diff > 0 ? '+' : '') + diff;
         }
 
         function renderPlayers(list) {
             const grid = document.getElementById('playerGrid');
-            grid.innerHTML = list.map(p => {
+            if (list.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-16 text-center text-[10px] font-black text-gray-500 uppercase tracking-widest border border-dashed border-gray-300 dark:border-white/10 rounded-2xl">Tidak ada data</div>`;
+                return;
+            }
+            grid.innerHTML = list.map((p, i) => {
                 const originalIdx = rawData.pemain.findIndex(orig => orig === p);
                 return `
-                <div onclick="showPlayerDetail(${originalIdx})" class="player-card glass-panel rounded-2xl p-4 flex items-center gap-4 relative overflow-hidden cursor-pointer">
-                    <div class="absolute -right-2 -bottom-6 text-7xl font-black italic text-white/5 pointer-events-none">${val(p.nomor, '00')}</div>
-                    <div class="w-16 h-16 rounded-xl overflow-hidden bg-white/10 border border-white/10 shrink-0">
+                <div onclick="showPlayerDetail(${originalIdx})" class="player-card glass-panel rounded-2xl p-4 flex items-center gap-4 relative overflow-hidden cursor-pointer stagger-item" style="animation-delay: ${i*0.05}s">
+                    <div class="absolute -right-2 -bottom-6 text-8xl font-black italic text-brand-dark/5 dark:text-white/5 pointer-events-none">${val(p.nomor, '00')}</div>
+                    <div class="w-20 h-20 rounded-xl overflow-hidden bg-gray-200 dark:bg-white/10 shrink-0 border border-white/10 relative z-10">
                         <img src="${val(p.link_foto, 'https://via.placeholder.com/200')}" class="w-full h-full object-cover">
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <h4 class="text-sm font-black uppercase text-white truncate">${val(p.nama, 'Pemain')}</h4>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="text-[9px] font-black bg-brand-neon/20 text-brand-neon px-2 py-0.5 rounded uppercase border border-brand-neon/30">${val(p.posisi, 'POS')}</span>
-                            <span class="text-[9px] text-gray-500 font-bold uppercase truncate">${val(p.sekolah, 'Instansi')}</span>
+                    <div class="flex-1 min-w-0 z-10">
+                        <div class="flex justify-between items-start mb-1">
+                            <div>
+                                <h4 class="text-sm font-black uppercase tracking-tight text-brand-dark dark:text-white truncate">${val(p.nama, 'Pemain')}</h4>
+                                <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest truncate block">${val(p.sekolah, 'Instansi')}</span>
+                            </div>
+                            <span class="text-[10px] font-black bg-brand-neon/20 text-brand-neon px-2 py-1 rounded shadow-sm border border-brand-neon/20">${val(p.posisi, 'POS')}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-white/5">
+                            <div><p class="text-[7px] text-gray-400 uppercase font-black tracking-widest">Kategori</p><p class="text-[11px] font-bold text-brand-dark dark:text-white uppercase">${val(p.kategori, '-')}</p></div>
+                            <div><p class="text-[7px] text-gray-400 uppercase font-black tracking-widest">Gol / Poin</p><p class="text-[11px] font-black text-brand-gold">${val(p.gol, 0)}</p></div>
                         </div>
                     </div>
                 </div>`;
@@ -180,81 +217,87 @@
             lucide.createIcons();
         }
 
-        function renderGallery(list) {
-            const grid = document.getElementById('galleryGrid');
-            grid.innerHTML = list.map(item => `
-                <a href="${item.link_drive}" target="_blank" class="glass-panel rounded-2xl p-3 flex flex-col gap-3 group">
-                    <div class="relative w-full aspect-video rounded-xl bg-black overflow-hidden">
-                        ${item.preview_image ? `<img src="${item.preview_image}" class="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity">` : '<div class="absolute inset-0 flex items-center justify-center"><i data-lucide="folder" class="w-8 h-8 text-white/20"></i></div>'}
-                        <div class="absolute top-3 left-3 bg-brand-neon text-white text-[8px] font-black px-2 py-1 rounded shadow-lg uppercase">${val(item.tanggal)}</div>
-                    </div>
-                    <h4 class="text-[11px] font-black uppercase text-white px-1 line-clamp-1">${val(item.kegiatan, 'Dokumentasi')}</h4>
-                </a>`).join('');
-            lucide.createIcons();
+        function runFilter() {
+            const query = document.getElementById('playerSearch').value.toLowerCase();
+            const filtered = rawData.pemain.filter(p => {
+                const searchStr = (val(p.nama) + val(p.sekolah) + val(p.posisi)).toLowerCase();
+                const matchTxt = searchStr.includes(query);
+                
+                const pos = val(p.posisi).toUpperCase();
+                let bPos = 'LAINNYA';
+                
+                if (['GK'].includes(pos)) bPos = 'GK';
+                else if (['CB','LB','RB','RWB','LWB','RB/LB','RWB/LWB'].includes(pos)) bPos = 'DEF';
+                else if (['CM','CDM','CAM','RM','LM','RM/LM'].includes(pos)) bPos = 'MID';
+                else if (['ST','CF','RW','LW','SS','RW/LW'].includes(pos)) bPos = 'FWD';
+
+                return matchTxt && (activePos === 'ALL' || bPos === activePos);
+            });
+            renderPlayers(filtered);
+        }
+
+        function setPosFilter(pos, btn) {
+            activePos = pos;
+            document.querySelectorAll('.pos-btn').forEach(b => {
+                b.className = "pos-btn border-gray-200 dark:border-white/10 text-gray-500 bg-white dark:bg-brand-surface px-6 py-2 rounded-xl text-[10px] font-bold uppercase border transition-all";
+            });
+            btn.className = "pos-btn border-brand-neon text-brand-blue dark:text-brand-neon bg-blue-50 dark:bg-brand-blue/10 px-6 py-2 rounded-xl text-[10px] font-black uppercase border shadow-sm transition-all";
+            runFilter();
         }
 
         function showPlayerDetail(idx) {
             const p = rawData.pemain[idx];
+            const coords = getPosCoords(p.posisi);
             
-            // Logika Posisi Radar Lapangan
-            let pitchTop = '50%', pitchLeft = '50%';
-            const pos = val(p.posisi).toUpperCase();
-            if (pos.includes('GK') || pos.includes('GAWANG') || pos.includes('KIPER')) { pitchTop = '85%'; pitchLeft = '50%'; }
-            else if (pos.includes('DEF') || pos.includes('BEK') || ['CB','LB','RB'].includes(pos)) { pitchTop = '65%'; pitchLeft = '50%'; }
-            else if (pos.includes('MID') || pos.includes('GELANDANG') || ['CM','CDM','CAM'].includes(pos)) { pitchTop = '45%'; pitchLeft = '50%'; }
-            else if (pos.includes('FWD') || pos.includes('ST') || pos.includes('SAYAP')) { pitchTop = '20%'; pitchLeft = '50%'; }
-
             document.getElementById('modalContent').innerHTML = `
-                <div class="relative bg-brand-surface">
-                    <button onclick="closeModal()" class="absolute top-5 right-5 z-20 bg-black/50 text-white p-2 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <div class="relative bg-brand-surface border border-white/10 rounded-[2rem] overflow-hidden">
+                    <button onclick="closeModal()" class="absolute top-5 right-5 z-[100] bg-black/50 text-white p-2 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button>
                     
-                    <div class="h-28 bg-gradient-to-br from-brand-blue to-brand-neon relative">
-                        <div class="absolute -bottom-12 left-1/2 -translate-x-1/2 w-24 h-24 rounded-2xl overflow-hidden border-4 border-brand-surface shadow-2xl">
+                    <div class="h-32 bg-gradient-to-br from-brand-blue to-brand-neon relative">
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-30"></div>
+                        <div class="absolute -bottom-16 left-8 w-28 h-28 rounded-2xl overflow-hidden border-4 border-brand-surface shadow-2xl bg-brand-surface">
                             <img src="${val(p.link_foto, 'https://via.placeholder.com/200')}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="absolute bottom-4 right-8 text-right">
+                            <h2 class="text-xl font-black uppercase tracking-tighter text-white leading-none">${val(p.nama)}</h2>
+                            <p class="text-[9px] font-black text-brand-neon uppercase tracking-widest mt-1">#${val(p.nomor, '0')} • ${val(p.posisi)}</p>
                         </div>
                     </div>
                     
-                    <div class="pt-16 pb-8 px-6 text-center">
-                        <h2 class="text-xl font-black uppercase text-white tracking-tighter">${val(p.nama)}</h2>
-                        <p class="text-[10px] font-bold text-brand-neon uppercase tracking-widest mt-1 mb-6">${val(p.posisi)} • #${val(p.nomor, '0')}</p>
-                        
+                    <div class="pt-20 pb-8 px-6">
+                        <div class="pitch-container mb-6">
+                            <div class="pitch-half"></div>
+                            <div class="pitch-circle pitch-line"></div>
+                            <div class="pitch-penalty pitch-line"></div>
+                            <div class="pitch-penalty-bottom pitch-line"></div>
+                            <div class="player-marker" style="bottom: ${coords.bottom}; left: ${coords.left};"></div>
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <span class="text-[7px] font-black text-brand-neon/20 uppercase tracking-[1em] rotate-90">TACTICAL VIEW</span>
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-2 gap-3 mb-6">
-                            <div class="bg-white/5 rounded-xl p-3 border border-white/5 text-left">
-                                <p class="text-[8px] text-gray-500 font-bold uppercase mb-1">Tanggal Lahir</p>
-                                <p class="text-[11px] font-black text-white">${val(p.tanggal_lahir, 'N/A')}</p>
+                            <div class="bg-white/5 rounded-xl p-3 border border-white/5">
+                                <p class="text-[8px] text-gray-400 font-bold uppercase tracking-widest mb-1">Tgl Lahir</p>
+                                <p class="text-xs font-black text-white">${val(p.tanggal_lahir, 'Belum Diisi')}</p>
                             </div>
-                            <div class="bg-white/5 rounded-xl p-3 border border-white/5 text-left">
-                                <p class="text-[8px] text-gray-500 font-bold uppercase mb-1">Postur (T/B)</p>
-                                <p class="text-[11px] font-black text-white">${val(p.tinggi, '0')}cm / ${val(p.berat, '0')}kg</p>
+                            <div class="bg-white/5 rounded-xl p-3 border border-white/5">
+                                <p class="text-[8px] text-gray-400 font-bold uppercase tracking-widest mb-1">Kaki Kuat</p>
+                                <p class="text-xs font-black text-white uppercase">${val(p.kaki)}</p>
                             </div>
-                        </div>
-
-                        <div class="mb-6">
-                            <p class="text-[8px] text-gray-500 font-bold uppercase tracking-[0.2em] mb-3">Posisi Taktis</p>
-                            <div class="mini-pitch">
-                                <div class="pitch-line pitch-center-line"></div>
-                                <div class="pitch-line pitch-center-circle"></div>
-                                <div class="pitch-line pitch-penalty-area"></div>
-                                <div class="pitch-line pitch-penalty-area-bot"></div>
-                                <div class="player-dot" style="top: ${pitchTop}; left: ${pitchLeft};"></div>
+                            <div class="bg-white/5 rounded-xl p-3 border border-white/5">
+                                <p class="text-[8px] text-gray-400 font-bold uppercase tracking-widest mb-1">Gol / Poin</p>
+                                <p class="text-sm font-black text-brand-gold">${val(p.gol, 0)}</p>
+                            </div>
+                            <div class="bg-white/5 rounded-xl p-3 border border-white/5">
+                                <p class="text-[8px] text-gray-400 font-bold uppercase tracking-widest mb-1">Postur</p>
+                                <p class="text-xs font-black text-white">${val(p.tinggi)}cm / ${val(p.berat)}kg</p>
                             </div>
                         </div>
-
-                        <div class="space-y-3">
-                            <div class="bg-white/5 rounded-xl p-4 border border-white/5 text-left flex items-center justify-between">
-                                <div>
-                                    <p class="text-[8px] text-brand-neon font-black uppercase tracking-widest">Kaki Kuat</p>
-                                    <p class="text-xs font-bold text-white uppercase">${val(p.kaki, '-')}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-[8px] text-brand-gold font-black uppercase tracking-widest">Poin/Gol</p>
-                                    <p class="text-xs font-bold text-white uppercase">${val(p.gol, '0')}</p>
-                                </div>
-                            </div>
-                            <button onclick="alert('Profil detail pemain sedang dalam sinkronisasi sistem MNA Sport.')" class="w-full py-3 bg-brand-neon text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand-blue/20 flex items-center justify-center gap-2 hover:bg-brand-blue transition-colors">
-                                <i data-lucide="user" class="w-3 h-3"></i> Lihat Profil Lengkap
-                            </button>
-                        </div>
+                        
+                        <button onclick="window.open('https://wa.me/6281234567890', '_blank')" class="w-full bg-brand-neon hover:bg-brand-blue text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all shadow-lg shadow-brand-neon/20 flex items-center justify-center gap-2">
+                           <i data-lucide="user" class="w-4 h-4"></i> Lihat Profil Lengkap
+                        </button>
                     </div>
                 </div>`;
             document.getElementById('playerModal').classList.remove('hidden');
@@ -263,37 +306,27 @@
         }
 
         function closeModal() { document.getElementById('playerModal').classList.add('hidden'); document.body.style.overflow = ''; }
-
-        function runFilter() {
-            const query = document.getElementById('playerSearch').value.toLowerCase();
-            const filtered = rawData.pemain.filter(p => {
-                const matchTxt = (val(p.nama) + val(p.sekolah)).toLowerCase().includes(query);
-                const posTxt = val(p.posisi).toUpperCase();
-                let bPos = 'LAINNYA';
-                if (posTxt.includes('GK') || posTxt.includes('KIPER')) bPos = 'GK';
-                else if (posTxt.includes('DEF') || ['CB','LB','RB'].includes(posTxt)) bPos = 'DEF';
-                else if (posTxt.includes('MID') || ['CM','CDM','CAM'].includes(posTxt)) bPos = 'MID';
-                else if (posTxt.includes('FWD') || posTxt.includes('ST')) bPos = 'FWD';
-                return matchTxt && (activePos === 'ALL' || bPos === activePos);
-            });
-            renderPlayers(filtered);
-        }
-
-        function setPosFilter(pos, btn) {
-            activePos = pos;
-            document.querySelectorAll('.pos-btn').forEach(b => b.className = "pos-btn border-white/10 text-gray-500 bg-brand-surface px-5 py-2 rounded-xl text-[10px] font-bold uppercase border transition-all");
-            btn.className = "pos-btn border-brand-neon text-brand-neon bg-brand-blue/10 px-5 py-2 rounded-xl text-[10px] font-black uppercase border shadow-sm transition-all";
-            runFilter();
-        }
-
         function switchMode(mode) {
             const isSquad = mode === 'squad';
             document.getElementById('view-squad').classList.toggle('hidden', !isSquad);
             document.getElementById('view-gallery').classList.toggle('hidden', isSquad);
             const tS = document.getElementById('tab-squad'), tG = document.getElementById('tab-gallery');
-            [tS, tG].forEach(b => b.className = "px-4 py-1.5 text-[10px] font-bold uppercase text-gray-500 transition-all");
+            [tS, tG].forEach(b => b.className = "px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-all");
             const act = isSquad ? tS : tG;
-            act.className = "px-4 py-1.5 text-[10px] font-black uppercase rounded-lg bg-white dark:bg-brand-surface text-brand-blue dark:text-white shadow-sm transition-all";
+            act.className = "px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg bg-white dark:bg-brand-surface text-brand-blue dark:text-white shadow-sm transition-all";
+        }
+        function renderGallery(list) {
+            const grid = document.getElementById('galleryGrid');
+            if (!list || list.length === 0) { grid.innerHTML = `<div class="col-span-full py-16 text-center text-[10px] font-black text-gray-500 uppercase tracking-widest">Kosong</div>`; return; }
+            grid.innerHTML = list.map((item, i) => `
+                <a href="${item.link_drive}" target="_blank" class="glass-panel rounded-2xl p-3 flex flex-col gap-3 relative overflow-hidden group stagger-item border border-white/5" style="animation-delay: ${i*0.05}s">
+                    <div class="relative w-full aspect-video rounded-xl bg-brand-dark overflow-hidden">
+                        ${item.preview_image ? `<img src="${item.preview_image}" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity">` : '<div class="absolute inset-0 flex items-center justify-center"><i data-lucide="folder" class="w-10 h-10 text-white/10"></i></div>'}
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-3 left-3 text-white"><h4 class="text-xs font-black uppercase tracking-tight line-clamp-1">${val(item.kegiatan)}</h4><p class="text-[9px] font-bold text-gray-300 uppercase mt-0.5">${val(item.tanggal)}</p></div>
+                    </div>
+                </a>`).join('');
+            lucide.createIcons();
         }
 
         window.addEventListener('DOMContentLoaded', init);
