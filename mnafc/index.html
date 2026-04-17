@@ -46,6 +46,17 @@
         .pitch-penalty { top: 0; left: 25%; width: 50%; height: 20%; border: 1px solid rgba(59, 130, 246, 0.2); border-top: 0; }
         .pitch-penalty-bottom { bottom: 0; left: 25%; width: 50%; height: 20%; border: 1px solid rgba(59, 130, 246, 0.2); border-bottom: 0; }
         
+        /* Zona Bermain Hijau ala eFootball */
+        .position-zone {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(ellipse at center, rgba(34, 197, 94, 0.45) 0%, rgba(34, 197, 94, 0.1) 40%, transparent 70%);
+            pointer-events: none;
+            z-index: 5;
+            transition: all 1s ease;
+            mix-blend-mode: screen;
+        }
+
         /* Marker Taktis Multi-Posisi */
         .player-marker { 
             position: absolute; 
@@ -149,26 +160,27 @@
 
         const val = (data, fallback = "-") => (data === "" || data === null || data === undefined) ? fallback : data;
 
-        // MESIN POSISI GANDA (Update: Bisa pecah RW/LW jadi 2 titik di sayap)
+        // MESIN POSISI & ZONA BERMAIN (Dimensi Dinamis)
         function getPosCoordsArray(pos) {
             const p = val(pos).toUpperCase().trim();
+            // Setiap posisi kini mendefinisikan lokasi (bottom, left) dan lebar/tinggi zona (w, h)
             const basePositions = {
-                'GK': { bottom: '5%', left: '50%' },
-                'CB': { bottom: '20%', left: '50%' },
-                'LB': { bottom: '25%', left: '15%' },
-                'RB': { bottom: '25%', left: '85%' },
-                'LWB': { bottom: '35%', left: '15%' },
-                'RWB': { bottom: '35%', left: '85%' },
-                'CDM': { bottom: '40%', left: '50%' },
-                'CM': { bottom: '50%', left: '50%' },
-                'LM': { bottom: '55%', left: '15%' },
-                'RM': { bottom: '55%', left: '85%' },
-                'CAM': { bottom: '65%', left: '50%' },
-                'SS': { bottom: '75%', left: '50%' },
-                'LW': { bottom: '80%', left: '15%' },
-                'RW': { bottom: '80%', left: '85%' },
-                'CF': { bottom: '80%', left: '50%' },
-                'ST': { bottom: '85%', left: '50%' }
+                'GK': { bottom: '5%', left: '50%', w: '40%', h: '25%' },
+                'CB': { bottom: '20%', left: '50%', w: '60%', h: '30%' },
+                'LB': { bottom: '25%', left: '15%', w: '25%', h: '50%' },
+                'RB': { bottom: '25%', left: '85%', w: '25%', h: '50%' },
+                'LWB': { bottom: '35%', left: '12%', w: '20%', h: '60%' },
+                'RWB': { bottom: '35%', left: '88%', w: '20%', h: '60%' },
+                'CDM': { bottom: '35%', left: '50%', w: '70%', h: '35%' },
+                'CM': { bottom: '50%', left: '50%', w: '60%', h: '40%' },
+                'LM': { bottom: '55%', left: '15%', w: '25%', h: '55%' },
+                'RM': { bottom: '55%', left: '85%', w: '25%', h: '55%' },
+                'CAM': { bottom: '65%', left: '50%', w: '60%', h: '35%' },
+                'SS': { bottom: '75%', left: '50%', w: '50%', h: '35%' },
+                'LW': { bottom: '80%', left: '15%', w: '30%', h: '45%' },
+                'RW': { bottom: '80%', left: '85%', w: '30%', h: '45%' },
+                'CF': { bottom: '80%', left: '50%', w: '45%', h: '35%' },
+                'ST': { bottom: '85%', left: '50%', w: '50%', h: '30%' }
             };
 
             // Memecah teks "RW/LW" menjadi ["RW", "LW"]
@@ -177,13 +189,19 @@
             
             parts.forEach(part => {
                 if (basePositions[part]) {
-                    results.push({ bottom: basePositions[part].bottom, left: basePositions[part].left, label: part });
+                    results.push({ 
+                        bottom: basePositions[part].bottom, 
+                        left: basePositions[part].left, 
+                        w: basePositions[part].w,
+                        h: basePositions[part].h,
+                        label: part 
+                    });
                 }
             });
             
             // Failsafe jika singkatan tidak dikenali
             if (results.length === 0) {
-                results.push({ bottom: '50%', left: '50%', label: p });
+                results.push({ bottom: '50%', left: '50%', w: '50%', h: '50%', label: p });
             }
             
             return results;
@@ -259,7 +277,6 @@
                 const posTxt = val(p.posisi).toUpperCase();
                 let bPos = 'LAINNYA';
                 
-                // Mesin Kategori Scanner Super Akurat
                 if (posTxt.includes('GK')) bPos = 'GK';
                 else if (['CB','LB','RB','RWB','LWB'].some(x => posTxt.includes(x))) bPos = 'DEF';
                 else if (['CM','CDM','CAM','RM','LM'].some(x => posTxt.includes(x))) bPos = 'MID';
@@ -320,16 +337,17 @@
             lucide.createIcons();
         }
 
-        // HALAMAN PROFIL PENUH (DOSSIER)
+        // HALAMAN PROFIL PENUH (DOSSIER) + ZONA BERMAIN HIJAU
         function bukaProfilPenuh(idx) {
-            closeModal(); // Tutup Pop-up awal
+            closeModal();
             const p = rawData.pemain[idx];
             
-            // Mendapatkan Array Koordinat (Jika posisinya ganda, misal "RW/LW", array ini berisi 2 objek)
+            // Mendapatkan Array Koordinat & Dimensi Zona
             const coordsArray = getPosCoordsArray(p.posisi);
             
-            // Mencetak elemen HTML Marker untuk setiap titik koordinat
-            const markersHTML = coordsArray.map(c => `
+            // Mencetak elemen HTML Zona & Marker untuk setiap titik koordinat
+            const pitchElementsHTML = coordsArray.map(c => `
+                <div class="position-zone" style="bottom: ${c.bottom}; left: ${c.left}; width: ${c.w}; height: ${c.h};"></div>
                 <div class="player-marker" style="bottom: ${c.bottom}; left: ${c.left};">${c.label}</div>
             `).join('');
 
@@ -364,7 +382,7 @@
                             <div class="pitch-penalty pitch-line"></div>
                             <div class="pitch-penalty-bottom pitch-line"></div>
                             
-                            ${markersHTML}
+                            ${pitchElementsHTML}
                             
                         </div>
                     </div>
