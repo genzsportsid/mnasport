@@ -256,9 +256,9 @@
                 const posTxt = val(p.posisi).toUpperCase();
                 let bPos = 'LAINNYA';
                 if (posTxt.includes('GAWANG') || posTxt.includes('KIPER') || posTxt === 'GK') bPos = 'GK';
-                else if (posTxt.includes('BEK') || posTxt.includes('DEFENDER') || ['CB','RB','LB','RWB','LWB'].includes(posTxt)) bPos = 'DEF';
-                else if (posTxt.includes('GELANDANG') || posTxt.includes('MIDFIELD') || ['CM','CDM','CAM','RM','LM'].includes(posTxt)) bPos = 'MID';
-                else if (posTxt.includes('PENYERANG') || posTxt.includes('SAYAP') || posTxt.includes('STRIKER') || ['ST','CF','RW','LW','SS'].includes(posTxt)) bPos = 'FWD';
+                else if (posTxt.includes('BEK') || posTxt.includes('DEFENDER') || ['CB','RB','LB','RWB','LWB','RWB/LWB','RB/LB'].includes(posTxt)) bPos = 'DEF';
+                else if (posTxt.includes('GELANDANG') || posTxt.includes('MIDFIELD') || ['CM','CDM','CAM','RM','LM','RM/LM'].includes(posTxt)) bPos = 'MID';
+                else if (posTxt.includes('PENYERANG') || posTxt.includes('SAYAP') || posTxt.includes('STRIKER') || ['ST','CF','RW','LW','SS','ST/CF','RW/LW'].includes(posTxt)) bPos = 'FWD';
                 return matchTxt && (activePos === 'ALL' || bPos === activePos);
             });
             renderPlayers(filtered);
