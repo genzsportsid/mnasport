@@ -267,6 +267,9 @@
         <button onclick="switchTab('jadwal', 'Jadwal Pertandingan')" id="tab-btn-jadwal" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Jadwal</button>
         <button onclick="switchTab('klasemen', 'Papan Klasemen')" id="tab-btn-klasemen" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Klasemen</button>
         <button onclick="switchTab('statistik', 'Statistik Pemain')" id="tab-btn-statistik" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Statistik</button>
+        <button onclick="switchTab('pencarian', 'Pencarian TSL')" id="tab-pencarian" class="tab-btn shrink-0 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 transition-colors flex items-center gap-2">
+        <i data-lucide="search" class="w-3 h-3"></i> CARI
+    </button>
     </div>
     <div id="view-home" class="hidden opacity-100 transition-opacity duration-300">
         
@@ -410,17 +413,23 @@
 
         </div> <div id="view-search" class="hidden min-h-screen bg-[#F9FAFB] dark:bg-brand-dark-bg pb-24 z-[90] absolute top-0 left-0 w-full transition-colors duration-500">
         
-        <div class="bg-brand-black dark:bg-[#09090b] text-white safe-header sticky top-0 z-50 transition-colors shadow-md border-b border-[#d7b67d]/30">
-            <div class="px-4 md:px-8 flex items-center relative h-12">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-[#b69152] to-[#d7b67d] rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(215,182,125,0.3)]">
-                        <span class="font-heading font-black text-[#09090b] text-sm">MNA</span>
-                    </div>
-                    <div>
-                        <h1 class="font-heading font-bold text-sm tracking-widest uppercase text-white leading-none">Pencarian Global</h1>
-                        <p class="text-[8px] text-[#d7b67d] uppercase tracking-widest mt-0.5">Ekosistem MNA Sport</p>
-                    </div>
-                </div>
+        <div class="px-5 pt-6 pb-4 sticky top-0 bg-[#F9FAFB]/90 dark:bg-[#09090b]/90 backdrop-blur-xl z-20 border-b border-gray-200 dark:border-white/10">
+            <div class="flex items-center gap-3 mb-4">
+                <button onclick="switchTab('beranda', 'TSL Match Center')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center text-gray-500 hover:text-brand-green transition-colors">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                </button>
+                <h2 class="font-heading font-black text-lg text-brand-black dark:text-white uppercase tracking-tighter">Pencarian <span class="text-brand-green">TSL</span></h2>
+            </div>
+            
+            <div class="relative">
+                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-green"></i>
+                <input type="text" id="searchInput" placeholder="Cari tim, pemain, atau sekolah di TSL..." 
+                       class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl py-3 px-5 pl-12 text-sm outline-none focus:ring-2 focus:ring-brand-green transition-all text-brand-black dark:text-white placeholder-gray-400">
+                <button id="clearSearch" class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 hover:text-brand-green hidden">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
             </div>
         </div>
         
