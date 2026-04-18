@@ -1,662 +1,234 @@
 <!DOCTYPE html>
-<html lang="id" class="dark scroll-smooth">
+<html lang="id" class="dark">
 <head>
-    <script>
-        if (localStorage.getItem('mna_theme') === 'light') {
-            document.documentElement.classList.remove('dark');
-        } else {
-            document.documentElement.classList.add('dark');
-        }
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MNA Sport Management | Command Center</title>
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#000000">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MNA Sport">
-    <link rel="apple-touch-icon" href="/tsl/icon-192.png">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>Sistem Operator | Super App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-    
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        'brand-gold': '#d7b67d',
-                        'brand-gold-dark': '#b69152',
-                        'brand-green': '#009A44',
-                        'brand-blue': '#2563eb',
-                        'brand-black': '#111111',
-                        'brand-dark-bg': '#09090b',
-                        'brand-dark-surface': '#18181b',
-                        'brand-dark-border': '#27272a',
-                        'brand-dark-muted': '#a1a1aa'
+                        'brand-dark': '#050505',
+                        'brand-surface': '#111111',
+                        'brand-accent': '#f59e0b', // Operator menggunakan aksen Amber/Emas sebagai pembeda
+                        'brand-danger': '#ef4444',
+                        'brand-success': '#22c55e',
                     },
-                    fontFamily: { heading: ['"Noto Sans"', 'sans-serif'], body: ['"Noto Sans"', 'sans-serif'] }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+        body { background-color: #050505; color: #ffffff; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
         .hide-scroll::-webkit-scrollbar { display: none; }
-        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
-        html.dark .glass-header { background: rgba(9, 9, 11, 0.85); border-bottom: 1px solid rgba(215, 182, 125, 0.1); }
         
-        .glass-card { background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.4) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(0, 0, 0, 0.05); }
-        html.dark .glass-card { background: linear-gradient(145deg, rgba(24, 24, 27, 0.9) 0%, rgba(24, 24, 27, 0.4) 100%); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .pt-safe { padding-top: max(env(safe-area-inset-top), 20px) !important; }
-        .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 16px) !important; }
+        /* Industrial Panel Design */
+        .glass-panel { background: rgba(17, 17, 17, 0.8); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .action-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .action-card:hover { transform: translateY(-4px); border-color: rgba(245, 158, 11, 0.5); box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.15); z-index: 10; background: rgba(245, 158, 11, 0.05);}
+        .action-card:active { transform: scale(0.98); }
+        
+        .stagger-item { animation: fadeUp 0.5s ease forwards; opacity: 0; transform: translateY(10px); }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* Sync Spin */
+        .syncing { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="font-body bg-[#F9FAFB] dark:bg-[#000000] text-brand-black dark:text-white antialiased overflow-x-hidden selection:bg-brand-gold selection:text-brand-dark-bg pb-[100px] transition-colors duration-500">
-    
-    <div id="global-menu-overlay" class="fixed inset-0 z-[110] hidden">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="toggleGlobalMenu()"></div>
-        
-        <div id="global-menu-panel" class="absolute right-0 top-0 bottom-0 w-72 bg-white dark:bg-[#09090b] border-l border-gray-200 dark:border-white/10 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col pt-safe transition-colors">
-            
-            <div class="p-5 border-b border-gray-100 dark:border-white/5 flex justify-between items-center transition-colors">
-                <h3 class="font-heading font-bold text-brand-black dark:text-white tracking-widest uppercase text-xs transition-colors">Pengaturan Global</h3>
-                <button onclick="toggleGlobalMenu()" class="text-gray-500 dark:text-gray-400 hover:text-brand-black dark:hover:text-white bg-gray-100 dark:bg-white/5 p-1.5 rounded-lg transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-            
-            <div class="p-5 flex-1 flex flex-col gap-6 overflow-y-auto hide-scroll">
-                <div>
-                    <span class="text-[9px] font-bold text-brand-gold uppercase tracking-widest mb-3 block">Tampilan Ekosistem</span>
-                    <button onclick="toggleGlobalTheme()" class="w-full flex items-center justify-between bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-xl p-3 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors group">
-                        <div class="flex items-center gap-3">
-                            <i data-lucide="moon" id="theme-icon" class="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-brand-gold transition-colors"></i>
-                            <span class="text-xs font-bold text-brand-black dark:text-gray-200 transition-colors" id="theme-text">Tema Gelap</span>
-                        </div>
-                        <div class="w-8 h-4 bg-brand-gold rounded-full relative transition-colors" id="theme-toggle-bg">
-                            <div class="absolute right-1 top-0.5 w-3 h-3 bg-white dark:bg-[#09090b] rounded-full transition-transform" id="theme-toggle-dot"></div>
-                        </div>
-                    </button>
-                </div>
+<body class="bg-brand-dark pb-32 transition-colors duration-500 selection:bg-brand-accent selection:text-white">
 
-                <div>
-                    <span class="text-[9px] font-bold text-brand-gold uppercase tracking-widest mb-3 block">Sistem</span>
-                    <button onclick="requestGlobalNotification()" class="w-full flex items-center justify-between bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-xl p-3 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors group">
-                        <div class="flex items-center gap-3">
-                            <i data-lucide="bell-ring" class="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-brand-green transition-colors"></i>
-                            <span class="text-xs font-bold text-brand-black dark:text-gray-200 transition-colors" id="notif-text">Aktifkan Notifikasi</span>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 dark:text-gray-500"></i>
-                    </button>
-                </div>
-
-                <div>
-                    <span class="text-[9px] font-bold text-brand-gold uppercase tracking-widest mb-3 block">Media Sosial Kami</span>
-                    <div class="flex flex-col gap-2">
-                        <a href="https://instagram.com/mnafootballclub" target="_blank" class="flex items-center gap-3 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-brand-blue dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-brand-blue/10 dark:hover:bg-brand-blue/20 group">
-                            <i data-lucide="instagram" class="w-4 h-4 text-brand-blue group-hover:scale-110 transition-transform"></i> @mnafootballclub
-                        </a>
-                        <a href="https://instagram.com/trenggalekstudentleague" target="_blank" class="flex items-center gap-3 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-brand-green dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-brand-green/10 dark:hover:bg-brand-green/20 group">
-                            <i data-lucide="instagram" class="w-4 h-4 text-brand-green group-hover:scale-110 transition-transform"></i> @trenggalekstudentleague
-                        </a>
-                        <a href="https://instagram.com/mnasportmanagement" target="_blank" class="flex items-center gap-3 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-brand-gold dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-brand-gold/10 dark:hover:bg-brand-gold/20 group">
-                            <i data-lucide="instagram" class="w-4 h-4 text-brand-gold group-hover:scale-110 transition-transform"></i> @mnasportmanagement
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-5 border-t border-gray-100 dark:border-white/5 text-center transition-colors">
-                <span class="text-[8px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">MNA Super App v1.0.0</span>
-            </div>
-        </div>
-    </div>
-    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden flex items-start justify-center">
-        <div class="w-[600px] h-[400px] bg-brand-gold-dark/15 blur-[120px] rounded-full mt-[-100px]"></div>
-    </div>
-
-    <header class="fixed w-full top-0 z-50 glass-header pt-safe">
-        <div class="max-w-3xl mx-auto px-5 h-16 flex items-center justify-between">
+    <header class="fixed top-0 w-full z-50 glass-panel border-b border-gray-200 dark:border-white/5 pt-safe">
+        <div class="max-w-4xl mx-auto px-5 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-gold to-brand-gold-dark flex items-center justify-center shadow-[0_0_15px_rgba(215,182,125,0.4)]">
-                    <span class="font-heading font-black text-black text-xs">MNA</span>
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-800 to-brand-surface flex items-center justify-center border border-white/10 shadow-lg">
+                    <i data-lucide="cpu" class="w-4 h-4 text-brand-accent"></i>
                 </div>
-                <div>
-                    <h1 class="font-heading font-bold text-sm tracking-widest uppercase leading-none">MNA Sport</h1>
-                    <p class="text-[9px] text-brand-gold font-bold uppercase tracking-widest mt-0.5">Ecosystem Operator</p>
-                </div>
+                <h1 class="font-black text-xl tracking-tighter uppercase text-white">SYS<span class="text-brand-accent">OP</span></h1>
             </div>
-            <button onclick="toggleGlobalMenu()" class="w-8 h-8 flex items-center justify-center rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/5 dark:border-white/10 transition-colors">
-                <i data-lucide="menu" class="w-4 h-4 text-brand-gold"></i>
-            </button>
+            <div class="flex items-center gap-2 bg-brand-success/10 border border-brand-success/20 px-3 py-1.5 rounded-lg shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-success animate-pulse"></span>
+                <span class="text-[9px] font-black uppercase tracking-widest text-brand-success">API Online</span>
+            </div>
         </div>
     </header>
 
-    <main class="relative z-10 pt-28 px-5 max-w-3xl mx-auto">
+    <main class="pt-24 px-5 max-w-4xl mx-auto">
         
-        <div class="mb-8">
-            <h2 class="text-3xl md:text-4xl font-heading font-black tracking-tight leading-tight text-brand-black dark:text-white transition-colors">
-                Pusat Komando <br/>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold to-brand-black dark:to-white">Ekosistem MNA.</span>
-            </h2>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 font-medium max-w-md leading-relaxed transition-colors">
-                Akses cepat seluruh layanan manajemen olahraga, liga pelajar, dan database klub.
-            </p>
+        <div class="mb-8 stagger-item" style="animation-delay: 0.1s">
+            <h2 class="text-2xl font-black uppercase tracking-tighter mb-1">Halo, Hanung</h2>
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Sistem Database Terpusat aktif dan tersinkronisasi.</p>
         </div>
 
-        <div class="mb-8">
-            <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <div class="w-1.5 h-1.5 bg-brand-green rounded-full animate-pulse"></div> Jalan Pintas
-            </h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass-panel p-5 rounded-2xl border-l-2 border-l-brand-accent stagger-item" style="animation-delay: 0.15s">
+                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1 flex items-center gap-1.5"><i data-lucide="database" class="w-3 h-3"></i> Total Entri</p>
+                <p class="text-2xl font-black text-white">1,248</p>
+            </div>
+            <div class="glass-panel p-5 rounded-2xl border-l-2 border-l-brand-blue stagger-item" style="animation-delay: 0.2s">
+                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1 flex items-center gap-1.5"><i data-lucide="users" class="w-3 h-3"></i> Pemain Aktif</p>
+                <p class="text-2xl font-black text-white">342</p>
+            </div>
+            <div class="glass-panel p-5 rounded-2xl border-l-2 border-l-green-500 stagger-item" style="animation-delay: 0.25s">
+                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1 flex items-center gap-1.5"><i data-lucide="swords" class="w-3 h-3"></i> Match TSL</p>
+                <p class="text-2xl font-black text-white">24</p>
+            </div>
+            <div class="glass-panel p-5 rounded-2xl border-l-2 border-l-purple-500 stagger-item" style="animation-delay: 0.3s">
+                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1 flex items-center gap-1.5"><i data-lucide="image" class="w-3 h-3"></i> Aset Galeri</p>
+                <p class="text-2xl font-black text-white">86</p>
+            </div>
+        </div>
+
+        <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2 stagger-item" style="animation-delay: 0.35s"><i data-lucide="zap" class="w-4 h-4 text-brand-accent"></i> Modul Kendali Cepat</h3>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
             
-            <div class="flex gap-3 overflow-x-auto hide-scroll pb-2">
-                <a href="/tsl/#jadwal" class="flex-shrink-0 flex items-center gap-2.5 px-4 py-2.5 rounded-full glass-card hover:border-brand-green/50 transition-all group">
-                    <i data-lucide="calendar" class="w-4 h-4 text-brand-green group-hover:scale-110 transition-transform"></i>
-                    <span class="text-xs font-bold text-brand-black dark:text-gray-200 uppercase tracking-wide transition-colors">Jadwal TSL</span>
-                </a>
-                <a href="/tsl/#klasemen" class="flex-shrink-0 flex items-center gap-2.5 px-4 py-2.5 rounded-full glass-card hover:border-brand-gold/50 transition-all group">
-                    <i data-lucide="bar-chart-2" class="w-4 h-4 text-brand-gold group-hover:scale-110 transition-transform"></i>
-                    <span class="text-xs font-bold text-brand-black dark:text-gray-200 uppercase tracking-wide transition-colors">Klasemen</span>
-                </a>
-                <a href="/mnafc/" class="flex-shrink-0 flex items-center gap-2.5 px-4 py-2.5 rounded-full glass-card hover:border-brand-blue/50 transition-all group">
-                    <i data-lucide="users" class="w-4 h-4 text-brand-blue group-hover:scale-110 transition-transform"></i>
-                    <span class="text-xs font-bold text-brand-black dark:text-gray-200 uppercase tracking-wide transition-colors">Data Skuad</span>
-                </a>
-            </div>
-        </div>
-
-        <div id="section-liga-aktif" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10 transition-all duration-500">
-            
-            <div class="glass-card rounded-[1.5rem] p-5 flex flex-col relative overflow-hidden group">
-                <div class="absolute right-0 top-0 w-32 h-32 bg-brand-green/10 rounded-full blur-2xl -z-10 group-hover:bg-brand-green/20 transition-all duration-500"></div>
-                
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-brand-green/10 flex items-center justify-center">
-                            <i data-lucide="calendar-clock" class="w-4 h-4 text-brand-green"></i>
-                        </div>
-                        <h3 class="font-heading font-bold text-sm text-brand-black dark:text-white transition-colors">Jadwal Terdekat</h3>
-                    </div>
-                    <span class="text-[9px] font-bold uppercase tracking-widest text-brand-green bg-brand-green/10 px-2 py-0.5 rounded animate-pulse">TSL Live</span>
+            <button onclick="window.open('LINK_SPREADSHEET_TSL_ANDA', '_blank')" class="action-card glass-panel p-5 rounded-2xl text-left border border-white/5 flex flex-col justify-between stagger-item" style="animation-delay: 0.4s">
+                <div class="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center mb-4 text-green-500 border border-green-500/20">
+                    <i data-lucide="trophy" class="w-5 h-5"></i>
                 </div>
-
-                <div id="mini-jadwal-list" class="flex-1 flex flex-col gap-2 mb-4">
-                    <div class="text-center py-6 text-[10px] text-brand-gold font-bold uppercase tracking-widest animate-pulse">
-                        Menyinkronkan Data TSL...
-                    </div>
+                <div>
+                    <h4 class="font-black text-sm uppercase tracking-tight text-white mb-1">Update Klasemen TSL</h4>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Buka Sheets Database Liga</p>
                 </div>
-
-                <a href="/tsl/#jadwal" class="w-full py-2.5 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-brand-green hover:text-white dark:hover:text-black border border-gray-100 dark:border-white/10 flex items-center justify-center gap-2 transition-all group/btn text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-300">
-                    Selengkapnya <i data-lucide="arrow-right" class="w-3 h-3 group-hover/btn:translate-x-1 transition-transform"></i>
-                </a>
-            </div>
-
-            <div class="glass-card rounded-[1.5rem] p-5 flex flex-col relative overflow-hidden group">
-                <div class="absolute right-0 top-0 w-32 h-32 bg-brand-gold/10 rounded-full blur-2xl -z-10 group-hover:bg-brand-gold/20 transition-all duration-500"></div>
-                
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-brand-gold/10 flex items-center justify-center shrink-0">
-                            <i data-lucide="bar-chart-2" class="w-4 h-4 text-brand-gold"></i>
-                        </div>
-                        <h3 class="font-heading font-bold text-sm text-brand-black dark:text-white truncate transition-colors">Papan Atas</h3>
-                    </div>
-                    
-                    <div class="flex bg-gray-100 dark:bg-white/5 rounded-lg p-0.5 shadow-inner border border-gray-200 dark:border-white/5 shrink-0 transition-colors">
-                        <button onclick="renderMiniKlasemen('SMP')" id="btn-mini-smp" class="px-3 py-1 text-[9px] font-bold rounded text-gray-500 dark:text-gray-400 hover:text-brand-black dark:hover:text-white uppercase transition-all bg-transparent">SMP</button>
-                        <button onclick="renderMiniKlasemen('SMA')" id="btn-mini-sma" class="px-3 py-1 text-[9px] font-bold rounded bg-brand-gold text-brand-black uppercase transition-all shadow-sm">SMA</button>
-                    </div>
-                </div>
-
-                <div id="klasemen-container" class="flex-1 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-xl p-3 mb-4 overflow-hidden transition-colors">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-gray-200 dark:border-white/10 text-[9px] text-gray-500 uppercase tracking-widest transition-colors">
-                                <th class="pb-2 font-medium w-8 text-center">Pos</th>
-                                <th class="pb-2 font-medium">Tim</th>
-                                <th class="pb-2 font-medium text-center w-8">P</th>
-                                <th class="pb-2 font-medium text-center w-8">Pts</th>
-                            </tr>
-                        </thead>
-                        <tbody id="mini-klasemen-list" class="text-xs font-bold text-gray-600 dark:text-gray-300">
-                        </tbody>
-                    </table>
-                </div>
-
-                <a href="/tsl/#klasemen" class="w-full py-2.5 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-brand-gold hover:text-white dark:hover:text-black border border-gray-100 dark:border-white/10 flex items-center justify-center gap-2 transition-all group/btn text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-300">
-                    Klasemen Lengkap <i data-lucide="arrow-right" class="w-3 h-3 group-hover/btn:translate-x-1 transition-transform"></i>
-                </a>
-            </div>
-
-        </div>
-        
-        <div id="banner-liga-off" class="hidden mb-10">
-            <div class="glass-card rounded-[1.5rem] p-8 text-center border-dashed border-brand-gold/30">
-                <div class="w-16 h-16 bg-brand-gold/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i data-lucide="timer" class="w-8 h-8 text-brand-gold"></i>
-                </div>
-                <h3 class="font-heading font-bold text-xl text-brand-black dark:text-white transition-colors">Liga Belum Dimulai</h3>
-                <p class="text-xs text-gray-500 mt-2 transition-colors">Sistem jadwal dan klasemen akan otomatis aktif saat turnamen resmi dibuka (26 Juli 2026).</p>
-            </div>
-        </div>
-
-        <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Portal Aplikasi Utama</h3>
-        
-        <div class="flex flex-col gap-4">
-            
-            <a href="/tsl/" class="group relative overflow-hidden rounded-[1.5rem] glass-card p-5 flex items-center gap-4 hover:border-brand-green/40 transition-all duration-300">
-                <div class="absolute right-0 top-0 w-32 h-32 bg-brand-green/10 rounded-full blur-2xl -z-10 group-hover:bg-brand-green/20 transition-all"></div>
-                
-                <div class="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gradient-to-br dark:from-[#111] dark:to-[#222] border border-gray-200 dark:border-white/5 flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-all">
-                    <span class="text-2xl">🏆</span>
-                </div>
-                
-                <div class="flex-1 min-w-0">
-                    <h4 class="font-heading font-bold text-base md:text-lg text-brand-black dark:text-white group-hover:text-brand-green transition-colors truncate">TSL Match Center</h4>
-                    <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 leading-tight line-clamp-2 transition-colors">Aplikasi ofisial liga pelajar. Live score, jadwal lengkap, & statistik.</p>
-                </div>
-                
-                <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-brand-green group-hover:text-white transition-colors text-gray-400 dark:text-gray-300">
-                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </div>
-            </a>
-
-            <a href="/mnafc/" class="group relative overflow-hidden rounded-[1.5rem] glass-card p-5 flex items-center gap-4 hover:border-brand-blue/40 transition-all duration-300">
-                <div class="absolute right-0 top-0 w-32 h-32 bg-brand-blue/10 rounded-full blur-2xl -z-10 group-hover:bg-brand-blue/20 transition-all"></div>
-                
-                <div class="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gradient-to-br dark:from-[#111] dark:to-[#222] border border-gray-200 dark:border-white/5 flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-all">
-                    <span class="text-2xl">🛡️</span>
-                </div>
-                
-                <div class="flex-1 min-w-0">
-                    <h4 class="font-heading font-bold text-base md:text-lg text-brand-black dark:text-white group-hover:text-brand-blue transition-colors truncate">MNA Football Club</h4>
-                    <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 leading-tight line-clamp-2 transition-colors">Database internal klub. Manajemen skuad, akademi, dan performa pemain.</p>
-                </div>
-                
-                <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-brand-blue group-hover:text-white transition-colors text-gray-400 dark:text-gray-300">
-                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </div>
-            </a>
-
-        </div>
-    </main>
-        
-    <nav id="main-bottom-nav" class="fixed bottom-0 w-full z-[100] bg-white/90 dark:bg-[#09090b]/90 backdrop-blur-xl border-t border-gray-200 dark:border-white/10 pb-safe transition-colors">
-        <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
-            <button class="flex flex-col items-center justify-center w-full h-full text-brand-gold transition-colors">
-                <i data-lucide="layout-dashboard" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
-                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">Operator</span>
             </button>
-            <a href="/tsl/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-green transition-colors">
-                <i data-lucide="trophy" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
-                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">TSL Liga</span>
+
+            <button onclick="window.open('LINK_SPREADSHEET_TSL_ANDA', '_blank')" class="action-card glass-panel p-5 rounded-2xl text-left border border-white/5 flex flex-col justify-between stagger-item" style="animation-delay: 0.45s">
+                <div class="w-10 h-10 rounded-xl bg-brand-danger/10 flex items-center justify-center mb-4 text-brand-danger border border-brand-danger/20">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h4 class="font-black text-sm uppercase tracking-tight text-white mb-1">Log Pelanggaran</h4>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Update Kartu Kuning/Merah</p>
+                </div>
+            </button>
+
+            <button onclick="window.open('LINK_SPREADSHEET_MNAFC_ANDA', '_blank')" class="action-card glass-panel p-5 rounded-2xl text-left border border-white/5 flex flex-col justify-between stagger-item" style="animation-delay: 0.5s">
+                <div class="w-10 h-10 rounded-xl bg-brand-blue/10 flex items-center justify-center mb-4 text-brand-blue border border-brand-blue/20">
+                    <i data-lucide="shield" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h4 class="font-black text-sm uppercase tracking-tight text-white mb-1">Roster MNA FC</h4>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Edit Pemain & Visual Taktis</p>
+                </div>
+            </button>
+
+            <button onclick="window.open('LINK_SPREADSHEET_MNAFC_ANDA', '_blank')" class="action-card glass-panel p-5 rounded-2xl text-left border border-white/5 flex flex-col justify-between stagger-item" style="animation-delay: 0.55s">
+                <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center mb-4 text-purple-500 border border-purple-500/20">
+                    <i data-lucide="images" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h4 class="font-black text-sm uppercase tracking-tight text-white mb-1">Media Hub</h4>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Upload Link Drive Latihan Baru</p>
+                </div>
+            </button>
+
+            <button onclick="forceSync()" id="btn-sync" class="action-card glass-panel p-5 rounded-2xl text-left border border-white/5 flex flex-col justify-between md:col-span-2 stagger-item" style="animation-delay: 0.6s">
+                <div class="flex items-center justify-between w-full mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-brand-accent/10 flex items-center justify-center text-brand-accent border border-brand-accent/20">
+                        <i data-lucide="refresh-cw" id="icon-sync" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-[9px] font-black bg-brand-accent/20 text-brand-accent px-2 py-1 rounded shadow-sm border border-brand-accent/20 uppercase tracking-widest">System Tool</span>
+                </div>
+                <div>
+                    <h4 class="font-black text-sm uppercase tracking-tight text-white mb-1">Force API Sync</h4>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Bersihkan Cache & Tarik Data Terbaru</p>
+                </div>
+            </button>
+        </div>
+
+        <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2 stagger-item" style="animation-delay: 0.65s"><i data-lucide="activity" class="w-4 h-4 text-brand-accent"></i> System Audit Log</h3>
+        
+        <div class="glass-panel rounded-2xl border border-white/5 p-2 overflow-hidden stagger-item" style="animation-delay: 0.7s">
+            <div class="flex items-center gap-4 p-3 border-b border-white/5 hover:bg-white/5 transition-colors">
+                <div class="w-2 h-2 rounded-full bg-brand-blue"></div>
+                <div class="flex-1">
+                    <p class="text-xs font-bold text-white uppercase">Data Pemain MNA FC Diperbarui</p>
+                    <p class="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Oleh: Hanung • via Google Sheets</p>
+                </div>
+                <span class="text-[9px] font-black text-gray-600 uppercase">Baru saja</span>
+            </div>
+            <div class="flex items-center gap-4 p-3 border-b border-white/5 hover:bg-white/5 transition-colors">
+                <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                <div class="flex-1">
+                    <p class="text-xs font-bold text-white uppercase">Skor Pertandingan TSL Disimpan</p>
+                    <p class="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Oleh: System Webhook</p>
+                </div>
+                <span class="text-[9px] font-black text-gray-600 uppercase">2 Jam Lalu</span>
+            </div>
+            <div class="flex items-center gap-4 p-3 hover:bg-white/5 transition-colors">
+                <div class="w-2 h-2 rounded-full bg-brand-accent"></div>
+                <div class="flex-1">
+                    <p class="text-xs font-bold text-white uppercase">Pembersihan Cache Sistem</p>
+                    <p class="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Oleh: Admin Operator</p>
+                </div>
+                <span class="text-[9px] font-black text-gray-600 uppercase">Kemarin</span>
+            </div>
+        </div>
+
+    </main>
+
+    <nav class="fixed bottom-0 w-full z-[110] bg-white/95 dark:bg-brand-surface/95 backdrop-blur-2xl border-t border-gray-200 dark:border-white/5 pb-safe transition-colors">
+        <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
+            <button class="flex flex-col items-center justify-center w-full h-full text-brand-accent transition-colors">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]"></i>
+                <span class="text-[9px] font-black uppercase tracking-wider">Operator</span>
+            </button>
+            <a href="/tsl/" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-500 transition-colors">
+                <i data-lucide="trophy" class="w-5 h-5 mb-1"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">TSL Liga</span>
             </a>
-            <a href="/mnafc/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-blue transition-colors">
-                <i data-lucide="shield" class="w-5 h-5 md:w-6 md:h-6 mb-1"></i>
-                <span class="text-[8px] md:text-[9px] font-bold uppercase tracking-wider">MNA FC</span>
+            <a href="/mnafc/" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-brand-blue transition-colors">
+                <i data-lucide="shield" class="w-5 h-5 mb-1"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">MNA FC</span>
             </a>
         </div>
     </nav>
 
     <script>
-        lucide.createIcons();
-
-        // ==========================================
-        // ALGORITMA WAKTU & TANGGAL
-        // ==========================================
-        function parseIndoDate(waktuStr) {
-            try {
-                if(!waktuStr) return 0; let w = String(waktuStr).trim(); let dObj = new Date(w);
-                if (!isNaN(dObj.getTime()) && (w.includes('-') || w.includes('/'))) return dObj.getTime();
-                const parts = w.split(" - "); if(parts.length < 2) return 0;
-                const dateParts = parts[0].toLowerCase().replace(',', '').split(" "); const timeStr = parts[1].trim();
-                const bulanIndo = { "januari":"01", "februari":"02", "maret":"03", "april":"04", "mei":"05", "juni":"06", "juli":"07", "agustus":"08", "september":"09", "oktober":"10", "november":"11", "desember":"12" };
-                let hari = dateParts.find(x => !isNaN(x) && x.length <= 2);
-                let bln = Object.keys(bulanIndo).find(k => dateParts.includes(k));
-                let thn = dateParts.find(x => !isNaN(x) && x.length === 4);
-                if(hari && bln && thn) return new Date(`${thn}-${bulanIndo[bln]}-${hari.padStart(2, '0')}T${timeStr}:00`).getTime();
-                return 0;
-            } catch(e) { return 0; }
-        }
-
-        function getRelativeDayLabel(timestamp) {
-            if(!timestamp) return "TBA";
-            let today = new Date(); today.setHours(0,0,0,0); 
-            let target = new Date(timestamp); target.setHours(0,0,0,0);
-            let diffDays = Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-            if (diffDays === 0) return "HARI INI"; 
-            if (diffDays === 1) return "BESOK"; 
-            const blnIndo = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-            return `${target.getDate()} ${blnIndo[target.getMonth()]}`;
-        }
-
-        const TSL_API_URL = 'https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec'; 
-        let globalKlasemenCache = [];
-
-        // ==========================================
-        // SAKELAR MASTER (MASTER SWITCH)
-        // Ubah ke 'true' jika liga dimulai, 'false' jika liga belum dimulai
-        // ==========================================
-        const CONFIG_LIGA_AKTIF = false; 
-
-        function updateTampilanLiga() {
-            const sectionOn = document.getElementById('section-liga-aktif');
-            const sectionOff = document.getElementById('banner-liga-off');
+        function forceSync() {
+            const btn = document.getElementById('btn-sync');
+            const icon = document.getElementById('icon-sync');
             
-            if (CONFIG_LIGA_AKTIF) {
-                if(sectionOn) sectionOn.classList.remove('hidden');
-                if(sectionOff) sectionOff.classList.add('hidden');
-            } else {
-                if(sectionOn) sectionOn.classList.add('hidden');
-                if(sectionOff) sectionOff.classList.remove('hidden');
-            }
-        }
-
-        function cekNotifikasiBaru(dataEventBaru) {
-            if (!("Notification" in window) || Notification.permission !== "granted") return;
-            if (!dataEventBaru || dataEventBaru.length === 0) return;
-
-            let lastCount = parseInt(localStorage.getItem('tsl_event_count') || '0');
-            let currentCount = dataEventBaru.length;
-
-            if (currentCount > lastCount && lastCount > 0) {
-                for (let i = lastCount; i < currentCount; i++) {
-                    let ev = dataEventBaru[i];
-                    let jenis = String(ev.jenis || '').toUpperCase();
-                    let icon = jenis === 'GOL' ? '⚽' : (jenis === 'KUNING' ? '🟨' : '🟥');
-                    let judul = `${icon} ${jenis} - ${ev.tim || ''}`;
-                    let pesan = `${ev.pemain || ''} (${ev.menit || ''}')`;
-                    
-                    let notifOptions = { 
-                        body: pesan, 
-                        icon: "/tsl/icon-192.png", 
-                        vibrate: [200, 100, 200]
-                    };
-                    
-                    if ('serviceWorker' in navigator) {
-                        navigator.serviceWorker.ready.then(function(registration) {
-                            registration.showNotification(judul, notifOptions);
-                        }).catch(function() { 
-                            new Notification(judul, notifOptions); 
-                        });
-                    } else {
-                        new Notification(judul, notifOptions);
-                    }
-                }
-            }
-            localStorage.setItem('tsl_event_count', currentCount.toString());
-        }
-
-        function renderMiniKlasemen(jenjang) {
-            const klasemenWadah = document.getElementById('mini-klasemen-list');
-            if(!klasemenWadah) return;
-
-            const btnSmp = document.getElementById('btn-mini-smp');
-            const btnSma = document.getElementById('btn-mini-sma');
-            if (btnSmp && btnSma) {
-                const isActive = "px-3 py-1 text-[9px] font-bold rounded bg-brand-gold text-brand-black uppercase transition-all shadow-sm";
-                const isInactive = "px-3 py-1 text-[9px] font-bold rounded text-gray-500 dark:text-gray-400 hover:text-brand-black dark:hover:text-white uppercase transition-all bg-transparent";
-                btnSma.className = (jenjang === 'SMA') ? isActive : isInactive;
-                btnSmp.className = (jenjang === 'SMP') ? isActive : isInactive;
-            }
-
-            klasemenWadah.innerHTML = '';
-
-            if (Array.isArray(globalKlasemenCache) && globalKlasemenCache.length > 0) {
-                let filteredData = globalKlasemenCache.filter(item => {
-                    let j = 'SMA';
-                    for (let key in item) { if (key.toLowerCase().trim() === 'jenjang' || key.toLowerCase().trim() === 'liga') j = String(item[key]).toUpperCase().trim(); }
-                    return j === jenjang;
-                });
-
-                const grupMap = {};
-                filteredData.forEach(item => {
-                    let g = 'UTAMA';
-                    for (let key in item) {
-                        let lowerKey = key.toLowerCase().trim();
-                        if (lowerKey === 'grup' || lowerKey === 'group') if (item[key]) g = String(item[key]).toUpperCase().trim();
-                    }
-                    if (!grupMap[g]) grupMap[g] = [];
-                    grupMap[g].push(item);
-                });
-
-                const groupKeys = Object.keys(grupMap).sort();
-
-                if (groupKeys.length > 0) {
-                    groupKeys.forEach(key => {
-                        if (groupKeys.length > 1 || key !== 'UTAMA') {
-                            let namaHeader = key === 'UTAMA' ? 'KLASEMEN' : `GRUP ${key}`;
-                            klasemenWadah.innerHTML += `
-                                <tr class="bg-gray-100/50 dark:bg-white/5 transition-colors">
-                                    <td colspan="4" class="py-1.5 px-2 text-[9px] font-black text-brand-gold tracking-[0.2em] uppercase border-b border-gray-200 dark:border-white/5">
-                                        ${namaHeader}
-                                    </td>
-                                </tr>`;
-                        }
-
-                        const sortedGrup = grupMap[key].sort((a,b) => {
-                            let poinA = 0; let poinB = 0;
-                            for (let k in a) { if(k.toLowerCase().trim() === 'poin' || k.toLowerCase().trim() === 'pts') poinA = parseInt(a[k]) || 0; }
-                            for (let k in b) { if(k.toLowerCase().trim() === 'poin' || k.toLowerCase().trim() === 'pts') poinB = parseInt(b[k]) || 0; }
-                            return poinB - poinA;
-                        }).slice(0, 3);
-                        
-                        sortedGrup.forEach((klub, idx) => {
-                            let namaKlub = 'Tim'; let main = 0; let poin = 0;
-                            for (let k in klub) {
-                                let lowerK = k.toLowerCase().trim();
-                                if (lowerK === 'klub' || lowerK === 'tim') namaKlub = klub[k];
-                                if (lowerK === 'main' || lowerK === 'p') main = klub[k];
-                                if (lowerK === 'poin' || lowerK === 'pts') poin = klub[k];
-                            }
-                            
-                            const colorPos = idx === 0 ? 'text-brand-gold' : 'text-brand-black dark:text-white';
-
-                            klasemenWadah.innerHTML += `
-                            <tr class="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors">
-                                <td class="py-2 text-center font-black ${colorPos} transition-colors">${idx + 1}</td>
-                                <td class="py-2 text-brand-black dark:text-white truncate max-w-[110px] font-medium transition-colors">${namaKlub}</td>
-                                <td class="py-2 text-center text-gray-500 font-medium transition-colors">${main}</td>
-                                <td class="py-2 text-center text-brand-green font-bold transition-colors">${poin}</td>
-                            </tr>`;
-                        });
-                        if (groupKeys.length > 1) klasemenWadah.innerHTML += `<tr class="h-2"></tr>`;
-                    });
-                } else {
-                    klasemenWadah.innerHTML = `<tr><td colspan="4" class="text-center text-[10px] text-gray-500 py-6 uppercase font-bold tracking-widest">Klasemen ${jenjang} Belum Tersedia</td></tr>`;
-                }
-            } else {
-                 klasemenWadah.innerHTML = `<tr><td colspan="4" class="text-center text-[10px] text-gray-500 py-6 uppercase font-bold tracking-widest">Data belum tersedia</td></tr>`;
-            }
-        }
-
-        function renderJadwalTerdekat(dataJadwal) {
-            const jadwalWadah = document.getElementById('mini-jadwal-list');
-            if (!jadwalWadah) return;
-
-            if (Array.isArray(dataJadwal) && dataJadwal.length > 0) {
-                let upcomingMatches = dataJadwal.filter(m => !String(m.status || '').toUpperCase().includes('FT'));
-                upcomingMatches.sort((a, b) => parseIndoDate(a.waktu) - parseIndoDate(b.waktu));
-                const jadwalTerdekat = upcomingMatches.slice(0, 4);
+            // Animasi Loading
+            icon.classList.add('syncing');
+            btn.style.borderColor = '#f59e0b';
+            
+            // Hapus cache LocalStorage untuk TSL dan MNA FC
+            localStorage.removeItem('mnafc_elite_final');
+            localStorage.removeItem('tsl_data_cache');
+            
+            // Simulasi delay API Call
+            setTimeout(() => {
+                icon.classList.remove('syncing');
+                btn.style.borderColor = 'rgba(255,255,255,0.05)';
                 
-                if (jadwalTerdekat.length > 0) {
-                    jadwalWadah.innerHTML = '';
-                    jadwalTerdekat.forEach(match => {
-                        const timKandang = match.tim_kiri || 'Tim A';
-                        const timTandang = match.tim_kanan || 'Tim B';
-                        const status = String(match.status || '').toUpperCase();
-                        const timestamp = parseIndoDate(match.waktu);
-                        const dayLabel = getRelativeDayLabel(timestamp);
-                        
-                        let w = String(match.waktu || ''); let timeOnly = "TBA";
-                        if (w.includes("T")) { 
-                            let dObj = new Date(w); 
-                            if(!isNaN(dObj.getTime())) timeOnly = String(dObj.getHours()).padStart(2, '0') + ":" + String(dObj.getMinutes()).padStart(2, '0'); 
-                        } else { timeOnly = w.split(" - ")[1] || w || "TBA"; }
+                // Ubah icon sesaat jadi centang
+                const originalIcon = icon.getAttribute('data-lucide');
+                icon.setAttribute('data-lucide', 'check');
+                icon.classList.remove('text-brand-accent');
+                icon.classList.add('text-brand-success');
+                lucide.createIcons();
 
-                        let isLive = status.includes('LIVE') || status.includes('HT');
-                        let displayStatus = isLive ? 'LIVE' : timeOnly;
-                        let statusColor = isLive ? 'text-brand-red animate-pulse' : 'text-brand-gold';
+                setTimeout(() => {
+                    icon.setAttribute('data-lucide', originalIcon);
+                    icon.classList.add('text-brand-accent');
+                    icon.classList.remove('text-brand-success');
+                    lucide.createIcons();
+                }, 2000);
 
-                        jadwalWadah.innerHTML += `
-                        <div class="bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-xl py-2 px-3 flex items-center justify-between hover:bg-white dark:hover:bg-white/10 transition-colors mb-2 shadow-sm dark:shadow-none">
-                            <div class="flex-1 text-right truncate pr-2"><span class="font-bold text-[11px] text-brand-black dark:text-white transition-colors">${timKandang}</span></div>
-                            <div class="px-2 text-center shrink-0">
-                                <span class="block text-[10px] font-bold ${statusColor}">${displayStatus}</span>
-                                <span class="block text-[8px] text-gray-500 uppercase tracking-widest mt-0.5">${isLive ? 'SEKARANG' : dayLabel}</span>
-                            </div>
-                            <div class="flex-1 text-left truncate pl-2"><span class="font-bold text-[11px] text-brand-black dark:text-white transition-colors">${timTandang}</span></div>
-                        </div>`;
-                    });
-                } else {
-                    jadwalWadah.innerHTML = '<div class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Semua jadwal telah selesai</div>';
-                }
-            } else {
-                jadwalWadah.innerHTML = '<div class="text-center text-[10px] text-gray-500 py-4 font-bold uppercase tracking-widest">Belum ada jadwal</div>';
-            }
+            }, 1500);
         }
 
-        async function tarikDataPreview() {
-            const cacheJadwal = localStorage.getItem('mna_cache_jadwal');
-            const cacheKlasemen = localStorage.getItem('mna_cache_klasemen');
-            
-            if (cacheJadwal && cacheKlasemen) {
-                try {
-                    const parsedJadwal = JSON.parse(cacheJadwal);
-                    const parsedKlasemen = JSON.parse(cacheKlasemen);
-                    renderJadwalTerdekat(parsedJadwal);
-                    globalKlasemenCache = parsedKlasemen;
-                    let activeDivisi = 'SMA';
-                    const btnSma = document.getElementById('btn-mini-sma');
-                    if (btnSma && !btnSma.classList.contains('bg-brand-gold')) activeDivisi = 'SMP';
-                    renderMiniKlasemen(activeDivisi);
-                } catch(e) { console.error("Gagal membaca cache:", e); }
-            }
-
-            try {
-                const [resJadwal, resKlasemen, resEvent] = await Promise.all([
-                    fetch(`${TSL_API_URL}?sheet=Jadwal&t=${Date.now()}`),
-                    fetch(`${TSL_API_URL}?sheet=Klasemen&t=${Date.now()}`),
-                    fetch(`${TSL_API_URL}?sheet=Event_Match&t=${Date.now()}`)
-                ]);
-
-                const dataJadwal = await resJadwal.json();
-                const dataKlasemen = await resKlasemen.json();
-                const dataEvent = await resEvent.json();
-
-                if (Array.isArray(dataEvent)) cekNotifikasiBaru(dataEvent);
-
-                localStorage.setItem('mna_cache_jadwal', JSON.stringify(dataJadwal));
-                localStorage.setItem('mna_cache_klasemen', JSON.stringify(dataKlasemen));
-
-                renderJadwalTerdekat(dataJadwal);
-                
-                if (Array.isArray(dataKlasemen)) {
-                    globalKlasemenCache = dataKlasemen;
-                    let activeDivisi = 'SMA';
-                    const btnSma = document.getElementById('btn-mini-sma');
-                    if (btnSma && !btnSma.classList.contains('bg-brand-gold')) activeDivisi = 'SMP';
-                    renderMiniKlasemen(activeDivisi); 
-                }
-
-            } catch (error) {
-                console.error("Gagal menyinkronkan data background:", error);
-                if (!cacheJadwal) {
-                    const jWadah = document.getElementById('mini-jadwal-list');
-                    const kWadah = document.getElementById('mini-klasemen-list');
-                    if(jWadah) jWadah.innerHTML = '<div class="text-center text-red-500 text-[10px] py-4 font-bold uppercase tracking-widest">Gagal menyinkronkan data</div>';
-                    if(kWadah) kWadah.innerHTML = '<tr><td colspan="4" class="text-center text-red-500 text-[10px] py-4 font-bold uppercase tracking-widest">Gagal menyinkronkan data</td></tr>';
-                }
-            }
-        }
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then((registration) => {
-                    console.log('MNA Super App Service Worker aktif dengan scope:', registration.scope);
-                }).catch((error) => {
-                    console.error('Registrasi Service Worker gagal:', error);
-                });
-            });
-        }
-
-        function toggleGlobalMenu() {
-            const overlay = document.getElementById('global-menu-overlay');
-            const panel = document.getElementById('global-menu-panel');
-            if (overlay.classList.contains('hidden')) {
-                overlay.classList.remove('hidden');
-                setTimeout(() => panel.classList.remove('translate-x-full'), 10);
-            } else {
-                panel.classList.add('translate-x-full');
-                setTimeout(() => overlay.classList.add('hidden'), 300);
-            }
-        }
-
-        function syncThemeUI() {
-            const isDark = localStorage.getItem('mna_theme') !== 'light';
-            const html = document.documentElement;
-            const tText = document.getElementById('theme-text');
-            const tIcon = document.getElementById('theme-icon');
-            const tDot = document.getElementById('theme-toggle-dot');
-            const tBg = document.getElementById('theme-toggle-bg');
-
-            if (isDark) {
-                html.classList.add('dark');
-                if(tText) tText.innerText = 'Tema Gelap';
-                if(tIcon) tIcon.setAttribute('data-lucide', 'moon');
-                if(tDot) { tDot.classList.remove('translate-x-[-16px]'); tDot.classList.add('translate-x-0'); }
-                if(tBg) { tBg.classList.remove('bg-gray-300'); tBg.classList.add('bg-brand-gold'); }
-            } else {
-                html.classList.remove('dark');
-                if(tText) tText.innerText = 'Tema Terang';
-                if(tIcon) tIcon.setAttribute('data-lucide', 'sun');
-                if(tDot) { tDot.classList.remove('translate-x-0'); tDot.classList.add('translate-x-[-16px]'); }
-                if(tBg) { tBg.classList.remove('bg-brand-gold'); tBg.classList.add('bg-gray-300'); }
-            }
-            if(typeof lucide !== 'undefined') lucide.createIcons();
-        }
-            
-        function toggleGlobalTheme() {
-            const isDark = localStorage.getItem('mna_theme') !== 'light';
-            localStorage.setItem('mna_theme', isDark ? 'light' : 'dark');
-            syncThemeUI();
-        }
-
-        function requestGlobalNotification() {
-            if (!("Notification" in window)) {
-                alert("Browser Anda tidak mendukung notifikasi."); return;
-            }
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    alert("Notifikasi GOL & Kartu Aktif!");
-                    document.getElementById('notif-text').innerText = 'Notifikasi Aktif';
-                    document.getElementById('notif-text').classList.add('text-brand-green');
-                } else {
-                    alert("Izin notifikasi ditolak.");
-                }
-            });
-        }
-
-        // ==========================================
-        // INISIALISASI SAAT WEBSITE DIMUAT
-        // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
-            updateTampilanLiga();
-            syncThemeUI();
-            
-            if (typeof tarikDataPreview === 'function') tarikDataPreview();
-            
-            if(Notification.permission === 'granted' && document.getElementById('notif-text')) {
-                document.getElementById('notif-text').innerText = 'Notifikasi Aktif';
-                document.getElementById('notif-text').classList.add('text-brand-green');
-            }
+            lucide.createIcons();
         });
-
-        // Polling Data Background
-        setInterval(tarikDataPreview, 30000);
-
     </script>
 </body>
 </html>
