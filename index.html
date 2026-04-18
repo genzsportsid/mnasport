@@ -168,7 +168,6 @@
         function renderNews(beritaList) {
             const grid = document.getElementById('newsGrid');
             
-            // Failsafe jika tab Berita belum dibuat di Apps Script atau masih kosong
             if (!beritaList || beritaList.length === 0) {
                 grid.innerHTML = `
                     <div class="glass-panel min-w-[280px] rounded-[1.5rem] p-5 border border-white/5 snap-start">
@@ -180,24 +179,31 @@
                 return;
             }
 
-            // Membalik urutan (Berita terbaru di depan) dan ambil maksimal 5
             const latestNews = beritaList.slice().reverse().slice(0, 5);
 
             grid.innerHTML = latestNews.map(b => `
-                <a href="${val(b.link_tautan, '#')}" target="${b.link_tautan ? '_blank' : '_self'}" class="glass-panel min-w-[280px] w-[280px] rounded-[1.5rem] p-5 border border-white/5 snap-start group hover:border-brand-neon/50 transition-all flex flex-col justify-between">
-                    <div>
+                <a href="${val(b.link_tautan, '#')}" target="${b.link_tautan ? '_blank' : '_self'}" class="glass-panel min-w-[280px] w-[280px] rounded-[1.5rem] overflow-hidden border border-white/5 snap-start group hover:border-brand-neon/50 transition-all flex flex-col">
+                    
+                    ${b.link_gambar && b.link_gambar !== '-' ? `
+                    <div class="w-full h-32 relative overflow-hidden bg-brand-dark">
+                        <img src="${b.link_gambar}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#111111] via-transparent to-transparent"></div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="p-5 flex flex-col flex-1 ${b.link_gambar && b.link_gambar !== '-' ? '-mt-8 relative z-10' : ''}">
                         <div class="flex items-center justify-between mb-3">
-                            <span class="text-[8px] font-black bg-white/10 text-gray-300 px-2 py-1 rounded uppercase tracking-widest">${val(b.tanggal)}</span>
-                            <span class="text-[8px] font-black text-brand-neon uppercase tracking-widest flex items-center gap-1"><i data-lucide="hash" class="w-3 h-3"></i>${val(b.kategori, 'INFO')}</span>
+                            <span class="text-[8px] font-black bg-white/10 text-white px-2 py-1 rounded uppercase tracking-widest backdrop-blur-md shadow-sm">${val(b.tanggal)}</span>
+                            <span class="text-[8px] font-black text-brand-neon uppercase tracking-widest flex items-center gap-1 drop-shadow-md"><i data-lucide="hash" class="w-3 h-3"></i>${val(b.kategori, 'INFO')}</span>
                         </div>
-                        <h4 class="text-sm font-black text-white leading-tight uppercase tracking-tight group-hover:text-brand-neon transition-colors line-clamp-2 mb-2">${val(b.judul)}</h4>
+                        <h4 class="text-sm font-black text-white leading-tight uppercase tracking-tight group-hover:text-brand-neon transition-colors line-clamp-2 mb-2 drop-shadow-sm">${val(b.judul)}</h4>
                         <p class="text-[10px] text-gray-400 line-clamp-2 leading-relaxed">${val(b.ringkasan, 'Baca selengkapnya...')}</p>
                     </div>
                 </a>
             `).join('');
             lucide.createIcons();
         }
-
+        
         function renderMedia(galeriList) {
             const grid = document.getElementById('mediaGrid');
             
