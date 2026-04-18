@@ -103,9 +103,12 @@
                 <h3 class="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-white">
                     <i data-lucide="radio" class="w-4 h-4 text-brand-neon animate-pulse"></i> Radar Berita
                 </h3>
+                <span id="sync-status" class="text-[8px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1">
+                    <div class="w-1.5 h-1.5 bg-gray-500 rounded-full animate-pulse"></div> Offline Mode
+                </span>
             </div>
             <div id="newsGrid" class="flex gap-4 overflow-x-auto hide-scroll pb-4 snap-x snap-mandatory">
-                <div class="glass-panel min-w-[260px] h-[140px] rounded-2xl p-4 flex items-center justify-center animate-pulse border border-white/5">
+                <div class="glass-panel min-w-[280px] h-[140px] rounded-2xl p-4 flex items-center justify-center animate-pulse border border-white/5">
                     <div class="w-6 h-6 border-2 border-brand-neon border-t-transparent rounded-full animate-spin"></div>
                 </div>
             </div>
@@ -144,27 +147,72 @@
     </nav>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbws_yoHGqge_wnAciFE02oJUhXLikMh8txqEUHbzvFKfF1-etTGD6pPkFF5B1i7AanpUQ/exec'; 
+        // API URL Anda yang sudah fix
+        const API_URL = 'https://script.google.com/macros/s/AKfycbw993ZoUft52Da4SWg-9l4rDFDxk0O_bjH-0_gzmBMOCJm4PGL-rPfJO5wWtJVzsf47SQ/exec'; 
 
         const val = (data, fallback = "-") => (data === "" || data === null || data === undefined) ? fallback : data;
 
+        // MESIN CACHE & SYNC UTAMA
         async function init() {
             lucide.createIcons();
+            
+            // TAHAP 1: BACA CACHE LOKAL (Instan Render 0ms)
+            const cache = localStorage.getItem('mna_ecosystem_cache');
+            if (cache) {
+                try {
+                    const data = JSON.parse(cache);
+                    renderNews(data.berita);
+                    renderMedia(data.galeri);
+                    setSyncStatus('Memuat update...', 'text-brand-neon', 'bg-brand-neon');
+                } catch (e) {
+                    console.error("Cache rusak, akan sinkron ulang.");
+                }
+            } else {
+                setSyncStatus('Menyinkronkan...', 'text-brand-gold', 'bg-brand-gold');
+            }
+
+            // TAHAP 2: FETCH BACKGROUND (Stale-While-Revalidate)
             try {
-                // Fetch data dari spreadsheet (termasuk galeri dan berita jika sudah ditambah di Apps Script)
                 const res = await fetch(`${API_URL}?t=${Date.now()}`);
                 const data = await res.json();
                 
+                // Timpa cache lama dengan data segar
+                localStorage.setItem('mna_ecosystem_cache', JSON.stringify(data));
+                
+                // Render ulang secara mulus (Seamless)
                 renderNews(data.berita);
                 renderMedia(data.galeri);
+                
+                setSyncStatus('Live', 'text-green-500', 'bg-green-500');
+                
+                // Sembunyikan status Live setelah 3 detik agar UI tetap bersih
+                setTimeout(() => {
+                    document.getElementById('sync-status').style.opacity = '0';
+                }, 3000);
+
             } catch (e) { 
-                console.error("Gagal sinkronisasi data", e);
-                // Tampilkan Fallback Error UI
-                document.getElementById('newsGrid').innerHTML = `<p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-4">Gagal memuat berita.</p>`;
-                document.getElementById('mediaGrid').innerHTML = `<p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest col-span-full">Gagal memuat galeri.</p>`;
+                console.error("Gagal sinkronisasi jaringan", e);
+                setSyncStatus('Offline (Mode Cache)', 'text-gray-500', 'bg-gray-500');
+                
+                // Jika cache juga kosong (Kunjungan pertama tapi gagal sinyal)
+                if (!cache) {
+                    document.getElementById('newsGrid').innerHTML = `<p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-4">Gagal memuat berita. Cek koneksi Anda.</p>`;
+                    document.getElementById('mediaGrid').innerHTML = `<p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest col-span-full">Gagal memuat galeri.</p>`;
+                }
             }
         }
 
+        // FUNGSI PEMBANTU: Indikator Status Koneksi
+        function setSyncStatus(text, textColor, bgColor) {
+            const statusEl = document.getElementById('sync-status');
+            if(statusEl) {
+                statusEl.style.opacity = '1';
+                statusEl.className = `text-[8px] font-bold ${textColor} uppercase tracking-widest flex items-center gap-1 transition-opacity duration-500`;
+                statusEl.innerHTML = `<div class="w-1.5 h-1.5 ${bgColor} rounded-full animate-pulse shadow-[0_0_5px_currentColor]"></div> ${text}`;
+            }
+        }
+
+        // RENDERER KARTU BERITA VISUAL
         function renderNews(beritaList) {
             const grid = document.getElementById('newsGrid');
             
@@ -182,7 +230,7 @@
             const latestNews = beritaList.slice().reverse().slice(0, 5);
 
             grid.innerHTML = latestNews.map(b => `
-                <a href="${val(b.link_tautan, '#')}" target="${b.link_tautan ? '_blank' : '_self'}" class="glass-panel min-w-[280px] w-[280px] rounded-[1.5rem] overflow-hidden border border-white/5 snap-start group hover:border-brand-neon/50 transition-all flex flex-col">
+                <a href="${val(b.link_tautan, '#')}" target="${b.link_tautan ? '_blank' : '_self'}" class="glass-panel min-w-[280px] w-[280px] rounded-[1.5rem] overflow-hidden border border-white/5 snap-start group hover:border-brand-neon/50 transition-all flex flex-col shadow-lg">
                     
                     ${b.link_gambar && b.link_gambar !== '-' ? `
                     <div class="w-full h-32 relative overflow-hidden bg-brand-dark">
@@ -203,7 +251,8 @@
             `).join('');
             lucide.createIcons();
         }
-        
+
+        // RENDERER GALERI MASONRY
         function renderMedia(galeriList) {
             const grid = document.getElementById('mediaGrid');
             
@@ -212,11 +261,11 @@
                 return;
             }
 
-            // Ambil 4 foto terbaru saja untuk di beranda
+            // Ambil 4 foto terbaru
             const latestMedia = galeriList.slice().reverse().slice(0, 4);
 
             grid.innerHTML = latestMedia.map(item => `
-                <a href="${item.link_drive}" target="_blank" class="glass-panel aspect-square rounded-2xl overflow-hidden relative group border border-white/5 block">
+                <a href="${item.link_drive}" target="_blank" class="glass-panel aspect-square rounded-2xl overflow-hidden relative group border border-white/5 block shadow-lg">
                     ${item.preview_image 
                         ? `<img src="${item.preview_image}" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">` 
                         : `<div class="w-full h-full flex items-center justify-center bg-white/5"><i data-lucide="image" class="w-8 h-8 text-white/20"></i></div>`
