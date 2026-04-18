@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MNA SPORT | Ecosystem Hub</title>
+    <title>MNA Sport | Ecosystem Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
     <script>
@@ -14,27 +14,12 @@
                     colors: {
                         'brand-blue': '#1d4ed8',
                         'brand-neon': '#3b82f6',
-                        'brand-green': '#009A44',
                         'brand-gold': '#d7b67d',
                         'brand-dark': '#050505',
                         'brand-surface': '#111111',
+                        'tsl-green': '#009A44',
                     },
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    animation: {
-                        'blob': 'blob 7s infinite',
-                        'fade-in': 'fadeIn 0.8s ease-out forwards',
-                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards'
-                    },
-                    keyframes: {
-                        blob: {
-                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
-                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
-                        },
-                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                        slideUp: { '0%': { opacity: '0', transform: 'translateY(30px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } }
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
@@ -44,117 +29,114 @@
         body { background-color: #050505; color: #ffffff; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         
-        .glass-panel { background: rgba(17, 17, 17, 0.6); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-panel { background: rgba(17, 17, 17, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .bento-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: hidden; position: relative; }
+        .bento-card:hover { transform: translateY(-5px) scale(1.02); z-index: 10; }
         
-        /* Cinematic Card Hover Effects */
-        .portal-card { transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .portal-card:hover { transform: translateY(-8px) scale(1.02); z-index: 20;}
-        .portal-card .bg-pattern { transition: transform 0.8s ease, opacity 0.8s ease; }
-        .portal-card:hover .bg-pattern { transform: scale(1.15) rotate(2deg); opacity: 0.4; }
-        .portal-card .glow-layer { transition: opacity 0.5s ease; opacity: 0; }
-        .portal-card:hover .glow-layer { opacity: 1; }
+        .stagger-item { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
-        .stagger-1 { animation-delay: 0.1s; }
-        .stagger-2 { animation-delay: 0.2s; }
-        .stagger-3 { animation-delay: 0.3s; }
+        /* Neon Glows */
+        .glow-blue { box-shadow: 0 0 30px rgba(59, 130, 246, 0.15); }
+        .glow-green { box-shadow: 0 0 30px rgba(0, 154, 68, 0.15); }
     </style>
 </head>
-<body class="bg-brand-dark min-h-[100dvh] flex flex-col relative overflow-x-hidden selection:bg-brand-gold selection:text-brand-dark">
+<body class="bg-[#F9FAFB] dark:bg-brand-dark pb-32 transition-colors duration-500 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
 
-    <div class="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div class="absolute top-0 left-1/4 w-96 h-96 bg-brand-blue/20 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-blob"></div>
-        <div class="absolute top-1/4 right-1/4 w-96 h-96 bg-brand-green/10 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-blob" style="animation-delay: 2s;"></div>
-        <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-brand-gold/10 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-blob" style="animation-delay: 4s;"></div>
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 mix-blend-overlay"></div>
-    </div>
-
-    <header class="w-full z-50 pt-8 pb-4 px-6 relative animate-fade-in text-center">
-        <div class="inline-flex items-center justify-center gap-3 bg-white/5 border border-white/10 px-5 py-2.5 rounded-full backdrop-blur-md shadow-lg shadow-black/50">
-            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_#22c55e]"></div>
-            <span class="text-[9px] font-black tracking-[0.3em] uppercase text-gray-300">System Online</span>
+    <header class="fixed top-0 w-full z-50 bg-brand-dark/80 backdrop-blur-xl border-b border-white/5 pt-safe transition-all">
+        <div class="max-w-4xl mx-auto px-5 h-16 flex items-center justify-center">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-blue to-tsl-green flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                    <span class="font-black text-white text-xs tracking-tighter">M</span>
+                </div>
+                <h1 class="font-black text-xl italic tracking-tighter uppercase text-white">MNA <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-tsl-green">SPORT</span></h1>
+            </div>
         </div>
-        <h1 class="mt-6 font-black text-4xl md:text-5xl italic tracking-tighter uppercase text-white drop-shadow-2xl">
-            MNA <span class="text-transparent bg-clip-text bg-gradient-to-br from-brand-neon to-brand-blue">SPORT</span>
-        </h1>
-        <p class="mt-2 text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest">Ecosystem Command Hub</p>
     </header>
 
-    <main class="flex-1 w-full max-w-4xl mx-auto px-5 py-6 flex flex-col gap-6 relative z-10 pb-32">
+    <main class="pt-24 px-5 max-w-4xl mx-auto space-y-8">
         
-        <a href="/tsl/" class="portal-card relative w-full rounded-[2.5rem] overflow-hidden bg-brand-surface border border-white/5 group block opacity-0 animate-slide-up stagger-1 shadow-2xl">
-            <div class="absolute inset-0 bg-gradient-to-br from-brand-green/20 to-transparent z-10 glow-layer"></div>
-            <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1518605368461-1ee71168f6ce?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-luminosity bg-pattern"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-transparent"></div>
-            
-            <div class="relative z-20 p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 h-full min-h-[220px]">
-                <div class="flex-1">
-                    <div class="w-14 h-14 rounded-2xl bg-brand-green/20 border border-brand-green/30 flex items-center justify-center mb-5 shadow-[0_0_20px_rgba(0,154,68,0.3)] group-hover:scale-110 transition-transform duration-500">
-                        <i data-lucide="trophy" class="w-7 h-7 text-brand-green"></i>
-                    </div>
-                    <h2 class="text-3xl md:text-4xl font-black uppercase tracking-tighter text-white mb-2 leading-none">TSL Liga</h2>
-                    <p class="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest max-w-sm">Pusat Database, Klasemen, dan Manajemen Operator Trenggalek Student League.</p>
-                </div>
-                <div class="hidden md:flex w-16 h-16 rounded-full bg-white/5 border border-white/10 items-center justify-center group-hover:bg-brand-green group-hover:text-white transition-colors duration-500">
-                    <i data-lucide="arrow-right" class="w-6 h-6 group-hover:translate-x-1 transition-transform"></i>
-                </div>
-                <div class="absolute bottom-8 right-8 md:hidden text-brand-green opacity-50 group-hover:opacity-100 group-hover:translate-x-2 transition-all">
-                    <i data-lucide="arrow-right" class="w-8 h-8"></i>
-                </div>
-            </div>
-        </a>
+        <section class="text-center space-y-3 relative py-6 stagger-item" style="animation-delay: 0.1s;">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-brand-neon/10 blur-[100px] rounded-full pointer-events-none"></div>
+            <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-tight">
+                Pusat Ekosistem <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue via-brand-neon to-white">Sepak Bola Modern</span>
+            </h2>
+            <p class="text-[10px] text-gray-400 font-bold tracking-[0.3em] uppercase max-w-md mx-auto">Sistem Manajemen Terintegrasi Untuk Klub & Liga Pelajar</p>
+        </section>
 
-        <a href="/mnafc/" class="portal-card relative w-full rounded-[2.5rem] overflow-hidden bg-brand-surface border border-white/5 group block opacity-0 animate-slide-up stagger-2 shadow-2xl">
-            <div class="absolute inset-0 bg-gradient-to-br from-brand-neon/20 to-transparent z-10 glow-layer"></div>
-            <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551280857-236ec7d576a1?q=80&w=2074&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-luminosity bg-pattern"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/80 to-transparent"></div>
+        <section class="grid grid-cols-2 gap-4 md:gap-6 stagger-item" style="animation-delay: 0.2s;">
             
-            <div class="relative z-20 p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 h-full min-h-[220px]">
-                <div class="flex-1">
-                    <div class="w-14 h-14 rounded-2xl bg-brand-neon/20 border border-brand-neon/30 flex items-center justify-center mb-5 shadow-[0_0_20px_rgba(59,130,246,0.3)] group-hover:scale-110 transition-transform duration-500">
-                        <i data-lucide="shield" class="w-7 h-7 text-brand-neon"></i>
+            <a href="/mnafc/" class="bento-card glass-panel rounded-[2rem] p-6 border border-brand-blue/20 glow-blue group block">
+                <div class="absolute -right-6 -bottom-6 text-brand-blue/10 group-hover:scale-110 transition-transform duration-500">
+                    <i data-lucide="shield" class="w-40 h-40"></i>
+                </div>
+                <div class="relative z-10 flex flex-col h-full justify-between min-h-[120px]">
+                    <div class="w-10 h-10 rounded-full bg-brand-blue/20 flex items-center justify-center mb-4 border border-brand-blue/30 group-hover:bg-brand-blue transition-colors">
+                        <i data-lucide="swords" class="w-5 h-5 text-brand-neon group-hover:text-white"></i>
                     </div>
-                    <h2 class="text-3xl md:text-4xl font-black uppercase tracking-tighter text-white mb-2 leading-none">MNA FC</h2>
-                    <p class="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest max-w-sm">Elite Command Center. Manajemen Skuad, Analitik Taktis, dan Media Hub Klub.</p>
+                    <div>
+                        <h3 class="text-2xl font-black uppercase tracking-tighter text-white mb-1">MNA FC</h3>
+                        <p class="text-[9px] font-bold text-brand-neon uppercase tracking-widest">Klub & Akademi</p>
+                    </div>
                 </div>
-                <div class="hidden md:flex w-16 h-16 rounded-full bg-white/5 border border-white/10 items-center justify-center group-hover:bg-brand-neon group-hover:text-white transition-colors duration-500">
-                    <i data-lucide="arrow-right" class="w-6 h-6 group-hover:translate-x-1 transition-transform"></i>
-                </div>
-                <div class="absolute bottom-8 right-8 md:hidden text-brand-neon opacity-50 group-hover:opacity-100 group-hover:translate-x-2 transition-all">
-                    <i data-lucide="arrow-right" class="w-8 h-8"></i>
-                </div>
-            </div>
-        </a>
+            </a>
 
-        <div class="glass-panel p-6 rounded-[2rem] border border-white/5 flex items-center justify-between opacity-0 animate-slide-up stagger-3 mt-4">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-full bg-brand-gold/20 flex items-center justify-center border border-brand-gold/30">
-                    <i data-lucide="fingerprint" class="w-5 h-5 text-brand-gold"></i>
+            <a href="/tsl/" class="bento-card glass-panel rounded-[2rem] p-6 border border-tsl-green/20 glow-green group block">
+                <div class="absolute -right-6 -bottom-6 text-tsl-green/10 group-hover:scale-110 transition-transform duration-500">
+                    <i data-lucide="trophy" class="w-40 h-40"></i>
                 </div>
-                <div>
-                    <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Otentikasi Utama</p>
-                    <p class="text-sm font-black text-white uppercase tracking-tight">Hanung (Principal)</p>
+                <div class="relative z-10 flex flex-col h-full justify-between min-h-[120px]">
+                    <div class="w-10 h-10 rounded-full bg-tsl-green/20 flex items-center justify-center mb-4 border border-tsl-green/30 group-hover:bg-tsl-green transition-colors">
+                        <i data-lucide="medal" class="w-5 h-5 text-tsl-green group-hover:text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-black uppercase tracking-tighter text-white mb-1">TSL 2026</h3>
+                        <p class="text-[9px] font-bold text-tsl-green uppercase tracking-widest">Liga Pelajar</p>
+                    </div>
+                </div>
+            </a>
+
+        </section>
+
+        <section class="stagger-item" style="animation-delay: 0.3s;">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-white">
+                    <i data-lucide="radio" class="w-4 h-4 text-brand-neon animate-pulse"></i> Radar Berita
+                </h3>
+            </div>
+            <div id="newsGrid" class="flex gap-4 overflow-x-auto hide-scroll pb-4 snap-x snap-mandatory">
+                <div class="glass-panel min-w-[260px] h-[140px] rounded-2xl p-4 flex items-center justify-center animate-pulse border border-white/5">
+                    <div class="w-6 h-6 border-2 border-brand-neon border-t-transparent rounded-full animate-spin"></div>
                 </div>
             </div>
-            <div class="text-right">
-                <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Versi Engine</p>
-                <p class="text-sm font-black text-brand-neon uppercase tracking-tight">v2.4.0 Elite</p>
+        </section>
+
+        <section class="stagger-item" style="animation-delay: 0.4s;">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-white">
+                    <i data-lucide="camera" class="w-4 h-4 text-tsl-green"></i> Lensa Ekosistem
+                </h3>
             </div>
-        </div>
+            <div id="mediaGrid" class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="glass-panel aspect-square rounded-2xl animate-pulse border border-white/5"></div>
+                <div class="glass-panel aspect-square rounded-2xl animate-pulse border border-white/5"></div>
+            </div>
+        </section>
 
     </main>
 
-    <nav class="fixed bottom-0 w-full z-[110] bg-white/95 dark:bg-brand-surface/95 backdrop-blur-2xl border-t border-gray-200 dark:border-white/5 pb-safe transition-colors">
+    <nav class="fixed bottom-0 w-full z-[110] bg-brand-surface/95 backdrop-blur-2xl border-t border-white/5 pb-safe transition-colors">
         <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
-            <button class="flex flex-col items-center justify-center w-full h-full text-brand-gold transition-colors relative group">
-                <div class="absolute -top-3 w-8 h-1 bg-brand-gold rounded-full shadow-[0_0_10px_#d7b67d]"></div>
-                <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1 group-hover:scale-110 transition-transform"></i>
-                <span class="text-[9px] font-black uppercase tracking-wider">Operator</span>
+            <button class="flex flex-col items-center justify-center w-full h-full text-white transition-colors relative">
+                <div class="absolute -top-1 w-8 h-1 bg-white rounded-b-full"></div>
+                <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">Ekosistem</span>
             </button>
-            <a href="/tsl/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-green transition-colors">
+            <a href="/tsl/" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-tsl-green transition-colors">
                 <i data-lucide="trophy" class="w-5 h-5 mb-1"></i>
                 <span class="text-[9px] font-bold uppercase tracking-wider">TSL Liga</span>
             </a>
-            <a href="/mnafc/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-neon transition-colors">
+            <a href="/mnafc/" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-brand-neon transition-colors">
                 <i data-lucide="shield" class="w-5 h-5 mb-1"></i>
                 <span class="text-[9px] font-bold uppercase tracking-wider">MNA FC</span>
             </a>
@@ -162,10 +144,87 @@
     </nav>
 
     <script>
-        // Inisialisasi Ikon
-        document.addEventListener('DOMContentLoaded', () => {
+        const API_URL = 'https://script.google.com/macros/s/AKfycbw993ZoUft52Da4SWg-9l4rDFDxk0O_bjH-0_gzmBMOCJm4PGL-rPfJO5wWtJVzsf47SQ/exec'; 
+
+        const val = (data, fallback = "-") => (data === "" || data === null || data === undefined) ? fallback : data;
+
+        async function init() {
             lucide.createIcons();
-        });
+            try {
+                // Fetch data dari spreadsheet (termasuk galeri dan berita jika sudah ditambah di Apps Script)
+                const res = await fetch(`${API_URL}?t=${Date.now()}`);
+                const data = await res.json();
+                
+                renderNews(data.berita);
+                renderMedia(data.galeri);
+            } catch (e) { 
+                console.error("Gagal sinkronisasi data", e);
+                // Tampilkan Fallback Error UI
+                document.getElementById('newsGrid').innerHTML = `<p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-4">Gagal memuat berita.</p>`;
+                document.getElementById('mediaGrid').innerHTML = `<p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest col-span-full">Gagal memuat galeri.</p>`;
+            }
+        }
+
+        function renderNews(beritaList) {
+            const grid = document.getElementById('newsGrid');
+            
+            // Failsafe jika tab Berita belum dibuat di Apps Script atau masih kosong
+            if (!beritaList || beritaList.length === 0) {
+                grid.innerHTML = `
+                    <div class="glass-panel min-w-[280px] rounded-[1.5rem] p-5 border border-white/5 snap-start">
+                        <p class="text-[10px] font-black text-brand-neon uppercase tracking-widest mb-2">SYSTEM INFO</p>
+                        <h4 class="text-sm font-black text-white leading-tight uppercase">Belum ada berita disiarkan</h4>
+                        <p class="text-[10px] text-gray-400 mt-2">Tambahkan data di tab "Berita" Spreadsheet Anda.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Membalik urutan (Berita terbaru di depan) dan ambil maksimal 5
+            const latestNews = beritaList.slice().reverse().slice(0, 5);
+
+            grid.innerHTML = latestNews.map(b => `
+                <a href="${val(b.link_tautan, '#')}" target="${b.link_tautan ? '_blank' : '_self'}" class="glass-panel min-w-[280px] w-[280px] rounded-[1.5rem] p-5 border border-white/5 snap-start group hover:border-brand-neon/50 transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[8px] font-black bg-white/10 text-gray-300 px-2 py-1 rounded uppercase tracking-widest">${val(b.tanggal)}</span>
+                            <span class="text-[8px] font-black text-brand-neon uppercase tracking-widest flex items-center gap-1"><i data-lucide="hash" class="w-3 h-3"></i>${val(b.kategori, 'INFO')}</span>
+                        </div>
+                        <h4 class="text-sm font-black text-white leading-tight uppercase tracking-tight group-hover:text-brand-neon transition-colors line-clamp-2 mb-2">${val(b.judul)}</h4>
+                        <p class="text-[10px] text-gray-400 line-clamp-2 leading-relaxed">${val(b.ringkasan, 'Baca selengkapnya...')}</p>
+                    </div>
+                </a>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderMedia(galeriList) {
+            const grid = document.getElementById('mediaGrid');
+            
+            if (!galeriList || galeriList.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-10 text-center"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Belum ada tangkapan lensa.</p></div>`;
+                return;
+            }
+
+            // Ambil 4 foto terbaru saja untuk di beranda
+            const latestMedia = galeriList.slice().reverse().slice(0, 4);
+
+            grid.innerHTML = latestMedia.map(item => `
+                <a href="${item.link_drive}" target="_blank" class="glass-panel aspect-square rounded-2xl overflow-hidden relative group border border-white/5 block">
+                    ${item.preview_image 
+                        ? `<img src="${item.preview_image}" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">` 
+                        : `<div class="w-full h-full flex items-center justify-center bg-white/5"><i data-lucide="image" class="w-8 h-8 text-white/20"></i></div>`
+                    }
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-dark/90 via-transparent to-transparent opacity-80"></div>
+                    <div class="absolute bottom-2 left-2 right-2">
+                        <p class="text-[8px] font-black text-white uppercase tracking-tighter line-clamp-1 leading-none shadow-black drop-shadow-md">${val(item.kegiatan)}</p>
+                    </div>
+                </a>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
