@@ -175,56 +175,68 @@
     </nav>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbws_yoHGqge_wnAciFE02oJUhXLikMh8txqEUHbzvFKfF1-etTGD6pPkFF5B1i7AanpUQ/exec'; 
+        const API_URL = 'https://script.google.com/macros/s/AKfycbw993ZoUft52Da4SWg-9l4rDFDxk0O_bjH-0_gzmBMOCJm4PGL-rPfJO5wWtJVzsf47SQ/exec'; 
         let rawData = { pemain: [], statistik: {}, galeri: [] };
         let activePos = 'ALL';
 
         const val = (data, fallback = "-") => (data === "" || data === null || data === undefined) ? fallback : data;
 
-        // MESIN PENGHITUNG UMUR OTOMATIS & FORMAT TANGGAL LAHIR
+        // FUNGSI PEMBANTU: PARSING TANGGAL FORMAT INDONESIA (DD/MM/YYYY)
+        function parseIndoDate(dateStr) {
+            if (!dateStr || dateStr === '-') return null;
+            // Menangani DD/MM/YYYY atau DD-MM-YYYY
+            const parts = dateStr.split(/[\/\-]/);
+            if (parts.length === 3) {
+                let day = parseInt(parts[0]);
+                let month = parseInt(parts[1]) - 1; // JS bulan mulai dari 0
+                let year = parseInt(parts[2]);
+                if (year < 100) year += 2000; // Menangani format YY
+                return new Date(year, month, day);
+            }
+            // Failsafe jika format bawaan spreadsheet sudah benar secara sistem
+            const attempt = new Date(dateStr);
+            return isNaN(attempt) ? null : attempt;
+        }
+
+        // MESIN PENGHITUNG UMUR & KATEGORI (ULTRA PRECISION)
         function processPlayerData(players) {
             return players.map(p => {
+                const birthDate = parseIndoDate(p.tanggal_lahir);
                 p.tanggal_lahir_format = '-';
                 p.umur_detail = '-';
-                p.kategori_auto = val(p.kategori, '-');
+                p.kategori_auto = '-';
 
-                if (p.tanggal_lahir && p.tanggal_lahir !== '-' && p.tanggal_lahir !== '') {
-                    const birthDate = new Date(p.tanggal_lahir);
-                    if (!isNaN(birthDate)) {
-                        // 1. Format dd/mm/yy
-                        const dd = String(birthDate.getDate()).padStart(2, '0');
-                        const mm = String(birthDate.getMonth() + 1).padStart(2, '0');
-                        const yy = String(birthDate.getFullYear()).slice(-2);
-                        p.tanggal_lahir_format = `${dd}/${mm}/${yy}`;
-                        
-                        // 2. Kalkulasi Umur Presisi (Tahun, Bulan, Hari)
-                        const today = new Date();
-                        let years = today.getFullYear() - birthDate.getFullYear();
-                        let months = today.getMonth() - birthDate.getMonth();
-                        let days = today.getDate() - birthDate.getDate();
-                        
-                        if (days < 0) {
-                            months--;
-                            const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-                            days += lastMonth.getDate();
-                        }
-                        if (months < 0) {
-                            years--;
-                            months += 12;
-                        }
-                        p.umur_detail = `${years}th ${months}bln ${days}hr`;
-                        
-                        // 3. Klasifikasi Kategori Tim
-                        if (years <= 15) {
-                            p.kategori_auto = 'U-15';
-                        } else if (years > 15 && years <= 17) {
-                            p.kategori_auto = 'U-17';
-                        } else {
-                            p.kategori_auto = 'SENIOR';
-                        }
+                if (birthDate) {
+                    // 1. Format dd/mm/yy untuk tampilan
+                    const dd = String(birthDate.getDate()).padStart(2, '0');
+                    const mm = String(birthDate.getMonth() + 1).padStart(2, '0');
+                    const yy = String(birthDate.getFullYear()).slice(-2);
+                    p.tanggal_lahir_format = `${dd}/${mm}/${yy}`;
+                    
+                    // 2. Kalkulasi Umur Presisi (Tahun, Bulan, Hari)
+                    const today = new Date();
+                    let years = today.getFullYear() - birthDate.getFullYear();
+                    let months = today.getMonth() - birthDate.getMonth();
+                    let days = today.getDate() - birthDate.getDate();
+                    
+                    if (days < 0) {
+                        months--;
+                        const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                        days += lastMonth.getDate();
+                    }
+                    if (months < 0) {
+                        years--;
+                        months += 12;
+                    }
+                    p.umur_detail = `${years}th ${months}bln ${days}hr`;
+                    
+                    // 3. Klasifikasi Kategori Tim
+                    if (years <= 15) {
+                        p.kategori_auto = 'U-15';
+                    } else if (years >= 16 && years <= 17) {
+                        p.kategori_auto = 'U-17';
                     } else {
-                        // Failsafe jika format tanggal sheet salah/tidak dikenali
-                        p.tanggal_lahir_format = p.tanggal_lahir;
+                        p.kategori_auto = 'SENIOR';
                     }
                 }
                 return p;
@@ -247,13 +259,11 @@
                 'RB': { bottom: '24%', left: '85%', w: '30%', h: '35%', color: colorDEF },
                 'LWB': { bottom: '35%', left: '15%', w: '30%', h: '30%', color: colorDEF },
                 'RWB': { bottom: '35%', left: '85%', w: '30%', h: '30%', color: colorDEF },
-                
                 'CDM': { bottom: '40%', left: '50%', w: '45%', h: '18%', color: colorMID },
                 'CM': { bottom: '50%', left: '50%', w: '45%', h: '18%', color: colorMID },
                 'LM': { bottom: '55%', left: '15%', w: '30%', h: '30%', color: colorMID },
                 'RM': { bottom: '55%', left: '85%', w: '30%', h: '30%', color: colorMID },
                 'CAM': { bottom: '62%', left: '50%', w: '45%', h: '15%', color: colorMID },
-                
                 'SS': { bottom: '70%', left: '50%', w: '40%', h: '15%', color: colorFWD },
                 'LW': { bottom: '75%', left: '18%', w: '30%', h: '25%', color: colorFWD },
                 'LWG': { bottom: '75%', left: '18%', w: '30%', h: '25%', color: colorFWD },
@@ -265,7 +275,6 @@
 
             const parts = p.split('/').map(x => x.trim());
             let results = [];
-            
             parts.forEach(part => {
                 if (basePositions[part]) {
                     results.push({ 
@@ -282,13 +291,13 @@
             const cache = localStorage.getItem('mnafc_elite_final');
             if (cache) { 
                 rawData = JSON.parse(cache); 
-                rawData.pemain = processPlayerData(rawData.pemain); // Eksekusi kalkulator umur ke cache
+                rawData.pemain = processPlayerData(rawData.pemain); 
                 updateUI(); 
             }
             try {
                 const res = await fetch(`${API_URL}?t=${Date.now()}`);
                 const data = await res.json();
-                data.pemain = processPlayerData(data.pemain); // Eksekusi kalkulator umur ke data server
+                data.pemain = processPlayerData(data.pemain);
                 rawData = data;
                 localStorage.setItem('mnafc_elite_final', JSON.stringify(data));
                 updateUI();
@@ -349,15 +358,12 @@
             const filtered = rawData.pemain.filter(p => {
                 const searchStr = (val(p.nama) + val(p.sekolah) + val(p.posisi) + val(p.posisi_alt, '')).toLowerCase();
                 const matchTxt = searchStr.includes(query);
-                
                 const posTxt = val(p.posisi).toUpperCase();
                 let bPos = 'LAINNYA';
-                
                 if (posTxt.includes('GK')) bPos = 'GK';
                 else if (['CB','LB','RB','RWB','LWB'].some(x => posTxt.includes(x))) bPos = 'DEF';
                 else if (['CM','CDM','CAM','RM','LM'].some(x => posTxt.includes(x))) bPos = 'MID';
                 else if (['ST','CF','RW','LW','RWG','LWG','SS'].some(x => posTxt.includes(x))) bPos = 'FWD';
-
                 return matchTxt && (activePos === 'ALL' || bPos === activePos);
             });
             renderPlayers(filtered);
@@ -389,7 +395,7 @@
                     <div class="pt-16 px-6">
                         <h2 class="text-xl font-black uppercase tracking-tighter text-white leading-tight mb-4">${val(p.nama)}</h2>
                         <div class="grid grid-cols-3 gap-2 mb-6">
-                            <div class="bg-white/5 rounded-xl p-2 border border-white/5 text-center">
+                            <div class="bg-white/5 rounded-xl p-2 border border-white/5 text-center flex flex-col justify-center">
                                 <p class="text-[8px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">Kategori / Umur</p>
                                 <p class="text-[10px] font-black text-white">${val(p.kategori_auto, '-')}</p>
                                 <p class="text-[7px] font-bold text-brand-neon mt-0.5">${val(p.umur_detail, '-')}</p>
@@ -416,24 +422,19 @@
         function bukaProfilPenuh(idx) {
             closeModal();
             const p = rawData.pemain[idx];
-            
             const mainCoordsArray = getPosCoordsArray(p.posisi);
             const altPosRaw = val(p.posisi_alt, '');
             const altCoordsArray = (altPosRaw && altPosRaw !== '-') ? getPosCoordsArray(altPosRaw) : [];
-
             let pitchElementsHTML = mainCoordsArray.map(c => `
                 <div class="position-zone" style="bottom: ${c.bottom}; left: ${c.left}; width: ${c.w}; height: ${c.h}; background: ${c.color.bg};"></div>
                 <div class="player-marker" style="bottom: ${c.bottom}; left: ${c.left}; background: ${c.color.marker}; box-shadow: 0 0 15px ${c.color.marker};">${c.label}</div>
             `).join('');
-
             pitchElementsHTML += altCoordsArray.map(c => `
                 <div class="player-marker-alt" style="bottom: ${c.bottom}; left: ${c.left}; background: ${c.color.marker};">${c.label}</div>
             `).join('');
-
             const altBadgeHTML = (altPosRaw && altPosRaw !== '-') 
                 ? `<span class="text-xs font-black bg-white/5 text-gray-300 border border-white/10 px-4 py-1.5 rounded-lg uppercase shadow-sm">ALT: ${altPosRaw}</span>` 
                 : '';
-
             const page = document.getElementById('fullProfilePage');
             page.innerHTML = `
                 <div class="sticky top-0 z-50 glass-panel border-b border-white/10 px-5 py-4 flex items-center justify-between">
@@ -442,7 +443,6 @@
                     </button>
                     <span class="text-[10px] font-black text-brand-neon uppercase tracking-widest">Player Dossier</span>
                 </div>
-
                 <div class="relative pt-10 pb-16 px-5 flex flex-col items-center justify-center border-b border-white/5 bg-gradient-to-b from-brand-blue/10 to-brand-dark">
                     <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
                     <div class="relative z-10 w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] overflow-hidden border-2 border-brand-neon shadow-[0_0_30px_rgba(59,130,246,0.3)] mb-6">
@@ -455,12 +455,9 @@
                         <span class="text-xs font-black bg-white/10 text-white border border-white/10 px-4 py-1.5 rounded-lg uppercase shadow-sm">#${val(p.nomor, '0')}</span>
                     </div>
                 </div>
-
                 <div class="max-w-4xl mx-auto px-5 py-8 space-y-8 pb-32">
-                    
                     <div class="glass-panel p-6 rounded-[2rem] border border-white/5">
                         <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="crosshair" class="w-4 h-4 text-brand-neon"></i> Tactical Deployment</h3>
-                        
                         <div class="pitch-wrapper">
                             <div class="pitch-container">
                                 <div class="pitch-half pitch-line"></div>
@@ -471,7 +468,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="glass-panel p-6 rounded-[2rem] border border-white/5">
                         <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4 text-brand-neon"></i> Biometrik & Fisik</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -494,7 +490,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="glass-panel p-6 rounded-[2rem] border border-white/5 flex flex-col justify-center">
                             <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="award" class="w-4 h-4 text-brand-gold"></i> Rekor Performa</h3>
@@ -503,7 +498,6 @@
                                 <p class="text-6xl font-black text-brand-gold drop-shadow-[0_0_15px_rgba(215,182,125,0.4)]">${val(p.gol, 0)}</p>
                             </div>
                         </div>
-
                         <div class="glass-panel p-6 rounded-[2rem] border border-white/5 flex flex-col justify-center">
                             <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="graduation-cap" class="w-4 h-4 text-brand-neon"></i> Afiliasi Akademik</h3>
                             <div class="bg-white/5 p-8 rounded-2xl text-center border border-white/5 flex-1 flex flex-col justify-center">
@@ -514,7 +508,6 @@
                     </div>
                 </div>
             `;
-            
             page.classList.remove('hidden');
             setTimeout(() => { page.classList.add('page-slide-in'); }, 10);
             document.body.style.overflow = 'hidden';
@@ -524,14 +517,10 @@
         function tutupProfilPenuh() {
             const page = document.getElementById('fullProfilePage');
             page.classList.remove('page-slide-in');
-            setTimeout(() => { 
-                page.classList.add('hidden'); 
-                document.body.style.overflow = '';
-            }, 500); 
+            setTimeout(() => { page.classList.add('hidden'); document.body.style.overflow = ''; }, 500); 
         }
 
         function closeModal() { document.getElementById('playerModal').classList.add('hidden'); document.body.style.overflow = ''; }
-        
         function switchMode(mode) {
             const isSquad = mode === 'squad';
             document.getElementById('view-squad').classList.toggle('hidden', !isSquad);
@@ -541,10 +530,9 @@
             const act = isSquad ? tS : tG;
             act.className = "px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg bg-white dark:bg-brand-surface text-brand-blue dark:text-white shadow-sm transition-all";
         }
-        
         function renderGallery(list) {
             const grid = document.getElementById('galleryGrid');
-            if (!list || list.length === 0) { grid.innerHTML = `<div class="col-span-full py-16 text-center text-[10px] font-black text-gray-500 uppercase tracking-widest border border-dashed border-gray-300 dark:border-white/10 rounded-2xl">Kosong</div>`; return; }
+            if (!list || list.length === 0) { grid.innerHTML = `<div class="col-span-full py-16 text-center text-[10px] font-black text-gray-500 uppercase tracking-widest">Kosong</div>`; return; }
             grid.innerHTML = list.map((item, i) => `
                 <a href="${item.link_drive}" target="_blank" class="glass-panel rounded-2xl p-3 flex flex-col gap-3 relative overflow-hidden group stagger-item border border-white/5" style="animation-delay: ${i*0.05}s">
                     <div class="relative w-full aspect-video rounded-xl bg-brand-dark overflow-hidden">
