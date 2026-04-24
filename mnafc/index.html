@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MNA FC | Command Center</title>
+    <title>MNA FC & FUTSAL | Elite Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
     <script>
@@ -29,36 +29,41 @@
         .hide-scroll::-webkit-scrollbar { display: none; }
         .glass-panel { background: rgba(17, 17, 17, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .player-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .player-card:hover { transform: translateY(-8px) scale(1.02); border-color: rgba(59, 130, 246, 0.4); }
+        .player-card:hover { transform: translateY(-8px) scale(1.02); border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 15px 30px -10px rgba(59, 130, 246, 0.2); z-index: 10;}
         
-        /* PITCH SYSTEM */
-        .pitch-wrapper {
-            position: relative; width: 100%; max-width: 300px; margin: 0 auto;
-            border-radius: 16px; overflow: hidden; border: 1.5px solid rgba(255, 255, 255, 0.15);
-        }
-        .pitch-wrapper::before { content: ""; display: block; padding-top: 145%; }
-        .pitch-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: all 0.5s ease; }
-        
-        /* VISUAL LAPANGAN BOLA (GRASS) */
-        .pitch-football { background: #061c06; background-image: repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(255,255,255,0.02) 10%, rgba(255,255,255,0.02) 20%); }
-        
-        /* VISUAL LAPANGAN FUTSAL (HARDWOOD) */
-        .pitch-futsal { background: #2d1b0d; background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png'); }
-
-        .pitch-line { position: absolute; border: 1.5px solid rgba(255, 255, 255, 0.2); }
-        .pitch-half { top: 0; left: 0; width: 100%; height: 50%; border-bottom: 1.5px solid rgba(255, 255, 255, 0.2); }
-        .pitch-circle { top: 50%; left: 50%; width: 60px; height: 60px; border-radius: 50%; transform: translate(-50%, -50%); }
-        
-        .position-zone { position: absolute; transform: translate(-50%, 50%); border-radius: 12px; pointer-events: none; z-index: 5; opacity: 0.7; }
-        .player-marker { 
-            position: absolute; width: 38px; height: 38px; border: 2px solid white; border-radius: 50%; 
-            transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center;
-            font-size: 10px; font-weight: 900; color: white; text-shadow: 0px 1px 3px rgba(0,0,0,0.8); z-index: 10;
-        }
-
         .stagger-item { animation: fadeUp 0.5s ease forwards; opacity: 0; transform: translateY(10px); }
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* TACTICAL PITCH SYSTEM */
+        .pitch-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 320px; 
+            margin: 0 auto;
+            border-radius: 16px;
+            border: 1.5px solid rgba(255, 255, 255, 0.15); 
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        /* Style Lapangan Bola */
+        .pitch-football { background: linear-gradient(180deg, #132411 0%, #050505 100%); }
+        /* Style Lapangan Futsal (Hardwood/Blue Vinyl) */
+        .pitch-futsal { background: linear-gradient(180deg, #1e3a8a 0%, #050505 100%); border-color: rgba(59, 130, 246, 0.4); }
+        
+        .pitch-wrapper::before { content: ""; display: block; padding-top: 145%; }
+        .pitch-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .pitch-line { position: absolute; border: 1.5px solid rgba(255, 255, 255, 0.15); }
+        .pitch-half { top: 0; left: 0; width: 100%; height: 50%; border-bottom: 1.5px solid rgba(255, 255, 255, 0.15); }
+        .pitch-circle { top: 50%; left: 50%; width: 60px; height: 60px; border-radius: 50%; transform: translate(-50%, -50%); }
+        .pitch-penalty { top: -1.5px; left: 20%; width: 60%; height: 18%; border-top: 0; }
+        .pitch-penalty-bottom { bottom: -1.5px; left: 20%; width: 60%; height: 18%; border-bottom: 0; }
+        
+        .position-zone { position: absolute; transform: translate(-50%, 50%); border-radius: 12px; pointer-events: none; z-index: 5; opacity: 0.85; transition: all 0.5s ease; }
+        .player-marker { position: absolute; width: 38px; height: 38px; border: 2px solid white; border-radius: 50%; transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; font-weight: 900; color: white; text-shadow: 0px 1px 3px rgba(0,0,0,0.9); z-index: 10; transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .player-marker-alt { position: absolute; width: 34px; height: 34px; border: 2px dashed rgba(255,255,255,0.7); border-radius: 50%; transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 9px; font-weight: 800; color: rgba(255,255,255,0.8); z-index: 9; opacity: 0.6; }
+
         .page-slide-in { transform: translateX(0) !important; }
+        .sport-btn-active { background: #3b82f6; color: white; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
     </style>
 </head>
 <body class="bg-brand-dark pb-32">
@@ -66,44 +71,56 @@
     <header class="fixed top-0 w-full z-50 glass-panel border-b border-white/5 pt-safe">
         <div class="max-w-4xl mx-auto px-5 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-brand-blue flex items-center justify-center">
-                    <span id="header-initial" class="font-black text-white text-xs">M</span>
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-blue to-brand-neon flex items-center justify-center">
+                    <span class="font-black text-white text-xs">MNA</span>
                 </div>
-                <h1 class="font-black text-lg italic tracking-tighter uppercase text-white" id="brand-name">MNA FC</h1>
+                <h1 id="header-title" class="font-black text-xl italic tracking-tighter uppercase text-white">MNA <span class="text-brand-neon">FC</span></h1>
             </div>
-            <div class="flex bg-white/5 p-1 rounded-xl border border-white/10">
-                <button onclick="switchSport('mnafc')" id="btn-fc" class="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all bg-brand-blue text-white shadow-lg">FC</button>
-                <button onclick="switchSport('futsal')" id="btn-futsal" class="px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all text-gray-500">Futsal</button>
+            <div class="flex bg-white/5 p-1 rounded-xl border border-white/5">
+                <button onclick="switchMode('squad')" id="tab-squad" class="px-4 py-1.5 text-[10px] font-black uppercase rounded-lg bg-brand-neon text-white shadow-sm transition-all">Squad</button>
+                <button onclick="switchMode('gallery')" id="tab-gallery" class="px-4 py-1.5 text-[10px] font-bold uppercase text-gray-500 hover:text-white transition-all">Media</button>
             </div>
         </div>
     </header>
 
     <main class="pt-24 px-5 max-w-4xl mx-auto">
-        <div class="glass-panel rounded-3xl p-6 mb-8 border border-white/5 relative overflow-hidden">
-            <div class="absolute -right-20 -top-20 w-64 h-64 bg-brand-blue/10 blur-[80px] rounded-full"></div>
-            <div class="grid grid-cols-3 gap-4 relative z-10">
-                <div><p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Win Rate</p><p id="win-rate" class="text-3xl font-black text-brand-neon">0%</p></div>
-                <div class="pl-4 border-l border-white/10"><p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">W-S-K</p><p id="match-record" class="text-3xl font-black text-white">0-0-0</p></div>
-                <div class="pl-4 border-l border-white/10"><p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Goal Diff</p><p id="goal-diff" class="text-3xl font-black text-brand-gold">+0</p></div>
+        <div class="glass-panel rounded-3xl p-6 mb-6 border border-white/5 relative overflow-hidden">
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-brand-blue/20 blur-[80px] rounded-full pointer-events-none"></div>
+            <div class="grid grid-cols-3 gap-4 divide-x divide-white/10">
+                <div><p class="text-[10px] font-bold text-gray-500 uppercase mb-1">Win Rate</p><p id="win-rate" class="text-3xl font-black text-brand-neon">0%</p></div>
+                <div class="pl-4"><p class="text-[10px] font-bold text-gray-500 uppercase mb-1">W-S-K</p><p id="match-record" class="text-3xl font-black text-white">0-0-0</p></div>
+                <div class="pl-4"><p class="text-[10px] font-bold text-gray-500 uppercase mb-1">Goal Diff</p><p id="goal-diff" class="text-3xl font-black text-brand-gold">+0</p></div>
             </div>
         </div>
 
-        <div id="view-squad" class="block">
+        <div class="flex gap-2 mb-8 bg-white/5 p-1.5 rounded-2xl border border-white/5">
+            <button id="btn-fc" onclick="setSport('mnafc')" class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all sport-btn-active">
+                <i data-lucide="circle-dot" class="w-3 h-3"></i> Sepak Bola
+            </button>
+            <button id="btn-futsal" onclick="setSport('futsal')" class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all text-gray-500">
+                <i data-lucide="zap" class="w-3 h-3"></i> Futsal
+            </button>
+        </div>
+
+        <div id="view-squad" class="block animate-fade-in">
             <div class="sticky top-16 z-40 bg-brand-dark/90 backdrop-blur-xl py-4 -mx-5 px-5 mb-4 border-b border-white/5">
-                <div class="relative flex-1 mb-4">
-                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
-                    <input type="text" id="playerSearch" oninput="runFilter()" placeholder="Cari nama, posisi, atau sekolah..." 
-                        class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm font-medium outline-none focus:border-brand-neon transition-colors text-white placeholder-gray-500">
+                <div class="relative mb-4">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                    <input type="text" id="playerSearch" oninput="runFilter()" placeholder="Cari pemain..." class="w-full bg-brand-surface border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm font-medium outline-none focus:border-brand-neon transition-colors text-white">
                 </div>
                 <div class="flex gap-2 overflow-x-auto hide-scroll">
-                    <button onclick="setPosFilter('ALL', this)" class="pos-btn bg-brand-blue text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase border border-brand-blue transition-all">Semua</button>
-                    <button onclick="setPosFilter('GK', this)" class="pos-btn text-gray-500 bg-white/5 px-6 py-2 rounded-xl text-[9px] font-bold uppercase border border-white/10 transition-all">GK</button>
-                    <button onclick="setPosFilter('DEF', this)" class="pos-btn text-gray-500 bg-white/5 px-6 py-2 rounded-xl text-[9px] font-bold uppercase border border-white/10 transition-all">DEF</button>
-                    <button onclick="setPosFilter('MID', this)" class="pos-btn text-gray-500 bg-white/5 px-6 py-2 rounded-xl text-[9px] font-bold uppercase border border-white/10 transition-all">MID</button>
-                    <button onclick="setPosFilter('FWD', this)" class="pos-btn text-gray-500 bg-white/5 px-6 py-2 rounded-xl text-[9px] font-bold uppercase border border-white/10 transition-all">FWD</button>
+                    <button onclick="setPosFilter('ALL', this)" class="pos-btn bg-brand-neon text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase border border-brand-neon">Semua</button>
+                    <button onclick="setPosFilter('GK', this)" class="pos-btn bg-white/5 text-gray-500 px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/5">GK</button>
+                    <button onclick="setPosFilter('DEF', this)" class="pos-btn bg-white/5 text-gray-500 px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/5">DEF</button>
+                    <button onclick="setPosFilter('MID', this)" class="pos-btn bg-white/5 text-gray-500 px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/5">MID</button>
+                    <button onclick="setPosFilter('FWD', this)" class="pos-btn bg-white/5 text-gray-500 px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/5">FWD</button>
                 </div>
             </div>
             <div id="playerGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        </div>
+
+        <div id="view-gallery" class="hidden animate-fade-in">
+            <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5"></div>
         </div>
     </main>
 
@@ -114,41 +131,116 @@
 
     <div id="fullProfilePage" class="fixed inset-0 z-[200] hidden bg-brand-dark overflow-y-auto transition-transform duration-500 translate-x-full"></div>
 
+    <nav class="fixed bottom-0 w-full z-[110] bg-brand-surface/95 backdrop-blur-2xl border-t border-white/5 pb-safe">
+        <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2 text-gray-500">
+            <a href="/" class="flex flex-col items-center w-full"><i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i><span class="text-[9px] font-bold uppercase">Ekosistem</span></a>
+            <a href="/tsl/" class="flex flex-col items-center w-full"><i data-lucide="trophy" class="w-5 h-5 mb-1"></i><span class="text-[9px] font-bold uppercase">TSL Liga</span></a>
+            <button class="flex flex-col items-center w-full text-brand-neon"><i data-lucide="shield" class="w-5 h-5 mb-1"></i><span class="text-[9px] font-bold uppercase">MNA Squad</span></button>
+        </div>
+    </nav>
+
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbw993ZoUft52Da4SWg-9l4rDFDxk0O_bjH-0_gzmBMOCJm4PGL-rPfJO5wWtJVzsf47SQ/exec'; 
-        let rawData = { mnafc: { pemain: [], statistik: {} }, futsal: { pemain: [], statistik: {} } };
-        let activeSport = 'mnafc'; // Mode Default
+        let rawData = { mnafc: { pemain: [], statistik: {} }, futsal: { pemain: [], statistik: {} }, galeri: [] };
+        let activeSport = 'mnafc'; // 'mnafc' atau 'futsal'
         let activePos = 'ALL';
 
-        const val = (d, f = "-") => (d === "" || d === null || d === undefined) ? f : d;
+        const val = (data, fallback = "-") => (data === "" || data === null || data === undefined) ? fallback : data;
+
+        // FUNGSI UTAMA: SWITCH CABANG OLAHRAGA
+        function setSport(sport) {
+            activeSport = sport;
+            document.getElementById('btn-fc').className = `flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${sport === 'mnafc' ? 'sport-btn-active' : 'text-gray-500'}`;
+            document.getElementById('btn-futsal').className = `flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${sport === 'futsal' ? 'sport-btn-active' : 'text-gray-500'}`;
+            
+            const titleSpan = sport === 'mnafc' ? 'FC' : 'FUTSAL';
+            document.getElementById('header-title').innerHTML = `MNA <span class="text-brand-neon">${titleSpan}</span>`;
+            
+            updateUI();
+        }
+
+        // MESIN POSISI DINAMIS (Bola vs Futsal)
+        function getPosCoordsArray(pos) {
+            const p = val(pos).toUpperCase().trim();
+            const colorFWD = { bg: 'rgba(239, 68, 68, 0.45)', marker: '#ef4444' };
+            const colorMID = { bg: 'rgba(34, 197, 94, 0.45)', marker: '#22c55e' };
+            const colorDEF = { bg: 'rgba(59, 130, 246, 0.45)', marker: '#3b82f6' };
+            const colorGK  = { bg: 'rgba(234, 179, 8, 0.45)', marker: '#eab308' };
+
+            const basePositions = {
+                // FOOTBALL
+                'GK': { bottom: '8%', left: '50%', w: '40%', h: '15%', color: colorGK },
+                'CB': { bottom: '20%', left: '50%', w: '45%', h: '18%', color: colorDEF },
+                'LB': { bottom: '24%', left: '15%', w: '30%', h: '35%', color: colorDEF },
+                'RB': { bottom: '24%', left: '85%', w: '30%', h: '35%', color: colorDEF },
+                'CDM': { bottom: '40%', left: '50%', w: '45%', h: '18%', color: colorMID },
+                'CM': { bottom: '50%', left: '50%', w: '45%', h: '18%', color: colorMID },
+                'LW': { bottom: '75%', left: '18%', w: '30%', h: '25%', color: colorFWD },
+                'RW': { bottom: '75%', left: '82%', w: '30%', h: '25%', color: colorFWD },
+                'ST': { bottom: '82%', left: '50%', w: '40%', h: '15%', color: colorFWD },
+                // FUTSAL SPECIFIC
+                'ANC': { bottom: '25%', left: '50%', w: '60%', h: '25%', color: colorDEF }, // Anchor
+                'FLK': { bottom: '50%', left: '50%', w: '80%', h: '30%', color: colorMID }, // Flank
+                'FLK-L': { bottom: '50%', left: '15%', w: '25%', h: '40%', color: colorMID },
+                'FLK-R': { bottom: '50%', left: '85%', w: '25%', h: '40%', color: colorMID },
+                'PVT': { bottom: '80%', left: '50%', w: '50%', h: '20%', color: colorFWD }, // Pivot
+            };
+
+            const parts = p.split('/').map(x => x.trim());
+            let results = [];
+            parts.forEach(part => {
+                if (basePositions[part]) {
+                    results.push({ ...basePositions[part], label: part });
+                }
+            });
+            return results;
+        }
+
+        // MESIN UMUR OTOMATIS
+        function processPlayerData(players) {
+            return players.map(p => {
+                let dateStr = val(p.tanggal_lahir, '-');
+                const parts = dateStr.split(/[\/\-]/);
+                let birthDate = parts.length === 3 ? new Date(parseInt(parts[2] < 100 ? "20"+parts[2] : parts[2]), parseInt(parts[1])-1, parseInt(parts[0])) : null;
+                
+                if (birthDate && !isNaN(birthDate)) {
+                    const today = new Date();
+                    let years = today.getFullYear() - birthDate.getFullYear();
+                    let months = today.getMonth() - birthDate.getMonth();
+                    if (months < 0) { years--; months += 12; }
+                    p.umur_detail = `${years}th ${months}bln`;
+                    p.kategori_auto = years < 16 ? 'U-15' : (years <= 17 ? 'U-17' : 'SENIOR');
+                    p.tgl_format = `${String(birthDate.getDate()).padStart(2,'0')}/${String(birthDate.getMonth()+1).padStart(2,'0')}/${String(birthDate.getFullYear()).slice(-2)}`;
+                } else {
+                    p.umur_detail = '-'; p.kategori_auto = '-'; p.tgl_format = dateStr;
+                }
+                return p;
+            });
+        }
 
         async function init() {
             lucide.createIcons();
-            const cache = localStorage.getItem('mnafc_multisport_cache');
-            if (cache) { rawData = JSON.parse(cache); updateUI(); }
+            const cache = localStorage.getItem('mna_multi_cache');
+            if (cache) { 
+                rawData = JSON.parse(cache); 
+                updateUI(); 
+            }
             try {
                 const res = await fetch(`${API_URL}?t=${Date.now()}`);
                 const data = await res.json();
+                data.mnafc.pemain = processPlayerData(data.mnafc.pemain);
+                data.futsal.pemain = processPlayerData(data.futsal.pemain);
                 rawData = data;
-                localStorage.setItem('mnafc_multisport_cache', JSON.stringify(data));
+                localStorage.setItem('mna_multi_cache', JSON.stringify(data));
                 updateUI();
             } catch (e) { console.error(e); }
         }
 
-        function switchSport(sport) {
-            activeSport = sport;
-            // Update UI Tombol
-            document.getElementById('btn-fc').className = sport === 'mnafc' ? "px-4 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg bg-brand-blue text-white shadow-lg" : "px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg text-gray-500";
-            document.getElementById('btn-futsal').className = sport === 'futsal' ? "px-4 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg bg-brand-blue text-white shadow-lg" : "px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg text-gray-500";
-            
-            document.getElementById('brand-name').innerText = sport === 'mnafc' ? 'MNA FC' : 'MNA FUTSAL';
-            updateUI();
-        }
-
         function updateUI() {
-            const data = rawData[activeSport];
-            renderStats(data.statistik);
+            const currentData = rawData[activeSport];
+            renderStats(currentData.statistik);
             runFilter();
+            renderGallery(rawData.galeri);
         }
 
         function renderStats(s) {
@@ -157,155 +249,138 @@
             document.getElementById('win-rate').innerText = (total > 0 ? Math.round((m/total)*100) : 0) + '%';
             document.getElementById('match-record').innerText = `${m}-${s_}-${k}`;
             const diff = parseInt(val(s.gol_masuk, 0)) - parseInt(val(s.gol_kemasukan, 0));
-            document.getElementById('goal-diff').innerText = (diff >= 0 ? '+' : '') + diff;
-        }
-
-        // MESIN POSISI (Sepak Bola & Futsal)
-        function getCoords(pos) {
-            const p = val(pos).toUpperCase().trim();
-            const colors = { F: {bg: 'rgba(239,68,68,0.4)', m: '#ef4444'}, M: {bg: 'rgba(34,197,94,0.4)', m: '#22c55e'}, D: {bg: 'rgba(59,130,246,0.4)', m: '#3b82f6'}, G: {bg: 'rgba(234,179,8,0.4)', m: '#eab308'}};
-            
-            const positions = {
-                // FOOTBALL
-                'GK': { b: '8%', l: '50%', w: '40%', h: '15%', c: colors.G },
-                'CB': { b: '22%', l: '50%', w: '45%', h: '18%', c: colors.D },
-                'LB': { b: '26%', l: '15%', w: '30%', h: '35%', c: colors.D },
-                'RB': { b: '26%', l: '85%', w: '30%', h: '35%', c: colors.D },
-                'CDM': { b: '42%', l: '50%', w: '45%', h: '18%', c: colors.M },
-                'CM': { b: '52%', l: '50%', w: '45%', h: '18%', c: colors.M },
-                'CAM': { b: '65%', l: '50%', w: '45%', h: '15%', c: colors.M },
-                'LW': { b: '78%', l: '18%', w: '30%', h: '25%', c: colors.F },
-                'RW': { b: '78%', l: '82%', w: '30%', h: '25%', c: colors.F },
-                'ST': { b: '88%', l: '50%', w: '40%', h: '15%', c: colors.F },
-                // FUTSAL SPECIAL
-                'ANC': { b: '25%', l: '50%', w: '50%', h: '20%', c: colors.D },
-                'FLK-L': { b: '50%', l: '15%', w: '25%', h: '40%', c: colors.M },
-                'FLK-R': { b: '50%', l: '85%', w: '25%', h: '40%', c: colors.M },
-                'FLK': { b: '50%', l: '50%', w: '70%', h: '30%', c: colors.M },
-                'PVT': { b: '80%', l: '50%', w: '50%', h: '20%', c: colors.F }
-            };
-
-            const parts = p.split('/').map(x => x.trim());
-            let results = [];
-            parts.forEach(part => { if (positions[part]) results.push({...positions[part], label: part}); });
-            if (results.length === 0) results.push({ b: '50%', l: '50%', w: '40%', h: '20%', c: {bg: 'rgba(156,163,175,0.4)', m: '#9ca3af'}, label: p });
-            return results;
-        }
-
-        function runFilter() {
-            const query = document.getElementById('playerSearch').value.toLowerCase();
-            const list = rawData[activeSport].pemain;
-            const filtered = list.filter(p => {
-                const searchTxt = (val(p.nama) + val(p.sekolah) + val(p.posisi)).toLowerCase().includes(query);
-                const pos = val(p.posisi).toUpperCase();
-                let cat = 'FWD';
-                if (['GK'].includes(pos)) cat = 'GK';
-                else if (['CB','LB','RB','ANC'].some(x => pos.includes(x))) cat = 'DEF';
-                else if (['CM','CDM','CAM','FLK'].some(x => pos.includes(x))) cat = 'MID';
-                return searchTxt && (activePos === 'ALL' || cat === activePos);
-            });
-            renderPlayers(filtered);
+            document.getElementById('goal-diff').innerText = (diff > 0 ? '+' : '') + diff;
         }
 
         function renderPlayers(list) {
             const grid = document.getElementById('playerGrid');
-            grid.innerHTML = list.map((p, i) => `
-                <div onclick="showPreview(${rawData[activeSport].pemain.indexOf(p)})" class="player-card glass-panel rounded-2xl p-4 flex items-center gap-4 relative overflow-hidden cursor-pointer stagger-item" style="animation-delay: ${i*0.05}s">
-                    <div class="absolute -right-2 -bottom-6 text-8xl font-black italic text-white/5 pointer-events-none">${val(p.nomor, '0')}</div>
-                    <div class="w-16 h-16 rounded-xl overflow-hidden bg-white/10 shrink-0 border border-white/10 z-10"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div>
-                    <div class="flex-1 min-w-0 z-10">
+            grid.innerHTML = list.length === 0 ? '<div class="col-span-full py-10 text-center text-gray-500 uppercase text-[10px] font-bold">Data Kosong</div>' : list.map((p, i) => `
+                <div onclick="showPlayerDetail('${activeSport}', ${rawData[activeSport].pemain.indexOf(p)})" class="player-card glass-panel rounded-2xl p-4 flex items-center gap-4 relative overflow-hidden stagger-item" style="animation-delay: ${i*0.05}s">
+                    <div class="absolute -right-2 -bottom-6 text-8xl font-black italic text-white/5 pointer-events-none">${val(p.nomor, '00')}</div>
+                    <img src="${val(p.link_foto, 'https://via.placeholder.com/200')}" class="w-16 h-16 rounded-xl object-cover border border-white/10 z-10">
+                    <div class="flex-1 z-10">
                         <div class="flex justify-between items-start">
-                            <h4 class="text-sm font-black uppercase text-white truncate">${val(p.nama)}</h4>
+                            <h4 class="text-sm font-black uppercase text-white truncate w-32">${val(p.nama)}</h4>
                             <span class="text-[9px] font-black bg-brand-neon/20 text-brand-neon px-2 py-0.5 rounded border border-brand-neon/20">${val(p.posisi)}</span>
                         </div>
-                        <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mt-1">${val(p.sekolah)}</p>
+                        <p class="text-[8px] text-gray-500 font-bold uppercase tracking-widest mt-1">${val(p.sekolah)}</p>
+                        <div class="flex gap-4 mt-2">
+                            <div><p class="text-[6px] text-gray-500 uppercase">Kategori</p><p class="text-[9px] font-bold text-white uppercase">${val(p.kategori_auto)}</p></div>
+                            <div><p class="text-[6px] text-gray-500 uppercase">Gol</p><p class="text-[9px] font-bold text-brand-gold">${val(p.gol, 0)}</p></div>
+                        </div>
                     </div>
                 </div>`).join('');
             lucide.createIcons();
         }
 
-        function showPreview(idx) {
-            const p = rawData[activeSport].pemain[idx];
+        function runFilter() {
+            const query = document.getElementById('playerSearch').value.toLowerCase();
+            const currentPlayers = rawData[activeSport].pemain;
+            const filtered = currentPlayers.filter(p => {
+                const searchTxt = (val(p.nama) + val(p.sekolah) + val(p.posisi)).toLowerCase().includes(query);
+                const pos = val(p.posisi).toUpperCase();
+                let cat = 'LAIN';
+                if(pos.includes('GK')) cat = 'GK';
+                else if(['CB','LB','RB','ANC'].some(x => pos.includes(x))) cat = 'DEF';
+                else if(['CM','CDM','CAM','LM','RM','FLK'].some(x => pos.includes(x))) cat = 'MID';
+                else if(['ST','CF','LW','RW','SS','PVT'].some(x => pos.includes(x))) cat = 'FWD';
+                return searchTxt && (activePos === 'ALL' || cat === activePos);
+            });
+            renderPlayers(filtered);
+        }
+
+        function setPosFilter(pos, btn) {
+            activePos = pos;
+            document.querySelectorAll('.pos-btn').forEach(b => b.className = "pos-btn bg-white/5 text-gray-500 px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/5");
+            btn.className = "pos-btn bg-brand-neon text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase border border-brand-neon";
+            runFilter();
+        }
+
+        function showPlayerDetail(sport, idx) {
+            const p = rawData[sport].pemain[idx];
             document.getElementById('modalContent').innerHTML = `
-                <div class="relative bg-brand-surface p-6">
-                    <div class="flex gap-5 items-center mb-6">
-                        <div class="w-24 h-24 rounded-2xl overflow-hidden border-2 border-brand-neon shadow-2xl shadow-brand-neon/20"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div>
-                        <div>
-                            <h2 class="text-xl font-black uppercase text-white leading-none">${val(p.nama)}</h2>
-                            <p class="text-[10px] font-bold text-brand-neon mt-2 uppercase tracking-widest">#${val(p.nomor)} • ${val(p.posisi)}</p>
-                        </div>
+                <div class="relative bg-brand-surface p-6 pb-8">
+                    <button onclick="closeModal()" class="absolute top-5 right-5 text-white/50"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    <div class="flex flex-col items-center text-center mt-4">
+                        <img src="${val(p.link_foto)}" class="w-24 h-24 rounded-2xl object-cover border-2 border-brand-neon mb-4">
+                        <h2 class="text-xl font-black text-white uppercase">${val(p.nama)}</h2>
+                        <p class="text-[10px] font-bold text-brand-neon tracking-widest uppercase">#${val(p.nomor)} • ${val(p.posisi)}</p>
                     </div>
-                    <button onclick="bukaDossier(${idx})" class="w-full bg-brand-neon text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-brand-neon/30">Buka Dossier Pemain</button>
+                    <div class="grid grid-cols-3 gap-2 mt-6">
+                        <div class="bg-white/5 p-3 rounded-xl text-center"><p class="text-[7px] text-gray-500 uppercase">Usia</p><p class="text-[10px] font-bold text-white">${val(p.umur_detail)}</p></div>
+                        <div class="bg-white/5 p-3 rounded-xl text-center"><p class="text-[7px] text-gray-500 uppercase">Kaki</p><p class="text-[10px] font-bold text-white uppercase">${val(p.kaki)}</p></div>
+                        <div class="bg-white/5 p-3 rounded-xl text-center"><p class="text-[7px] text-gray-500 uppercase">Gol</p><p class="text-[10px] font-bold text-brand-gold">${val(p.gol, 0)}</p></div>
+                    </div>
+                    <button onclick="bukaProfilPenuh('${sport}', ${idx})" class="w-full bg-brand-neon py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest mt-6">Buka Dossier Pemain</button>
                 </div>`;
             document.getElementById('playerModal').classList.remove('hidden');
             lucide.createIcons();
         }
 
-        function bukaDossier(idx) {
+        function bukaProfilPenuh(sport, idx) {
             closeModal();
-            const p = rawData[activeSport].pemain[idx];
-            const coords = getCoords(p.posisi);
-            const isFutsal = activeSport === 'futsal';
-            
-            const markers = coords.map(c => `
-                <div class="position-zone" style="bottom:${c.b}; left:${c.l}; width:${c.w}; height:${c.h}; background:${c.c.bg};"></div>
-                <div class="player-marker" style="bottom:${c.b}; left:${c.l}; background:${c.c.m}; box-shadow:0 0 15px ${c.c.m};">${c.label}</div>
-            `).join('');
+            const p = rawData[sport].pemain[idx];
+            const coords = getPosCoordsArray(p.posisi);
+            const altCoords = getPosCoordsArray(val(p.posisi_alt, ''));
+            const isFutsal = sport === 'futsal';
 
-            const page = document.getElementById('fullProfilePage');
-            page.innerHTML = `
-                <div class="sticky top-0 z-50 glass-panel border-b border-white/10 px-5 py-4 flex items-center justify-between">
-                    <button onclick="tutupDossier()" class="text-gray-400 text-[10px] font-black uppercase tracking-widest flex items-center gap-1"><i data-lucide="chevron-left" class="w-4 h-4"></i> Kembali</button>
-                    <span class="text-[9px] font-black text-brand-neon uppercase tracking-widest">${activeSport === 'mnafc' ? 'Football' : 'Futsal'} Dossier</span>
-                </div>
-                <div class="p-6 space-y-8">
-                    <div class="text-center">
-                        <div class="w-32 h-32 mx-auto rounded-[2.5rem] overflow-hidden border-2 border-brand-neon shadow-2xl mb-4"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div>
-                        <h2 class="text-3xl font-black uppercase text-white tracking-tighter">${val(p.nama)}</h2>
-                        <p class="text-xs font-bold text-gray-500 uppercase tracking-[0.3em] mt-1">${val(p.sekolah)}</p>
-                    </div>
-                    
-                    <div class="glass-panel p-6 rounded-[2rem] border border-white/5">
-                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="crosshair" class="w-4 h-4"></i> Tactical View</h3>
-                        <div class="pitch-wrapper">
-                            <div class="pitch-container ${isFutsal ? 'pitch-futsal' : 'pitch-football'}">
-                                <div class="pitch-half"></div>
-                                <div class="pitch-circle pitch-line"></div>
-                                <div class="pitch-line" style="top:0; left:20%; width:60%; height:18%; border-top:0;"></div>
-                                <div class="pitch-line" style="bottom:0; left:20%; width:60%; height:18%; border-bottom:0;"></div>
-                                ${markers}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="glass-panel p-4 rounded-2xl border border-white/5 text-center">
-                            <p class="text-[8px] text-gray-500 uppercase font-black mb-1">Gol / Poin</p>
-                            <p class="text-2xl font-black text-brand-gold">${val(p.gol, 0)}</p>
-                        </div>
-                        <div class="glass-panel p-4 rounded-2xl border border-white/5 text-center">
-                            <p class="text-[8px] text-gray-500 uppercase font-black mb-1">Kaki Kuat</p>
-                            <p class="text-lg font-black text-white uppercase">${val(p.kaki)}</p>
-                        </div>
+            const pitchHTML = `
+                <div class="pitch-wrapper ${isFutsal ? 'pitch-futsal' : 'pitch-football'}">
+                    <div class="pitch-container">
+                        <div class="pitch-half"></div><div class="pitch-circle pitch-line"></div>
+                        <div class="pitch-penalty pitch-line"></div><div class="pitch-penalty-bottom pitch-line"></div>
+                        ${coords.map(c => `<div class="position-zone" style="bottom:${c.bottom};left:${c.left};width:${c.w};height:${c.h};background:${c.color.bg}"></div><div class="player-marker" style="bottom:${c.bottom};left:${c.left};background:${c.color.marker}">${c.label}</div>`).join('')}
+                        ${altCoords.map(c => `<div class="player-marker-alt" style="bottom:${c.bottom};left:${c.left};background:${c.color.marker}">${c.label}</div>`).join('')}
                     </div>
                 </div>`;
-            page.classList.remove('hidden');
-            setTimeout(() => page.classList.add('page-slide-in'), 10);
+
+            document.getElementById('fullProfilePage').innerHTML = `
+                <div class="p-6 pb-32">
+                    <button onclick="tutupProfilPenuh()" class="flex items-center gap-2 text-gray-500 font-bold uppercase text-[10px] mb-8"><i data-lucide="chevron-left" class="w-4 h-4"></i> Kembali</button>
+                    <div class="flex items-center gap-6 mb-8">
+                        <img src="${val(p.link_foto)}" class="w-24 h-24 rounded-3xl object-cover border-2 border-brand-neon">
+                        <div>
+                            <h2 class="text-3xl font-black text-white uppercase leading-none mb-2">${val(p.nama)}</h2>
+                            <span class="text-xs font-black text-brand-neon bg-brand-neon/10 px-3 py-1 rounded-lg uppercase">POS: ${val(p.posisi)}</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-[2rem] border border-white/5 mb-6">
+                        <h3 class="text-[10px] font-black text-gray-500 uppercase mb-4 tracking-[0.2em]">Deployment Taktis</h3>
+                        ${pitchHTML}
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="glass-panel p-4 rounded-2xl"><p class="text-[8px] text-gray-500 uppercase">Tgl Lahir</p><p class="text-sm font-black text-white">${val(p.tgl_format)}</p></div>
+                        <div class="glass-panel p-4 rounded-2xl"><p class="text-[8px] text-gray-500 uppercase">Kategori</p><p class="text-sm font-black text-white uppercase">${val(p.kategori_auto)}</p></div>
+                        <div class="glass-panel p-4 rounded-2xl"><p class="text-[8px] text-gray-500 uppercase">Postur</p><p class="text-sm font-black text-white">${val(p.tinggi)}cm / ${val(p.berat)}kg</p></div>
+                        <div class="glass-panel p-4 rounded-2xl"><p class="text-[8px] text-gray-500 uppercase">Instansi</p><p class="text-sm font-black text-white uppercase truncate">${val(p.sekolah)}</p></div>
+                    </div>
+                </div>`;
+            document.getElementById('fullProfilePage').classList.remove('hidden');
+            setTimeout(() => document.getElementById('fullProfilePage').classList.add('page-slide-in'), 10);
             lucide.createIcons();
         }
 
-        function tutupDossier() {
-            const p = document.getElementById('fullProfilePage');
-            p.classList.remove('page-slide-in');
-            setTimeout(() => p.classList.add('hidden'), 500);
+        function tutupProfilPenuh() {
+            document.getElementById('fullProfilePage').classList.remove('page-slide-in');
+            setTimeout(() => document.getElementById('fullProfilePage').classList.add('hidden'), 500);
         }
 
         function closeModal() { document.getElementById('playerModal').classList.add('hidden'); }
-        function setPosFilter(pos, btn) {
-            activePos = pos;
-            document.querySelectorAll('.pos-btn').forEach(b => b.className = "pos-btn text-gray-500 bg-white/5 px-6 py-2 rounded-xl text-[9px] font-bold uppercase border border-white/10 transition-all");
-            btn.className = "pos-btn bg-brand-blue text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase border border-brand-blue transition-all";
-            runFilter();
+        function switchMode(mode) {
+            const isSquad = mode === 'squad';
+            document.getElementById('view-squad').classList.toggle('hidden', !isSquad);
+            document.getElementById('view-gallery').classList.toggle('hidden', isSquad);
+            document.getElementById('tab-squad').className = isSquad ? "px-4 py-1.5 text-[10px] font-black uppercase rounded-lg bg-brand-neon text-white shadow-sm transition-all" : "px-4 py-1.5 text-[10px] font-bold uppercase text-gray-500 hover:text-white transition-all";
+            document.getElementById('tab-gallery').className = !isSquad ? "px-4 py-1.5 text-[10px] font-black uppercase rounded-lg bg-brand-neon text-white shadow-sm transition-all" : "px-4 py-1.5 text-[10px] font-bold uppercase text-gray-500 hover:text-white transition-all";
+        }
+
+        function renderGallery(list) {
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = list.map(item => `
+                <a href="${item.link_drive}" target="_blank" class="glass-panel rounded-2xl p-3 block border border-white/5">
+                    <img src="${item.preview_image}" class="w-full aspect-video object-cover rounded-xl opacity-80">
+                    <p class="text-[9px] font-black text-white uppercase mt-3 truncate">${val(item.kegiatan)}</p>
+                </a>`).join('');
         }
 
         window.addEventListener('DOMContentLoaded', init);
