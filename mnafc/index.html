@@ -181,24 +181,49 @@
 
         const val = (data, fallback = "-") => (data === "" || data === null || data === undefined) ? fallback : data;
 
-        // FUNGSI PEMBANTU: PARSING TANGGAL FORMAT INDONESIA (DD/MM/YYYY)
+        // MESIN PARSING TANGGAL (BULLETPROOF - MENDUKUNG DD/MM/YY)
         function parseIndoDate(dateStr) {
             if (!dateStr || dateStr === '-') return null;
-            // Menangani DD/MM/YYYY atau DD-MM-YYYY
-            const parts = dateStr.split(/[\/\-]/);
+            
+            // Membuang data jam yang mungkin ikut dari Spreadsheet (misal: 17/08/08 00:00:00)
+            let cleanStr = String(dateStr).trim().split(' ')[0].split('T')[0];
+            const parts = cleanStr.split(/[\/\-]/);
+            
             if (parts.length === 3) {
-                let day = parseInt(parts[0]);
-                let month = parseInt(parts[1]) - 1; // JS bulan mulai dari 0
-                let year = parseInt(parts[2]);
-                if (year < 100) year += 2000; // Menangani format YY
-                return new Date(year, month, day);
+                let p1 = parseInt(parts[0], 10);
+                let p2 = parseInt(parts[1], 10);
+                let p3 = parseInt(parts[2], 10);
+                
+                // Format 1: YYYY/MM/DD atau YYYY-MM-DD
+                if (p1 > 1000) {
+                    return new Date(p1, p2 - 1, p3);
+                } 
+                // Format 2: DD/MM/YY atau DD/MM/YYYY
+                else {
+                    let day = p1;
+                    let month = p2 - 1;
+                    let year = p3;
+                    
+                    // Failsafe: Jika locale spreadsheet terbalik menjadi MM/DD/YYYY
+                    if (month > 11) {
+                        day = p2;
+                        month = p1 - 1;
+                    }
+                    
+                    // Failsafe: Konversi YY menjadi YYYY (misal '08' menjadi '2008')
+                    if (year < 100) {
+                        year += (year > 50 ? 1900 : 2000); 
+                    }
+                    return new Date(year, month, day);
+                }
             }
-            // Failsafe jika format bawaan spreadsheet sudah benar secara sistem
+            
+            // Native fallback
             const attempt = new Date(dateStr);
             return isNaN(attempt) ? null : attempt;
         }
 
-        // MESIN PENGHITUNG UMUR & KATEGORI (ULTRA PRECISION)
+        // MESIN PENGHITUNG UMUR & KATEGORI
         function processPlayerData(players) {
             return players.map(p => {
                 const birthDate = parseIndoDate(p.tanggal_lahir);
@@ -207,7 +232,7 @@
                 p.kategori_auto = '-';
 
                 if (birthDate) {
-                    // 1. Format dd/mm/yy untuk tampilan
+                    // 1. Memaksa Format Final ke DD/MM/YY
                     const dd = String(birthDate.getDate()).padStart(2, '0');
                     const mm = String(birthDate.getMonth() + 1).padStart(2, '0');
                     const yy = String(birthDate.getFullYear()).slice(-2);
@@ -231,7 +256,7 @@
                     p.umur_detail = `${years}th ${months}bln ${days}hr`;
                     
                     // 3. Klasifikasi Kategori Tim
-                    if (years <= 15) {
+                    if (years < 16) {
                         p.kategori_auto = 'U-15';
                     } else if (years >= 16 && years <= 17) {
                         p.kategori_auto = 'U-17';
@@ -259,11 +284,13 @@
                 'RB': { bottom: '24%', left: '85%', w: '30%', h: '35%', color: colorDEF },
                 'LWB': { bottom: '35%', left: '15%', w: '30%', h: '30%', color: colorDEF },
                 'RWB': { bottom: '35%', left: '85%', w: '30%', h: '30%', color: colorDEF },
+                
                 'CDM': { bottom: '40%', left: '50%', w: '45%', h: '18%', color: colorMID },
                 'CM': { bottom: '50%', left: '50%', w: '45%', h: '18%', color: colorMID },
                 'LM': { bottom: '55%', left: '15%', w: '30%', h: '30%', color: colorMID },
                 'RM': { bottom: '55%', left: '85%', w: '30%', h: '30%', color: colorMID },
                 'CAM': { bottom: '62%', left: '50%', w: '45%', h: '15%', color: colorMID },
+                
                 'SS': { bottom: '70%', left: '50%', w: '40%', h: '15%', color: colorFWD },
                 'LW': { bottom: '75%', left: '18%', w: '30%', h: '25%', color: colorFWD },
                 'LWG': { bottom: '75%', left: '18%', w: '30%', h: '25%', color: colorFWD },
@@ -358,12 +385,15 @@
             const filtered = rawData.pemain.filter(p => {
                 const searchStr = (val(p.nama) + val(p.sekolah) + val(p.posisi) + val(p.posisi_alt, '')).toLowerCase();
                 const matchTxt = searchStr.includes(query);
+                
                 const posTxt = val(p.posisi).toUpperCase();
                 let bPos = 'LAINNYA';
+                
                 if (posTxt.includes('GK')) bPos = 'GK';
                 else if (['CB','LB','RB','RWB','LWB'].some(x => posTxt.includes(x))) bPos = 'DEF';
                 else if (['CM','CDM','CAM','RM','LM'].some(x => posTxt.includes(x))) bPos = 'MID';
                 else if (['ST','CF','RW','LW','RWG','LWG','SS'].some(x => posTxt.includes(x))) bPos = 'FWD';
+
                 return matchTxt && (activePos === 'ALL' || bPos === activePos);
             });
             renderPlayers(filtered);
@@ -425,16 +455,20 @@
             const mainCoordsArray = getPosCoordsArray(p.posisi);
             const altPosRaw = val(p.posisi_alt, '');
             const altCoordsArray = (altPosRaw && altPosRaw !== '-') ? getPosCoordsArray(altPosRaw) : [];
+            
             let pitchElementsHTML = mainCoordsArray.map(c => `
                 <div class="position-zone" style="bottom: ${c.bottom}; left: ${c.left}; width: ${c.w}; height: ${c.h}; background: ${c.color.bg};"></div>
                 <div class="player-marker" style="bottom: ${c.bottom}; left: ${c.left}; background: ${c.color.marker}; box-shadow: 0 0 15px ${c.color.marker};">${c.label}</div>
             `).join('');
+
             pitchElementsHTML += altCoordsArray.map(c => `
                 <div class="player-marker-alt" style="bottom: ${c.bottom}; left: ${c.left}; background: ${c.color.marker};">${c.label}</div>
             `).join('');
+
             const altBadgeHTML = (altPosRaw && altPosRaw !== '-') 
                 ? `<span class="text-xs font-black bg-white/5 text-gray-300 border border-white/10 px-4 py-1.5 rounded-lg uppercase shadow-sm">ALT: ${altPosRaw}</span>` 
                 : '';
+
             const page = document.getElementById('fullProfilePage');
             page.innerHTML = `
                 <div class="sticky top-0 z-50 glass-panel border-b border-white/10 px-5 py-4 flex items-center justify-between">
@@ -443,6 +477,7 @@
                     </button>
                     <span class="text-[10px] font-black text-brand-neon uppercase tracking-widest">Player Dossier</span>
                 </div>
+
                 <div class="relative pt-10 pb-16 px-5 flex flex-col items-center justify-center border-b border-white/5 bg-gradient-to-b from-brand-blue/10 to-brand-dark">
                     <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
                     <div class="relative z-10 w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] overflow-hidden border-2 border-brand-neon shadow-[0_0_30px_rgba(59,130,246,0.3)] mb-6">
@@ -455,7 +490,9 @@
                         <span class="text-xs font-black bg-white/10 text-white border border-white/10 px-4 py-1.5 rounded-lg uppercase shadow-sm">#${val(p.nomor, '0')}</span>
                     </div>
                 </div>
+
                 <div class="max-w-4xl mx-auto px-5 py-8 space-y-8 pb-32">
+                    
                     <div class="glass-panel p-6 rounded-[2rem] border border-white/5">
                         <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="crosshair" class="w-4 h-4 text-brand-neon"></i> Tactical Deployment</h3>
                         <div class="pitch-wrapper">
@@ -468,6 +505,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="glass-panel p-6 rounded-[2rem] border border-white/5">
                         <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4 text-brand-neon"></i> Biometrik & Fisik</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -490,6 +528,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="glass-panel p-6 rounded-[2rem] border border-white/5 flex flex-col justify-center">
                             <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="award" class="w-4 h-4 text-brand-gold"></i> Rekor Performa</h3>
@@ -498,6 +537,7 @@
                                 <p class="text-6xl font-black text-brand-gold drop-shadow-[0_0_15px_rgba(215,182,125,0.4)]">${val(p.gol, 0)}</p>
                             </div>
                         </div>
+
                         <div class="glass-panel p-6 rounded-[2rem] border border-white/5 flex flex-col justify-center">
                             <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="graduation-cap" class="w-4 h-4 text-brand-neon"></i> Afiliasi Akademik</h3>
                             <div class="bg-white/5 p-8 rounded-2xl text-center border border-white/5 flex-1 flex flex-col justify-center">
@@ -508,6 +548,7 @@
                     </div>
                 </div>
             `;
+            
             page.classList.remove('hidden');
             setTimeout(() => { page.classList.add('page-slide-in'); }, 10);
             document.body.style.overflow = 'hidden';
@@ -532,7 +573,7 @@
         }
         function renderGallery(list) {
             const grid = document.getElementById('galleryGrid');
-            if (!list || list.length === 0) { grid.innerHTML = `<div class="col-span-full py-16 text-center text-[10px] font-black text-gray-500 uppercase tracking-widest">Kosong</div>`; return; }
+            if (!list || list.length === 0) { grid.innerHTML = `<div class="col-span-full py-16 text-center text-[10px] font-black text-gray-500 uppercase tracking-widest border border-dashed border-gray-300 dark:border-white/10 rounded-2xl">Kosong</div>`; return; }
             grid.innerHTML = list.map((item, i) => `
                 <a href="${item.link_drive}" target="_blank" class="glass-panel rounded-2xl p-3 flex flex-col gap-3 relative overflow-hidden group stagger-item border border-white/5" style="animation-delay: ${i*0.05}s">
                     <div class="relative w-full aspect-video rounded-xl bg-brand-dark overflow-hidden">
