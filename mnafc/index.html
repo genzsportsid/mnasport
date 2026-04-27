@@ -25,12 +25,9 @@
         body { background-color: #050505; color: #ffffff; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .glass-panel { background: rgba(17, 17, 17, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .player-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .player-card:hover { transform: translateY(-5px); border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2); }
         
-        /* STACKED CARD EFFECT */
-        .stacked-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); background: #0a0a0a; border-top: 1px solid rgba(255,255,255,0.1); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); box-shadow: 0 -10px 20px rgba(0,0,0,0.6); }
-        .stacked-card:hover { transform: translateY(-16px); z-index: 50 !important; border-top-color: rgba(59, 130, 246, 0.5); box-shadow: 0 -15px 30px rgba(59, 130, 246, 0.2), 0 15px 20px rgba(0,0,0,0.8); }
-
-        /* TACTICAL PITCH ENGINE */
         .pitch-wrapper { position: relative; width: 100%; max-width: 380px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 1.5px solid rgba(255, 255, 255, 0.15); box-shadow: inset 0 0 40px rgba(0,0,0,0.5); }
         .pitch-wrapper::before { content: ""; display: block; padding-top: 145%; }
         .pitch-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: all 0.5s ease; }
@@ -44,26 +41,22 @@
         .player-marker { position: absolute; width: 34px; height: 34px; border: 2px solid white; border-radius: 50%; transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 9px; font-weight: 900; color: white; text-shadow: 0px 1px 3px rgba(0,0,0,0.8); z-index: 10; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
         .player-marker-alt { position: absolute; width: 30px; height: 30px; border: 2px dashed rgba(255,255,255,0.7); border-radius: 50%; transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 8px; font-weight: 800; color: rgba(255,255,255,0.8); z-index: 9; opacity: 0.6; }
 
-        /* LINEUP BUILDER */
         .lineup-slot { position: absolute; width: 40px; height: 40px; border-radius: 50%; transform: translate(-50%, 50%); z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); border: 2px dashed rgba(255,255,255,0.5); backdrop-filter: blur(4px); cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
         .lineup-slot:hover { border-color: white; transform: translate(-50%, 50%) scale(1.05); }
         .lineup-slot.active { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); transform: translate(-50%, 50%) scale(1.15); background: rgba(59, 130, 246, 0.3); z-index: 30; }
         .lineup-slot.filled { border-style: solid; border-color: white; background-size: cover; background-position: center; border-width: 2px; }
         .lineup-slot-label { position: absolute; bottom: -16px; white-space: nowrap; font-size: 8px; font-weight: 900; background: rgba(0,0,0,0.9); padding: 2px 6px; border-radius: 4px; color: white; border: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.05em; }
 
-        .pool-card { min-width: 70px; width: 70px; transition: all 0.2s; cursor: pointer; }
-        .pool-card:hover { transform: translateY(-3px); }
-        .pool-card:active { transform: scale(0.95); }
-        .pool-card.disabled { opacity: 0.2; pointer-events: none; filter: grayscale(100%); }
-
-        .stagger-item { animation: fadeUp 0.5s ease forwards; opacity: 0; transform: translateY(10px); }
+        .stagger-item { animation: fadeUp 0.5s ease forwards; opacity: 0; transform: translateY(15px); }
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
         
-        .action-btn { transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .action-btn:active { transform: scale(0.95); }
         .page-slide-in { transform: translateX(0) !important; }
+        
+        /* Animasi Berkedip FotMob Live */
+        .live-pulse { animation: pulseLive 1.5s infinite; }
+        @keyframes pulseLive { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body class="bg-brand-dark lg:pb-0 pb-32">
@@ -78,11 +71,11 @@
             <div class="flex items-center gap-2">
                 <div id="main-nav-tabs" class="flex bg-white/5 p-1 rounded-xl border border-white/10">
                     <button onclick="switchMode('squad')" id="tab-squad" class="px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all bg-brand-blue text-white shadow-lg">Squad</button>
+                    <button onclick="switchMode('matches')" id="tab-matches" class="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all text-gray-500 hover:text-white">Jadwal</button>
                     <button onclick="switchMode('gallery')" id="tab-gallery" class="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all text-gray-500 hover:text-white">Media</button>
                 </div>
-                <button id="btn-lock" onclick="openCoachGate()" class="p-2 ml-1 bg-brand-panel rounded-xl border border-white/10 text-brand-gold hover:bg-brand-gold hover:text-black transition-all shadow-lg group relative">
+                <button id="btn-lock" onclick="openCoachGate()" class="p-2 ml-1 bg-brand-panel rounded-xl border border-white/10 text-brand-gold hover:bg-brand-gold hover:text-black transition-all shadow-lg">
                     <i data-lucide="lock" class="w-4 h-4"></i>
-                    <span class="absolute -bottom-8 right-0 bg-black text-[8px] px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Coach Access</span>
                 </button>
             </div>
         </div>
@@ -114,21 +107,32 @@
                 </div>
                 <div id="filter-football" class="flex gap-2 overflow-x-auto hide-scroll pb-1">
                     <button onclick="setPosFilter('ALL', this, 'mnafc')" class="pos-btn-fc bg-brand-blue text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase border border-brand-blue transition-all whitespace-nowrap">Semua</button>
-                    <button onclick="setPosFilter('GK', this, 'mnafc')" class="pos-btn-fc text-gray-500 bg-white/5 px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">GK</button>
-                    <button onclick="setPosFilter('DEF', this, 'mnafc')" class="pos-btn-fc text-gray-500 bg-white/5 px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">DEF</button>
-                    <button onclick="setPosFilter('MID', this, 'mnafc')" class="pos-btn-fc text-gray-500 bg-white/5 px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">MID</button>
-                    <button onclick="setPosFilter('FWD', this, 'mnafc')" class="pos-btn-fc text-gray-500 bg-white/5 px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">FWD</button>
+                    <button onclick="setPosFilter('GK', this, 'mnafc')" class="pos-btn-fc text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">GK</button>
+                    <button onclick="setPosFilter('DEF', this, 'mnafc')" class="pos-btn-fc text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">DEF</button>
+                    <button onclick="setPosFilter('MID', this, 'mnafc')" class="pos-btn-fc text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">MID</button>
+                    <button onclick="setPosFilter('FWD', this, 'mnafc')" class="pos-btn-fc text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">FWD</button>
                 </div>
                 <div id="filter-futsal" class="hidden gap-2 overflow-x-auto hide-scroll pb-1">
                     <button onclick="setPosFilter('ALL', this, 'futsal')" class="pos-btn-fs bg-brand-blue text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase border border-brand-blue transition-all whitespace-nowrap">Semua</button>
-                    <button onclick="setPosFilter('GK', this, 'futsal')" class="pos-btn-fs text-gray-500 bg-white/5 px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">GK</button>
-                    <button onclick="setPosFilter('ANC', this, 'futsal')" class="pos-btn-fs text-gray-500 bg-white/5 px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">Anchor</button>
-                    <button onclick="setPosFilter('FLK', this, 'futsal')" class="pos-btn-fs text-gray-500 bg-white/5 px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">Flank</button>
-                    <button onclick="setPosFilter('PVT', this, 'futsal')" class="pos-btn-fs text-gray-500 bg-white/5 px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">Pivot</button>
+                    <button onclick="setPosFilter('GK', this, 'futsal')" class="pos-btn-fs text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">GK</button>
+                    <button onclick="setPosFilter('ANC', this, 'futsal')" class="pos-btn-fs text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">Anchor</button>
+                    <button onclick="setPosFilter('FLK', this, 'futsal')" class="pos-btn-fs text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">Flank</button>
+                    <button onclick="setPosFilter('PVT', this, 'futsal')" class="pos-btn-fs text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">Pivot</button>
                 </div>
             </div>
-            
-            <div id="playerGrid" class="flex flex-col -space-y-4 pb-12 pt-2"></div>
+            <div id="playerGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-12"></div>
+        </div>
+
+        <div id="view-matches" class="hidden animate-fade-in max-w-4xl mx-auto">
+            <div class="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
+                <h2 class="text-sm font-black uppercase tracking-widest text-brand-neon">Jadwal & Live Score</h2>
+                <div id="live-indicator" class="hidden items-center gap-2 bg-red-500/10 border border-red-500/30 px-3 py-1 rounded-full">
+                    <span class="w-2 h-2 bg-red-500 rounded-full live-pulse"></span>
+                    <span class="text-[8px] font-black text-red-500 uppercase tracking-widest">LIVE MATCH</span>
+                </div>
+            </div>
+            <div id="public-match-list" class="space-y-4">
+                </div>
         </div>
 
         <div id="view-gallery" class="hidden animate-fade-in max-w-7xl mx-auto">
@@ -142,38 +146,50 @@
         </div>
         
         <div id="view-coach-dashboard" class="hidden animate-fade-in">
-            <div class="bg-brand-panel border border-white/10 p-4 rounded-2xl flex flex-wrap justify-between items-center gap-4 mb-6 shadow-lg">
+            <div class="bg-brand-panel border border-brand-gold/30 p-4 rounded-2xl flex flex-wrap justify-between items-center gap-4 mb-6 shadow-lg">
                 <div class="flex items-center gap-4">
-                    <div class="flex items-center justify-center w-12 h-12 bg-white/5 rounded-xl border border-white/10">
+                    <div class="flex items-center justify-center w-12 h-12 bg-black rounded-xl border border-brand-gold/50">
                         <i data-lucide="shield-check" class="w-6 h-6 text-brand-gold"></i>
                     </div>
                     <div>
                         <h2 class="text-sm md:text-base font-black text-white uppercase tracking-widest leading-tight" id="coach-sport-label">MNA FC Coach</h2>
-                        <p class="text-[10px] text-brand-neon font-bold uppercase tracking-widest" id="match-status-text">Mode Persiapan (Setup)</p>
+                        <p class="text-[10px] text-brand-neon font-bold uppercase tracking-widest" id="match-status-text">Pilih Pertandingan</p>
                     </div>
                 </div>
                 
                 <div id="match-scoreboard" class="hidden items-center gap-6 px-6 py-2 bg-black rounded-xl border border-white/10">
-                    <div class="text-center"><p class="text-[8px] text-gray-500 uppercase font-black">HOME</p><p class="text-2xl font-black text-white" id="score-home">0</p></div>
+                    <div class="text-center relative">
+                        <button onclick="correctScore('home')" class="absolute -left-6 top-1 text-red-500 hover:bg-red-500/20 rounded-full p-0.5"><i data-lucide="minus-circle" class="w-4 h-4"></i></button>
+                        <p class="text-[8px] text-gray-500 uppercase font-black">HOME</p><p class="text-2xl font-black text-white" id="score-home">0</p>
+                    </div>
                     <div class="text-center cursor-pointer" onclick="toggleTimer()">
                         <p class="text-[8px] text-gray-500 uppercase font-black mb-1">TIMER</p>
                         <p class="text-xl font-black text-brand-gold bg-white/5 px-3 py-1 rounded border border-white/10" id="match-timer">00:00</p>
                     </div>
-                    <div class="text-center"><p class="text-[8px] text-gray-500 uppercase font-black">AWAY</p><p class="text-2xl font-black text-red-400" id="score-away">0</p></div>
+                    <div class="text-center relative">
+                        <button onclick="correctScore('away')" class="absolute -right-6 top-1 text-red-500 hover:bg-red-500/20 rounded-full p-0.5"><i data-lucide="minus-circle" class="w-4 h-4"></i></button>
+                        <p class="text-[8px] text-gray-500 uppercase font-black">AWAY</p><p class="text-2xl font-black text-red-400" id="score-away">0</p>
+                    </div>
                 </div>
 
                 <div class="flex gap-2">
-                    <button id="btn-start-match" onclick="startLiveMatch()" class="bg-brand-neon hover:bg-blue-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors shadow-[0_0_15px_rgba(59,130,246,0.3)]">Mulai Match</button>
+                    <button id="btn-start-match" onclick="startLiveMatch()" class="hidden bg-brand-neon hover:bg-blue-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors shadow-[0_0_15px_rgba(59,130,246,0.3)]">Mulai Match</button>
                     <button onclick="closeCoachDashboard()" class="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-colors"><i data-lucide="log-out" class="w-4 h-4"></i></button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div id="coach-match-selector" class="max-w-3xl mx-auto space-y-4 animate-fade-in">
+                <h3 class="text-xs font-black uppercase text-brand-gold border-b border-white/10 pb-2">1. Pilih Jadwal Pertandingan</h3>
+                <div id="coach-schedule-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    </div>
+            </div>
+
+            <div id="coach-active-match-panel" class="hidden grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
                 
                 <div class="lg:col-span-5 flex flex-col">
                     <div class="bg-brand-panel p-5 rounded-[2rem] border border-white/10 shadow-xl sticky top-24">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2"><i data-lucide="layout-template" class="w-4 h-4 text-brand-neon"></i> Formasi</h3>
+                            <h3 class="text-[10px] font-black text-white uppercase tracking-widest">Vs <span id="active-opponent-label" class="text-brand-gold"></span></h3>
                             <select id="formation-select" onchange="changeFormation(this.value)" class="bg-black border border-white/10 text-white text-[10px] font-bold uppercase rounded-lg py-1.5 px-3 outline-none focus:border-brand-neon cursor-pointer"></select>
                         </div>
                         
@@ -194,7 +210,7 @@
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 border-b border-white/5 pb-4">
                             <div>
                                 <h3 class="text-xs font-black text-white uppercase tracking-widest">Bursa Skuad</h3>
-                                <p class="text-[9px] font-bold text-gray-500 uppercase mt-1" id="lineup-instruction">Pilih slot formasi di lapangan</p>
+                                <p class="text-[9px] font-bold text-gray-500 uppercase mt-1" id="lineup-instruction">1. Ketuk slot formasi di lapangan</p>
                             </div>
                             <div class="flex items-center gap-2 w-full sm:w-auto">
                                 <input type="text" id="lineupSearch" oninput="renderLineupPool()" placeholder="Cari pemain..." class="bg-black border border-white/10 text-[10px] px-3 py-2 rounded-lg text-white outline-none focus:border-brand-neon w-full sm:w-40">
@@ -233,7 +249,7 @@
                         </div>
 
                         <button onclick="endLiveMatch()" class="w-full bg-red-600/20 border border-red-500 text-red-400 py-4 mt-2 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-[0_0_20px_rgba(239,68,68,0.2)] hover:bg-red-500 hover:text-white transition-all">
-                            <i data-lucide="save" class="w-4 h-4 inline pb-0.5 mr-1"></i> Akhiri & Simpan Match
+                            <i data-lucide="save" class="w-4 h-4 inline pb-0.5 mr-1"></i> Selesai (Full Time) & Simpan
                         </button>
                     </div>
                 </div>
@@ -293,9 +309,81 @@
 
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbyjnfuOzPD5wu124WU_h86p8TjdNt7ll9iHgmd2w6mOnaHbMQs-ee6ShoVw3U5F_CZdcg/exec'; 
-        let rawData = { mnafc: { pemain: [], statistik: {} }, futsal: { pemain: [], statistik: {} }, galeri: [] };
+        // Menginisialisasi data jadwal kosong
+        let rawData = { mnafc: { pemain: [], statistik: {} }, futsal: { pemain: [], statistik: {} }, galeri: [], jadwal: [] };
         let activeSport = 'mnafc'; 
         let activePos = 'ALL';
+        
+        let livePollingInterval = null; // Untuk auto-refresh FotMob style
+
+        const val = (d, f = "-") => (d === "" || d === null || d === undefined) ? f : d;
+
+        function parseIndoDate(dateStr) {
+            if (!dateStr || dateStr === '-') return null;
+            let cleanStr = String(dateStr).trim().split(' ')[0].split('T')[0];
+            const parts = cleanStr.split(/[\/\-]/);
+            if (parts.length === 3) {
+                let p1 = parseInt(parts[0], 10); let p2 = parseInt(parts[1], 10); let p3 = parseInt(parts[2], 10);
+                if (p1 > 1000) { return new Date(p1, p2 - 1, p3); } 
+                else { let day = p1; let month = p2 - 1; let year = p3; if (month > 11) { day = p2; month = p1 - 1; } if (year < 100) { year += (year > 50 ? 1900 : 2000); } return new Date(year, month, day); }
+            }
+            const attempt = new Date(dateStr); return isNaN(attempt) ? null : attempt;
+        }
+
+        function processPlayerData(players) {
+            if(!players) return [];
+            return players.map(p => {
+                const birthDate = parseIndoDate(p.tanggal_lahir);
+                p.tanggal_lahir_format = '-'; p.umur_detail = '-'; p.kategori_auto = '-';
+                if (birthDate) {
+                    p.tanggal_lahir_format = `${String(birthDate.getDate()).padStart(2, '0')}/${String(birthDate.getMonth() + 1).padStart(2, '0')}/${String(birthDate.getFullYear()).slice(-2)}`;
+                    const today = new Date(); let years = today.getFullYear() - birthDate.getFullYear(); let months = today.getMonth() - birthDate.getMonth(); let days = today.getDate() - birthDate.getDate();
+                    if (days < 0) { months--; const lm = new Date(today.getFullYear(), today.getMonth(), 0); days += lm.getDate(); }
+                    if (months < 0) { years--; months += 12; }
+                    p.umur_detail = `${years}th ${months}bln`;
+                    p.kategori_auto = years < 16 ? 'U-15' : (years <= 17 ? 'U-17' : 'SENIOR');
+                }
+                return p;
+            });
+        }
+
+        async function init() {
+            lucide.createIcons();
+            const cache = localStorage.getItem('mnafc_multisport_cache');
+            if (cache) { 
+                rawData = JSON.parse(cache); 
+                if(rawData.mnafc && rawData.mnafc.pemain) rawData.mnafc.pemain = processPlayerData(rawData.mnafc.pemain);
+                if(rawData.futsal && rawData.futsal.pemain) rawData.futsal.pemain = processPlayerData(rawData.futsal.pemain);
+                updateUI(); if(rawData.galeri) renderGallery(rawData.galeri); renderPublicMatches();
+            }
+            fetchLiveDatabase(); // Panggilan asinkron tanpa nge-block UI
+            
+            // FOTMOB STYLE: Jalankan Smart Polling setiap 30 detik
+            livePollingInterval = setInterval(() => {
+                // Hanya fetch ulang jika di tab public Jadwal ATAU Coach lagi Live
+                if(!document.getElementById('view-matches').classList.contains('hidden') || matchState.mode === 'live') {
+                    fetchLiveDatabase(true);
+                }
+            }, 30000); 
+        }
+
+        async function fetchLiveDatabase(isPolling = false) {
+            try {
+                const res = await fetch(`${API_URL}?t=${Date.now()}`);
+                const data = await res.json();
+                if(data.mnafc && data.mnafc.pemain) data.mnafc.pemain = processPlayerData(data.mnafc.pemain);
+                if(data.futsal && data.futsal.pemain) data.futsal.pemain = processPlayerData(data.futsal.pemain);
+                rawData = data;
+                localStorage.setItem('mnafc_multisport_cache', JSON.stringify(data));
+                
+                // Jika ini dari background polling, update jadwal secara diam-diam
+                if(isPolling) {
+                    renderPublicMatches();
+                } else {
+                    updateUI(); if(rawData.galeri) renderGallery(rawData.galeri); renderPublicMatches();
+                }
+            } catch (e) { console.error("Gagal sinkronisasi data:", e); }
+        }
 
         // --- SISTEM LOGIN PELATIH ---
         const SECRET_PIN = '2026';
@@ -319,11 +407,12 @@
         }
 
         // --- PRO COACH DASHBOARD LOGIC ---
-        let matchState = { time: 0, timerId: null, isRunning: false, home: 0, away: 0, events: [], mode: 'setup' };
+        let matchState = { id: null, lawan: '', time: 0, timerId: null, isRunning: false, home: 0, away: 0, events: [], mode: 'select' };
         let trackerLineup = {}; 
 
         function openCoachDashboard() {
             document.getElementById('view-squad').classList.add('hidden');
+            document.getElementById('view-matches').classList.add('hidden');
             document.getElementById('view-gallery').classList.add('hidden');
             document.getElementById('sport-dashboard-container').classList.add('hidden');
             document.getElementById('main-nav-tabs').classList.add('hidden');
@@ -333,15 +422,15 @@
             document.getElementById('view-coach-dashboard').classList.remove('hidden');
             document.getElementById('coach-sport-label').innerText = activeSport === 'mnafc' ? 'MNA FC Coach' : 'MNA FUTSAL Coach';
             
-            matchState.mode = 'setup';
+            matchState.mode = 'select';
             matchState.home = 0; matchState.away = 0; matchState.events = [];
-            document.getElementById('coach-setup-panel').classList.remove('hidden');
-            document.getElementById('coach-live-panel').classList.add('hidden');
-            document.getElementById('match-scoreboard').classList.add('hidden');
-            document.getElementById('match-status-text').innerText = 'Mode Persiapan Lineup';
-            document.getElementById('btn-start-match').classList.remove('hidden');
             
-            initLineupBuilder();
+            document.getElementById('coach-match-selector').classList.remove('hidden');
+            document.getElementById('coach-active-match-panel').classList.add('hidden');
+            document.getElementById('match-scoreboard').classList.add('hidden');
+            document.getElementById('btn-start-match').classList.add('hidden');
+            
+            renderCoachMatchList();
         }
 
         function closeCoachDashboard() {
@@ -355,6 +444,49 @@
             document.getElementById('bottom-nav').classList.remove('translate-y-full');
             
             switchMode('squad'); 
+        }
+
+        function renderCoachMatchList() {
+            const list = document.getElementById('coach-schedule-list');
+            if(!rawData.jadwal || rawData.jadwal.length === 0) { 
+                list.innerHTML = '<p class="text-[10px] text-gray-500 uppercase font-bold">Belum ada jadwal. Tambahkan jadwal di spreadsheet tab "Jadwal".</p>'; 
+                return; 
+            }
+            
+            // Tampilkan jadwal yang belum "Selesai"
+            const activeMatches = rawData.jadwal.filter(j => j.status !== 'FT' && j.status !== 'Selesai');
+            if(activeMatches.length === 0) {
+                 list.innerHTML = '<p class="text-[10px] text-gray-500 uppercase font-bold">Semua pertandingan sudah selesai.</p>'; 
+                 return;
+            }
+
+            list.innerHTML = activeMatches.map(j => `
+                <div onclick="selectMatchToCoach('${j.id_match}', '${j.lawan}')" class="bg-black border border-white/10 p-4 rounded-xl cursor-pointer hover:border-brand-neon transition-all">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-[8px] text-brand-gold uppercase tracking-widest">${j.tanggal} • ${j.waktu}</p>
+                        <span class="text-[8px] font-black uppercase tracking-widest ${j.status === 'LIVE' ? 'text-red-500 bg-red-500/10' : 'text-gray-400 bg-white/5'} px-2 py-0.5 rounded">${val(j.status, 'Pending')}</span>
+                    </div>
+                    <h4 class="text-sm font-black text-white uppercase truncate">VS ${j.lawan}</h4>
+                    <p class="text-[9px] text-gray-500 uppercase mt-1"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> ${j.tempat}</p>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function selectMatchToCoach(id, lawan) {
+            matchState.id = id; matchState.lawan = lawan;
+            matchState.mode = 'setup'; matchState.home = 0; matchState.away = 0; matchState.time = 0; matchState.events = [];
+            
+            document.getElementById('coach-match-selector').classList.add('hidden');
+            document.getElementById('coach-active-match-panel').classList.remove('hidden');
+            document.getElementById('coach-active-match-panel').classList.add('grid');
+            
+            document.getElementById('active-opponent-label').innerText = lawan;
+            document.getElementById('btn-start-match').classList.remove('hidden');
+            document.getElementById('coach-setup-panel').classList.remove('hidden');
+            document.getElementById('coach-live-panel').classList.add('hidden');
+            
+            initLineupBuilder();
         }
 
         function startLiveMatch() {
@@ -382,6 +514,9 @@
             document.getElementById('event-log').innerHTML = '';
 
             renderTrackerPitch();
+
+            // SINKRONISASI FOTMOB: Set status ke LIVE di server
+            syncLiveStateToServer('LIVE');
         }
 
         function toggleTimer() {
@@ -404,6 +539,35 @@
 
         function getMatchMinute() { return Math.floor(matchState.time / 60) + "'"; }
 
+        function correctScore(team) {
+            if(team === 'home' && matchState.home > 0) {
+                matchState.home--;
+                document.getElementById('score-home').innerText = matchState.home;
+                syncLiveStateToServer('LIVE'); // Update FotMob public
+            }
+            if(team === 'away' && matchState.away > 0) {
+                matchState.away--;
+                document.getElementById('score-away').innerText = matchState.away;
+                syncLiveStateToServer('LIVE'); // Update FotMob public
+            }
+        }
+
+        // PUSH REAL-TIME KE SPREADSHEET (MENGUBAH STATUS DI TAB JADWAL)
+        function syncLiveStateToServer(status) {
+            if(!matchState.id) return;
+            const payload = {
+                id_match: matchState.id,
+                status: status,
+                skor_kita: matchState.home,
+                skor_lawan: matchState.away
+            };
+            // Jalan di background (Fire and forget)
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'update_live_match', payload: payload })
+            }).catch(e => console.error("Gagal sinkron live state", e));
+        }
+
         function renderTrackerPitch() {
             const container = document.getElementById('lineup-slots-container');
             const slotsDef = FORMATIONS[activeSport][currentFormationKey];
@@ -418,9 +582,9 @@
             }).join('');
         }
 
-        // --- FASE 4: ACTION ENGINE & SUBSTITUSI ---
+        // --- ACTION ENGINE ---
         let currentActionType = '';
-        let playerOutSlot = null;
+        let playerOutSlot = null; 
 
         function triggerAction(type) {
             currentActionType = type;
@@ -428,7 +592,9 @@
             
             if(type === 'goal_away') {
                 logEvent('red', 'Kebobolan', 'Gol oleh Tim Lawan', 'shield-alert');
-                matchState.away++; document.getElementById('score-away').innerText = matchState.away; return;
+                matchState.away++; document.getElementById('score-away').innerText = matchState.away; 
+                syncLiveStateToServer('LIVE'); // Update Fotmob
+                return;
             }
             
             document.getElementById('action-search-container').classList.add('hidden'); // Sembunyikan search bar default
@@ -443,7 +609,7 @@
             else if(type === 'red') { titleTxt = 'Kartu Merah'; color = 'text-red-500'; }
             else if(type === 'pen_won') { titleTxt = 'Dapat Penalti'; color = 'text-green-400'; }
             else if(type === 'pen_miss') { titleTxt = 'Gagal Penalti'; color = 'text-red-400'; }
-            else if(type === 'sub') { titleTxt = 'Pemain KELUAR (Sub Out)'; color = 'text-brand-gold'; }
+            else if(type === 'sub') { titleTxt = 'Pilih Pemain KELUAR'; color = 'text-brand-gold'; }
 
             titleEl.className = `text-lg lg:text-xl font-black uppercase tracking-widest mb-4 text-center drop-shadow-md ${color}`;
             titleEl.innerText = titleTxt;
@@ -464,7 +630,6 @@
         }
 
         function executeAction(slotIdx) {
-            // FASE 4: LOGIKA SUB-IN DENGAN FITUR PENCARIAN
             if (currentActionType === 'sub') {
                 playerOutSlot = slotIdx;
                 currentActionType = 'sub_in';
@@ -472,12 +637,11 @@
                 document.getElementById('action-title').innerText = 'Pemain MASUK (Sub In)';
                 document.getElementById('action-title').className = 'text-lg lg:text-xl font-black uppercase tracking-widest mb-4 text-center drop-shadow-md text-brand-neon';
                 
-                // Tampilkan search bar untuk sub
                 document.getElementById('action-search-container').classList.remove('hidden');
                 document.getElementById('actionSearch').value = '';
                 
-                renderSubInPool(); // Render bursa cadangan
-                return; // Berhenti agar modal tidak tertutup
+                renderSubInPool(); 
+                return; 
             }
 
             const p = trackerLineup[slotIdx];
@@ -486,6 +650,7 @@
             if (currentActionType === 'goal_home') {
                 logEvent('green', 'Gol', p.nama, 'goal');
                 matchState.home++; document.getElementById('score-home').innerText = matchState.home;
+                syncLiveStateToServer('LIVE'); // Update FotMob
             } else if (currentActionType === 'assist') {
                 logEvent('blue', 'Assist', p.nama, 'footprints');
             } else if (currentActionType === 'yellow') {
@@ -499,17 +664,15 @@
             }
         }
 
-        // Render Bursa Pemain Cadangan dengan Pencarian
         function renderSubInPool() {
             const listEl = document.getElementById('action-player-list');
-            const query = document.getElementById('actionSearch').value.toLowerCase();
+            const query = document.getElementById('actionSearch') ? document.getElementById('actionSearch').value.toLowerCase() : '';
             listEl.innerHTML = '';
             
             const allPlayers = rawData[activeSport].pemain;
             const activeIds = Object.values(trackerLineup).filter(player => player).map(player => player.nomor + player.nama);
             
             allPlayers.forEach((benchPlayer, originalIdx) => {
-                // Hanya tampilkan jika belum ada di lapangan DAN sesuai dengan pencarian (jika ada)
                 const searchTxt = (val(benchPlayer.nama) + val(benchPlayer.posisi)).toLowerCase();
                 if(!activeIds.includes(benchPlayer.nomor + benchPlayer.nama) && searchTxt.includes(query)) {
                     listEl.innerHTML += `
@@ -563,9 +726,8 @@
 
         function closeActionModal() { document.getElementById('actionModal').classList.add('hidden'); }
 
-        // FASE 4: FUNGSI POST FETCH KE GOOGLE SHEETS
         async function endLiveMatch() {
-            if(!confirm("Akhiri pertandingan dan simpan log data ke Database Server?")) return;
+            if(!confirm("Akhiri pertandingan (Full Time) dan simpan log data ke Database?")) return;
             
             const btn = document.querySelector('button[onclick="endLiveMatch()"]');
             const originalText = btn.innerHTML;
@@ -573,25 +735,30 @@
             btn.disabled = true;
 
             const payload = {
-                id_match: 'M' + Date.now(),
+                id_match: matchState.id,
                 tanggal: new Date().toLocaleDateString('id-ID'),
                 cabang: activeSport,
-                lawan: 'Pertandingan Uji Coba', 
+                lawan: matchState.lawan,
                 skor_kita: matchState.home,
                 skor_lawan: matchState.away,
                 events: matchState.events
             };
 
             try {
+                // 1. Simpan Log
                 await fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: 'save_match', payload: payload })
                 });
+                
+                // 2. Set status Jadwal menjadi Selesai / FT
+                syncLiveStateToServer('FT');
+
                 alert("Pertandingan Selesai! Log data telah diamankan ke server MNA FC.");
                 closeCoachDashboard(); 
             } catch(e) {
                 console.error(e);
-                alert("Gagal mengirim ke server. Pastikan Code.gs Anda memiliki fungsi doPost dan sudah di-deploy ulang sebagai versi baru.");
+                alert("Gagal mengirim ke server. Pastikan koneksi stabil.");
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -615,57 +782,6 @@
             }
         };
 
-        const val = (d, f = "-") => (d === "" || d === null || d === undefined) ? f : d;
-
-        function parseIndoDate(dateStr) {
-            if (!dateStr || dateStr === '-') return null;
-            let cleanStr = String(dateStr).trim().split(' ')[0].split('T')[0];
-            const parts = cleanStr.split(/[\/\-]/);
-            if (parts.length === 3) {
-                let p1 = parseInt(parts[0], 10); let p2 = parseInt(parts[1], 10); let p3 = parseInt(parts[2], 10);
-                if (p1 > 1000) { return new Date(p1, p2 - 1, p3); } 
-                else { let day = p1; let month = p2 - 1; let year = p3; if (month > 11) { day = p2; month = p1 - 1; } if (year < 100) { year += (year > 50 ? 1900 : 2000); } return new Date(year, month, day); }
-            }
-            const attempt = new Date(dateStr); return isNaN(attempt) ? null : attempt;
-        }
-
-        function processPlayerData(players) {
-            if(!players) return [];
-            return players.map(p => {
-                const birthDate = parseIndoDate(p.tanggal_lahir);
-                p.tanggal_lahir_format = '-'; p.umur_detail = '-'; p.kategori_auto = '-';
-                if (birthDate) {
-                    p.tanggal_lahir_format = `${String(birthDate.getDate()).padStart(2, '0')}/${String(birthDate.getMonth() + 1).padStart(2, '0')}/${String(birthDate.getFullYear()).slice(-2)}`;
-                    const today = new Date(); let years = today.getFullYear() - birthDate.getFullYear(); let months = today.getMonth() - birthDate.getMonth(); let days = today.getDate() - birthDate.getDate();
-                    if (days < 0) { months--; const lm = new Date(today.getFullYear(), today.getMonth(), 0); days += lm.getDate(); }
-                    if (months < 0) { years--; months += 12; }
-                    p.umur_detail = `${years}th ${months}bln`;
-                    p.kategori_auto = years < 16 ? 'U-15' : (years <= 17 ? 'U-17' : 'SENIOR');
-                }
-                return p;
-            });
-        }
-
-        async function init() {
-            lucide.createIcons();
-            const cache = localStorage.getItem('mnafc_multisport_cache');
-            if (cache) { 
-                rawData = JSON.parse(cache); 
-                if(rawData.mnafc && rawData.mnafc.pemain) rawData.mnafc.pemain = processPlayerData(rawData.mnafc.pemain);
-                if(rawData.futsal && rawData.futsal.pemain) rawData.futsal.pemain = processPlayerData(rawData.futsal.pemain);
-                updateUI(); if(rawData.galeri) renderGallery(rawData.galeri);
-            }
-            try {
-                const res = await fetch(`${API_URL}?t=${Date.now()}`);
-                const data = await res.json();
-                if(data.mnafc && data.mnafc.pemain) data.mnafc.pemain = processPlayerData(data.mnafc.pemain);
-                if(data.futsal && data.futsal.pemain) data.futsal.pemain = processPlayerData(data.futsal.pemain);
-                rawData = data;
-                localStorage.setItem('mnafc_multisport_cache', JSON.stringify(data));
-                updateUI(); if(rawData.galeri) renderGallery(rawData.galeri);
-            } catch (e) { console.error(e); }
-        }
-
         function switchSport(sport) {
             activeSport = sport; activePos = 'ALL'; 
             document.getElementById('btn-fc').className = sport === 'mnafc' ? "flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all bg-brand-blue text-white shadow-lg" : "flex-1 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all text-gray-500 hover:text-white";
@@ -675,36 +791,38 @@
             document.getElementById('filter-football').className = sport === 'mnafc' ? "flex gap-2 overflow-x-auto hide-scroll pb-1" : "hidden";
             document.getElementById('filter-futsal').className = sport === 'futsal' ? "flex gap-2 overflow-x-auto hide-scroll pb-1" : "hidden";
             
-            // Perbaikan Logika Filter UI Switcher
             document.querySelectorAll('.pos-btn-fc, .pos-btn-fs').forEach(b => {
                 b.classList.remove('bg-brand-blue', 'text-white', 'font-black', 'border-brand-blue');
-                b.classList.add('bg-white/5', 'text-gray-500', 'font-bold', 'border-white/10');
+                b.classList.add('bg-brand-panel', 'text-gray-500', 'font-bold', 'border-white/10');
             });
             const activeBtn = sport === 'mnafc' ? document.querySelector('.pos-btn-fc') : document.querySelector('.pos-btn-fs');
             if(activeBtn) {
-                activeBtn.classList.remove('bg-white/5', 'text-gray-500', 'font-bold', 'border-white/10');
+                activeBtn.classList.remove('bg-brand-panel', 'text-gray-500', 'font-bold', 'border-white/10');
                 activeBtn.classList.add('bg-brand-blue', 'text-white', 'font-black', 'border-brand-blue');
             }
             updateUI(); 
         }
 
         function switchMode(mode) {
-            const isSquad = mode === 'squad'; const isGallery = mode === 'gallery';
+            const isSquad = mode === 'squad'; const isMatches = mode === 'matches'; const isGallery = mode === 'gallery';
             
             document.getElementById('view-squad').classList.toggle('hidden', !isSquad);
+            document.getElementById('view-matches').classList.toggle('hidden', !isMatches);
             document.getElementById('view-gallery').classList.toggle('hidden', !isGallery);
-            document.getElementById('sport-dashboard-container').classList.toggle('hidden', isGallery); 
+            document.getElementById('sport-dashboard-container').classList.toggle('hidden', isGallery || isMatches); 
             
             const activeClass = "px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all bg-brand-blue text-white shadow-lg";
             const inactiveClass = "px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all text-gray-500 hover:text-white";
             document.getElementById('tab-squad').className = isSquad ? activeClass : inactiveClass;
+            document.getElementById('tab-matches').className = isMatches ? activeClass : inactiveClass;
             document.getElementById('tab-gallery').className = isGallery ? activeClass : inactiveClass;
+
+            if(isMatches) renderPublicMatches();
         }
 
         function updateUI() {
             if(!rawData[activeSport]) return;
-            const data = rawData[activeSport];
-            renderStats(data.statistik);
+            renderStats(rawData[activeSport].statistik);
             runFilter();
         }
 
@@ -719,8 +837,7 @@
 
         function getCoords(pos) {
             const p = val(pos).toUpperCase().trim();
-            if(!p || p === '-') return []; // Failsafe agar posisi kosong tidak memunculkan titik abu-abu
-            
+            if(!p || p === '-') return []; 
             const colors = { F: {bg: 'rgba(239,68,68,0.4)', m: '#ef4444'}, M: {bg: 'rgba(34,197,94,0.4)', m: '#22c55e'}, D: {bg: 'rgba(59,130,246,0.4)', m: '#3b82f6'}, G: {bg: 'rgba(234,179,8,0.4)', m: '#eab308'}};
             const positions = {
                 'GK': { b: '8%', l: '50%', w: '40%', h: '15%', c: colors.G }, 'CB': { b: '22%', l: '50%', w: '45%', h: '18%', c: colors.D }, 'LB': { b: '26%', l: '15%', w: '30%', h: '35%', c: colors.D }, 'RB': { b: '26%', l: '85%', w: '30%', h: '35%', c: colors.D }, 'LWB': { b: '35%', l: '15%', w: '30%', h: '30%', c: colors.D }, 'RWB': { b: '35%', l: '85%', w: '30%', h: '30%', c: colors.D }, 'CDM': { b: '42%', l: '50%', w: '45%', h: '18%', c: colors.M }, 'CM': { b: '52%', l: '50%', w: '45%', h: '18%', c: colors.M }, 'LM': { b: '55%', l: '15%', w: '30%', h: '30%', c: colors.M }, 'RM': { b: '55%', l: '85%', w: '30%', h: '30%', c: colors.M }, 'CAM': { b: '65%', l: '50%', w: '45%', h: '15%', c: colors.M }, 'LW': { b: '78%', l: '18%', w: '30%', h: '25%', c: colors.F }, 'RW': { b: '78%', l: '82%', w: '30%', h: '25%', c: colors.F }, 'LWG': { b: '78%', l: '18%', w: '30%', h: '25%', c: colors.F }, 'RWG': { b: '78%', l: '82%', w: '30%', h: '25%', c: colors.F }, 'CF': { b: '78%', l: '50%', w: '40%', h: '15%', c: colors.F }, 'ST': { b: '88%', l: '50%', w: '40%', h: '15%', c: colors.F },
@@ -753,29 +870,25 @@
         function setPosFilter(pos, btn, targetSport) {
             activePos = pos;
             const btnClass = targetSport === 'mnafc' ? '.pos-btn-fc' : '.pos-btn-fs';
-            // Perbaikan Logika Filter UI Set Posisi
             document.querySelectorAll(btnClass).forEach(b => {
                 b.classList.remove('bg-brand-blue', 'text-white', 'font-black', 'border-brand-blue');
-                b.classList.add('bg-white/5', 'text-gray-500', 'font-bold', 'border-white/10');
+                b.classList.add('bg-brand-panel', 'text-gray-500', 'font-bold', 'border-white/10');
             });
-            btn.classList.remove('bg-white/5', 'text-gray-500', 'font-bold', 'border-white/10');
+            btn.classList.remove('bg-brand-panel', 'text-gray-500', 'font-bold', 'border-white/10');
             btn.classList.add('bg-brand-blue', 'text-white', 'font-black', 'border-brand-blue');
             runFilter();
         }
 
+        // DESAIN GRID NORMAL DENGAN ANIMASI MEDIA HUB (Sesuai Permintaan)
         function renderPlayers(list) {
             const grid = document.getElementById('playerGrid');
             if (list.length === 0) { 
-                grid.className = ""; // reset class jika kosong
                 grid.innerHTML = `<div class="col-span-full py-16 text-center text-[10px] font-black text-gray-500 uppercase tracking-widest border border-dashed border-white/10 rounded-2xl">Kosong</div>`; 
                 return; 
             }
             
-            // FASE UPDATE: Stacked Card Design
-            grid.className = "flex flex-col -space-y-4 pt-2 pb-12 px-2";
-            
             grid.innerHTML = list.map((p, i) => `
-                <div onclick="showPreview(${rawData[activeSport].pemain.indexOf(p)})" class="stacked-card rounded-[2rem] p-5 flex items-center gap-4 relative cursor-pointer" style="z-index: ${list.length - i};">
+                <div onclick="showPreview(${rawData[activeSport].pemain.indexOf(p)})" class="player-card glass-panel rounded-[2rem] p-5 flex items-center gap-4 relative overflow-hidden cursor-pointer stagger-item border border-white/5" style="animation-delay: ${i*0.05}s">
                     <div class="absolute -right-2 -bottom-6 text-8xl font-black italic text-white/5 pointer-events-none">${val(p.nomor, '0')}</div>
                     <div class="w-16 h-16 rounded-xl overflow-hidden bg-white/10 shrink-0 border border-white/10 z-10"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div>
                     <div class="flex-1 min-w-0 z-10">
@@ -888,10 +1001,63 @@
             setTimeout(() => page.classList.add('page-slide-in'), 10); lucide.createIcons();
         }
 
+        // --- PUBLIC MATCH CENTER (JADWAL FOTMOB STYLE) ---
+        function renderPublicMatches() {
+            const list = document.getElementById('public-match-list');
+            const ind = document.getElementById('live-indicator');
+            
+            if(!rawData.jadwal || rawData.jadwal.length === 0) { 
+                list.innerHTML = '<div class="text-center py-10 border border-dashed border-white/10 rounded-2xl"><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Belum ada jadwal pertandingan</p></div>'; 
+                ind.classList.add('hidden');
+                return; 
+            }
+            
+            let isAnyLive = false;
+            
+            list.innerHTML = rawData.jadwal.map(j => {
+                if(j.status === 'LIVE') isAnyLive = true;
+                
+                const isLive = j.status === 'LIVE';
+                const isFT = j.status === 'FT' || j.status === 'Selesai';
+                
+                return `
+                <div class="bg-brand-panel border ${isLive ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'border-white/10'} p-5 rounded-[1.5rem] flex items-center justify-between transition-all">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <p class="text-[8px] font-black ${isLive ? 'text-red-500' : 'text-brand-gold'} uppercase tracking-widest">${j.tanggal} • ${j.waktu}</p>
+                            ${isLive ? '<span class="text-[7px] font-black bg-red-500 text-white px-1.5 rounded uppercase live-pulse">LIVE</span>' : ''}
+                            ${isFT ? '<span class="text-[7px] font-black bg-gray-700 text-white px-1.5 rounded uppercase">FT</span>' : ''}
+                        </div>
+                        <div class="flex items-center gap-4 mt-2">
+                            <div>
+                                <h4 class="text-base font-black text-white uppercase leading-none mb-1">MNA FC</h4>
+                                <h4 class="text-base font-black text-gray-400 uppercase leading-none">${j.lawan}</h4>
+                            </div>
+                            ${(isLive || isFT) ? `
+                            <div class="bg-black border border-white/10 px-3 py-1 rounded-lg text-center">
+                                <p class="text-lg font-black ${isLive ? 'text-red-500' : 'text-white'} leading-none mb-1">${j.skor_kita || 0}</p>
+                                <p class="text-lg font-black text-gray-400 leading-none">${j.skor_lawan || 0}</p>
+                            </div>
+                            ` : ''}
+                        </div>
+                        <p class="text-[9px] text-gray-500 uppercase mt-3"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> ${j.tempat}</p>
+                    </div>
+                </div>
+            `}).join('');
+            
+            // Indikator header
+            if(isAnyLive) {
+                ind.classList.remove('hidden'); ind.classList.add('flex');
+            } else {
+                ind.classList.add('hidden'); ind.classList.remove('flex');
+            }
+            
+            lucide.createIcons();
+        }
+
         // --- LINEUP BUILDER ENGINE ---
         function initLineupBuilder() {
-            lineupData = {}; activeLineupSlot = null;
-            document.getElementById('lineupSearch').value = ''; // Reset search
+            lineupData = {}; activeLineupSlot = null; document.getElementById('lineupSearch').value = '';
             const select = document.getElementById('formation-select'); const forms = FORMATIONS[activeSport];
             select.innerHTML = Object.keys(forms).map(k => `<option value="${k}">${k}</option>`).join('');
             currentFormationKey = Object.keys(forms)[0]; renderLineupPitchSetup(); renderLineupPool();
@@ -917,7 +1083,7 @@
             
             if (activeLineupSlot === null) {
                 pool.style.opacity = '0.3'; pool.style.pointerEvents = 'none';
-                inst.innerText = '1. Ketuk slot formasi di lapangan (Sebelah Kiri)'; inst.className = 'text-[9px] font-bold text-gray-500 uppercase tracking-widest mt-1';
+                inst.innerText = '1. Ketuk slot formasi di lapangan'; inst.className = 'text-[9px] font-bold text-gray-500 uppercase tracking-widest mt-1';
             } else {
                 pool.style.opacity = '1'; pool.style.pointerEvents = 'auto';
                 const role = FORMATIONS[activeSport][currentFormationKey][activeLineupSlot].role;
@@ -927,7 +1093,6 @@
             const players = rawData[activeSport]?.pemain || []; 
             const assignedIds = Object.values(lineupData).map(p => p.nomor + p.nama);
             
-            // FASE UPDATE: Filter Berdasarkan Pencarian di Bursa Pemain
             const filteredPlayers = players.filter(p => (val(p.nama) + val(p.posisi)).toLowerCase().includes(query));
 
             pool.innerHTML = filteredPlayers.map((p) => {
@@ -960,28 +1125,6 @@
 
         function tutupDossier() { const p = document.getElementById('fullProfilePage'); p.classList.remove('page-slide-in'); setTimeout(() => { p.classList.add('hidden'); document.body.style.overflow = ''; }, 500); }
         function closeModal() { document.getElementById('playerModal').classList.add('hidden'); document.body.style.overflow = ''; }
-
-        // --- SUB IN SEARCH LOGIC (FASE 4) ---
-        function renderSubInPool() {
-            const listEl = document.getElementById('action-player-list');
-            const query = document.getElementById('actionSearch') ? document.getElementById('actionSearch').value.toLowerCase() : '';
-            listEl.innerHTML = '';
-            
-            const allPlayers = rawData[activeSport].pemain;
-            const activeIds = Object.values(trackerLineup).filter(player => player).map(player => player.nomor + player.nama);
-            
-            allPlayers.forEach((benchPlayer, originalIdx) => {
-                const searchTxt = (val(benchPlayer.nama) + val(benchPlayer.posisi)).toLowerCase();
-                if(!activeIds.includes(benchPlayer.nomor + benchPlayer.nama) && searchTxt.includes(query)) {
-                    listEl.innerHTML += `
-                    <div onclick="executeSubIn('${originalIdx}')" class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform">
-                        <div class="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-white/10 bg-black overflow-hidden hover:border-brand-neon transition-all shadow-lg"><img src="${val(benchPlayer.link_foto)}" class="w-full h-full object-cover"></div>
-                        <p class="text-[9px] font-black text-white uppercase text-center leading-tight line-clamp-1 w-full px-1">${val(benchPlayer.nama).split(' ')[0]}</p>
-                        <p class="text-[7px] text-brand-neon font-bold">${val(benchPlayer.posisi)}</p>
-                    </div>`;
-                }
-            });
-        }
 
         window.addEventListener('DOMContentLoaded', init);
     </script>
