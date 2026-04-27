@@ -12,11 +12,8 @@
             theme: {
                 extend: {
                     colors: {
-                        'brand-blue': '#1d4ed8',
-                        'brand-neon': '#3b82f6',
-                        'brand-gold': '#d7b67d',
-                        'brand-dark': '#050505',
-                        'brand-surface': '#111111',
+                        'brand-blue': '#1d4ed8', 'brand-neon': '#3b82f6', 'brand-gold': '#d7b67d',
+                        'brand-dark': '#050505', 'brand-surface': '#111111',
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
@@ -31,15 +28,9 @@
         .player-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .player-card:hover { transform: translateY(-8px) scale(1.02); border-color: rgba(59, 130, 246, 0.4); }
         
-        /* PITCH SYSTEM */
-        .pitch-wrapper {
-            position: relative; width: 100%; max-width: 320px; margin: 0 auto;
-            border-radius: 16px; overflow: hidden; border: 1.5px solid rgba(255, 255, 255, 0.15);
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
-        }
+        .pitch-wrapper { position: relative; width: 100%; max-width: 320px; margin: 0 auto; border-radius: 16px; overflow: hidden; border: 1.5px solid rgba(255, 255, 255, 0.15); box-shadow: inset 0 0 40px rgba(0,0,0,0.5); }
         .pitch-wrapper::before { content: ""; display: block; padding-top: 145%; }
         .pitch-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: all 0.5s ease; }
-        
         .pitch-football { background: #061c06; background-image: repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(255,255,255,0.02) 10%, rgba(255,255,255,0.02) 20%); }
         .pitch-futsal { background: #091324; background-image: repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(255,255,255,0.02) 10%, rgba(255,255,255,0.02) 20%); }
 
@@ -48,32 +39,13 @@
         .pitch-circle { top: 50%; left: 50%; width: 60px; height: 60px; border-radius: 50%; transform: translate(-50%, -50%); }
         
         .position-zone { position: absolute; transform: translate(-50%, 50%); border-radius: 12px; pointer-events: none; z-index: 5; opacity: 0.7; }
-        .player-marker { 
-            position: absolute; width: 38px; height: 38px; border: 2px solid white; border-radius: 50%; 
-            transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center;
-            text-align: center; font-size: 10px; font-weight: 900; color: white; text-shadow: 0px 1px 3px rgba(0,0,0,0.8); z-index: 10;
-        }
-        .player-marker-alt {
-            position: absolute; width: 34px; height: 34px; border: 2px dashed rgba(255,255,255,0.7); border-radius: 50%; 
-            transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center;
-            text-align: center; font-size: 9px; font-weight: 800; color: rgba(255,255,255,0.8); z-index: 9; opacity: 0.6; 
-        }
+        .player-marker { position: absolute; width: 38px; height: 38px; border: 2px solid white; border-radius: 50%; transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; font-weight: 900; color: white; text-shadow: 0px 1px 3px rgba(0,0,0,0.8); z-index: 10; }
+        .player-marker-alt { position: absolute; width: 34px; height: 34px; border: 2px dashed rgba(255,255,255,0.7); border-radius: 50%; transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 9px; font-weight: 800; color: rgba(255,255,255,0.8); z-index: 9; opacity: 0.6; }
 
-        /* LINEUP BUILDER SYSTEM */
-        .lineup-slot {
-            position: absolute; width: 42px; height: 42px; border-radius: 50%;
-            transform: translate(-50%, 50%); z-index: 20;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.6); border: 2px dashed rgba(255,255,255,0.5); backdrop-filter: blur(4px);
-            cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        .lineup-slot { position: absolute; width: 42px; height: 42px; border-radius: 50%; transform: translate(-50%, 50%); z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); border: 2px dashed rgba(255,255,255,0.5); backdrop-filter: blur(4px); cursor: pointer; transition: all 0.3s; }
         .lineup-slot.active { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); transform: translate(-50%, 50%) scale(1.15); background: rgba(59, 130, 246, 0.2); }
         .lineup-slot.filled { border-style: solid; border-color: white; background-size: cover; background-position: center; }
-        .lineup-slot-label {
-            position: absolute; bottom: -16px; white-space: nowrap; font-size: 8px; font-weight: 900;
-            background: rgba(0,0,0,0.8); padding: 2px 6px; border-radius: 4px; color: white; border: 1px solid rgba(255,255,255,0.2);
-            text-shadow: none; text-transform: uppercase;
-        }
+        .lineup-slot-label { position: absolute; bottom: -16px; white-space: nowrap; font-size: 8px; font-weight: 900; background: rgba(0,0,0,0.8); padding: 2px 6px; border-radius: 4px; color: white; border: 1px solid rgba(255,255,255,0.2); text-transform: uppercase; }
 
         .pool-card { min-width: 70px; width: 70px; transition: all 0.2s; }
         .pool-card:active { transform: scale(0.95); }
@@ -82,6 +54,10 @@
         .stagger-item { animation: fadeUp 0.5s ease forwards; opacity: 0; transform: translateY(10px); }
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
         .page-slide-in { transform: translateX(0) !important; }
+        
+        /* PIN ANIMATION */
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
     </style>
 </head>
 <body class="bg-brand-dark pb-32">
@@ -90,14 +66,20 @@
         <div class="max-w-4xl mx-auto px-5 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-brand-blue flex items-center justify-center">
-                    <span id="header-initial" class="font-black text-white text-xs">M</span>
+                    <span class="font-black text-white text-xs">M</span>
                 </div>
                 <h1 class="font-black text-lg italic tracking-tighter uppercase text-white" id="brand-name">MNA FC</h1>
             </div>
-            <div class="flex bg-white/5 p-1 rounded-xl border border-white/10">
-                <button onclick="switchMode('squad')" id="tab-squad" class="px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all bg-brand-blue text-white shadow-lg">Squad</button>
-                <button onclick="switchMode('lineup')" id="tab-lineup" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all text-gray-500 hover:text-white">Lineup</button>
-                <button onclick="switchMode('gallery')" id="tab-gallery" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all text-gray-500 hover:text-white">Media</button>
+            
+            <div class="flex items-center gap-2">
+                <div class="flex bg-white/5 p-1 rounded-xl border border-white/10">
+                    <button onclick="switchMode('squad')" id="tab-squad" class="px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all bg-brand-blue text-white shadow-lg">Squad</button>
+                    <button onclick="switchMode('lineup')" id="tab-lineup" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all text-gray-500 hover:text-white">Lineup</button>
+                    <button onclick="switchMode('gallery')" id="tab-gallery" class="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all text-gray-500 hover:text-white">Media</button>
+                </div>
+                <button onclick="openCoachGate()" class="p-2 ml-1 bg-white/5 rounded-xl border border-white/10 text-brand-gold hover:bg-brand-gold hover:text-black transition-colors shadow-lg">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -105,12 +87,8 @@
     <main class="pt-24 px-5 max-w-4xl mx-auto">
         <div id="sport-dashboard-container" class="block animate-fade-in">
             <div class="flex gap-2 mb-6 bg-white/5 p-1.5 rounded-2xl border border-white/5">
-                <button id="btn-fc" onclick="switchSport('mnafc')" class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all bg-brand-blue text-white shadow-lg">
-                    <i data-lucide="circle-dot" class="w-3 h-3"></i> Sepak Bola
-                </button>
-                <button id="btn-futsal" onclick="switchSport('futsal')" class="flex-1 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all text-gray-500 hover:text-white">
-                    <i data-lucide="zap" class="w-3 h-3"></i> Futsal
-                </button>
+                <button id="btn-fc" onclick="switchSport('mnafc')" class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all bg-brand-blue text-white shadow-lg"><i data-lucide="circle-dot" class="w-3 h-3"></i> Sepak Bola</button>
+                <button id="btn-futsal" onclick="switchSport('futsal')" class="flex-1 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all text-gray-500 hover:text-white"><i data-lucide="zap" class="w-3 h-3"></i> Futsal</button>
             </div>
         </div>
 
@@ -127,8 +105,7 @@
             <div class="sticky top-16 z-40 bg-brand-dark/90 backdrop-blur-xl py-4 -mx-5 px-5 mb-4 border-b border-white/5">
                 <div class="relative flex-1 mb-4">
                     <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
-                    <input type="text" id="playerSearch" oninput="runFilter()" placeholder="Cari nama, posisi, atau instansi..." 
-                        class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm font-medium outline-none focus:border-brand-neon transition-colors text-white placeholder-gray-500">
+                    <input type="text" id="playerSearch" oninput="runFilter()" placeholder="Cari nama, posisi, atau instansi..." class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm font-medium outline-none focus:border-brand-neon transition-colors text-white placeholder-gray-500">
                 </div>
                 <div id="filter-football" class="flex gap-2 overflow-x-auto hide-scroll">
                     <button onclick="setPosFilter('ALL', this, 'mnafc')" class="pos-btn-fc bg-brand-blue text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase border border-brand-blue transition-all">Semua</button>
@@ -151,15 +128,13 @@
         <div id="view-lineup" class="hidden animate-fade-in">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xs font-black uppercase tracking-widest text-brand-neon flex items-center gap-2"><i data-lucide="clipboard-list" class="w-4 h-4"></i> Tactical Board</h2>
-                <select id="formation-select" onchange="changeFormation(this.value)" class="bg-white/5 border border-white/10 text-white text-[10px] font-bold uppercase rounded-lg py-1 px-3 outline-none focus:border-brand-neon">
-                    </select>
+                <select id="formation-select" onchange="changeFormation(this.value)" class="bg-white/5 border border-white/10 text-white text-[10px] font-bold uppercase rounded-lg py-1 px-3 outline-none focus:border-brand-neon"></select>
             </div>
             
             <div class="glass-panel p-4 rounded-[2rem] border border-white/5 mb-6">
                 <div class="pitch-wrapper">
                     <div id="lineup-pitch" class="pitch-container pitch-football">
-                        <div class="pitch-half pitch-line"></div>
-                        <div class="pitch-circle pitch-line"></div>
+                        <div class="pitch-half pitch-line"></div><div class="pitch-circle pitch-line"></div>
                         <div class="pitch-line" style="top:0; left:20%; width:60%; height:18%; border-top:0;"></div>
                         <div class="pitch-line" style="bottom:0; left:20%; width:60%; height:18%; border-bottom:0;"></div>
                         <div id="lineup-slots-container"></div>
@@ -169,8 +144,7 @@
 
             <div class="mb-4">
                 <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3" id="lineup-instruction">1. Pilih slot di lapangan</p>
-                <div id="lineup-pool" class="flex gap-3 overflow-x-auto hide-scroll pb-2 transition-opacity duration-300 opacity-30 pointer-events-none">
-                    </div>
+                <div id="lineup-pool" class="flex gap-3 overflow-x-auto hide-scroll pb-2 transition-opacity duration-300 opacity-30 pointer-events-none"></div>
             </div>
             
             <button onclick="resetLineup()" class="w-full py-3 rounded-xl border border-red-500/30 text-red-400 text-[10px] font-bold uppercase tracking-widest hover:bg-red-500/10 transition-colors mb-8">
@@ -182,13 +156,35 @@
             <div class="sticky top-16 z-40 bg-brand-dark/90 backdrop-blur-xl py-4 -mx-5 px-5 mb-4 border-b border-white/5">
                 <div class="relative w-full">
                     <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
-                    <input type="text" id="mediaSearch" oninput="runMediaFilter()" placeholder="Cari kegiatan atau tanggal..." 
-                        class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm font-medium outline-none focus:border-brand-neon transition-colors text-white placeholder-gray-500">
+                    <input type="text" id="mediaSearch" oninput="runMediaFilter()" placeholder="Cari kegiatan atau tanggal..." class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm font-medium outline-none focus:border-brand-neon transition-colors text-white placeholder-gray-500">
                 </div>
             </div>
             <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5"></div>
         </div>
+        
+        <div id="view-match-tracker" class="hidden animate-fade-in pb-10">
+            <div class="bg-brand-gold/10 border border-brand-gold/20 p-5 rounded-2xl text-center">
+                <i data-lucide="shield-check" class="w-8 h-8 text-brand-gold mx-auto mb-2"></i>
+                <h3 class="text-sm font-black text-brand-gold uppercase tracking-widest mb-1">Akses Pelatih Diberikan</h3>
+                <p class="text-[10px] text-gray-400">Arsitektur Live Match Tracker dengan sistem Goal, Substitusi, dan Kartu akan dibangun di layar ini pada fase berikutnya.</p>
+                <button onclick="closeMatchTracker()" class="mt-4 px-4 py-2 bg-white/5 border border-white/10 text-[9px] font-bold text-white uppercase rounded-lg">Kunci Kembali</button>
+            </div>
+        </div>
+
     </main>
+
+    <div id="gateModal" class="fixed inset-0 z-[300] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeCoachGate()"></div>
+        <div class="relative bg-brand-surface p-8 rounded-3xl border border-brand-gold/30 shadow-[0_0_50px_rgba(215,182,125,0.15)] w-full max-w-xs z-10 text-center modal-enter">
+            <i data-lucide="lock" class="w-10 h-10 text-brand-gold mx-auto mb-4"></i>
+            <h2 class="text-lg font-black uppercase text-white tracking-widest mb-1">Coach Area</h2>
+            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-6">Masukkan PIN Otorisasi</p>
+            
+            <input type="password" id="coach-pin" maxlength="4" placeholder="••••" class="w-full text-center text-3xl font-black tracking-[0.5em] bg-black border border-white/10 text-brand-gold rounded-xl py-3 outline-none focus:border-brand-gold focus:shadow-[0_0_15px_rgba(215,182,125,0.3)] mb-4 transition-all">
+            
+            <button onclick="verifyPin()" class="w-full py-3 bg-brand-gold text-black font-black uppercase text-[10px] tracking-widest rounded-xl hover:bg-white transition-colors">Akses Tracker</button>
+        </div>
+    </div>
 
     <div id="playerModal" class="fixed inset-0 z-[150] hidden flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-brand-dark/95 backdrop-blur-xl" onclick="closeModal()"></div>
@@ -217,7 +213,52 @@
         let activeSport = 'mnafc'; 
         let activePos = 'ALL';
 
-        // --- LINEUP BUILDER ENGINE ---
+        // --- SISTEM LOGIN PELATIH (COACH GATE) ---
+        const SECRET_PIN = '2026'; // PIN STANDAR
+
+        function openCoachGate() {
+            document.getElementById('gateModal').classList.remove('hidden');
+            document.getElementById('coach-pin').value = '';
+            document.getElementById('coach-pin').focus();
+        }
+
+        function closeCoachGate() {
+            document.getElementById('gateModal').classList.add('hidden');
+        }
+
+        function verifyPin() {
+            const input = document.getElementById('coach-pin');
+            if (input.value === SECRET_PIN) {
+                closeCoachGate();
+                openMatchTracker();
+            } else {
+                input.classList.add('shake', 'border-red-500', 'text-red-500');
+                setTimeout(() => input.classList.remove('shake', 'border-red-500', 'text-red-500'), 500);
+            }
+        }
+
+        function openMatchTracker() {
+            // Sembunyikan semua tab reguler
+            document.getElementById('view-squad').classList.add('hidden');
+            document.getElementById('view-lineup').classList.add('hidden');
+            document.getElementById('view-gallery').classList.add('hidden');
+            
+            // Tampilkan Layar Match Tracker (Fase 3 nanti akan kita bangun di div ini)
+            document.getElementById('view-match-tracker').classList.remove('hidden');
+            
+            // Ubah gaya tab (Reset semua)
+            const inactiveClass = "px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all text-gray-500 hover:text-white";
+            document.getElementById('tab-squad').className = inactiveClass;
+            document.getElementById('tab-lineup').className = inactiveClass;
+            document.getElementById('tab-gallery').className = inactiveClass;
+        }
+
+        function closeMatchTracker() {
+            document.getElementById('view-match-tracker').classList.add('hidden');
+            switchMode('squad'); // Kembali ke Squad
+        }
+        // -----------------------------------------
+
         const FORMATIONS = {
             mnafc: {
                 '4-3-3': [
@@ -261,9 +302,7 @@
 
         let currentFormationKey = '';
         let activeLineupSlot = null;
-        let lineupData = {}; // Format: { slotIndex: playerObject }
-
-        // --- END LINEUP DATA ---
+        let lineupData = {}; 
 
         const val = (d, f = "-") => (d === "" || d === null || d === undefined) ? f : d;
 
@@ -351,20 +390,22 @@
             if(activeBtn) activeBtn.className = activeBtn.className.replace('bg-white/5 text-gray-500 font-bold border-white/10', 'bg-brand-blue text-white font-black border-brand-blue');
 
             updateUI();
-            initLineupBuilder(); // Reset lineup for new sport
+            initLineupBuilder(); 
         }
 
         function switchMode(mode) {
             const isSquad = mode === 'squad';
             const isLineup = mode === 'lineup';
             const isGallery = mode === 'gallery';
+            
+            // Jika keluar dari match tracker, pastikan hidden
+            document.getElementById('view-match-tracker').classList.add('hidden');
 
             document.getElementById('view-squad').classList.toggle('hidden', !isSquad);
             document.getElementById('view-lineup').classList.toggle('hidden', !isLineup);
             document.getElementById('view-gallery').classList.toggle('hidden', !isGallery);
             document.getElementById('sport-dashboard-container').classList.toggle('hidden', isGallery); 
             
-            // Tab styling
             const activeClass = "px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all bg-brand-blue text-white shadow-lg";
             const inactiveClass = "px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all text-gray-500 hover:text-white";
 
@@ -462,15 +503,6 @@
             runFilter();
         }
 
-        function runMediaFilter() {
-            const query = document.getElementById('mediaSearch').value.toLowerCase();
-            if(!rawData.galeri) return;
-            const filtered = rawData.galeri.filter(item => {
-                return val(item.kegiatan).toLowerCase().includes(query) || val(item.tanggal).toLowerCase().includes(query);
-            });
-            renderGallery(filtered);
-        }
-
         function renderPlayers(list) {
             const grid = document.getElementById('playerGrid');
             grid.innerHTML = list.map((p, i) => `
@@ -518,6 +550,7 @@
                     <button onclick="bukaDossier(${idx})" class="w-full bg-brand-neon text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-brand-neon/30 mt-6">Buka Dossier Pemain</button>
                 </div>`;
             document.getElementById('playerModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
             lucide.createIcons();
         }
 
@@ -606,7 +639,7 @@
                             <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="graduation-cap" class="w-4 h-4 text-brand-neon"></i> Afiliasi Akademik</h3>
                             <div class="bg-white/5 p-8 rounded-2xl text-center border border-white/5 flex-1 flex flex-col justify-center">
                                 <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-2">Instansi / Sekolah</p>
-                                <p class="text-lg font-black text-white uppercase leading-tight">"${val(p.sekolah, 'Belum Terdaftar')}"</p>
+                                <p class="text-xs font-black text-white uppercase line-clamp-2 mt-1 leading-tight">${val(p.sekolah)}</p>
                             </div>
                         </div>
                     </div>
@@ -617,7 +650,7 @@
             lucide.createIcons();
         }
 
-        // --- FUNGSI LINEUP BUILDER ---
+        // --- LINEUP BUILDER LOGIC ---
         function initLineupBuilder() {
             lineupData = {};
             activeLineupSlot = null;
@@ -625,8 +658,6 @@
             const forms = FORMATIONS[activeSport];
             
             select.innerHTML = Object.keys(forms).map(k => `<option value="${k}">${k}</option>`).join('');
-            
-            // Set default
             currentFormationKey = Object.keys(forms)[0];
             renderLineupPitch();
             renderLineupPool();
@@ -668,30 +699,24 @@
             const inst = document.getElementById('lineup-instruction');
             
             if (activeLineupSlot === null) {
-                pool.style.opacity = '0.3';
-                pool.style.pointerEvents = 'none';
+                pool.style.opacity = '0.3'; pool.style.pointerEvents = 'none';
                 inst.innerText = '1. Ketuk slot formasi di lapangan';
                 inst.className = 'text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3';
             } else {
-                pool.style.opacity = '1';
-                pool.style.pointerEvents = 'auto';
+                pool.style.opacity = '1'; pool.style.pointerEvents = 'auto';
                 const role = FORMATIONS[activeSport][currentFormationKey][activeLineupSlot].role;
                 inst.innerHTML = `2. Pilih pemain untuk <span class="text-brand-neon">${role}</span>`;
                 inst.className = 'text-[9px] font-black text-white uppercase tracking-widest mb-3';
             }
 
             const players = rawData[activeSport]?.pemain || [];
-            
-            // Cek pemain yang sudah masuk formasi
             const assignedIds = Object.values(lineupData).map(p => p.nomor + p.nama);
 
             pool.innerHTML = players.map((p, i) => {
                 const isAssigned = assignedIds.includes(p.nomor + p.nama);
                 return `
                 <div onclick="assignPlayerToSlot(${i})" class="pool-card flex flex-col items-center gap-2 cursor-pointer ${isAssigned ? 'disabled' : ''}">
-                    <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white/10 bg-white/5">
-                        <img src="${val(p.link_foto)}" class="w-full h-full object-cover">
-                    </div>
+                    <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white/10 bg-white/5"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div>
                     <div class="text-center">
                         <p class="text-[8px] font-black text-white uppercase line-clamp-1 w-14 leading-tight">${val(p.nama)}</p>
                         <p class="text-[7px] text-brand-neon font-bold mt-0.5">${val(p.posisi)}</p>
@@ -700,26 +725,23 @@
             }).join('');
         }
 
-        function selectLineupSlot(idx) {
-            activeLineupSlot = idx;
-            renderLineupPitch();
-            renderLineupPool();
-        }
-
+        function selectLineupSlot(idx) { activeLineupSlot = idx; renderLineupPitch(); renderLineupPool(); }
         function assignPlayerToSlot(playerIdx) {
             if (activeLineupSlot === null) return;
             const p = rawData[activeSport].pemain[playerIdx];
-            lineupData[activeLineupSlot] = p;
-            activeLineupSlot = null; // Reset setelah memilih
-            renderLineupPitch();
-            renderLineupPool();
+            lineupData[activeLineupSlot] = p; activeLineupSlot = null; 
+            renderLineupPitch(); renderLineupPool();
         }
+        function resetLineup() { lineupData = {}; activeLineupSlot = null; renderLineupPitch(); renderLineupPool(); }
 
-        function resetLineup() {
-            lineupData = {};
-            activeLineupSlot = null;
-            renderLineupPitch();
-            renderLineupPool();
+        // --- MEDIA HUB LOGIC ---
+        function runMediaFilter() {
+            const query = document.getElementById('mediaSearch').value.toLowerCase();
+            if(!rawData.galeri) return;
+            const filtered = rawData.galeri.filter(item => {
+                return val(item.kegiatan).toLowerCase().includes(query) || val(item.tanggal).toLowerCase().includes(query);
+            });
+            renderGallery(filtered);
         }
 
         function renderGallery(list) {
@@ -742,7 +764,7 @@
             setTimeout(() => { p.classList.add('hidden'); document.body.style.overflow = ''; }, 500); 
         }
 
-        function closeModal() { document.getElementById('playerModal').classList.add('hidden'); }
+        function closeModal() { document.getElementById('playerModal').classList.add('hidden'); document.body.style.overflow = ''; }
 
         window.addEventListener('DOMContentLoaded', init);
     </script>
