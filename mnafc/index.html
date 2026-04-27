@@ -275,7 +275,29 @@
             </div>
         </div>
     </div>
+    <div id="matchDetailModal" class="fixed inset-0 z-[250] hidden flex flex-col justify-end lg:justify-center lg:items-center p-0 lg:p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeMatchDetail()"></div>
+        <div class="relative bg-brand-panel border-t border-x border-white/10 lg:border lg:rounded-3xl rounded-t-[2rem] p-6 w-full lg:max-w-lg mx-auto z-10 modal-enter pb-safe shadow-2xl h-[80vh] flex flex-col">
+            <button onclick="closeMatchDetail()" class="absolute top-5 right-5 text-white/50"><i data-lucide="x" class="w-5 h-5"></i></button>
+            
+            <div class="text-center border-b border-white/10 pb-6 mb-6 mt-4 shrink-0">
+                <p id="md-status" class="text-[9px] font-black bg-white/10 text-white inline-block px-3 py-1 rounded uppercase tracking-widest mb-3">FT</p>
+                <div class="flex justify-center items-center gap-6">
+                    <div class="w-1/3 text-right"><h3 class="text-sm font-black text-white uppercase">MNA FC</h3></div>
+                    <div class="w-auto bg-black px-4 py-2 rounded-xl border border-white/10"><p class="text-3xl font-black text-brand-neon" id="md-score">0 - 0</p></div>
+                    <div class="w-1/3 text-left"><h3 class="text-sm font-black text-gray-400 uppercase" id="md-lawan">Lawan</h3></div>
+                </div>
+            </div>
 
+            <h4 class="text-[10px] font-black uppercase text-gray-500 tracking-widest mb-4 shrink-0 flex items-center gap-2"><i data-lucide="activity" class="w-3 h-3"></i> Match Events</h4>
+            
+            <div id="md-timeline" class="flex-1 overflow-y-auto hide-scroll relative px-2">
+                <div class="absolute left-[19px] top-0 bottom-0 w-[2px] bg-white/10 z-0"></div>
+                <div id="md-events-container" class="space-y-4 relative z-10">
+                    </div>
+            </div>
+        </div>
+    </div>
     <div id="gateModal" class="fixed inset-0 z-[300] hidden flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeCoachGate()"></div>
         <div class="relative bg-[#0a0a0a] p-8 rounded-[2rem] border border-brand-gold/30 shadow-[0_0_50px_rgba(215,182,125,0.15)] w-full max-w-xs z-10 text-center modal-enter">
@@ -356,11 +378,11 @@
                 if(rawData.futsal && rawData.futsal.pemain) rawData.futsal.pemain = processPlayerData(rawData.futsal.pemain);
                 updateUI(); if(rawData.galeri) renderGallery(rawData.galeri); renderPublicMatches();
             }
-            fetchLiveDatabase(); // Panggilan asinkron tanpa nge-block UI
             
-            // FOTMOB STYLE: Jalankan Smart Polling setiap 30 detik
+            fetchLiveDatabase(); // Tarik data awal
+            
+            // SMART POLLING: Refresh tiap 30 detik untuk FotMob effect
             livePollingInterval = setInterval(() => {
-                // Hanya fetch ulang jika di tab public Jadwal ATAU Coach lagi Live
                 if(!document.getElementById('view-matches').classList.contains('hidden') || matchState.mode === 'live') {
                     fetchLiveDatabase(true);
                 }
@@ -376,15 +398,14 @@
                 rawData = data;
                 localStorage.setItem('mnafc_multisport_cache', JSON.stringify(data));
                 
-                // Jika ini dari background polling, update jadwal secara diam-diam
                 if(isPolling) {
-                    renderPublicMatches();
+                    renderPublicMatches(); // Hanya update jadwal kalau polling background
                 } else {
                     updateUI(); if(rawData.galeri) renderGallery(rawData.galeri); renderPublicMatches();
                 }
-            } catch (e) { console.error("Gagal sinkronisasi data:", e); }
+            } catch (e) { console.error("Gagal sinkron", e); }
         }
-
+        
         // --- SISTEM LOGIN PELATIH ---
         const SECRET_PIN = '2026';
 
@@ -540,18 +561,28 @@
         function getMatchMinute() { return Math.floor(matchState.time / 60) + "'"; }
 
         function correctScore(team) {
-            if(team === 'home' && matchState.home > 0) {
-                matchState.home--;
-                document.getElementById('score-home').innerText = matchState.home;
-                syncLiveStateToServer('LIVE'); // Update FotMob public
-            }
-            if(team === 'away' && matchState.away > 0) {
-                matchState.away--;
-                document.getElementById('score-away').innerText = matchState.away;
-                syncLiveStateToServer('LIVE'); // Update FotMob public
-            }
+            if(team === 'home' && matchState.home > 0) { matchState.home--; }
+            if(team === 'away' && matchState.away > 0) { matchState.away--; }
+            document.getElementById('score-home').innerText = matchState.home; 
+            document.getElementById('score-away').innerText = matchState.away;
+            syncLiveStateToServer('LIVE'); // Update ke FotMob
         }
 
+        function syncLiveStateToServer(status) {
+            if(!matchState.id) return;
+            const payload = {
+                id_match: matchState.id,
+                status: status,
+                skor_kita: matchState.home,
+                skor_lawan: matchState.away
+            };
+            // Tembak API secara diam-diam
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'update_live_match', payload: payload })
+            }).catch(e => console.log(e));
+        }
+        
         // PUSH REAL-TIME KE SPREADSHEET (MENGUBAH STATUS DI TAB JADWAL)
         function syncLiveStateToServer(status) {
             if(!matchState.id) return;
@@ -727,42 +758,28 @@
         function closeActionModal() { document.getElementById('actionModal').classList.add('hidden'); }
 
         async function endLiveMatch() {
-            if(!confirm("Akhiri pertandingan (Full Time) dan simpan log data ke Database?")) return;
+            if(!confirm("Akhiri pertandingan (Full Time) dan simpan log data?")) return;
             
             const btn = document.querySelector('button[onclick="endLiveMatch()"]');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = "Menyimpan ke Database...";
-            btn.disabled = true;
+            const originalText = btn.innerHTML; btn.innerHTML = "Menyimpan ke Database..."; btn.disabled = true;
 
-            const payload = {
-                id_match: matchState.id,
-                tanggal: new Date().toLocaleDateString('id-ID'),
-                cabang: activeSport,
-                lawan: matchState.lawan,
-                skor_kita: matchState.home,
-                skor_lawan: matchState.away,
-                events: matchState.events
+            const payload = { 
+                id_match: matchState.id, 
+                tanggal: new Date().toLocaleDateString('id-ID'), 
+                cabang: activeSport, 
+                lawan: matchState.lawan, 
+                skor_kita: matchState.home, 
+                skor_lawan: matchState.away, 
+                events: matchState.events 
             };
 
             try {
-                // 1. Simpan Log
-                await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'save_match', payload: payload })
-                });
-                
-                // 2. Set status Jadwal menjadi Selesai / FT
-                syncLiveStateToServer('FT');
-
-                alert("Pertandingan Selesai! Log data telah diamankan ke server MNA FC.");
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'save_match', payload: payload }) });
+                syncLiveStateToServer('FT'); // Set status di spreadsheet jadi FT
+                alert("Match Selesai! Log tersimpan.");
                 closeCoachDashboard(); 
-            } catch(e) {
-                console.error(e);
-                alert("Gagal mengirim ke server. Pastikan koneksi stabil.");
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
+            } catch(e) { alert("Gagal mengirim ke server."); } 
+            finally { btn.innerHTML = originalText; btn.disabled = false; }
         }
 
         // ==========================================
@@ -1004,56 +1021,78 @@
         // --- PUBLIC MATCH CENTER (JADWAL FOTMOB STYLE) ---
         function renderPublicMatches() {
             const list = document.getElementById('public-match-list');
-            const ind = document.getElementById('live-indicator');
-            
-            if(!rawData.jadwal || rawData.jadwal.length === 0) { 
-                list.innerHTML = '<div class="text-center py-10 border border-dashed border-white/10 rounded-2xl"><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Belum ada jadwal pertandingan</p></div>'; 
-                ind.classList.add('hidden');
-                return; 
-            }
-            
-            let isAnyLive = false;
+            if(!rawData.jadwal || rawData.jadwal.length === 0) { list.innerHTML = '<div class="text-center py-10 border border-dashed border-white/10 rounded-2xl"><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Belum ada jadwal pertandingan</p></div>'; return; }
             
             list.innerHTML = rawData.jadwal.map(j => {
-                if(j.status === 'LIVE') isAnyLive = true;
-                
                 const isLive = j.status === 'LIVE';
                 const isFT = j.status === 'FT' || j.status === 'Selesai';
+                const hasScore = isLive || isFT;
                 
                 return `
-                <div class="bg-brand-panel border ${isLive ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'border-white/10'} p-5 rounded-[1.5rem] flex items-center justify-between transition-all">
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <p class="text-[8px] font-black ${isLive ? 'text-red-500' : 'text-brand-gold'} uppercase tracking-widest">${j.tanggal} • ${j.waktu}</p>
-                            ${isLive ? '<span class="text-[7px] font-black bg-red-500 text-white px-1.5 rounded uppercase live-pulse">LIVE</span>' : ''}
-                            ${isFT ? '<span class="text-[7px] font-black bg-gray-700 text-white px-1.5 rounded uppercase">FT</span>' : ''}
-                        </div>
-                        <div class="flex items-center gap-4 mt-2">
-                            <div>
-                                <h4 class="text-base font-black text-white uppercase leading-none mb-1">MNA FC</h4>
-                                <h4 class="text-base font-black text-gray-400 uppercase leading-none">${j.lawan}</h4>
-                            </div>
-                            ${(isLive || isFT) ? `
-                            <div class="bg-black border border-white/10 px-3 py-1 rounded-lg text-center">
-                                <p class="text-lg font-black ${isLive ? 'text-red-500' : 'text-white'} leading-none mb-1">${j.skor_kita || 0}</p>
-                                <p class="text-lg font-black text-gray-400 leading-none">${j.skor_lawan || 0}</p>
-                            </div>
-                            ` : ''}
-                        </div>
-                        <p class="text-[9px] text-gray-500 uppercase mt-3"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> ${j.tempat}</p>
+                <div class="bg-brand-panel border ${isLive ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-white/10'} p-5 rounded-[1.5rem] flex flex-col justify-between transition-all group">
+                    <div class="flex justify-between items-start mb-3">
+                        <p class="text-[8px] font-black ${isLive ? 'text-red-500' : 'text-brand-gold'} uppercase tracking-widest">${j.tanggal} • ${j.waktu}</p>
+                        ${isLive ? '<span class="text-[7px] font-black bg-red-500 text-white px-1.5 rounded uppercase animate-pulse">LIVE</span>' : ''}
+                        ${isFT ? '<span class="text-[7px] font-black bg-gray-700 text-white px-1.5 rounded uppercase tracking-widest">FT</span>' : ''}
                     </div>
-                </div>
-            `}).join('');
-            
-            // Indikator header
-            if(isAnyLive) {
-                ind.classList.remove('hidden'); ind.classList.add('flex');
-            } else {
-                ind.classList.add('hidden'); ind.classList.remove('flex');
-            }
-            
+                    <div class="flex items-center justify-between">
+                        <div class="w-1/3"><h4 class="text-sm font-black text-white uppercase leading-none">MNA FC</h4></div>
+                        <div class="w-1/3 flex justify-center">
+                            ${hasScore ? `
+                            <div class="bg-black border border-white/10 px-4 py-1.5 rounded-lg text-center flex items-center gap-3">
+                                <p class="text-xl font-black ${isLive ? 'text-red-500' : 'text-white'} leading-none">${j.skor_kita || 0}</p><span class="text-gray-600 font-bold">-</span><p class="text-xl font-black text-gray-400 leading-none">${j.skor_lawan || 0}</p>
+                            </div>` : `<div class="text-[10px] font-black text-gray-600 bg-white/5 px-3 py-1 rounded-full uppercase">VS</div>`}
+                        </div>
+                        <div class="w-1/3 text-right"><h4 class="text-sm font-black text-gray-400 uppercase leading-none truncate">${j.lawan}</h4></div>
+                    </div>
+                    <div class="flex justify-between items-end mt-4">
+                        <p class="text-[8px] text-gray-500 uppercase"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> ${j.tempat}</p>
+                        ${hasScore ? `<button onclick="openMatchDetail('${j.id_match}')" class="text-[8px] font-black bg-white/5 hover:bg-white/10 text-white px-3 py-1.5 rounded-lg uppercase tracking-widest border border-white/10 transition-colors">Timeline <i data-lucide="chevron-right" class="w-3 h-3 inline"></i></button>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
             lucide.createIcons();
         }
+
+        // FUNGSI BARU UNTUK MEMBUKA MODAL EVENT TIMELINE
+        function openMatchDetail(matchId) {
+            const jadwal = rawData.jadwal.find(j => j.id_match === matchId);
+            const log = rawData.match_log ? rawData.match_log.find(l => l.id_match === matchId) : null;
+            if(!jadwal) return;
+            
+            document.getElementById('md-lawan').innerText = jadwal.lawan;
+            document.getElementById('md-score').innerText = `${jadwal.skor_kita || 0} - ${jadwal.skor_lawan || 0}`;
+            document.getElementById('md-status').innerText = jadwal.status === 'LIVE' ? 'LIVE MATCH' : 'FULL TIME';
+            document.getElementById('md-status').className = jadwal.status === 'LIVE' ? 'text-[9px] font-black bg-red-500/20 border border-red-500 text-red-500 inline-block px-3 py-1 rounded uppercase tracking-widest mb-3 animate-pulse' : 'text-[9px] font-black bg-white/10 text-white inline-block px-3 py-1 rounded uppercase tracking-widest mb-3';
+
+            const container = document.getElementById('md-events-container');
+            if(log && log.detail_event) {
+                try {
+                    const events = JSON.parse(log.detail_event);
+                    if(events.length === 0) container.innerHTML = '<p class="text-center text-[9px] font-bold text-gray-500 uppercase mt-10">Tidak ada kejadian.</p>';
+                    else {
+                        container.innerHTML = events.map(ev => {
+                            let dotCol = 'bg-gray-500';
+                            if(ev.type.includes('Gol') || ev.type.includes('Penalti Didapat')) dotCol = 'bg-green-500';
+                            if(ev.type.includes('Kebobolan') || ev.type.includes('Merah') || ev.type.includes('Gagal')) dotCol = 'bg-red-500';
+                            if(ev.type.includes('Kuning')) dotCol = 'bg-yellow-500';
+                            if(ev.type.includes('Assist') || ev.type.includes('Substitusi')) dotCol = 'bg-brand-neon';
+
+                            return `
+                            <div class="relative pl-6 mb-4">
+                                <div class="absolute left-[3px] top-1/2 -translate-y-1/2 w-2.5 h-2.5 ${dotCol} rounded-full border-2 border-brand-panel z-10 shadow-[0_0_5px_currentColor]"></div>
+                                <div class="bg-black border border-white/5 p-3 rounded-xl ml-2 shadow-md flex items-center gap-3">
+                                    <div><p class="text-[10px] font-black uppercase tracking-widest text-white mb-0.5">${ev.type} <span class="text-[7px] text-gray-500 font-bold ml-1">${ev.time}</span></p><p class="text-[8px] text-gray-400 uppercase">${ev.detail}</p></div>
+                                </div>
+                            </div>`;
+                        }).join('');
+                    }
+                } catch(e) { container.innerHTML = '<p class="text-center text-[9px] text-red-500">Error data.</p>'; }
+            } else { container.innerHTML = '<p class="text-center text-[9px] font-bold text-gray-500 uppercase mt-10">Data timeline belum masuk ke server.</p>'; }
+
+            document.getElementById('matchDetailModal').classList.remove('hidden');
+        }
+        function closeMatchDetail() { document.getElementById('matchDetailModal').classList.add('hidden'); }
 
         // --- LINEUP BUILDER ENGINE ---
         function initLineupBuilder() {
@@ -1095,10 +1134,22 @@
             
             const filteredPlayers = players.filter(p => (val(p.nama) + val(p.posisi)).toLowerCase().includes(query));
 
+            // Perbaikan efek abu-abu (gray-out)
             pool.innerHTML = filteredPlayers.map((p) => {
                 const i = players.indexOf(p);
                 const isAssigned = assignedIds.includes(p.nomor + p.nama);
-                return `<div onclick="assignPlayerToSlot(${i})" class="pool-card flex flex-col items-center gap-2 cursor-pointer ${isAssigned ? 'disabled' : ''}"><div class="w-14 h-14 rounded-full overflow-hidden border-2 border-white/10 bg-black"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div><div class="text-center"><p class="text-[8px] font-black text-white uppercase line-clamp-1 w-16 leading-tight">${val(p.nama)}</p><p class="text-[7px] text-brand-neon font-bold mt-0.5">${val(p.posisi)}</p></div></div>`;
+                
+                // Jika isAssigned, matikan klik dan beri efek abu-abu pekat
+                return `
+                <div onclick="${isAssigned ? '' : `assignPlayerToSlot(${i})`}" class="pool-card flex flex-col items-center gap-2 transition-all ${isAssigned ? 'opacity-20 grayscale cursor-not-allowed' : 'cursor-pointer hover:scale-105'}">
+                    <div class="w-14 h-14 rounded-full overflow-hidden border-2 ${isAssigned ? 'border-gray-800' : 'border-white/10'} bg-black">
+                        <img src="${val(p.link_foto)}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[8px] font-black ${isAssigned ? 'text-gray-600' : 'text-white'} uppercase line-clamp-1 w-16 leading-tight">${val(p.nama)}</p>
+                        <p class="text-[7px] ${isAssigned ? 'text-gray-700' : 'text-brand-neon'} font-bold mt-0.5">${val(p.posisi)}</p>
+                    </div>
+                </div>`;
             }).join('');
         }
 
