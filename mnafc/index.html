@@ -196,7 +196,7 @@
                         </div>
                         
                         <div id="lineup-pool" class="flex flex-wrap lg:grid lg:grid-cols-5 gap-3 overflow-y-auto max-h-[400px] hide-scroll opacity-30 pointer-events-none transition-opacity duration-300">
-                            </div>
+                        </div>
                     </div>
 
                     <div id="coach-live-panel" class="hidden flex-col gap-6">
@@ -225,6 +225,10 @@
                                 <div class="text-center mt-10"><p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Belum ada kejadian tercatat</p></div>
                             </div>
                         </div>
+
+                        <button onclick="endLiveMatch()" class="w-full bg-gradient-to-r from-red-600/80 to-red-900/90 hover:from-red-500 hover:to-red-700 text-white py-4 mt-2 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all">
+                            <i data-lucide="save" class="w-4 h-4 inline pb-0.5 mr-1"></i> Akhiri & Simpan Match
+                        </button>
                         
                     </div>
                 </div>
@@ -239,7 +243,7 @@
             <h3 id="action-title" class="text-lg lg:text-xl font-black text-white uppercase tracking-widest mb-6 text-center drop-shadow-md">Pilih Pemain</h3>
             
             <div id="action-player-list" class="grid grid-cols-4 lg:grid-cols-6 gap-4 max-h-[50vh] overflow-y-auto hide-scroll px-2 pb-2">
-                </div>
+            </div>
             
             <div class="mt-6 pt-4 border-t border-white/10 text-center">
                 <button onclick="closeActionModal()" class="bg-white/5 hover:bg-white/10 border border-white/10 px-8 py-3 rounded-xl text-[10px] font-bold text-white uppercase tracking-widest transition-all">Batal</button>
@@ -260,10 +264,7 @@
         </div>
     </div>
 
-    <div id="playerModal" class="fixed inset-0 z-[150] hidden flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-brand-dark/95 backdrop-blur-xl" onclick="closeModal()"></div>
-        <div id="modalContent" class="w-full max-w-sm glass-panel border border-white/10 rounded-[2.5rem] overflow-hidden relative z-10 modal-enter shadow-2xl"></div>
-    </div>
+    <div id="playerModal" class="fixed inset-0 z-[150] hidden flex items-center justify-center p-4"><div class="absolute inset-0 bg-brand-dark/95 backdrop-blur-xl" onclick="closeModal()"></div><div id="modalContent" class="w-full max-w-sm glass-panel border border-white/10 rounded-[2.5rem] overflow-hidden relative z-10 modal-enter shadow-2xl"></div></div>
     <div id="fullProfilePage" class="fixed inset-0 z-[200] hidden bg-brand-dark h-[100dvh] w-full overflow-y-auto overscroll-contain transition-transform duration-500 translate-x-full"></div>
 
     <nav class="fixed bottom-0 w-full z-[110] bg-brand-surface/95 backdrop-blur-2xl border-t border-white/5 pb-safe transition-colors lg:hidden" id="bottom-nav">
@@ -287,7 +288,6 @@
         let activeSport = 'mnafc'; 
         let activePos = 'ALL';
 
-        // --- SISTEM LOGIN PELATIH ---
         const SECRET_PIN = '2026';
 
         function openCoachGate() {
@@ -313,19 +313,16 @@
         let trackerLineup = {}; 
 
         function openCoachDashboard() {
-            // Sembunyikan Public View
             document.getElementById('view-squad').classList.add('hidden');
             document.getElementById('view-gallery').classList.add('hidden');
             document.getElementById('sport-dashboard-container').classList.add('hidden');
             document.getElementById('main-nav-tabs').classList.add('hidden');
             document.getElementById('btn-lock').classList.add('hidden');
-            document.getElementById('bottom-nav').classList.add('translate-y-full'); // Hide di mobile
+            document.getElementById('bottom-nav').classList.add('translate-y-full'); 
             
-            // Tampilkan Pro Dashboard
             document.getElementById('view-coach-dashboard').classList.remove('hidden');
             document.getElementById('coach-sport-label').innerText = activeSport === 'mnafc' ? 'MNA FC Coach' : 'MNA FUTSAL Coach';
             
-            // Reset ke mode Setup
             matchState.mode = 'setup';
             document.getElementById('coach-setup-panel').classList.remove('hidden');
             document.getElementById('coach-live-panel').classList.add('hidden');
@@ -333,18 +330,14 @@
             document.getElementById('match-status-text').innerText = 'Mode Persiapan Lineup';
             document.getElementById('btn-start-match').classList.remove('hidden');
             
-            // Re-init Lineup Builder agar sinkron dengan ukuran layar
             initLineupBuilder();
         }
 
         function closeCoachDashboard() {
             if(matchState.mode === 'live' && !confirm("Yakin ingin keluar? Match sedang berjalan.")) return;
-            
-            // Matikan timer jika nyala
             if(matchState.isRunning) toggleTimer();
             
             document.getElementById('view-coach-dashboard').classList.add('hidden');
-            
             document.getElementById('main-nav-tabs').classList.remove('hidden');
             document.getElementById('btn-lock').classList.remove('hidden');
             document.getElementById('sport-dashboard-container').classList.remove('hidden');
@@ -362,7 +355,6 @@
             matchState.mode = 'live';
             trackerLineup = JSON.parse(JSON.stringify(lineupData));
 
-            // Transisi UI dari Setup ke Live
             document.getElementById('coach-setup-panel').classList.add('hidden');
             document.getElementById('coach-live-panel').classList.remove('hidden');
             document.getElementById('coach-live-panel').classList.add('flex');
@@ -374,7 +366,6 @@
             document.getElementById('match-status-text').innerText = 'Live Match Tracker';
             document.getElementById('match-status-text').classList.replace('text-brand-neon', 'text-red-500');
 
-            // Render formasi tracker (mengunci klik)
             renderTrackerPitch();
         }
 
@@ -412,8 +403,9 @@
             }).join('');
         }
 
-        // --- ACTION ENGINE ---
+        // --- FASE 4: ACTION ENGINE & SUBSTITUSI ---
         let currentActionType = '';
+        let playerOutSlot = null; // Variabel pelacak siapa yang diganti
 
         function triggerAction(type) {
             currentActionType = type;
@@ -434,7 +426,7 @@
             else if(type === 'red') { titleTxt = 'Kartu Merah'; color = 'text-red-500'; }
             else if(type === 'pen_won') { titleTxt = 'Dapat Penalti'; color = 'text-green-400'; }
             else if(type === 'pen_miss') { titleTxt = 'Gagal Penalti'; color = 'text-red-400'; }
-            else if(type === 'sub') { titleTxt = 'Sub Out (Pilih Pemain Keluar)'; color = 'text-brand-gold'; }
+            else if(type === 'sub') { titleTxt = 'Pilih Pemain KELUAR'; color = 'text-brand-gold'; }
 
             titleEl.className = `text-lg lg:text-xl font-black uppercase tracking-widest mb-6 text-center drop-shadow-md ${color}`;
             titleEl.innerText = titleTxt;
@@ -455,6 +447,35 @@
         }
 
         function executeAction(slotIdx) {
+            // LOGIKA SUBSTITUSI FASE 4
+            if (currentActionType === 'sub') {
+                playerOutSlot = slotIdx;
+                currentActionType = 'sub_in'; // Ubah mode menjadi Pemain Masuk
+                
+                document.getElementById('action-title').innerText = 'Pilih Pemain MASUK';
+                document.getElementById('action-title').classList.replace('text-brand-gold', 'text-brand-neon');
+                
+                const listEl = document.getElementById('action-player-list');
+                listEl.innerHTML = '';
+                
+                const allPlayers = rawData[activeSport].pemain;
+                const activeIds = Object.values(trackerLineup).filter(p => p).map(p => p.nomor + p.nama);
+                
+                // Render pemain Cadangan (Yang tidak ada di trackerLineup saat ini)
+                allPlayers.forEach((p, originalIdx) => {
+                    if(!activeIds.includes(p.nomor + p.nama)) {
+                        listEl.innerHTML += `
+                        <div onclick="executeSubIn(${originalIdx})" class="flex flex-col items-center gap-2 cursor-pointer group">
+                            <div class="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-white/10 bg-black overflow-hidden group-hover:border-brand-neon transition-all shadow-lg"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div>
+                            <p class="text-[9px] font-black text-white uppercase text-center leading-tight line-clamp-1 w-full px-1">${val(p.nama).split(' ')[0]}</p>
+                            <p class="text-[7px] text-brand-neon font-bold">${val(p.posisi)}</p>
+                        </div>`;
+                    }
+                });
+                return; // Berhenti di sini, biarkan modal tetap terbuka untuk sub-in
+            }
+
+            // LOGIKA EVENT BIASA (GOL, KARTU DLL)
             const p = trackerLineup[slotIdx];
             closeActionModal();
 
@@ -471,9 +492,21 @@
                 logEvent('green', 'Penalti Didapat', p.nama, 'target');
             } else if (currentActionType === 'pen_miss') {
                 logEvent('red', 'Penalti Gagal', p.nama, 'x-circle');
-            } else if (currentActionType === 'sub') {
-                alert(`Substitusi untuk ${p.nama} akan dikembangkan di fase integrasi backend.`);
             }
+        }
+
+        // Eksekusi Akhir Substitusi
+        function executeSubIn(playerIdx) {
+            const pOut = trackerLineup[playerOutSlot];
+            const pIn = rawData[activeSport].pemain[playerIdx];
+            
+            // Ganti foto/data pemain di Formasi Aktif
+            trackerLineup[playerOutSlot] = pIn;
+            
+            logEvent('blue', 'Substitusi', `IN: ${pIn.nama.split(' ')[0]} | OUT: ${pOut.nama.split(' ')[0]}`, 'arrow-left-right');
+            
+            renderTrackerPitch(); // Render ulang lapangan
+            closeActionModal();
         }
 
         function logEvent(colorScheme, title, desc, iconName) {
@@ -505,6 +538,41 @@
         }
 
         function closeActionModal() { document.getElementById('actionModal').classList.add('hidden'); }
+
+        // FASE 4: SAVE MATCH KE SPREADSHEET
+        async function endLiveMatch() {
+            if(!confirm("Akhiri pertandingan dan simpan log data ke Database Server?")) return;
+            
+            const btn = document.querySelector('button[onclick="endLiveMatch()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "Menyimpan ke Database...";
+            btn.disabled = true;
+
+            const payload = {
+                id_match: 'M' + Date.now(),
+                tanggal: new Date().toLocaleDateString('id-ID'),
+                cabang: activeSport,
+                lawan: 'Match Bebas', // Default karena di index(4) tidak ada match selector
+                skor_kita: matchState.home,
+                skor_lawan: matchState.away,
+                events: matchState.events
+            };
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'save_match', payload: payload })
+                });
+                alert("Pertandingan Selesai! Data berhasil disimpan ke Spreadsheet.");
+                closeCoachDashboard(); // Otomatis keluar setelah save
+            } catch(e) {
+                console.error(e);
+                alert("Gagal menyimpan ke server. Pastikan koneksi internet stabil.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
 
         // ==========================================
         // DATA & ENGINE PUBLIC
