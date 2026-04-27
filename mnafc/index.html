@@ -1063,9 +1063,18 @@
             document.getElementById('md-status').className = jadwal.status === 'LIVE' ? 'text-[9px] font-black bg-red-500/20 border border-red-500 text-red-500 inline-block px-3 py-1 rounded uppercase tracking-widest mb-3 animate-pulse' : 'text-[9px] font-black bg-white/10 text-white inline-block px-3 py-1 rounded uppercase tracking-widest mb-3';
 
             const container = document.getElementById('md-events-container');
-            if(log && log.detail_event) {
+            
+            // SISTEM PEMBACAAN REAL-TIME
+            let eventsJSON = null;
+            if (jadwal.status === 'LIVE' && jadwal.live_events) {
+                eventsJSON = jadwal.live_events; // Tarik data dari tab Jadwal jika masih main
+            } else if (log && log.detail_event) {
+                eventsJSON = log.detail_event; // Tarik dari Match_Log jika sudah Selesai (FT)
+            }
+
+            if(eventsJSON) {
                 try {
-                    const events = JSON.parse(log.detail_event);
+                    const events = JSON.parse(eventsJSON);
                     if(events.length === 0) container.innerHTML = '<p class="text-center text-[9px] font-bold text-gray-500 uppercase mt-10">Tidak ada kejadian.</p>';
                     else {
                         container.innerHTML = events.map(ev => {
