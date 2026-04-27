@@ -260,7 +260,10 @@
         </div>
     </div>
 
-    <div id="playerModal" class="fixed inset-0 z-[150] hidden flex items-center justify-center p-4"><div class="absolute inset-0 bg-brand-dark/95 backdrop-blur-xl" onclick="closeModal()"></div><div id="modalContent" class="w-full max-w-sm glass-panel border border-white/10 rounded-[2.5rem] overflow-hidden relative z-10 modal-enter shadow-2xl"></div></div>
+    <div id="playerModal" class="fixed inset-0 z-[150] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-brand-dark/95 backdrop-blur-xl" onclick="closeModal()"></div>
+        <div id="modalContent" class="w-full max-w-sm glass-panel border border-white/10 rounded-[2.5rem] overflow-hidden relative z-10 modal-enter shadow-2xl"></div>
+    </div>
     <div id="fullProfilePage" class="fixed inset-0 z-[200] hidden bg-brand-dark h-[100dvh] w-full overflow-y-auto overscroll-contain transition-transform duration-500 translate-x-full"></div>
 
     <nav class="fixed bottom-0 w-full z-[110] bg-brand-surface/95 backdrop-blur-2xl border-t border-white/5 pb-safe transition-colors lg:hidden" id="bottom-nav">
@@ -310,16 +313,19 @@
         let trackerLineup = {}; 
 
         function openCoachDashboard() {
+            // Sembunyikan Public View
             document.getElementById('view-squad').classList.add('hidden');
             document.getElementById('view-gallery').classList.add('hidden');
             document.getElementById('sport-dashboard-container').classList.add('hidden');
             document.getElementById('main-nav-tabs').classList.add('hidden');
             document.getElementById('btn-lock').classList.add('hidden');
-            document.getElementById('bottom-nav').classList.add('translate-y-full'); 
+            document.getElementById('bottom-nav').classList.add('translate-y-full'); // Hide di mobile
             
+            // Tampilkan Pro Dashboard
             document.getElementById('view-coach-dashboard').classList.remove('hidden');
             document.getElementById('coach-sport-label').innerText = activeSport === 'mnafc' ? 'MNA FC Coach' : 'MNA FUTSAL Coach';
             
+            // Reset ke mode Setup
             matchState.mode = 'setup';
             document.getElementById('coach-setup-panel').classList.remove('hidden');
             document.getElementById('coach-live-panel').classList.add('hidden');
@@ -327,12 +333,14 @@
             document.getElementById('match-status-text').innerText = 'Mode Persiapan Lineup';
             document.getElementById('btn-start-match').classList.remove('hidden');
             
+            // Re-init Lineup Builder agar sinkron dengan ukuran layar
             initLineupBuilder();
         }
 
         function closeCoachDashboard() {
             if(matchState.mode === 'live' && !confirm("Yakin ingin keluar? Match sedang berjalan.")) return;
             
+            // Matikan timer jika nyala
             if(matchState.isRunning) toggleTimer();
             
             document.getElementById('view-coach-dashboard').classList.add('hidden');
@@ -354,6 +362,7 @@
             matchState.mode = 'live';
             trackerLineup = JSON.parse(JSON.stringify(lineupData));
 
+            // Transisi UI dari Setup ke Live
             document.getElementById('coach-setup-panel').classList.add('hidden');
             document.getElementById('coach-live-panel').classList.remove('hidden');
             document.getElementById('coach-live-panel').classList.add('flex');
@@ -365,6 +374,7 @@
             document.getElementById('match-status-text').innerText = 'Live Match Tracker';
             document.getElementById('match-status-text').classList.replace('text-brand-neon', 'text-red-500');
 
+            // Render formasi tracker (mengunci klik)
             renderTrackerPitch();
         }
 
@@ -429,6 +439,7 @@
             titleEl.className = `text-lg lg:text-xl font-black uppercase tracking-widest mb-6 text-center drop-shadow-md ${color}`;
             titleEl.innerText = titleTxt;
 
+            // Render pemain di lapangan
             Object.keys(trackerLineup).forEach(idx => {
                 const p = trackerLineup[idx];
                 if(p) {
