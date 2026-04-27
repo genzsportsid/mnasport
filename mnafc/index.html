@@ -11,7 +11,10 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    colors: { 'brand-blue': '#1d4ed8', 'brand-neon': '#3b82f6', 'brand-gold': '#d7b67d', 'brand-dark': '#050505', 'brand-surface': '#0a0a0a', 'brand-panel': '#111111' },
+                    colors: {
+                        'brand-blue': '#1d4ed8', 'brand-neon': '#3b82f6', 'brand-gold': '#d7b67d',
+                        'brand-dark': '#050505', 'brand-surface': '#0a0a0a', 'brand-panel': '#111111'
+                    },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
@@ -23,8 +26,9 @@
         .hide-scroll::-webkit-scrollbar { display: none; }
         .glass-panel { background: rgba(17, 17, 17, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .player-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .player-card:hover { transform: translateY(-5px); border-color: rgba(59, 130, 246, 0.4); }
+        .player-card:hover { transform: translateY(-5px) scale(1.02); border-color: rgba(59, 130, 246, 0.4); }
         
+        /* TACTICAL PITCH ENGINE */
         .pitch-wrapper { position: relative; width: 100%; max-width: 380px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 1.5px solid rgba(255, 255, 255, 0.15); box-shadow: inset 0 0 40px rgba(0,0,0,0.5); }
         .pitch-wrapper::before { content: ""; display: block; padding-top: 145%; }
         .pitch-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: all 0.5s ease; }
@@ -38,21 +42,25 @@
         .player-marker { position: absolute; width: 34px; height: 34px; border: 2px solid white; border-radius: 50%; transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 9px; font-weight: 900; color: white; text-shadow: 0px 1px 3px rgba(0,0,0,0.8); z-index: 10; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
         .player-marker-alt { position: absolute; width: 30px; height: 30px; border: 2px dashed rgba(255,255,255,0.7); border-radius: 50%; transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 8px; font-weight: 800; color: rgba(255,255,255,0.8); z-index: 9; opacity: 0.6; }
 
-        .lineup-slot { position: absolute; width: 40px; height: 40px; border-radius: 50%; transform: translate(-50%, 50%); z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); border: 2px dashed rgba(255,255,255,0.5); backdrop-filter: blur(4px); cursor: pointer; transition: all 0.2s; }
+        /* LINEUP BUILDER */
+        .lineup-slot { position: absolute; width: 40px; height: 40px; border-radius: 50%; transform: translate(-50%, 50%); z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); border: 2px dashed rgba(255,255,255,0.5); backdrop-filter: blur(4px); cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .lineup-slot:hover { border-color: white; transform: translate(-50%, 50%) scale(1.05); }
         .lineup-slot.active { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); transform: translate(-50%, 50%) scale(1.15); background: rgba(59, 130, 246, 0.3); z-index: 30; }
         .lineup-slot.filled { border-style: solid; border-color: white; background-size: cover; background-position: center; border-width: 2px; }
-        .lineup-slot-label { position: absolute; bottom: -16px; white-space: nowrap; font-size: 8px; font-weight: 900; background: rgba(0,0,0,0.9); padding: 2px 6px; border-radius: 4px; color: white; border: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; }
+        .lineup-slot-label { position: absolute; bottom: -16px; white-space: nowrap; font-size: 8px; font-weight: 900; background: rgba(0,0,0,0.9); padding: 2px 6px; border-radius: 4px; color: white; border: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.05em; }
 
         .pool-card { min-width: 70px; width: 70px; transition: all 0.2s; cursor: pointer; }
         .pool-card:hover { transform: translateY(-3px); }
+        .pool-card:active { transform: scale(0.95); }
         .pool-card.disabled { opacity: 0.2; pointer-events: none; filter: grayscale(100%); }
 
         .stagger-item { animation: fadeUp 0.5s ease forwards; opacity: 0; transform: translateY(10px); }
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        
+        .action-btn { transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .action-btn:active { transform: scale(0.95); }
-        .page-slide-in { transform: translateX(0) !important; }
     </style>
 </head>
 <body class="bg-brand-dark lg:pb-0 pb-32">
@@ -72,6 +80,7 @@
                 </div>
                 <button id="btn-lock" onclick="openGate()" class="p-2 ml-1 bg-brand-panel rounded-xl border border-white/10 text-brand-gold hover:bg-brand-gold hover:text-black transition-all shadow-lg group relative">
                     <i data-lucide="lock" class="w-4 h-4"></i>
+                    <span class="absolute -bottom-8 right-0 bg-black text-[8px] px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Gate Access</span>
                 </button>
             </div>
         </div>
@@ -134,7 +143,7 @@
             </div>
             <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"></div>
         </div>
-        
+
         <div id="view-dev-dashboard" class="hidden animate-fade-in max-w-2xl mx-auto">
             <div class="bg-purple-900/20 border border-purple-500/30 p-6 rounded-[2rem] shadow-xl">
                 <div class="flex items-center gap-3 mb-6 border-b border-purple-500/20 pb-4">
@@ -152,20 +161,25 @@
                     
                     <button type="submit" id="dev-submit-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-black uppercase text-xs py-4 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.4)] mt-4 transition-all">Upload ke Database</button>
                 </form>
-                <button onclick="closeSecretArea()" class="w-full mt-4 bg-white/5 text-gray-400 py-3 rounded-xl text-[10px] font-bold uppercase hover:bg-white/10">Tutup Developer Mode</button>
+                <button onclick="closeSecretArea()" class="w-full mt-4 bg-white/5 text-gray-400 py-3 rounded-xl text-[10px] font-bold uppercase hover:bg-white/10 transition-colors">Tutup Developer Mode</button>
             </div>
         </div>
-
+        
         <div id="view-coach-dashboard" class="hidden animate-fade-in">
             <div class="bg-brand-panel border border-brand-gold/30 p-4 rounded-2xl flex flex-wrap justify-between items-center gap-4 mb-6 shadow-lg">
                 <div class="flex items-center gap-4">
-                    <div class="flex items-center justify-center w-12 h-12 bg-black rounded-xl border border-brand-gold/50"><i data-lucide="shield-check" class="w-6 h-6 text-brand-gold"></i></div>
-                    <div><h2 class="text-sm md:text-base font-black text-white uppercase tracking-widest leading-tight" id="coach-sport-label">MNA FC Coach</h2><p class="text-[10px] text-brand-neon font-bold uppercase tracking-widest" id="match-status-text">Pilih Pertandingan</p></div>
+                    <div class="flex items-center justify-center w-12 h-12 bg-black rounded-xl border border-brand-gold/50">
+                        <i data-lucide="shield-check" class="w-6 h-6 text-brand-gold"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm md:text-base font-black text-white uppercase tracking-widest leading-tight" id="coach-sport-label">MNA FC Coach</h2>
+                        <p class="text-[10px] text-brand-neon font-bold uppercase tracking-widest" id="match-status-text">Pilih Pertandingan</p>
+                    </div>
                 </div>
                 
                 <div id="match-scoreboard" class="hidden items-center gap-6 px-6 py-2 bg-black rounded-xl border border-white/10">
                     <div class="text-center relative">
-                        <button onclick="correctScore('home')" class="absolute -left-4 top-1 text-red-500 hover:bg-red-500/20 rounded-full p-0.5"><i data-lucide="minus-circle" class="w-3 h-3"></i></button>
+                        <button onclick="correctScore('home')" class="absolute -left-6 top-1 text-red-500 hover:bg-red-500/20 rounded-full p-0.5"><i data-lucide="minus-circle" class="w-4 h-4"></i></button>
                         <p class="text-[8px] text-gray-500 uppercase font-black">HOME</p><p class="text-2xl font-black text-white" id="score-home">0</p>
                     </div>
                     <div class="text-center cursor-pointer" onclick="toggleTimer()">
@@ -173,7 +187,7 @@
                         <p class="text-xl font-black text-brand-gold bg-white/5 px-3 py-1 rounded border border-white/10" id="match-timer">00:00</p>
                     </div>
                     <div class="text-center relative">
-                        <button onclick="correctScore('away')" class="absolute -right-4 top-1 text-red-500 hover:bg-red-500/20 rounded-full p-0.5"><i data-lucide="minus-circle" class="w-3 h-3"></i></button>
+                        <button onclick="correctScore('away')" class="absolute -right-6 top-1 text-red-500 hover:bg-red-500/20 rounded-full p-0.5"><i data-lucide="minus-circle" class="w-4 h-4"></i></button>
                         <p class="text-[8px] text-gray-500 uppercase font-black">AWAY</p><p class="text-2xl font-black text-red-400" id="score-away">0</p>
                     </div>
                 </div>
@@ -198,7 +212,15 @@
                             <h3 class="text-[10px] font-black text-white uppercase tracking-widest">Lawan: <span id="active-opponent-label" class="text-brand-gold"></span></h3>
                             <select id="formation-select" onchange="changeFormation(this.value)" class="bg-black border border-white/10 text-white text-[10px] font-bold uppercase rounded-lg py-1.5 px-3 outline-none focus:border-brand-neon cursor-pointer"></select>
                         </div>
-                        <div class="pitch-wrapper"><div id="lineup-pitch" class="pitch-container pitch-football"><div class="pitch-half pitch-line"></div><div class="pitch-circle pitch-line"></div><div class="pitch-line" style="top:0; left:20%; width:60%; height:18%; border-top:0;"></div><div class="pitch-line" style="bottom:0; left:20%; width:60%; height:18%; border-bottom:0;"></div><div id="lineup-slots-container"></div></div></div>
+                        
+                        <div class="pitch-wrapper">
+                            <div id="lineup-pitch" class="pitch-container pitch-football">
+                                <div class="pitch-half pitch-line"></div><div class="pitch-circle pitch-line"></div>
+                                <div class="pitch-line" style="top:0; left:20%; width:60%; height:18%; border-top:0;"></div>
+                                <div class="pitch-line" style="bottom:0; left:20%; width:60%; height:18%; border-bottom:0;"></div>
+                                <div id="lineup-slots-container"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -206,20 +228,31 @@
                     
                     <div id="coach-setup-panel" class="bg-brand-panel p-5 rounded-3xl border border-white/10 shadow-lg block">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 border-b border-white/5 pb-4">
-                            <div><h3 class="text-xs font-black text-white uppercase tracking-widest">Bursa Skuad</h3><p class="text-[9px] font-bold text-gray-500 uppercase mt-1" id="lineup-instruction">Pilih slot formasi di lapangan</p></div>
+                            <div>
+                                <h3 class="text-xs font-black text-white uppercase tracking-widest">Bursa Skuad</h3>
+                                <p class="text-[9px] font-bold text-gray-500 uppercase mt-1" id="lineup-instruction">Pilih slot formasi di lapangan</p>
+                            </div>
                             <div class="flex items-center gap-2 w-full sm:w-auto">
                                 <input type="text" id="lineupSearch" oninput="renderLineupPool()" placeholder="Cari pemain..." class="bg-black border border-white/10 text-xs px-3 py-1.5 rounded-lg text-white outline-none focus:border-brand-neon w-full sm:w-40">
-                                <button onclick="resetLineup()" class="text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest hover:bg-red-500/20 whitespace-nowrap">Reset</button>
+                                <button onclick="resetLineup()" class="text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest hover:bg-red-500/20 transition-all whitespace-nowrap">Reset</button>
                             </div>
                         </div>
-                        <div id="lineup-pool" class="flex flex-wrap lg:grid lg:grid-cols-5 gap-3 overflow-y-auto max-h-[400px] hide-scroll opacity-30 pointer-events-none transition-opacity duration-300"></div>
+                        
+                        <div id="lineup-pool" class="flex flex-wrap lg:grid lg:grid-cols-5 gap-3 overflow-y-auto max-h-[400px] hide-scroll opacity-30 pointer-events-none transition-opacity duration-300">
+                            </div>
                     </div>
 
                     <div id="coach-live-panel" class="hidden flex-col gap-6">
+                        
                         <div class="grid grid-cols-2 gap-4">
-                            <button onclick="triggerAction('goal_home')" class="action-btn bg-gradient-to-br from-green-600/30 to-green-900/40 border border-green-500/50 text-green-400 p-6 rounded-3xl flex flex-col items-center justify-center gap-3 hover:border-green-400 shadow-[0_0_30px_rgba(34,197,94,0.15)]"><i data-lucide="goal" class="w-10 h-10 drop-shadow-md"></i><span class="text-sm font-black uppercase tracking-widest text-white">Goal Scored</span></button>
-                            <button onclick="triggerAction('goal_away')" class="action-btn bg-gradient-to-br from-red-600/30 to-red-900/40 border border-red-500/50 text-red-400 p-6 rounded-3xl flex flex-col items-center justify-center gap-3 hover:border-red-400 shadow-[0_0_30px_rgba(239,68,68,0.15)]"><i data-lucide="shield-alert" class="w-10 h-10 drop-shadow-md"></i><span class="text-sm font-black uppercase tracking-widest text-white">Conceded</span></button>
+                            <button onclick="triggerAction('goal_home')" class="action-btn bg-gradient-to-br from-green-600/30 to-green-900/40 border border-green-500/50 text-green-400 p-6 rounded-3xl flex flex-col items-center justify-center gap-3 hover:border-green-400 shadow-[0_0_30px_rgba(34,197,94,0.15)]">
+                                <i data-lucide="goal" class="w-10 h-10 drop-shadow-md"></i><span class="text-sm font-black uppercase tracking-widest text-white">Goal Scored</span>
+                            </button>
+                            <button onclick="triggerAction('goal_away')" class="action-btn bg-gradient-to-br from-red-600/30 to-red-900/40 border border-red-500/50 text-red-400 p-6 rounded-3xl flex flex-col items-center justify-center gap-3 hover:border-red-400 shadow-[0_0_30px_rgba(239,68,68,0.15)]">
+                                <i data-lucide="shield-alert" class="w-10 h-10 drop-shadow-md"></i><span class="text-sm font-black uppercase tracking-widest text-white">Conceded</span>
+                            </button>
                         </div>
+                        
                         <div class="grid grid-cols-4 sm:grid-cols-6 gap-3">
                             <button onclick="triggerAction('assist')" class="action-btn bg-brand-panel border border-white/10 p-3 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5"><i data-lucide="footprints" class="w-5 h-5 text-brand-neon"></i><span class="text-[9px] font-bold uppercase text-gray-300">Assist</span></button>
                             <button onclick="triggerAction('sub')" class="action-btn bg-brand-panel border border-white/10 p-3 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5"><i data-lucide="arrow-left-right" class="w-5 h-5 text-brand-gold"></i><span class="text-[9px] font-bold uppercase text-gray-300">Sub</span></button>
@@ -228,10 +261,14 @@
                             <button onclick="triggerAction('pen_won')" class="action-btn col-span-2 sm:col-span-1 bg-brand-panel border border-white/10 p-3 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5"><i data-lucide="target" class="w-5 h-5 text-green-400"></i><span class="text-[9px] font-bold uppercase text-gray-300">Pen Won</span></button>
                             <button onclick="triggerAction('pen_miss')" class="action-btn col-span-2 sm:col-span-1 bg-brand-panel border border-white/10 p-3 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5"><i data-lucide="x-circle" class="w-5 h-5 text-red-400"></i><span class="text-[9px] font-bold uppercase text-gray-300">Pen Miss</span></button>
                         </div>
+
                         <div class="bg-[#050505] border border-white/10 rounded-3xl p-5 flex-1 min-h-[250px] shadow-inner flex flex-col">
                             <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-white/5 pb-3 mb-4 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4"></i> Match Timeline</h3>
-                            <div id="event-log" class="overflow-y-auto hide-scroll flex-1 space-y-3"><div class="text-center mt-10"><p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Belum ada kejadian</p></div></div>
+                            <div id="event-log" class="overflow-y-auto hide-scroll flex-1 space-y-3">
+                                <div class="text-center mt-10"><p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Belum ada kejadian tercatat</p></div>
+                            </div>
                         </div>
+                        
                     </div>
                 </div>
             </div>
@@ -243,8 +280,13 @@
         <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeActionModal()"></div>
         <div class="relative bg-brand-panel border-t border-x border-white/10 lg:border lg:rounded-3xl rounded-t-[2rem] p-6 w-full lg:max-w-2xl mx-auto z-10 modal-enter pb-safe shadow-2xl">
             <h3 id="action-title" class="text-lg lg:text-xl font-black text-white uppercase tracking-widest mb-6 text-center drop-shadow-md">Pilih Pemain</h3>
-            <div id="action-player-list" class="grid grid-cols-4 lg:grid-cols-6 gap-4 max-h-[50vh] overflow-y-auto hide-scroll px-2 pb-2"></div>
-            <div class="mt-6 pt-4 border-t border-white/10 text-center"><button onclick="closeActionModal()" class="bg-white/5 hover:bg-white/10 border border-white/10 px-8 py-3 rounded-xl text-[10px] font-bold text-white uppercase tracking-widest transition-all">Batal</button></div>
+            
+            <div id="action-player-list" class="grid grid-cols-4 lg:grid-cols-6 gap-4 max-h-[50vh] overflow-y-auto hide-scroll px-2 pb-2">
+                </div>
+            
+            <div class="mt-6 pt-4 border-t border-white/10 text-center">
+                <button onclick="closeActionModal()" class="bg-white/5 hover:bg-white/10 border border-white/10 px-8 py-3 rounded-xl text-[10px] font-bold text-white uppercase tracking-widest transition-all">Batal</button>
+            </div>
         </div>
     </div>
 
@@ -254,7 +296,9 @@
             <i data-lucide="key" class="w-10 h-10 text-white mx-auto mb-4 opacity-50"></i>
             <h2 class="text-xl font-black uppercase text-white tracking-widest mb-1">Security Gate</h2>
             <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-6">Coach = 2026 | Dev = 9999</p>
+            
             <input type="password" id="gate-pin" maxlength="4" placeholder="••••" class="w-full text-center text-4xl font-black tracking-[0.5em] bg-black border border-white/10 text-white rounded-2xl py-4 outline-none focus:border-brand-neon focus:shadow-[0_0_20px_rgba(59,130,246,0.2)] mb-6 transition-all placeholder-gray-800">
+            
             <button onclick="verifyGate()" class="w-full py-4 bg-white text-black font-black uppercase text-xs tracking-widest rounded-xl hover:bg-gray-300 transition-colors shadow-lg">Authenticate</button>
         </div>
     </div>
@@ -272,6 +316,7 @@
 
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbyjnfuOzPD5wu124WU_h86p8TjdNt7ll9iHgmd2w6mOnaHbMQs-ee6ShoVw3U5F_CZdcg/exec'; 
+        // MODUL JADWAL DITAMBAHKAN
         let rawData = { mnafc: { pemain: [], statistik: {} }, futsal: { pemain: [], statistik: {} }, galeri: [], jadwal: [] };
         let activeSport = 'mnafc'; let activePos = 'ALL';
 
@@ -320,7 +365,6 @@
             try {
                 await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'add_schedule', payload: payload }) });
                 alert("Jadwal Berhasil Disimpan ke Database!"); e.target.reset();
-                // Refresh data
                 const res = await fetch(`${API_URL}?t=${Date.now()}`);
                 const data = await res.json(); rawData.jadwal = data.jadwal; renderPublicMatches();
             } catch(err) { alert("Gagal menyimpan jadwal."); }
@@ -337,7 +381,6 @@
             document.getElementById('view-coach-dashboard').classList.remove('hidden');
             document.getElementById('coach-sport-label').innerText = activeSport === 'mnafc' ? 'MNA FC Coach' : 'MNA FUTSAL Coach';
             
-            // Masuk Mode Pilih Match
             matchState.mode = 'select';
             document.getElementById('coach-match-selector').classList.remove('hidden');
             document.getElementById('coach-active-match-panel').classList.add('hidden');
@@ -350,7 +393,6 @@
         function renderCoachMatchList() {
             const list = document.getElementById('coach-schedule-list');
             if(!rawData.jadwal || rawData.jadwal.length === 0) { list.innerHTML = '<p class="text-[10px] text-gray-500 uppercase font-bold">Belum ada jadwal dari Developer.</p>'; return; }
-            // Filter match yang belum ada di log (ideal logic), tapi untuk sekarang tampilkan semua
             list.innerHTML = rawData.jadwal.map(j => `
                 <div onclick="selectMatchToCoach('${j.id_match}', '${j.lawan}')" class="bg-black border border-white/10 p-4 rounded-xl cursor-pointer hover:border-brand-gold transition-all">
                     <p class="text-[8px] text-brand-gold uppercase tracking-widest mb-1">${j.tanggal} • ${j.waktu}</p>
@@ -564,7 +606,7 @@
             page.classList.remove('hidden'); document.body.style.overflow = 'hidden'; setTimeout(() => page.classList.add('page-slide-in'), 10); lucide.createIcons();
         }
 
-        // --- LINEUP BUILDER ENGINE (COACH) ---
+        // --- COACH LINEUP BUILDER ENGINE ---
         function initLineupBuilder() {
             lineupData = {}; activeLineupSlot = null; const select = document.getElementById('formation-select'); const forms = FORMATIONS[activeSport];
             select.innerHTML = Object.keys(forms).map(k => `<option value="${k}">${k}</option>`).join(''); currentFormationKey = Object.keys(forms)[0]; renderLineupPitchSetup(); renderLineupPool();
@@ -588,18 +630,13 @@
             const filteredPlayers = players.filter(p => (val(p.nama) + val(p.posisi)).toLowerCase().includes(query));
 
             pool.innerHTML = filteredPlayers.map((p) => {
-                const pIdx = players.indexOf(p);
-                const isAssigned = assignedIds.includes(p.nomor + p.nama);
+                const pIdx = players.indexOf(p); const isAssigned = assignedIds.includes(p.nomor + p.nama);
                 return `<div onclick="assignPlayerToSlot(${pIdx})" class="pool-card flex flex-col items-center gap-2 cursor-pointer ${isAssigned ? 'disabled' : ''}"><div class="w-14 h-14 rounded-full overflow-hidden border-2 border-white/10 bg-black"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div><div class="text-center"><p class="text-[8px] font-black text-white uppercase line-clamp-1 w-16 leading-tight">${val(p.nama)}</p><p class="text-[7px] text-brand-neon font-bold mt-0.5">${val(p.posisi)}</p></div></div>`;
             }).join('');
         }
         function selectLineupSlot(idx) { activeLineupSlot = idx; renderLineupPitchSetup(); renderLineupPool(); }
         function assignPlayerToSlot(playerIdx) { if (activeLineupSlot === null) return; const p = rawData[activeSport].pemain[playerIdx]; lineupData[activeLineupSlot] = p; activeLineupSlot = null; document.getElementById('lineupSearch').value = ''; renderLineupPitchSetup(); renderLineupPool(); }
-        function resetLineup() { lineupData = {}; activeLineupSlot = null; renderLineupPitchSetup(); renderLineupPool(); }
-
-        // --- MEDIA HUB LOGIC ---
-        function runMediaFilter() { const query = document.getElementById('mediaSearch').value.toLowerCase(); if(!rawData.galeri) return; const filtered = rawData.galeri.filter(item => { return val(item.kegiatan).toLowerCase().includes(query) || val(item.tanggal).toLowerCase().includes(query); }); renderGallery(filtered); }
-        function renderGallery(list) { const grid = document.getElementById('galleryGrid'); if (!list || list.length === 0) { grid.innerHTML = `<div class="col-span-full py-16 text-center text-[10px] font-black text-gray-500 uppercase tracking-widest border border-dashed border-white/10 rounded-2xl">Kosong</div>`; return; } grid.innerHTML = list.map((item, i) => `<a href="${item.link_drive}" target="_blank" class="glass-panel rounded-2xl p-3 flex flex-col gap-3 relative overflow-hidden group stagger-item border border-white/5" style="animation-delay: ${i*0.02}s"><div class="relative w-full aspect-video rounded-xl bg-brand-dark overflow-hidden">${item.preview_image ? `<img src="${item.preview_image}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-transform duration-700">` : '<div class="absolute inset-0 flex items-center justify-center"><i data-lucide="folder" class="w-10 h-10 text-white/10"></i></div>'}<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div><div class="absolute bottom-3 left-3 text-white"><h4 class="text-xs font-black uppercase tracking-tight line-clamp-1">${val(item.kegiatan)}</h4><p class="text-[9px] font-bold text-gray-300 uppercase mt-0.5">${val(item.tanggal)}</p></div></div></a>`).join(''); lucide.createIcons(); }
+        function resetLineup() { lineupData = {}; activeLineupSlot = null; document.getElementById('lineupSearch').value = ''; renderLineupPitchSetup(); renderLineupPool(); }
 
         // --- MATCH PUBLIC VIEW ---
         function renderPublicMatches() {
@@ -613,13 +650,14 @@
                         <h4 class="text-lg font-black text-gray-500 uppercase leading-none">VS ${j.lawan}</h4>
                         <p class="text-[9px] text-gray-500 uppercase mt-3"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> ${j.tempat}</p>
                     </div>
-                    <div class="text-right">
-                        <button class="bg-white/5 border border-white/10 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors">Detail</button>
-                    </div>
                 </div>
             `).join('');
             lucide.createIcons();
         }
+
+        // --- MEDIA HUB LOGIC ---
+        function runMediaFilter() { const query = document.getElementById('mediaSearch').value.toLowerCase(); if(!rawData.galeri) return; const filtered = rawData.galeri.filter(item => { return val(item.kegiatan).toLowerCase().includes(query) || val(item.tanggal).toLowerCase().includes(query); }); renderGallery(filtered); }
+        function renderGallery(list) { const grid = document.getElementById('galleryGrid'); if (!list || list.length === 0) { grid.innerHTML = `<div class="col-span-full py-16 text-center text-[10px] font-black text-gray-500 uppercase tracking-widest border border-dashed border-white/10 rounded-2xl">Kosong</div>`; return; } grid.innerHTML = list.map((item, i) => `<a href="${item.link_drive}" target="_blank" class="glass-panel rounded-2xl p-3 flex flex-col gap-3 relative overflow-hidden group stagger-item border border-white/5" style="animation-delay: ${i*0.02}s"><div class="relative w-full aspect-video rounded-xl bg-brand-dark overflow-hidden">${item.preview_image ? `<img src="${item.preview_image}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-transform duration-700">` : '<div class="absolute inset-0 flex items-center justify-center"><i data-lucide="folder" class="w-10 h-10 text-white/10"></i></div>'}<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div><div class="absolute bottom-3 left-3 text-white"><h4 class="text-xs font-black uppercase tracking-tight line-clamp-1">${val(item.kegiatan)}</h4><p class="text-[9px] font-bold text-gray-300 uppercase mt-0.5">${val(item.tanggal)}</p></div></div></a>`).join(''); lucide.createIcons(); }
 
         function tutupDossier() { const p = document.getElementById('fullProfilePage'); p.classList.remove('page-slide-in'); setTimeout(() => { p.classList.add('hidden'); document.body.style.overflow = ''; }, 500); }
         function closeModal() { document.getElementById('playerModal').classList.add('hidden'); document.body.style.overflow = ''; }
