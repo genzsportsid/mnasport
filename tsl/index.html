@@ -654,7 +654,7 @@
         </div>
     </div>
 
-    <nav id="main-bottom-nav" class="fixed bottom-0 w-full z-[110] bg-white/95 dark:bg-brand-dark-surface/95 backdrop-blur-2xl border-t border-gray-200 dark:border-brand-dark-border pb-safe transition-colors">
+    <nav id="main-bottom-nav" class="fixed bottom-0 w-full z-[110] bg-white/95 dark:bg-brand-surface/95 backdrop-blur-2xl border-t border-gray-200 dark:border-white/5 pb-safe transition-colors">
         <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
             <a href="/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-brand-gold transition-colors">
                 <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i>
@@ -850,22 +850,26 @@
             const lockScreen = document.getElementById('tsl-lock-screen');
             const viewHome = document.getElementById('view-home');
             const topTabs = document.getElementById('tsl-top-tabs');
+            const bottomNav = document.getElementById('main-bottom-nav');
+            const sponsorBar = document.getElementById('sponsor-bar');
             
             if (!CONFIG_LIGA_AKTIF) {
                 if(lockScreen) lockScreen.classList.remove('hidden');
                 jalankanCountdown();
                 document.body.style.overflow = 'hidden'; 
                 
-                // Matikan data rahasia sampai ke akar
+                // Sembunyikan semua komponen dari layar saat countdown
                 if(viewHome) viewHome.classList.add('hidden');
                 if(topTabs) topTabs.classList.add('hidden');
+                if(bottomNav) bottomNav.classList.add('hidden');
+                if(sponsorBar) sponsorBar.classList.add('hidden');
             } else {
                 if(lockScreen) lockScreen.classList.add('hidden');
                 document.body.style.overflow = ''; 
                 
-                // Nyalakan liga jika sakelar TRUE
                 if(viewHome) viewHome.classList.remove('hidden');
                 if(topTabs) topTabs.classList.remove('hidden');
+                if(bottomNav) bottomNav.classList.remove('hidden');
             }
         }
         const BASE_API = "https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec";
@@ -1325,6 +1329,12 @@
 
         // MESIN RENDER LOGO SPONSOR & HEADER
         function renderSponsors() {
+        if (!CONFIG_LIGA_AKTIF) {
+                const sponsorBar = document.getElementById('sponsor-bar');
+                if(sponsorBar) sponsorBar.classList.add('hidden');
+                return;
+            }
+            
             let data = rawData.Sponsor || [];
             let headerContainer = document.getElementById('header-logos');
             let sponsorBar = document.getElementById('sponsor-bar');
@@ -2160,7 +2170,19 @@
                 p = (rawData.Pemain||[]).find(x => String(getProp(x,'nama')).toLowerCase().trim() === String(namaPemain).toLowerCase().trim());
             }
             
-            if(!p) return;
+            // Failsafe: Jika pemain tidak ditemukan di database utama, bangun objek cadangan agar modal tetap terbuka
+            if(!p) {
+                p = {
+                    nama: namaPemain,
+                    tim: namaTim || "Tanpa Klub",
+                    posisi: "PLAYER",
+                    nomor: "-",
+                    gol: 0,
+                    kuning: 0,
+                    merah: 0
+                };
+            }
+            let nmTim = getProp(p, 'tim') || p.tim;
             // FIX: Deteksi apakah yang diklik adalah Pelatih. Jika ya, belokkan ke Kartu Manager.
             let posCek = String(getProp(p,'posisi')).toUpperCase().replace(/\s+/g,'');
             if(['PELATIH','COACH','HEADCOACH','MANAGER'].includes(posCek)) {
