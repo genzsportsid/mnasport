@@ -412,21 +412,34 @@
         let livePollingInterval = null; 
 
         const val = (d, f = "-") => (d === "" || d === null || d === undefined) ? f : d;
+        // AUTO-COLOR GENERATOR (DETERMINISTIC HASHING)
         function getMatchBadge(jenis) {
-            const type = val(jenis, 'Friendly').toUpperCase();
-            let colorClass = 'bg-gray-500/20 text-gray-400 border-gray-500/30'; // Default (Abu-abu)
+            if (!jenis || jenis === '-') return ''; // Sembunyikan jika kosong
+            const typeUpper = String(jenis).toUpperCase().trim();
 
-            if (type.includes('FRIENDLY') || type.includes('UJI COBA')) {
-                colorClass = 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-            } else if (type.includes('SOERATIN') || type.includes('RESMI')) {
-                colorClass = 'bg-red-500/20 text-red-400 border-red-500/30';
-            } else if (type.includes('AAFI') || type.includes('LIGA')) {
-                colorClass = 'bg-brand-gold/20 text-brand-gold border-brand-gold/30';
-            } else if (type.includes('TURNAMEN') || type.includes('CUP')) {
-                colorClass = 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+            // Kumpulan palet warna premium Tailwind (UI-Safe)
+            const palettes = [
+                'bg-blue-500/20 text-blue-400 border-blue-500/30',
+                'bg-red-500/20 text-red-400 border-red-500/30',
+                'bg-brand-gold/20 text-brand-gold border-brand-gold/30',
+                'bg-purple-500/20 text-purple-400 border-purple-500/30',
+                'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+                'bg-orange-500/20 text-orange-400 border-orange-500/30',
+                'bg-pink-500/20 text-pink-400 border-pink-500/30',
+                'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'
+            ];
+
+            // Rumus Hash: Mengubah teks menjadi angka statis unik
+            let hash = 0;
+            for (let i = 0; i < typeUpper.length; i++) {
+                hash = typeUpper.charCodeAt(i) + ((hash << 5) - hash);
             }
+            
+            // Pilih warna secara otomatis berdasarkan nilai Hash
+            const colorIndex = Math.abs(hash) % palettes.length;
+            const selectedColor = palettes[colorIndex];
 
-            return `<span class="text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${colorClass}">${type}</span>`;
+            return `<span class="text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${selectedColor} inline-block">${typeUpper}</span>`;
         }
         
         function parseIndoDate(dateStr) {
@@ -579,7 +592,7 @@
                 <div onclick="selectMatchToCoach('${j.id_match}', '${j.lawan}')" class="bg-black border border-white/10 p-4 rounded-xl cursor-pointer hover:border-brand-neon transition-all">
                     <div class="flex justify-between items-start mb-3">
                         <div>
-                            <p class="text-[8px] text-brand-gold uppercase tracking-widest mb-1">${j.tanggal} • ${j.waktu}</p>
+                            <p class="text-[8px] text-brand-gold uppercase tracking-widest mb-1.5">${j.tanggal} • ${j.waktu}</p>
                             ${getMatchBadge(j.jenis_match)}
                         </div>
                         <span class="text-[8px] font-black uppercase tracking-widest ${j.status === 'LIVE' ? 'text-red-500 bg-red-500/10 animate-pulse' : 'text-gray-400 bg-white/5'} px-2 py-0.5 rounded">${val(j.status, 'Pending')}</span>
@@ -1147,12 +1160,14 @@
                 return `
                 <div class="bg-brand-panel border ${isLive ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-white/10'} p-5 rounded-[1.5rem] flex flex-col justify-between transition-all group">
                     <div class="flex justify-between items-start mb-3">
-                        <div class="flex items-center gap-2">
-                            <p class="text-[8px] font-black ${isLive ? 'text-red-500' : 'text-brand-gold'} uppercase tracking-widest">${j.tanggal} • ${j.waktu}</p>
-                            ${isLive ? `<span class="text-[7px] font-black bg-red-500 text-white px-1.5 rounded uppercase live-pulse">${val(j.live_timer, 'LIVE')}</span>` : ''}
-                            ${isFT ? '<span class="text-[7px] font-black bg-gray-700 text-white px-1.5 rounded uppercase">FT</span>' : ''}
+                        <div class="flex flex-col gap-1.5">
+                            <div class="flex items-center gap-2">
+                                <p class="text-[8px] font-black ${isLive ? 'text-red-500' : 'text-brand-gold'} uppercase tracking-widest">${j.tanggal} • ${j.waktu}</p>
+                                ${isLive ? '<span class="text-[7px] font-black bg-red-500 text-white px-1.5 rounded uppercase live-pulse">LIVE</span>' : ''}
+                                ${isFT ? '<span class="text-[7px] font-black bg-gray-700 text-white px-1.5 rounded uppercase tracking-widest">FT</span>' : ''}
+                            </div>
+                            <div>${getMatchBadge(j.jenis_match)}</div>
                         </div>
-                        ${getMatchBadge(j.jenis_match)}
                     </div>
                     
                     <div class="flex items-center justify-between mt-1">
