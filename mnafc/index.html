@@ -412,7 +412,23 @@
         let livePollingInterval = null; 
 
         const val = (d, f = "-") => (d === "" || d === null || d === undefined) ? f : d;
+        function getMatchBadge(jenis) {
+            const type = val(jenis, 'Friendly').toUpperCase();
+            let colorClass = 'bg-gray-500/20 text-gray-400 border-gray-500/30'; // Default (Abu-abu)
 
+            if (type.includes('FRIENDLY') || type.includes('UJI COBA')) {
+                colorClass = 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+            } else if (type.includes('SOERATIN') || type.includes('RESMI')) {
+                colorClass = 'bg-red-500/20 text-red-400 border-red-500/30';
+            } else if (type.includes('AAFI') || type.includes('LIGA')) {
+                colorClass = 'bg-brand-gold/20 text-brand-gold border-brand-gold/30';
+            } else if (type.includes('TURNAMEN') || type.includes('CUP')) {
+                colorClass = 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+            }
+
+            return `<span class="text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${colorClass}">${type}</span>`;
+        }
+        
         function parseIndoDate(dateStr) {
             if (!dateStr || dateStr === '-') return null;
             let cleanStr = String(dateStr).trim().split(' ')[0].split('T')[0];
@@ -547,21 +563,26 @@
         function renderCoachMatchList() {
             const list = document.getElementById('coach-schedule-list');
             if(!rawData.jadwal || rawData.jadwal.length === 0) { 
-                list.innerHTML = '<p class="text-[10px] text-gray-500 uppercase font-bold">Belum ada jadwal. Tambahkan jadwal di spreadsheet tab "Jadwal".</p>'; 
+                list.innerHTML = '<p class="text-[10px] text-gray-500 uppercase font-bold">Belum ada jadwal di database.</p>'; 
                 return; 
             }
             
-            const activeMatches = rawData.jadwal.filter(j => j.status !== 'FT' && j.status !== 'Selesai');
+            // FILTER: Hanya tampilkan status aktif DAN sesuai Cabang Olahraga
+            const activeMatches = rawData.jadwal.filter(j => j.status !== 'FT' && j.status !== 'Selesai' && j.cabang === activeSport);
+            
             if(activeMatches.length === 0) {
-                 list.innerHTML = '<p class="text-[10px] text-gray-500 uppercase font-bold">Semua pertandingan sudah selesai.</p>'; 
+                 list.innerHTML = '<p class="text-[10px] text-gray-500 uppercase font-bold">Belum ada jadwal untuk divisi ini.</p>'; 
                  return;
             }
 
             list.innerHTML = activeMatches.map(j => `
                 <div onclick="selectMatchToCoach('${j.id_match}', '${j.lawan}')" class="bg-black border border-white/10 p-4 rounded-xl cursor-pointer hover:border-brand-neon transition-all">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-[8px] text-brand-gold uppercase tracking-widest">${j.tanggal} • ${j.waktu}</p>
-                        <span class="text-[8px] font-black uppercase tracking-widest ${j.status === 'LIVE' ? 'text-red-500 bg-red-500/10' : 'text-gray-400 bg-white/5'} px-2 py-0.5 rounded">${val(j.status, 'Pending')}</span>
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <p class="text-[8px] text-brand-gold uppercase tracking-widest mb-1">${j.tanggal} • ${j.waktu}</p>
+                            ${getMatchBadge(j.jenis_match)}
+                        </div>
+                        <span class="text-[8px] font-black uppercase tracking-widest ${j.status === 'LIVE' ? 'text-red-500 bg-red-500/10 animate-pulse' : 'text-gray-400 bg-white/5'} px-2 py-0.5 rounded">${val(j.status, 'Pending')}</span>
                     </div>
                     <h4 class="text-sm font-black text-white uppercase truncate">VS ${j.lawan}</h4>
                     <p class="text-[9px] text-gray-500 uppercase mt-1"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> ${j.tempat}</p>
@@ -1105,9 +1126,18 @@
                 return; 
             }
             
+            // FILTER: Pisahkan berdasarkan cabang olahraga
+            const filteredMatches = rawData.jadwal.filter(j => j.cabang === activeSport);
+
+            if(filteredMatches.length === 0) { 
+                list.innerHTML = '<div class="text-center py-10 border border-dashed border-white/10 rounded-2xl"><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Belum ada jadwal untuk divisi ini</p></div>'; 
+                ind.classList.add('hidden');
+                return; 
+            }
+
             let isAnyLive = false;
             
-            list.innerHTML = rawData.jadwal.map(j => {
+            list.innerHTML = filteredMatches.map(j => {
                 if(j.status === 'LIVE') isAnyLive = true;
                 
                 const isLive = j.status === 'LIVE';
@@ -1115,28 +1145,34 @@
                 const hasScore = isLive || isFT;
                 
                 return `
-                <div class="bg-brand-panel border ${isLive ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-white/10'} p-5 rounded-[1.5rem] flex items-center justify-between transition-all">
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
+                <div class="bg-brand-panel border ${isLive ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-white/10'} p-5 rounded-[1.5rem] flex flex-col justify-between transition-all group">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-2">
                             <p class="text-[8px] font-black ${isLive ? 'text-red-500' : 'text-brand-gold'} uppercase tracking-widest">${j.tanggal} • ${j.waktu}</p>
                             ${isLive ? `<span class="text-[7px] font-black bg-red-500 text-white px-1.5 rounded uppercase live-pulse">${val(j.live_timer, 'LIVE')}</span>` : ''}
                             ${isFT ? '<span class="text-[7px] font-black bg-gray-700 text-white px-1.5 rounded uppercase">FT</span>' : ''}
                         </div>
-                        <div class="flex items-center gap-4 mt-2">
-                            <div>
-                                <h4 class="text-base font-black text-white uppercase leading-none mb-1">MNA FC</h4>
-                                <h4 class="text-base font-black text-gray-400 uppercase leading-none">${j.lawan}</h4>
-                            </div>
-                            ${hasScore ? `
-                            <div class="bg-black border border-white/10 px-3 py-1 rounded-lg text-center">
-                                <p class="text-lg font-black ${isLive ? 'text-red-500' : 'text-white'} leading-none mb-1">${j.skor_kita || 0}</p>
-                                <p class="text-lg font-black text-gray-400 leading-none">${j.skor_lawan || 0}</p>
-                            </div>
-                            ` : `<div class="text-[10px] font-black text-gray-600 bg-white/5 px-3 py-1 rounded-full uppercase ml-4">VS</div>`}
-                        </div>
-                        <p class="text-[9px] text-gray-500 uppercase mt-3"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> ${j.tempat}</p>
+                        ${getMatchBadge(j.jenis_match)}
                     </div>
-                    ${hasScore ? `<button onclick="openMatchDetail('${j.id_match}')" class="bg-white/5 border border-white/10 hover:bg-white/10 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-colors shrink-0">Detail</button>` : ''}
+                    
+                    <div class="flex items-center justify-between mt-1">
+                        <div class="w-1/3"><h4 class="text-sm md:text-base font-black text-white uppercase leading-none">MNA FC</h4></div>
+                        <div class="w-1/3 flex justify-center">
+                            ${hasScore ? `
+                            <div class="bg-black border border-white/10 px-3 py-1.5 rounded-lg text-center flex items-center gap-2 md:gap-3 shrink-0">
+                                <p class="text-lg md:text-xl font-black ${isLive ? 'text-red-500' : 'text-white'} leading-none">${j.skor_kita || 0}</p>
+                                <span class="text-gray-600 font-bold">-</span>
+                                <p class="text-lg md:text-xl font-black text-gray-400 leading-none">${j.skor_lawan || 0}</p>
+                            </div>
+                            ` : `<div class="text-[10px] font-black text-gray-600 bg-white/5 px-3 py-1 rounded-full uppercase shrink-0">VS</div>`}
+                        </div>
+                        <div class="w-1/3 text-right"><h4 class="text-sm md:text-base font-black text-gray-400 uppercase leading-none truncate">${j.lawan}</h4></div>
+                    </div>
+                    
+                    <div class="flex justify-between items-end mt-4 pt-4 border-t border-white/5">
+                        <p class="text-[8px] text-gray-500 uppercase"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> ${j.tempat}</p>
+                        ${hasScore ? `<button onclick="openMatchDetail('${j.id_match}')" class="text-[8px] font-black bg-white/5 border border-white/10 hover:bg-white/10 text-white px-4 py-2 rounded-xl uppercase tracking-widest transition-colors shrink-0">Timeline Match <i data-lucide="chevron-right" class="w-3 h-3 inline"></i></button>` : ''}
+                    </div>
                 </div>
             `}).join('');
             
