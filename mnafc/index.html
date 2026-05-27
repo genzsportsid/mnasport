@@ -416,34 +416,34 @@
         let livePollingInterval = null; 
 
         const val = (d, f = "-") => (d === "" || d === null || d === undefined) ? f : d;
-        // AUTO-COLOR GENERATOR (DETERMINISTIC HASHING)
+        // AUTOMATED MATCH BADGE COLOR ENGINE
         function getMatchBadge(jenis) {
-            if (!jenis || jenis === '-') return ''; // Sembunyikan jika kosong
-            const typeUpper = String(jenis).toUpperCase().trim();
+            const type = val(jenis, '').trim();
+            if (!type || type === '-') return ''; 
+            const typeUpper = type.toUpperCase();
 
-            // Kumpulan palet warna premium Tailwind (UI-Safe)
+            // Koleksi Palet Warna Premium (UI Safe)
             const palettes = [
-                'bg-blue-500/20 text-blue-400 border-blue-500/30',
-                'bg-red-500/20 text-red-400 border-red-500/30',
-                'bg-brand-gold/20 text-brand-gold border-brand-gold/30',
-                'bg-purple-500/20 text-purple-400 border-purple-500/30',
-                'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-                'bg-orange-500/20 text-orange-400 border-orange-500/30',
-                'bg-pink-500/20 text-pink-400 border-pink-500/30',
-                'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'
+                'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                'bg-red-500/10 text-red-400 border-red-500/20',
+                'bg-brand-gold/10 text-brand-gold border-brand-gold/20',
+                'bg-purple-500/10 text-purple-400 border-purple-500/20',
+                'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                'bg-orange-500/10 text-orange-400 border-orange-500/20',
+                'bg-pink-500/10 text-pink-400 border-pink-500/20',
+                'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'
             ];
 
-            // Rumus Hash: Mengubah teks menjadi angka statis unik
+            // Algoritma Deterministik Hash String
             let hash = 0;
             for (let i = 0; i < typeUpper.length; i++) {
                 hash = typeUpper.charCodeAt(i) + ((hash << 5) - hash);
             }
             
-            // Pilih warna secara otomatis berdasarkan nilai Hash
             const colorIndex = Math.abs(hash) % palettes.length;
             const selectedColor = palettes[colorIndex];
 
-            return `<span class="text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${selectedColor} inline-block">${typeUpper}</span>`;
+            return `<span class="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded border ${selectedColor} inline-block shadow-sm">${typeUpper}</span>`;
         }
         
         function parseIndoDate(dateStr) {
@@ -580,29 +580,39 @@
         function renderCoachMatchList() {
             const list = document.getElementById('coach-schedule-list');
             if(!rawData.jadwal || rawData.jadwal.length === 0) { 
-                list.innerHTML = '<p class="text-[10px] text-gray-500 uppercase font-bold">Belum ada jadwal. Tambahkan jadwal di spreadsheet tab "Jadwal".</p>'; 
+                list.innerHTML = '<p class="text-[10px] text-gray-500 uppercase font-bold">Belum ada jadwal pertandingan di database.</p>'; 
                 return; 
             }
             
-            // FILTER: Hanya tampilkan cabang aktif (default fallback ke 'mnafc' jika kosong)
+            // Filter Cabang Kompetisi Aktif
             const activeMatches = rawData.jadwal.filter(j => j.status !== 'FT' && j.status !== 'Selesai' && val(j.cabang, 'mnafc').toLowerCase() === activeSport);
             
             if(activeMatches.length === 0) {
-                 list.innerHTML = '<p class="text-[10px] text-gray-500 uppercase font-bold">Belum ada jadwal untuk divisi ini.</p>'; 
+                 list.innerHTML = '<p class="text-[10px] text-gray-500 uppercase font-bold">Belum ada agenda pertandingan untuk divisi ini.</p>'; 
                  return;
             }
 
+            // Urutkan jadwal yang belum main berdasarkan tanggal terdekat (Ascending)
+            activeMatches.sort((a, b) => {
+                const dateA = parseIndoDate(a.tanggal) || new Date(0);
+                const dateB = parseIndoDate(b.tanggal) || new Date(0);
+                return dateA - dateB;
+            });
+
             list.innerHTML = activeMatches.map(j => `
-                <div onclick="selectMatchToCoach('${j.id_match}', '${j.lawan}')" class="bg-black border border-white/10 p-4 rounded-xl cursor-pointer hover:border-brand-neon transition-all">
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="flex items-center gap-2">
-                            <p class="text-[8px] text-brand-gold uppercase tracking-widest">${j.tanggal} • ${j.waktu}</p>
-                            ${val(j.kategori_umur, '') !== '-' && j.kategori_umur ? `<span class="text-[7px] font-black bg-brand-neon/20 text-brand-neon border border-brand-neon/30 px-1.5 rounded uppercase">${j.kategori_umur}</span>` : ''}
+                <div onclick="selectMatchToCoach('${j.id_match}', '${j.lawan}')" class="bg-brand-panel border border-white/5 p-4 rounded-2xl cursor-pointer hover:border-brand-neon transition-all flex flex-col gap-3 shadow-md relative overflow-hidden">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            ${getMatchBadge(j.jenis_match)}
+                            ${val(j.kategori_umur, '') !== '-' && j.kategori_umur ? `<span class="bg-brand-neon/10 text-brand-neon border border-brand-neon/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider text-[8px]">${j.kategori_umur}</span>` : ''}
                         </div>
                         <span class="text-[8px] font-black uppercase tracking-widest ${j.status === 'LIVE' ? 'text-red-500 bg-red-500/10' : 'text-gray-400 bg-white/5'} px-2 py-0.5 rounded">${val(j.status, 'Pending')}</span>
                     </div>
-                    <h4 class="text-sm font-black text-white uppercase truncate">VS ${j.lawan}</h4>
-                    <p class="text-[9px] text-gray-500 uppercase mt-1"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> ${j.tempat}</p>
+                    <div>
+                        <p class="text-[10px] text-brand-gold font-bold uppercase tracking-wide mb-0.5">${j.tanggal} • ${j.waktu}</p>
+                        <h4 class="text-sm font-black text-white uppercase truncate">VS ${j.lawan}</h4>
+                    </div>
+                    <p class="text-[10px] text-gray-500 uppercase flex items-center gap-1 pt-2 border-t border-white/5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-600"></i> ${j.tempat}</p>
                 </div>
             `).join('');
             lucide.createIcons();
@@ -1148,22 +1158,39 @@
             const ind = document.getElementById('live-indicator');
             
             if(!rawData.jadwal || rawData.jadwal.length === 0) { 
-                list.innerHTML = '<div class="text-center py-10 border border-dashed border-white/10 rounded-2xl"><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Belum ada jadwal pertandingan</p></div>'; 
-                ind.classList.add('hidden');
+                list.innerHTML = '<div class="text-center py-16 border border-dashed border-white/10 rounded-2xl"><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Belum ada jadwal pertandingan</p></div>'; 
+                if(ind) ind.classList.add('hidden');
                 return; 
             }
             
-            // FILTER: Hanya tampilkan jadwal untuk Futsal / Sepakbola yang dipilih
+            // 1. FILTER berdasarkan Cabang Olahraga Aktif
             const filteredMatches = rawData.jadwal.filter(j => val(j.cabang, 'mnafc').toLowerCase() === activeSport);
 
             if(filteredMatches.length === 0) {
-                list.innerHTML = '<div class="text-center py-10 border border-dashed border-white/10 rounded-2xl"><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Belum ada jadwal untuk divisi ini</p></div>'; 
-                ind.classList.add('hidden');
+                list.innerHTML = '<div class="text-center py-16 border border-dashed border-white/10 rounded-2xl"><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Belum ada pertandingan di divisi ini</p></div>'; 
+                if(ind) ind.classList.add('hidden');
                 return; 
             }
 
+            // 2. ALGORITMA SORTIR CERDAS (LIVE -> Pending Terdekat -> Hasil FT Terbaru)
+            filteredMatches.sort((a, b) => {
+                const scoreA = a.status === 'LIVE' ? 3 : (a.status === 'Pending' ? 2 : 1);
+                const scoreB = b.status === 'LIVE' ? 3 : (b.status === 'Pending' ? 2 : 1);
+                if (scoreA !== scoreB) return scoreB - scoreA; 
+
+                const dateA = parseIndoDate(a.tanggal) || new Date(0);
+                const dateB = parseIndoDate(b.tanggal) || new Date(0);
+                
+                if (a.status === 'Pending') {
+                    return dateA - dateB; // Jadwal terdekat berada di atas (Ascending)
+                } else {
+                    return dateB - dateA; // Hasil pertandingan terbaru berada di atas (Descending)
+                }
+            });
+
             let isAnyLive = false;
             
+            // 3. RENDER UI DENGAN TATA LETAK FOTMOB STYLE
             list.innerHTML = filteredMatches.map(j => {
                 if(j.status === 'LIVE') isAnyLive = true;
                 
@@ -1172,39 +1199,64 @@
                 const hasScore = isLive || isFT;
                 
                 return `
-                <div class="bg-brand-panel border ${isLive ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-white/10'} p-5 rounded-[1.5rem] flex items-center justify-between transition-all">
-                    <div class="w-full">
-                        <div class="flex items-center gap-2 mb-2">
-                            <p class="text-[8px] font-black ${isLive ? 'text-red-500' : 'text-brand-gold'} uppercase tracking-widest">${j.tanggal} • ${j.waktu}</p>
-                            ${isLive ? `<span class="text-[7px] font-black bg-red-500 text-white px-1.5 rounded uppercase live-pulse">${val(j.live_timer, 'LIVE')}</span>` : ''}
-                            ${isFT ? '<span class="text-[7px] font-black bg-gray-700 text-white px-1.5 rounded uppercase">FT</span>' : ''}
-                            ${val(j.kategori_umur, '') !== '-' && j.kategori_umur ? `<span class="text-[7px] font-black bg-brand-neon/20 text-brand-neon border border-brand-neon/30 px-1.5 rounded uppercase">${j.kategori_umur}</span>` : ''}
+                <div class="bg-brand-panel border ${isLive ? 'border-red-500/30 bg-gradient-to-r from-red-950/10 to-transparent' : 'border-white/5'} p-4 md:p-5 rounded-2xl flex flex-col gap-4 hover:border-white/10 transition-all shadow-lg relative overflow-hidden stagger-item">
+                    
+                    <div class="flex justify-between items-center text-[10px]">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            ${getMatchBadge(j.jenis_match)}
+                            ${val(j.kategori_umur, '') !== '-' && j.kategori_umur ? `<span class="bg-brand-neon/10 text-brand-neon border border-brand-neon/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider text-[8px]">${j.kategori_umur}</span>` : ''}
                         </div>
-                        <div class="flex items-center justify-between mt-2">
-                            <div class="w-1/3"><h4 class="text-sm font-black text-white uppercase leading-none">MNA FC</h4></div>
-                            <div class="w-1/3 flex justify-center">
-                                ${hasScore ? `
-                                <div class="bg-black border border-white/10 px-3 py-1 rounded-lg text-center flex items-center gap-2 md:gap-3">
-                                    <p class="text-lg font-black ${isLive ? 'text-red-500' : 'text-white'} leading-none mb-0.5">${j.skor_kita || 0}</p>
-                                    <span class="text-gray-600 font-bold">-</span>
-                                    <p class="text-lg font-black text-gray-400 leading-none mb-0.5">${j.skor_lawan || 0}</p>
-                                </div>
-                                ` : `<div class="text-[10px] font-black text-gray-600 bg-white/5 px-3 py-1 rounded-full uppercase">VS</div>`}
-                            </div>
-                            <div class="w-1/3 text-right"><h4 class="text-sm font-black text-gray-400 uppercase leading-none truncate">${j.lawan}</h4></div>
-                        </div>
-                        <div class="flex justify-between items-end mt-3 pt-3 border-t border-white/5">
-                            <p class="text-[9px] text-gray-500 uppercase"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> ${j.tempat}</p>
-                            ${hasScore ? `<button onclick="openMatchDetail('${j.id_match}')" class="bg-white/5 border border-white/10 hover:bg-white/10 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-colors shrink-0">Detail</button>` : ''}
+                        <div class="flex items-center gap-2 font-semibold">
+                            <span class="text-gray-400">${j.tanggal}</span>
+                            <span class="w-1 h-1 bg-gray-800 rounded-full"></span>
+                            <span class="text-brand-gold">${j.waktu}</span>
+                            ${isLive ? `<span class="bg-red-500 text-white font-black px-2 py-0.5 rounded text-[8px] tracking-wider animate-pulse ml-1">${val(j.live_timer, 'LIVE')}</span>` : ''}
+                            ${isFT ? `<span class="bg-white/10 text-gray-500 font-bold px-1.5 py-0.5 rounded text-[8px] tracking-widest ml-1">FT</span>` : ''}
                         </div>
                     </div>
+                    
+                    <div class="flex items-center justify-between py-2.5 border-y border-white/5 bg-black/10 rounded-xl px-4">
+                        <div class="flex items-center gap-3 w-5/12 min-w-0">
+                            <div class="w-7 h-7 rounded-lg bg-brand-blue flex items-center justify-center text-white font-black text-xs shrink-0 shadow-md">M</div>
+                            <span class="font-black text-xs md:text-sm text-white uppercase tracking-tight truncate">MNA FC</span>
+                        </div>
+                        
+                        <div class="w-2/12 flex justify-center shrink-0">
+                            ${hasScore ? `
+                            <div class="bg-black/60 border border-white/10 px-3 py-1 rounded-xl font-mono text-base md:text-lg font-black tracking-tight flex items-center gap-2 shadow-inner">
+                                <span class="${isLive ? 'text-red-500' : 'text-white'}">${j.skor_kita || 0}</span>
+                                <span class="text-gray-600 font-sans text-xs">:</span>
+                                <span class="text-gray-400">${j.skor_lawan || 0}</span>
+                            </div>
+                            ` : `
+                            <div class="bg-white/5 border border-white/5 px-3 py-1 rounded-full text-[9px] font-black text-gray-500 uppercase tracking-widest">VS</div>
+                            `}
+                        </div>
+                        
+                        <div class="flex items-center gap-3 w-5/12 justify-end text-right min-w-0">
+                            <span class="font-bold text-xs md:text-sm text-gray-300 uppercase tracking-tight truncate">${j.lawan}</span>
+                            <div class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 font-black text-xs shrink-0">?</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center text-[10px] text-gray-500">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-600 shrink-0"></i>
+                            <span class="uppercase font-medium tracking-wide truncate">${j.tempat}</span>
+                        </div>
+                        ${hasScore ? `
+                        <button onclick="openMatchDetail('${j.id_match}')" class="bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white text-gray-300 px-3 py-1.5 rounded-xl font-black uppercase tracking-widest text-[9px] transition-all flex items-center gap-1 shadow-sm">
+                            Timeline <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                        </button>
+                        ` : ''}
+                    </div>
                 </div>
-            `}).join('');
+                `;
+            }).join('');
             
-            if(isAnyLive) {
-                ind.classList.remove('hidden'); ind.classList.add('flex');
-            } else {
-                ind.classList.add('hidden'); ind.classList.remove('flex');
+            if(ind) {
+                if(isAnyLive) { ind.classList.remove('hidden'); ind.classList.add('flex'); } 
+                else { ind.classList.add('hidden'); ind.classList.remove('flex'); }
             }
             
             lucide.createIcons();
