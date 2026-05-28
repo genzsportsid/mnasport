@@ -1268,8 +1268,9 @@
 
         // --- FUNGSI UNTUK MEMBUKA MODAL EVENT TIMELINE ---
         function openMatchDetail(matchId) {
-            const jadwal = rawData.jadwal.find(j => j.id_match === matchId);
-            const log = rawData.match_log ? rawData.match_log.find(l => l.id_match === matchId) : null;
+            // FIX: Gunakan String() agar Angka dari Spreadsheet dan Teks cocok 100%
+            const jadwal = rawData.jadwal.find(j => String(j.id_match) === String(matchId));
+            const log = rawData.match_log ? rawData.match_log.find(l => String(l.id_match) === String(matchId)) : null;
             
             if(!jadwal) return;
             
@@ -1294,13 +1295,10 @@
                     if(events.length === 0) {
                         container.innerHTML = '<div class="text-center py-10"><i data-lucide="clock" class="w-8 h-8 text-white/10 mx-auto mb-2"></i><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Belum ada kejadian</p></div>';
                     } else {
-                        // URUTKAN BERDASARKAN WAKTU (Kronologis: Awal Kick-off di atas)
                         events.sort((a, b) => parseInt(a.time) - parseInt(b.time));
 
                         container.innerHTML = events.map(ev => {
-                            // Algoritma pewarnaan event
-                            let dotCol = 'bg-gray-600 border-gray-500';
-                            let textCol = 'text-white';
+                            let dotCol = 'bg-gray-600 border-gray-500'; let textCol = 'text-white';
                             const typeLower = ev.type.toLowerCase();
                             
                             if(typeLower.includes('gol') || typeLower.includes('scored') || typeLower.includes('penalti didapat')) { dotCol = 'bg-green-500 border-green-400'; textCol = 'text-green-400'; }
@@ -1308,43 +1306,49 @@
                             else if(typeLower.includes('kuning')) { dotCol = 'bg-yellow-400 border-yellow-300'; textCol = 'text-yellow-400'; }
                             else if(typeLower.includes('assist') || typeLower.includes('sub')) { dotCol = 'bg-brand-neon border-blue-400'; textCol = 'text-brand-neon'; }
 
-                            // Render Komponen Kartu Timeline
                             return `
                             <div class="flex items-start gap-4 group stagger-item">
-                                <div class="w-10 md:w-12 pt-1 shrink-0 text-right">
-                                    <span class="text-[10px] md:text-xs font-black text-gray-400">${ev.time}</span>
-                                </div>
-                                <div class="relative flex flex-col items-center">
-                                    <div class="w-3.5 h-3.5 rounded-full ${dotCol} border-2 relative z-10 shadow-[0_0_10px_currentColor] mt-1 transition-transform group-hover:scale-125 duration-300"></div>
-                                </div>
+                                <div class="w-10 md:w-12 pt-1 shrink-0 text-right"><span class="text-[10px] md:text-xs font-black text-gray-400">${ev.time}</span></div>
+                                <div class="relative flex flex-col items-center"><div class="w-3.5 h-3.5 rounded-full ${dotCol} border-2 relative z-10 shadow-[0_0_10px_currentColor] mt-1 transition-transform group-hover:scale-125 duration-300"></div></div>
                                 <div class="bg-brand-panel border border-white/5 p-3.5 rounded-2xl flex-1 shadow-md group-hover:border-white/10 group-hover:bg-white/5 transition-all">
-                                    <div class="flex items-center gap-2 mb-1.5">
-                                        <i data-lucide="${ev.icon || 'activity'}" class="w-4 h-4 ${textCol}"></i>
-                                        <p class="text-[10px] font-black uppercase tracking-widest ${textCol}">${ev.type}</p>
-                                    </div>
+                                    <div class="flex items-center gap-2 mb-1.5"><i data-lucide="${ev.icon || 'activity'}" class="w-4 h-4 ${textCol}"></i><p class="text-[10px] font-black uppercase tracking-widest ${textCol}">${ev.type}</p></div>
                                     <p class="text-xs font-bold text-gray-200 capitalize leading-tight">${ev.detail}</p>
                                 </div>
-                            </div>
-                            `;
+                            </div>`;
                         }).join('');
                         
-                        // Tambahkan Penanda Peluit Akhir Jika Selesai
                         if(jadwal.status === 'FT' || jadwal.status === 'Selesai') {
-                             container.innerHTML += `
-                             <div class="flex items-start gap-4 opacity-50 mt-4 stagger-item">
-                                <div class="w-10 md:w-12 text-right"><span class="text-[10px] font-black text-gray-500">FT</span></div>
-                                <div class="relative flex flex-col items-center"><div class="w-3.5 h-3.5 rounded-full bg-transparent border-2 border-gray-500 mt-0.5"></div></div>
-                                <div class="flex-1"><p class="text-[10px] font-bold text-gray-500 uppercase mt-0.5 tracking-widest">Peluit Akhir Dibunyikan</p></div>
-                             </div>`;
+                             container.innerHTML += `<div class="flex items-start gap-4 opacity-50 mt-4 stagger-item"><div class="w-10 md:w-12 text-right"><span class="text-[10px] font-black text-gray-500">FT</span></div><div class="relative flex flex-col items-center"><div class="w-3.5 h-3.5 rounded-full bg-transparent border-2 border-gray-500 mt-0.5"></div></div><div class="flex-1"><p class="text-[10px] font-bold text-gray-500 uppercase mt-0.5 tracking-widest">Peluit Akhir Dibunyikan</p></div></div>`;
                         }
                     }
-                } catch(e) {
-                    container.innerHTML = '<p class="text-center text-[10px] text-red-500 font-bold">Gagal memproses data rekaman pertandingan.</p>';
-                }
+                } catch(e) { container.innerHTML = '<p class="text-center text-[10px] text-red-500 font-bold">Gagal memproses data rekaman pertandingan.</p>'; }
+            } else { container.innerHTML = '<div class="text-center py-10"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Pertandingan belum dimulai</p></div>'; }
+
+            // RENDER LINEUP (Hybrid Auto JSON / Manual Text)
+            const lineupContainer = document.getElementById('md-lineup-container');
+            if(log && log.lineup) {
+                try {
+                    const lData = JSON.parse(log.lineup);
+                    lineupContainer.innerHTML = renderMiniPitch(lData, log.formasi, jadwal.cabang);
+                } catch(e) {}
+            } else if (jadwal.lineup_manual && jadwal.lineup_manual !== '-') {
+                lineupContainer.innerHTML = `<div class="bg-white/5 border border-white/10 p-4 rounded-xl text-[10px] text-gray-300 leading-relaxed whitespace-pre-wrap">${jadwal.lineup_manual}</div>`;
             } else {
-                container.innerHTML = '<div class="text-center py-10"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Pertandingan belum dimulai</p></div>';
+                lineupContainer.innerHTML = '<div class="text-center py-10"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Belum ada data Line Up</p></div>';
             }
 
+            // RENDER STATS (Hybrid)
+            const statsContainer = document.getElementById('md-stats-container');
+            if (jadwal.statistik_manual && jadwal.statistik_manual !== '-') {
+                statsContainer.innerHTML = `<div class="bg-white/5 border border-white/10 p-4 rounded-xl text-[10px] text-gray-300 leading-relaxed whitespace-pre-wrap">${jadwal.statistik_manual}</div>`;
+            } else {
+                statsContainer.innerHTML = '<div class="text-center py-10"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Statistik belum tersedia</p></div>';
+            }
+            
+            document.getElementById('matchDetailModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+        
             // RENDER LINEUP (Hybrid Auto JSON / Manual Text)
             const lineupContainer = document.getElementById('md-lineup-container');
             if(log && log.lineup) {
@@ -1616,7 +1620,11 @@
         }
 
         // 3. FUNGSI RENDER LAPANGAN VIRTUAL MINI
-        function renderMiniPitch(lineupObj, formasi, cabang) {
+        // 3. FUNGSI RENDER LAPANGAN VIRTUAL MINI
+        function renderMiniPitch(lineupObj, formasi, cabangRaw) {
+            // FIX: Failsafe default ke 'mnafc' jika kolom cabang kosong
+            const cabang = val(cabangRaw, 'mnafc').toLowerCase() === 'futsal' ? 'futsal' : 'mnafc';
+            
             const formsDef = FORMATIONS[cabang][formasi] || FORMATIONS[cabang][Object.keys(FORMATIONS[cabang])[0]];
             const bgClass = cabang === 'futsal' ? 'pitch-futsal' : 'pitch-football';
             let slotsHTML = formsDef.map((s, i) => {
