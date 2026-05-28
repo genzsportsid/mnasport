@@ -1349,31 +1349,6 @@
             lucide.createIcons();
         }
         
-            // RENDER LINEUP (Hybrid Auto JSON / Manual Text)
-            const lineupContainer = document.getElementById('md-lineup-container');
-            if(log && log.lineup) {
-                try {
-                    const lData = JSON.parse(log.lineup);
-                    lineupContainer.innerHTML = renderMiniPitch(lData, log.formasi, jadwal.cabang);
-                } catch(e) {}
-            } else if (jadwal.lineup_manual && jadwal.lineup_manual !== '-') {
-                lineupContainer.innerHTML = `<div class="bg-white/5 border border-white/10 p-4 rounded-xl text-[10px] text-gray-300 leading-relaxed whitespace-pre-wrap">${jadwal.lineup_manual}</div>`;
-            } else {
-                lineupContainer.innerHTML = '<div class="text-center py-10"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Belum ada data Line Up</p></div>';
-            }
-
-            // RENDER STATS (Hybrid)
-            const statsContainer = document.getElementById('md-stats-container');
-            if (jadwal.statistik_manual && jadwal.statistik_manual !== '-') {
-                statsContainer.innerHTML = `<div class="bg-white/5 border border-white/10 p-4 rounded-xl text-[10px] text-gray-300 leading-relaxed whitespace-pre-wrap">${jadwal.statistik_manual}</div>`;
-            } else {
-                statsContainer.innerHTML = '<div class="text-center py-10"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Statistik belum tersedia</p></div>';
-            }
-            
-            document.getElementById('matchDetailModal').classList.remove('hidden');
-            lucide.createIcons();
-        }
-        
         function closeMatchDetail() { document.getElementById('matchDetailModal').classList.add('hidden'); }
 
         // --- LINEUP BUILDER ENGINE ---
