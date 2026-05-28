@@ -1268,13 +1268,11 @@
 
         // --- FUNGSI UNTUK MEMBUKA MODAL EVENT TIMELINE ---
         function openMatchDetail(matchId) {
-            // FIX: Gunakan String() agar Angka dari Spreadsheet dan Teks cocok 100%
             const jadwal = rawData.jadwal.find(j => String(j.id_match) === String(matchId));
             const log = rawData.match_log ? rawData.match_log.find(l => String(l.id_match) === String(matchId)) : null;
             
             if(!jadwal) return;
             
-            // Set Header Info
             document.getElementById('md-lawan').innerText = jadwal.lawan;
             document.getElementById('md-score').innerText = `${jadwal.skor_kita || 0} - ${jadwal.skor_lawan || 0}`;
             document.getElementById('md-date').innerText = `${jadwal.tanggal} • ${val(jadwal.tempat, 'Venue')}`;
@@ -1284,23 +1282,18 @@
             statusEl.className = jadwal.status === 'LIVE' ? 'text-[9px] font-black bg-red-500/20 border border-red-500 text-red-500 px-3 py-1 rounded uppercase tracking-widest live-pulse' : 'text-[9px] font-black bg-white/10 text-white px-3 py-1 rounded uppercase tracking-widest';
 
             const container = document.getElementById('md-events-container');
-            
-            // Pengambilan JSON Event (Live vs Selesai)
             let eventsJSON = (jadwal.status === 'LIVE' && jadwal.live_events) ? jadwal.live_events : (log && log.detail_event ? log.detail_event : null);
 
             if(eventsJSON) {
                 try {
                     let events = typeof eventsJSON === 'string' ? JSON.parse(eventsJSON) : eventsJSON;
-                    
                     if(events.length === 0) {
                         container.innerHTML = '<div class="text-center py-10"><i data-lucide="clock" class="w-8 h-8 text-white/10 mx-auto mb-2"></i><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Belum ada kejadian</p></div>';
                     } else {
                         events.sort((a, b) => parseInt(a.time) - parseInt(b.time));
-
                         container.innerHTML = events.map(ev => {
                             let dotCol = 'bg-gray-600 border-gray-500'; let textCol = 'text-white';
                             const typeLower = ev.type.toLowerCase();
-                            
                             if(typeLower.includes('gol') || typeLower.includes('scored') || typeLower.includes('penalti didapat')) { dotCol = 'bg-green-500 border-green-400'; textCol = 'text-green-400'; }
                             else if(typeLower.includes('kebobolan') || typeLower.includes('conceded') || typeLower.includes('merah') || typeLower.includes('gagal')) { dotCol = 'bg-red-500 border-red-400'; textCol = 'text-red-400'; }
                             else if(typeLower.includes('kuning')) { dotCol = 'bg-yellow-400 border-yellow-300'; textCol = 'text-yellow-400'; }
@@ -1324,7 +1317,6 @@
                 } catch(e) { container.innerHTML = '<p class="text-center text-[10px] text-red-500 font-bold">Gagal memproses data rekaman pertandingan.</p>'; }
             } else { container.innerHTML = '<div class="text-center py-10"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Pertandingan belum dimulai</p></div>'; }
 
-            // RENDER LINEUP (Hybrid Auto JSON / Manual Text)
             const lineupContainer = document.getElementById('md-lineup-container');
             if(log && log.lineup) {
                 try {
@@ -1337,7 +1329,6 @@
                 lineupContainer.innerHTML = '<div class="text-center py-10"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Belum ada data Line Up</p></div>';
             }
 
-            // RENDER STATS (Hybrid)
             const statsContainer = document.getElementById('md-stats-container');
             if (jadwal.statistik_manual && jadwal.statistik_manual !== '-') {
                 statsContainer.innerHTML = `<div class="bg-white/5 border border-white/10 p-4 rounded-xl text-[10px] text-gray-300 leading-relaxed whitespace-pre-wrap">${jadwal.statistik_manual}</div>`;
@@ -1345,7 +1336,7 @@
                 statsContainer.innerHTML = '<div class="text-center py-10"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Statistik belum tersedia</p></div>';
             }
             
-            switchMatchTab('timeline'); // Memaksa modal selalu terbuka di menu Timeline
+            switchMatchTab('timeline'); // Memaksa tab timeline terbuka otomatis
             document.getElementById('matchDetailModal').classList.remove('hidden');
             lucide.createIcons();
         }
