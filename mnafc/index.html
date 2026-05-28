@@ -1945,8 +1945,9 @@
         function assignPmePlayer(idx) {
             const p = rawData[activeSport].pemain[idx];
             if (pmeActiveSlot === 'event') {
-                document.getElementById('pme-event-player-name').innerText = p.nama;
-                document.getElementById('pme-event-player-name').className = 'w-full bg-brand-neon/20 border border-brand-neon text-brand-neon font-black text-[10px] p-2.5 rounded-lg truncate text-left';
+                // FIX: Menyamakan ID dengan tombol di HTML (pme-btn-select-player)
+                document.getElementById('pme-btn-select-player').innerText = p.nama;
+                document.getElementById('pme-btn-select-player').className = 'w-full bg-brand-neon/20 border border-brand-neon text-brand-neon font-black text-[10px] p-2.5 rounded-lg truncate text-left';
                 document.getElementById('pme-event-player-idx').value = idx;
             } else if (pmeActiveSlot === 'bench') {
                 pmeBench.push(p); renderPmeBench();
@@ -1970,9 +1971,11 @@
             else if(type === 'Assist') { bgStr = 'bg-brand-neon/10 border-brand-neon/30'; textStr = 'text-brand-neon'; iconCol = 'text-brand-neon'; iconName = 'footprints'; }
 
             pmeEvents.push({ time: time, type: type, detail: p.nama, icon: iconName, col: iconCol, bg: bgStr });
+            
+            // Reset form setelah sukses menambah
             document.getElementById('pme-input-time').value = '';
-            document.getElementById('pme-event-player-name').innerText = 'Klik Pilih Pemain...';
-            document.getElementById('pme-event-player-name').className = 'w-full bg-white/5 border border-white/10 text-brand-gold font-bold text-[10px] p-2.5 rounded-lg truncate text-left hover:bg-white/10 transition-colors';
+            document.getElementById('pme-btn-select-player').innerText = 'Klik Pilih Pemain...';
+            document.getElementById('pme-btn-select-player').className = 'w-full bg-white/5 border border-white/10 text-brand-gold font-bold text-[10px] p-2.5 rounded-lg truncate text-left hover:bg-white/10 transition-colors';
             document.getElementById('pme-event-player-idx').value = '';
             renderPmeEvents();
         }
