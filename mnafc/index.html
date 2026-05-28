@@ -214,7 +214,11 @@
                     <h3 class="text-xs font-black uppercase text-brand-gold">1. Pilih Jadwal Pertandingan</h3>
                     
                     <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <div class="relative w-full sm:w-48">
+                        <div class="flex gap-1 bg-black p-1 rounded-lg border border-white/10 shrink-0">
+                            <button onclick="switchSport('mnafc')" id="coach-btn-fc" class="px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest transition-all bg-brand-blue text-white">Sepak Bola</button>
+                            <button onclick="switchSport('futsal')" id="coach-btn-futsal" class="px-3 py-1 rounded text-[8px] font-bold uppercase tracking-widest transition-all text-gray-500 hover:text-white">Futsal</button>
+                        </div>
+                        <div class="relative w-full sm:w-40">
                             <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500"></i>
                             <input type="text" id="matchSearchCoach" oninput="renderCoachMatchList()" placeholder="Cari jadwal..." class="w-full bg-black border border-white/10 rounded-lg py-1.5 pl-8 pr-3 text-[10px] font-medium outline-none focus:border-brand-neon transition-colors text-white placeholder-gray-600">
                         </div>
@@ -668,6 +672,8 @@
             
             document.getElementById('coach-match-selector').classList.remove('hidden');
             document.getElementById('coach-attendance-panel').classList.add('hidden');
+            const pmePanel = document.getElementById('coach-post-match-panel');
+            if(pmePanel) { pmePanel.classList.add('hidden'); pmePanel.classList.remove('flex'); }
             document.getElementById('coach-active-match-panel').classList.add('hidden');
             document.getElementById('match-scoreboard').classList.add('hidden');
             document.getElementById('btn-start-match').classList.add('hidden');
@@ -1839,6 +1845,9 @@
             document.getElementById('pme-view-event').classList.toggle('hidden', tab !== 'event');
             document.getElementById('pme-view-stats').classList.toggle('hidden', tab !== 'stats');
             
+            // FIX: Sembunyikan panel Bursa Pemain secara total jika masuk ke Tab Statistik!
+            document.getElementById('pme-pool-section').classList.toggle('hidden', tab === 'stats');
+            
             const aCls = 'flex-1 py-2 text-[9px] font-black uppercase rounded-lg bg-brand-neon text-white transition-all';
             const iCls = 'flex-1 py-2 text-[9px] font-bold uppercase rounded-lg text-gray-500 hover:text-white transition-all';
             document.getElementById('pme-tab-skuad').className = tab === 'skuad' ? aCls : iCls;
@@ -1891,7 +1900,8 @@
             }
             
             const players = rawData[activeSport]?.pemain || []; 
-            const assignedIds = Object.values(pmeLineup).map(p => p.nomor + p.nama).concat(pmeBench.map(p => p.nomor + p.nama));
+            // FIX: Tambahkan filter validasi agar slot lapangan yang kosong tidak membuat sistem crash
+            const assignedIds = Object.values(pmeLineup).filter(p => p).map(p => p.nomor + p.nama).concat(pmeBench.map(p => p.nomor + p.nama));
             const filteredPlayers = players.filter(p => (val(p.nama) + val(p.posisi)).toLowerCase().includes(query));
 
             document.getElementById('pme-pool-container').innerHTML = filteredPlayers.map((p) => {
