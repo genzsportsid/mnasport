@@ -369,11 +369,25 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-black border border-white/10 p-5 rounded-2xl">
                             <div class="space-y-3">
                                 <h4 class="text-[10px] font-black text-brand-neon uppercase tracking-widest text-center border-b border-white/5 pb-2">MNA FC</h4>
-                                ${['pos','shot','sot','pass','acc','corn','off','foul'].map(k => `<div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">${k === 'pos'?'Penguasaan (%)':k==='shot'?'Tembakan':k==='sot'?'Tepat Sasaran':k==='pass'?'Total Umpan':k==='acc'?'Akurasi Umpan (%)':k==='corn'?'Tendangan Sudut':k==='off'?'Offside':'Pelanggaran'}</label><input type="number" id="pme-${k}-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>`).join('')}
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Penguasaan (%)</label><input type="number" id="pme-pos-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tembakan</label><input type="number" id="pme-shot-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tepat Sasaran</label><input type="number" id="pme-sot-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Total Umpan</label><input type="number" id="pme-pass-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Akurasi Umpan (%)</label><input type="number" id="pme-acc-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tendangan Sudut</label><input type="number" id="pme-corn-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Offside</label><input type="number" id="pme-off-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Pelanggaran</label><input type="number" id="pme-foul-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
                             </div>
                             <div class="space-y-3">
                                 <h4 class="text-[10px] font-black text-red-400 uppercase tracking-widest text-center border-b border-white/5 pb-2">LAWAN</h4>
-                                ${['pos','shot','sot','pass','acc','corn','off','foul'].map(k => `<div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">${k === 'pos'?'Penguasaan (%)':k==='shot'?'Tembakan':k==='sot'?'Tepat Sasaran':k==='pass'?'Total Umpan':k==='acc'?'Akurasi Umpan (%)':k==='corn'?'Tendangan Sudut':k==='off'?'Offside':'Pelanggaran'}</label><input type="number" id="pme-${k}-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>`).join('')}
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Penguasaan (%)</label><input type="number" id="pme-pos-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tembakan</label><input type="number" id="pme-shot-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tepat Sasaran</label><input type="number" id="pme-sot-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Total Umpan</label><input type="number" id="pme-pass-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Akurasi Umpan (%)</label><input type="number" id="pme-acc-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tendangan Sudut</label><input type="number" id="pme-corn-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Offside</label><input type="number" id="pme-off-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Pelanggaran</label><input type="number" id="pme-foul-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
                             </div>
                         </div>
                     </div>
@@ -1806,12 +1820,17 @@
             const jadwal = rawData.jadwal.find(j => String(j.id_match) === String(matchId));
             if(!jadwal) return; editMatchId = matchId;
             
+            // FIX: Sinkronisasi Cabang Olahraga Otomatis
+            const cab = val(jadwal.cabang, 'mnafc').toLowerCase();
+            if(cab === 'futsal' || cab === 'mnafc') activeSport = cab;
+            
             document.getElementById('coach-match-selector').classList.add('hidden');
             document.getElementById('coach-post-match-panel').classList.remove('hidden'); document.getElementById('coach-post-match-panel').classList.add('flex');
             document.getElementById('pme-match-title').innerText = `VS ${jadwal.lawan} (${jadwal.tanggal})`;
             
             const select = document.getElementById('pme-formation-select'); const forms = FORMATIONS[activeSport];
             select.innerHTML = Object.keys(forms).map(k => `<option value="${k}">${k}</option>`).join('');
+            select.value = Object.keys(forms)[0]; // Setel Default agar lapangan tidak kosong!
             
             // Dekode Data Lineup JSON
             pmeLineup = {}; pmeBench = []; pmeEvents = [];
@@ -1845,7 +1864,7 @@
             document.getElementById('pme-view-event').classList.toggle('hidden', tab !== 'event');
             document.getElementById('pme-view-stats').classList.toggle('hidden', tab !== 'stats');
             
-            // FIX: Sembunyikan panel Bursa Pemain secara total jika masuk ke Tab Statistik!
+            // FIX: Sembunyikan Bursa Pemain saat masuk ke tab statistik
             document.getElementById('pme-pool-section').classList.toggle('hidden', tab === 'stats');
             
             const aCls = 'flex-1 py-2 text-[9px] font-black uppercase rounded-lg bg-brand-neon text-white transition-all';
@@ -1900,8 +1919,8 @@
             }
             
             const players = rawData[activeSport]?.pemain || []; 
-            // FIX: Tambahkan filter validasi agar slot lapangan yang kosong tidak membuat sistem crash
-            const assignedIds = Object.values(pmeLineup).filter(p => p).map(p => p.nomor + p.nama).concat(pmeBench.map(p => p.nomor + p.nama));
+            // FIX: Filter (p => p) mencegah crash mematikan jika ada slot lapangan yang kosong
+            const assignedIds = Object.values(pmeLineup).filter(p => p).map(p => p.nomor + p.nama).concat(pmeBench.filter(p => p).map(p => p.nomor + p.nama));
             const filteredPlayers = players.filter(p => (val(p.nama) + val(p.posisi)).toLowerCase().includes(query));
 
             document.getElementById('pme-pool-container').innerHTML = filteredPlayers.map((p) => {
