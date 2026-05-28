@@ -364,7 +364,11 @@
             
             <div class="bg-brand-panel border-b border-white/5 pt-6 pb-5 px-6 relative shrink-0">
                 <button onclick="closeMatchDetail()" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors bg-white/5 p-1.5 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button>
-                <div class="text-center mb-4"><span id="md-status" class="text-[9px] font-black bg-white/10 text-white px-2 py-0.5 rounded uppercase tracking-widest">FT</span></div>
+                <div class="text-center mb-4">
+                    <span id="md-status" class="text-[9px] font-black bg-white/10 text-white px-2 py-0.5 rounded uppercase tracking-widest">FT</span>
+                    <!-- TAG INI YANG SEBELUMNYA HILANG -->
+                    <p id="md-date" class="text-[9px] text-gray-500 uppercase font-bold mt-2 tracking-wider">Tanggal • Venue</p>
+                </div>
                 <div class="flex justify-between items-center gap-4">
                     <div class="w-1/3 flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-brand-blue flex items-center justify-center text-white font-black text-2xl shadow-lg border border-brand-blue/50">M</div><h3 class="text-[10px] md:text-xs font-black text-white uppercase text-center leading-tight">MNA FC</h3></div>
                     <div class="w-1/3 text-center flex flex-col items-center"><p class="text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-md" id="md-score">0 - 0</p></div>
@@ -1275,7 +1279,8 @@
             
             document.getElementById('md-lawan').innerText = jadwal.lawan;
             document.getElementById('md-score').innerText = `${jadwal.skor_kita || 0} - ${jadwal.skor_lawan || 0}`;
-            document.getElementById('md-date').innerText = `${jadwal.tanggal} • ${val(jadwal.tempat, 'Venue')}`;
+            const dateEl = document.getElementById('md-date');
+            if(dateEl) dateEl.innerText = `${jadwal.tanggal} • ${val(jadwal.tempat, 'Venue')}`;
             
             const statusEl = document.getElementById('md-status');
             statusEl.innerText = jadwal.status === 'LIVE' ? 'LIVE MATCH' : 'FULL TIME';
