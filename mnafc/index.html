@@ -303,6 +303,53 @@
                 </div>
             </div>
 
+            <div id="coach-post-match-panel" class="hidden flex-col gap-6 max-w-3xl mx-auto animate-fade-in w-full pb-10">
+                <div class="bg-brand-panel p-6 rounded-[2rem] border border-white/10 shadow-xl">
+                    <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+                        <div>
+                            <h3 class="text-xs font-black text-white uppercase tracking-widest">Post-Match Editor</h3>
+                            <p class="text-[9px] font-bold text-brand-gold uppercase mt-1" id="pme-match-title">VS Lawan</p>
+                        </div>
+                        <button onclick="closePostMatchEditor()" class="text-gray-500 hover:text-white bg-white/5 p-2 rounded-xl transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <h4 class="text-[10px] font-black text-brand-neon uppercase tracking-widest text-center border-b border-white/5 pb-2">KITA (MNA FC)</h4>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Penguasaan Bola (%)</label><input type="number" id="pme-pos-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Total Tembakan</label><input type="number" id="pme-shot-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tepat Sasaran</label><input type="number" id="pme-sot-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Total Umpan</label><input type="number" id="pme-pass-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Akurasi Umpan (%)</label><input type="number" id="pme-acc-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tend. Sudut (Corner)</label><input type="number" id="pme-corn-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Offside</label><input type="number" id="pme-off-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Pelanggaran</label><input type="number" id="pme-foul-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h4 class="text-[10px] font-black text-red-400 uppercase tracking-widest text-center border-b border-white/5 pb-2">LAWAN</h4>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Penguasaan Bola (%)</label><input type="number" id="pme-pos-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Total Tembakan</label><input type="number" id="pme-shot-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tepat Sasaran</label><input type="number" id="pme-sot-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Total Umpan</label><input type="number" id="pme-pass-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Akurasi Umpan (%)</label><input type="number" id="pme-acc-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tend. Sudut (Corner)</label><input type="number" id="pme-corn-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Offside</label><input type="number" id="pme-off-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
+                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Pelanggaran</label><input type="number" id="pme-foul-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-5 border-t border-white/5">
+                        <label class="text-[9px] font-bold text-brand-gold uppercase mb-2 block">Line Up & Info Laga (Opsional)</label>
+                        <textarea id="pme-lineup" rows="3" class="w-full bg-black border border-white/10 text-white text-[10px] p-3 rounded-xl focus:border-brand-gold outline-none placeholder-gray-700 leading-relaxed" placeholder="Contoh: \nSTARTING 5:\n- Nanda\n- Hanung\n- Tito..."></textarea>
+                    </div>
+
+                    <button onclick="savePostMatchStats()" class="w-full bg-gradient-to-r from-brand-gold to-yellow-600 hover:from-yellow-500 hover:to-yellow-400 text-black py-4 mt-6 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-[0_0_20px_rgba(215,182,125,0.3)] transition-all">
+                        <i data-lucide="save" class="w-4 h-4 inline pb-0.5 mr-1"></i> Encode & Simpan JSON
+                    </button>
+                </div>
+            </div>
+            
             <!-- COACH FLOW 4: ABSENSI -->
             <div id="coach-attendance-panel" class="hidden flex-col gap-4 max-w-3xl mx-auto animate-fade-in w-full pb-10">
                 <div class="bg-brand-panel p-5 rounded-[2rem] border border-white/10 shadow-xl">
@@ -610,39 +657,44 @@
                 list.innerHTML = '<p class="text-[10px] text-gray-500 uppercase font-bold">Belum ada jadwal di database.</p>'; return; 
             }
             
-            // FILTER: Cabang Kompetisi Aktif, Status Bukan FT, dan Teks Pencarian
+            // FILTER: Hapus filter status agar jadwal Selesai (FT) juga muncul untuk di-edit
             const activeMatches = rawData.jadwal.filter(j => {
                 const matchSport = val(j.cabang, 'mnafc').toLowerCase();
                 const searchStr = (val(j.lawan) + val(j.tanggal) + val(j.tempat)).toLowerCase();
-                return j.status !== 'FT' && j.status !== 'Selesai' && matchSport === activeSport && searchStr.includes(query);
+                return matchSport === activeSport && searchStr.includes(query);
             });
             
             if(activeMatches.length === 0) {
                  list.innerHTML = `<p class="text-[10px] text-gray-500 uppercase font-bold">${query ? 'Jadwal tidak ditemukan.' : 'Belum ada agenda untuk divisi ini.'}</p>`; return;
             }
 
+            // Sorting: Yang Pending/Live di atas, FT di bawah
             activeMatches.sort((a, b) => {
-                const dateA = parseIndoDate(a.tanggal) || new Date(0);
-                const dateB = parseIndoDate(b.tanggal) || new Date(0);
-                return dateA - dateB;
+                const scoreA = a.status === 'LIVE' ? 3 : (a.status === 'Pending' ? 2 : 1);
+                const scoreB = b.status === 'LIVE' ? 3 : (b.status === 'Pending' ? 2 : 1);
+                if (scoreA !== scoreB) return scoreB - scoreA;
+                return (parseIndoDate(a.tanggal) || new Date(0)) - (parseIndoDate(b.tanggal) || new Date(0));
             });
 
             list.innerHTML = activeMatches.map(j => {
                 const badgeHTML = typeof getMatchBadge === 'function' ? getMatchBadge(j.jenis_match) : '';
+                const isFT = j.status === 'FT' || j.status === 'Selesai';
+                // LOGIKA PINTAR: Jika Selesai -> Buka Editor, Jika Belum -> Buka Live Tracker
+                const clickAction = isFT ? `openPostMatchEditor('${j.id_match}')` : `selectMatchToCoach('${j.id_match}', '${j.lawan}')`;
+                
                 return `
-                <div onclick="selectMatchToCoach('${j.id_match}', '${j.lawan}')" class="bg-brand-panel border border-white/5 p-4 rounded-2xl cursor-pointer hover:border-brand-neon transition-all flex flex-col gap-3 shadow-md relative overflow-hidden">
+                <div onclick="${clickAction}" class="bg-brand-panel border border-white/5 p-4 rounded-2xl cursor-pointer hover:border-brand-neon transition-all flex flex-col gap-3 shadow-md relative overflow-hidden group">
                     <div class="flex justify-between items-start">
                         <div class="flex items-center gap-1.5 flex-wrap">
                             ${badgeHTML}
                             ${val(j.kategori_umur, '') !== '-' && j.kategori_umur ? `<span class="bg-brand-neon/10 text-brand-neon border border-brand-neon/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider text-[8px]">${j.kategori_umur}</span>` : ''}
                         </div>
-                        <span class="text-[8px] font-black uppercase tracking-widest ${j.status === 'LIVE' ? 'text-red-500 bg-red-500/10' : 'text-gray-400 bg-white/5'} px-2 py-0.5 rounded shrink-0">${val(j.status, 'Pending')}</span>
+                        <span class="text-[8px] font-black uppercase tracking-widest ${isFT ? 'text-brand-gold bg-brand-gold/10' : (j.status === 'LIVE' ? 'text-red-500 bg-red-500/10' : 'text-gray-400 bg-white/5')} px-2 py-0.5 rounded shrink-0">${isFT ? 'EDIT DATA' : val(j.status, 'Pending')}</span>
                     </div>
                     <div>
                         <p class="text-[10px] text-brand-gold font-bold uppercase tracking-wide mb-0.5">${j.tanggal} • ${j.waktu}</p>
-                        <h4 class="text-sm font-black text-white uppercase truncate">VS ${j.lawan}</h4>
+                        <h4 class="text-sm font-black text-white uppercase truncate group-hover:text-brand-neon transition-colors">VS ${j.lawan}</h4>
                     </div>
-                    <p class="text-[10px] text-gray-500 uppercase flex items-center gap-1 pt-2 border-t border-white/5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-600"></i> ${j.tempat}</p>
                 </div>`;
             }).join('');
             lucide.createIcons();
@@ -1270,6 +1322,41 @@
             lucide.createIcons();
         }
 
+        // FOTMOB STYLE STAT BAR BUILDER
+        function buildStatBarHTML(label, homeVal, awayVal, isPct = false) {
+            let h = parseFloat(homeVal) || 0;
+            let a = parseFloat(awayVal) || 0;
+            let total = h + a;
+            let hPct = total > 0 ? (h / total) * 100 : 50;
+            let aPct = total > 0 ? (a / total) * 100 : 50;
+            
+            // Pewarnaan dinamis: Menang = Biru/Neon, Kalah = Merah, Seri = Abu-abu
+            let hCol = h > a ? 'bg-brand-neon' : (h === a ? 'bg-gray-400' : 'bg-gray-700');
+            let aCol = a > h ? 'bg-red-500' : (h === a ? 'bg-gray-400' : 'bg-gray-700');
+            let hText = h > a ? 'text-white font-black' : (h === a ? 'text-gray-300 font-bold' : 'text-gray-500');
+            let aText = a > h ? 'text-white font-black' : (h === a ? 'text-gray-300 font-bold' : 'text-gray-500');
+            
+            let displayH = isPct ? h + '%' : h;
+            let displayA = isPct ? a + '%' : a;
+
+            return `
+            <div class="mb-4 group">
+                <div class="flex justify-between items-center mb-1.5 px-1">
+                    <span class="w-10 text-left text-[11px] ${hText}">${displayH}</span>
+                    <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest text-center flex-1 group-hover:text-white transition-colors">${label}</span>
+                    <span class="w-10 text-right text-[11px] ${aText}">${displayA}</span>
+                </div>
+                <div class="flex items-center justify-center gap-1.5 w-full h-1.5">
+                    <div class="flex-1 bg-white/5 rounded-l-full h-full flex justify-end overflow-hidden">
+                        <div class="${hCol} h-full rounded-l-full transition-all duration-1000 ease-out shadow-[0_0_10px_currentColor]" style="width: ${hPct}%"></div>
+                    </div>
+                    <div class="flex-1 bg-white/5 rounded-r-full h-full flex justify-start overflow-hidden">
+                        <div class="${aCol} h-full rounded-r-full transition-all duration-1000 ease-out shadow-[0_0_10px_currentColor]" style="width: ${aPct}%"></div>
+                    </div>
+                </div>
+            </div>`;
+        }
+        
         // --- FUNGSI UNTUK MEMBUKA MODAL EVENT TIMELINE ---
         function openMatchDetail(matchId) {
             const jadwal = rawData.jadwal.find(j => String(j.id_match) === String(matchId));
@@ -1334,11 +1421,44 @@
                 lineupContainer.innerHTML = '<div class="text-center py-10"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Belum ada data Line Up</p></div>';
             }
 
+            // RENDER STATS (HYBRID JSON VISUALIZER / TEXT)
             const statsContainer = document.getElementById('md-stats-container');
-            if (jadwal.statistik_manual && jadwal.statistik_manual !== '-') {
-                statsContainer.innerHTML = `<div class="bg-white/5 border border-white/10 p-4 rounded-xl text-[10px] text-gray-300 leading-relaxed whitespace-pre-wrap">${jadwal.statistik_manual}</div>`;
+            let statData = null;
+            
+            // Baca data dari Match Log atau dari ketikan manual Spreadsheet
+            let statRaw = (log && log.statistik) ? log.statistik : (jadwal.statistik_manual !== '-' ? jadwal.statistik_manual : null);
+            
+            if (statRaw) {
+                try { 
+                    statData = JSON.parse(statRaw); // Coba ubah teks jadi JSON 
+                } catch(e) { 
+                    statData = null; // Jika gagal, berarti ini teks biasa dari ketikan lama
+                }
+            }
+
+            if (statData && typeof statData === 'object') {
+                // JIKA FORMAT JSON (DARI POST-MATCH EDITOR) -> RENDER GRAFIK FOTMOB
+                statsContainer.innerHTML = `
+                    <div class="bg-brand-panel border border-white/5 p-5 md:p-6 rounded-3xl shadow-xl mt-2 animate-fade-in relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/5 blur-3xl rounded-full pointer-events-none"></div>
+                        <h4 class="text-[10px] font-black text-brand-gold uppercase tracking-widest mb-6 border-b border-white/10 pb-3 text-center">Match Stats</h4>
+                        
+                        ${buildStatBarHTML('Penguasaan Bola', statData.pos_h, statData.pos_a, true)}
+                        ${buildStatBarHTML('Total Tembakan', statData.shot_h, statData.shot_a)}
+                        ${buildStatBarHTML('Tepat Sasaran', statData.sot_h, statData.sot_a)}
+                        ${buildStatBarHTML('Total Umpan', statData.pass_h, statData.pass_a)}
+                        ${buildStatBarHTML('Umpan Akurat', statData.acc_h, statData.acc_a, true)}
+                        ${buildStatBarHTML('Tendangan Sudut', statData.corn_h, statData.corn_a)}
+                        ${buildStatBarHTML('Offside', statData.off_h, statData.off_a)}
+                        ${buildStatBarHTML('Pelanggaran', statData.foul_h, statData.foul_a)}
+                    </div>
+                `;
+            } else if (statRaw && statRaw !== '-') {
+                // JIKA TEKS BIASA -> TAMPILKAN SEBAGAI CATATAN (BACKWARD COMPATIBILITY)
+                statsContainer.innerHTML = `<div class="bg-brand-panel border border-white/5 p-5 rounded-2xl text-[10px] text-gray-300 leading-relaxed whitespace-pre-wrap mt-2 shadow-lg"><h4 class="text-brand-neon font-black mb-2 uppercase tracking-widest">Catatan Statistik</h4>${statRaw}</div>`;
             } else {
-                statsContainer.innerHTML = '<div class="text-center py-10"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Statistik belum tersedia</p></div>';
+                // JIKA KOSONG
+                statsContainer.innerHTML = '<div class="text-center py-12"><i data-lucide="bar-chart-2" class="w-10 h-10 text-white/5 mx-auto mb-3"></i><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Statistik belum tersedia</p></div>';
             }
             
             switchMatchTab('timeline'); // Memaksa tab timeline terbuka otomatis
@@ -1614,6 +1734,76 @@
                     ${slotsHTML}
                 </div>
             </div>`;
+        }
+
+        // --- POST-MATCH EDITOR LOGIC ---
+        let editMatchId = null;
+
+        function openPostMatchEditor(matchId) {
+            const jadwal = rawData.jadwal.find(j => String(j.id_match) === String(matchId));
+            if(!jadwal) return;
+            
+            editMatchId = matchId;
+            document.getElementById('coach-match-selector').classList.add('hidden');
+            document.getElementById('coach-post-match-panel').classList.remove('hidden');
+            document.getElementById('coach-post-match-panel').classList.add('flex');
+            
+            document.getElementById('pme-match-title').innerText = `VS ${jadwal.lawan} (${jadwal.tanggal})`;
+            document.getElementById('match-status-text').innerText = 'Data Encoder';
+            document.getElementById('match-status-text').classList.replace('text-red-500', 'text-brand-gold');
+            
+            // Dekode JSON jika sebelumnya sudah ada
+            let statData = {};
+            try { statData = JSON.parse(jadwal.statistik_manual || '{}'); } catch(e) {}
+            
+            // Memasukkan data ke dalam form input
+            ['pos', 'shot', 'sot', 'pass', 'acc', 'corn', 'off', 'foul'].forEach(key => {
+                document.getElementById(`pme-${key}-h`).value = statData[`${key}_h`] || '';
+                document.getElementById(`pme-${key}-a`).value = statData[`${key}_a`] || '';
+            });
+            
+            document.getElementById('pme-lineup').value = (jadwal.lineup_manual && !String(jadwal.lineup_manual).startsWith('{')) ? jadwal.lineup_manual : '';
+            lucide.createIcons();
+        }
+
+        function closePostMatchEditor() {
+            document.getElementById('coach-post-match-panel').classList.add('hidden');
+            document.getElementById('coach-post-match-panel').classList.remove('flex');
+            document.getElementById('coach-match-selector').classList.remove('hidden');
+            document.getElementById('match-status-text').innerText = 'Pilih Pertandingan';
+            document.getElementById('match-status-text').classList.replace('text-brand-gold', 'text-brand-neon');
+        }
+
+        async function savePostMatchStats() {
+            if(!confirm("Encode dan kirim data statistik ke server?")) return;
+            const btn = document.querySelector('button[onclick="savePostMatchStats()"]');
+            const originalText = btn.innerHTML; btn.innerHTML = "Menyimpan ke Database..."; btn.disabled = true;
+
+            // Kumpulkan data dan Encode ke format JSON
+            const statObj = {};
+            ['pos', 'shot', 'sot', 'pass', 'acc', 'corn', 'off', 'foul'].forEach(key => {
+                statObj[`${key}_h`] = parseInt(document.getElementById(`pme-${key}-h`).value) || 0;
+                statObj[`${key}_a`] = parseInt(document.getElementById(`pme-${key}-a`).value) || 0;
+            });
+
+            const lineupText = document.getElementById('pme-lineup').value;
+
+            const payload = { 
+                id_match: editMatchId, 
+                statistik_manual: JSON.stringify(statObj), // Mengubah objek ke string JSON
+                lineup_manual: lineupText
+            };
+
+            try {
+                // Di tahap selanjutnya (Tahap 3), kita akan menambahkan fungsi penerima 'save_post_match_stats' di Apps Script
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'save_post_match_stats', payload: payload }) });
+                alert("SUKSES! Statistik JSON berhasil disimpan.");
+                closePostMatchEditor();
+            } catch(e) { 
+                alert("Gagal menyimpan statistik. Cek koneksi."); 
+            } finally { 
+                btn.innerHTML = originalText; btn.disabled = false; 
+            }
         }
         
         window.addEventListener('DOMContentLoaded', init);
