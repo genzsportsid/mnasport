@@ -303,66 +303,88 @@
                 </div>
             </div>
 
-            <div id="coach-post-match-panel" class="hidden flex-col gap-6 max-w-3xl mx-auto animate-fade-in w-full pb-10">
-                <div class="bg-brand-panel p-6 rounded-[2rem] border border-white/10 shadow-xl">
-                    <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
-                        <div>
-                            <h3 class="text-xs font-black text-white uppercase tracking-widest">Post-Match Editor</h3>
-                            <p class="text-[9px] font-bold text-brand-gold uppercase mt-1" id="pme-match-title">VS Lawan</p>
-                        </div>
+            <!-- COACH FLOW 5: POST-MATCH EDITOR PRO -->
+            <div id="coach-post-match-panel" class="hidden flex-col gap-6 max-w-4xl mx-auto animate-fade-in w-full pb-10">
+                <div class="bg-brand-panel p-5 md:p-6 rounded-[2rem] border border-white/10 shadow-xl">
+                    <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-4">
+                        <div><h3 class="text-xs font-black text-white uppercase tracking-widest">Post-Match Editor</h3><p class="text-[9px] font-bold text-brand-gold uppercase mt-1" id="pme-match-title">VS Lawan</p></div>
                         <button onclick="closePostMatchEditor()" class="text-gray-500 hover:text-white bg-white/5 p-2 rounded-xl transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-4">
-                            <h4 class="text-[10px] font-black text-brand-neon uppercase tracking-widest text-center border-b border-white/5 pb-2">KITA (MNA FC)</h4>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Penguasaan Bola (%)</label><input type="number" id="pme-pos-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Total Tembakan</label><input type="number" id="pme-shot-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tepat Sasaran</label><input type="number" id="pme-sot-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Total Umpan</label><input type="number" id="pme-pass-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Akurasi Umpan (%)</label><input type="number" id="pme-acc-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tend. Sudut (Corner)</label><input type="number" id="pme-corn-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Offside</label><input type="number" id="pme-off-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Pelanggaran</label><input type="number" id="pme-foul-h" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-brand-neon outline-none"></div>
-                        </div>
-
-                        <div class="space-y-4">
-                            <h4 class="text-[10px] font-black text-red-400 uppercase tracking-widest text-center border-b border-white/5 pb-2">LAWAN</h4>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Penguasaan Bola (%)</label><input type="number" id="pme-pos-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Total Tembakan</label><input type="number" id="pme-shot-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tepat Sasaran</label><input type="number" id="pme-sot-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Total Umpan</label><input type="number" id="pme-pass-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Akurasi Umpan (%)</label><input type="number" id="pme-acc-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tend. Sudut (Corner)</label><input type="number" id="pme-corn-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Offside</label><input type="number" id="pme-off-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
-                            <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Pelanggaran</label><input type="number" id="pme-foul-a" class="w-16 bg-black border border-white/10 text-white text-center text-[10px] py-1.5 rounded-lg focus:border-red-500 outline-none"></div>
-                        </div>
+                    <!-- TABS EDITOR -->
+                    <div class="flex border border-white/10 mb-5 bg-black rounded-xl p-1 gap-1">
+                        <button onclick="switchPmeTab('skuad')" id="pme-tab-skuad" class="flex-1 py-2 text-[9px] font-black uppercase rounded-lg bg-brand-neon text-white transition-all">1. Skuad</button>
+                        <button onclick="switchPmeTab('event')" id="pme-tab-event" class="flex-1 py-2 text-[9px] font-bold uppercase rounded-lg text-gray-500 hover:text-white transition-all">2. Kejadian</button>
+                        <button onclick="switchPmeTab('stats')" id="pme-tab-stats" class="flex-1 py-2 text-[9px] font-bold uppercase rounded-lg text-gray-500 hover:text-white transition-all">3. Statistik</button>
                     </div>
 
-                    <!-- MATCH EVENTS & VISUAL SQUAD SELECTOR -->
-                    <div class="mt-6 pt-5 border-t border-white/5 space-y-5">
-                        <h4 class="text-[10px] font-black text-brand-gold uppercase tracking-widest text-center border-b border-white/5 pb-2">Match Events & Squad Selector</h4>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="bg-black border border-white/10 p-3 rounded-xl"><label class="text-[8px] font-bold text-green-400 uppercase flex items-center gap-1 mb-1.5"><i data-lucide="goal" class="w-3 h-3"></i> Pencetak Gol</label><input type="text" id="pme-gol" placeholder="Pisahkan dg koma (Cth: Hanung, Tito)" class="w-full bg-transparent text-[10px] text-white outline-none placeholder-gray-700"></div>
-                            <div class="bg-black border border-white/10 p-3 rounded-xl"><label class="text-[8px] font-bold text-brand-neon uppercase flex items-center gap-1 mb-1.5"><i data-lucide="footprints" class="w-3 h-3"></i> Pemberi Assist</label><input type="text" id="pme-assist" placeholder="Pisahkan dg koma" class="w-full bg-transparent text-[10px] text-white outline-none placeholder-gray-700"></div>
-                            <div class="bg-black border border-white/10 p-3 rounded-xl"><label class="text-[8px] font-bold text-yellow-400 uppercase flex items-center gap-1 mb-1.5"><div class="w-2 h-3 bg-yellow-400 rounded"></div> Kartu Kuning</label><input type="text" id="pme-kk" placeholder="Pisahkan dg koma" class="w-full bg-transparent text-[10px] text-white outline-none placeholder-gray-700"></div>
-                            <div class="bg-black border border-white/10 p-3 rounded-xl"><label class="text-[8px] font-bold text-red-500 uppercase flex items-center gap-1 mb-1.5"><div class="w-2 h-3 bg-red-500 rounded"></div> Kartu Merah</label><input type="text" id="pme-km" placeholder="Pisahkan dg koma" class="w-full bg-transparent text-[10px] text-white outline-none placeholder-gray-700"></div>
+                    <!-- TAB 1: SKUAD & FORMASI -->
+                    <div id="pme-view-skuad" class="block space-y-4">
+                        <div class="flex items-center justify-between bg-black p-3 rounded-xl border border-white/5">
+                            <label class="text-[10px] font-black text-brand-gold uppercase tracking-widest">Formasi Starting XI</label>
+                            <select id="pme-formation-select" onchange="changePmeFormation(this.value)" class="bg-white/10 border border-white/10 text-white text-[10px] py-1.5 px-3 rounded-lg outline-none cursor-pointer"></select>
                         </div>
-
+                        <div class="pitch-wrapper mx-auto"><div id="pme-pitch" class="pitch-container pitch-football"></div></div>
                         <div>
-                            <div class="flex justify-between items-end mb-2">
-                                <label class="text-[9px] font-bold text-gray-400 uppercase">1x Klik = Starter | 2x Klik = Cadangan</label>
-                                <div class="flex gap-2 text-[8px] font-black uppercase tracking-widest"><span class="text-brand-neon bg-brand-neon/10 px-1 rounded">Starter (XI)</span><span class="text-brand-gold bg-brand-gold/10 px-1 rounded">Bench (SUB)</span></div>
+                            <div class="flex justify-between items-end border-b border-white/5 pb-2 mb-3 mt-4">
+                                <h4 class="text-[10px] font-black text-white uppercase tracking-widest">Cadangan (Bench)</h4>
+                                <button onclick="pmeActiveSlot = 'bench'; renderPmePool();" class="text-[8px] bg-white/10 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-white/20 transition-all uppercase"><i data-lucide="plus" class="w-3 h-3 inline"></i> Tambah Sub</button>
                             </div>
-                            <div id="pme-squad-selector" class="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-48 overflow-y-auto hide-scroll p-2 bg-black rounded-xl border border-white/10 shadow-inner">
-                                <!-- Diisi via JS (Visual Toggle) -->
+                            <div id="pme-bench-container" class="flex flex-wrap gap-2 min-h-[50px] bg-black/50 p-3 rounded-xl border border-white/5"></div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: KEJADIAN (EVENTS) -->
+                    <div id="pme-view-event" class="hidden space-y-4">
+                        <div class="bg-black border border-white/10 p-4 rounded-xl shadow-inner">
+                            <h4 class="text-[10px] font-black text-brand-neon uppercase mb-3 flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4"></i> Tambah Kejadian Laga</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+                                <div class="sm:col-span-1">
+                                    <label class="text-[8px] text-gray-500 uppercase font-bold block mb-1">1. Pilih Pemain</label>
+                                    <button onclick="pmeActiveSlot = 'event'; renderPmePool();" id="pme-btn-select-player" class="w-full bg-white/5 border border-white/10 text-brand-gold font-bold text-[10px] p-2.5 rounded-lg truncate text-left hover:bg-white/10 transition-colors">Klik Pilih Pemain...</button>
+                                    <input type="hidden" id="pme-event-player-idx">
+                                </div>
+                                <div class="sm:col-span-1">
+                                    <label class="text-[8px] text-gray-500 uppercase font-bold block mb-1">2. Jenis</label>
+                                    <select id="pme-input-type" class="w-full bg-white/5 border border-white/10 text-white text-[10px] p-2.5 rounded-lg outline-none cursor-pointer">
+                                        <option value="Gol">Gol</option><option value="Assist">Assist</option><option value="Kartu Kuning">Kartu Kuning</option><option value="Kartu Merah">Kartu Merah</option>
+                                    </select>
+                                </div>
+                                <div class="sm:col-span-1">
+                                    <label class="text-[8px] text-gray-500 uppercase font-bold block mb-1">3. Menit (Contoh: 45')</label>
+                                    <input type="text" id="pme-input-time" placeholder="45'" class="w-full bg-white/5 border border-white/10 text-white text-[10px] font-black p-2.5 rounded-lg text-center outline-none focus:border-brand-neon">
+                                </div>
+                                <div class="sm:col-span-1"><button onclick="addPmeEvent()" class="w-full bg-brand-neon text-white px-3 py-2.5 text-[10px] font-black uppercase rounded-lg hover:bg-blue-600 transition-all shadow-lg">Tambah</button></div>
+                            </div>
+                        </div>
+                        <div id="pme-events-list" class="space-y-2 max-h-60 overflow-y-auto hide-scroll p-1"></div>
+                    </div>
+
+                    <!-- TAB 3: STATISTIK -->
+                    <div id="pme-view-stats" class="hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-black border border-white/10 p-5 rounded-2xl">
+                            <div class="space-y-3">
+                                <h4 class="text-[10px] font-black text-brand-neon uppercase tracking-widest text-center border-b border-white/5 pb-2">MNA FC</h4>
+                                ${['pos','shot','sot','pass','acc','corn','off','foul'].map(k => `<div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">${k === 'pos'?'Penguasaan (%)':k==='shot'?'Tembakan':k==='sot'?'Tepat Sasaran':k==='pass'?'Total Umpan':k==='acc'?'Akurasi Umpan (%)':k==='corn'?'Tendangan Sudut':k==='off'?'Offside':'Pelanggaran'}</label><input type="number" id="pme-${k}-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>`).join('')}
+                            </div>
+                            <div class="space-y-3">
+                                <h4 class="text-[10px] font-black text-red-400 uppercase tracking-widest text-center border-b border-white/5 pb-2">LAWAN</h4>
+                                ${['pos','shot','sot','pass','acc','corn','off','foul'].map(k => `<div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">${k === 'pos'?'Penguasaan (%)':k==='shot'?'Tembakan':k==='sot'?'Tepat Sasaran':k==='pass'?'Total Umpan':k==='acc'?'Akurasi Umpan (%)':k==='corn'?'Tendangan Sudut':k==='off'?'Offside':'Pelanggaran'}</label><input type="number" id="pme-${k}-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>`).join('')}
                             </div>
                         </div>
                     </div>
 
-                    <button onclick="savePostMatchStats()" class="w-full bg-gradient-to-r from-brand-gold to-yellow-600 hover:from-yellow-500 hover:to-yellow-400 text-black py-4 mt-6 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-[0_0_20px_rgba(215,182,125,0.3)] transition-all">
-                        <i data-lucide="save" class="w-4 h-4 inline pb-0.5 mr-1"></i> Encode & Simpan JSON
+                    <!-- SHARED PLAYER POOL -->
+                    <div id="pme-pool-section" class="mt-6 pt-5 border-t border-white/5 opacity-30 pointer-events-none transition-opacity duration-300">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4">
+                            <div><h4 class="text-[10px] font-black text-white uppercase tracking-widest">Bursa Pemain</h4><p class="text-[8px] font-bold text-brand-gold uppercase mt-0.5" id="pme-pool-instruction">Klik slot di atas terlebih dahulu</p></div>
+                            <div class="relative w-full sm:w-48"><i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500"></i><input type="text" id="pmeSearch" oninput="renderPmePool()" placeholder="Cari nama / posisi..." class="w-full bg-black border border-white/10 rounded-xl py-2 pl-9 pr-3 text-[10px] text-white outline-none focus:border-brand-neon shadow-inner"></div>
+                        </div>
+                        <div id="pme-pool-container" class="flex flex-wrap lg:grid lg:grid-cols-5 gap-3 overflow-y-auto max-h-[300px] hide-scroll"></div>
+                    </div>
+
+                    <button onclick="savePmeData()" class="w-full bg-gradient-to-r from-brand-neon to-brand-blue hover:from-blue-500 hover:to-blue-700 text-white py-4 mt-6 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all flex justify-center items-center gap-2">
+                        <i data-lucide="upload-cloud" class="w-4 h-4"></i> Encode & Simpan Seluruh Data Laga
                     </button>
                 </div>
             </div>
@@ -1329,12 +1351,11 @@
                         </div>
                     </div>
 
-                    ${(val(j.pencetak_gol) !== '-' || val(j.kartu_merah) !== '-' || val(j.kartu_kuning) !== '-') && hasScore ? `
-                <div class="px-4 py-2.5 bg-black/20 border-y border-white/5 flex flex-col gap-1.5">
+                    ${(val(j.pencetak_gol, '') !== '-' || val(j.kartu_merah, '') !== '-' || val(j.kartu_kuning, '') !== '-') && hasScore ? `
+                <div class="px-4 md:px-5 py-2.5 bg-black/30 border-y border-white/5 flex flex-col gap-1.5">
                     ${val(j.pencetak_gol, '') !== '-' && j.pencetak_gol ? `<div class="flex items-start gap-2"><i data-lucide="goal" class="w-3 h-3 text-green-400 mt-0.5 shrink-0"></i><p class="text-[9px] font-bold text-gray-300 leading-tight">${j.pencetak_gol}</p></div>` : ''}
                     ${val(j.kartu_merah, '') !== '-' && j.kartu_merah ? `<div class="flex items-start gap-2"><div class="w-2.5 h-3.5 bg-red-500 rounded shadow-sm mt-0.5 shrink-0"></div><p class="text-[9px] font-bold text-gray-300 leading-tight">${j.kartu_merah}</p></div>` : ''}
-                </div>
-                ` : ''}
+                </div>` : ''}
                     
                     <div class="flex justify-between items-center text-[10px] text-gray-500">
                         <div class="flex items-center gap-1.5 min-w-0"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-600 shrink-0"></i><span class="uppercase font-medium tracking-wide truncate">${j.tempat}</span></div>
@@ -1399,7 +1420,8 @@
             statusEl.className = jadwal.status === 'LIVE' ? 'text-[9px] font-black bg-red-500/20 border border-red-500 text-red-500 px-3 py-1 rounded uppercase tracking-widest live-pulse' : 'text-[9px] font-black bg-white/10 text-white px-3 py-1 rounded uppercase tracking-widest';
 
             const container = document.getElementById('md-events-container');
-            let eventsJSON = (jadwal.status === 'LIVE' && jadwal.live_events) ? jadwal.live_events : (log && log.detail_event ? log.detail_event : null);
+            // FIX TIMELINE: Ambil event live log, JIKA TIDAK ADA ambil live_events hasil encode PME
+            let eventsJSON = (log && log.detail_event) ? log.detail_event : jadwal.live_events;
 
             if(eventsJSON) {
                 try {
@@ -1434,36 +1456,24 @@
                 } catch(e) { container.innerHTML = '<p class="text-center text-[10px] text-red-500 font-bold">Gagal memproses data rekaman pertandingan.</p>'; }
             } else { container.innerHTML = '<div class="text-center py-10"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Pertandingan belum dimulai</p></div>'; }
 
-            // RENDER LINEUP (Hybrid Auto JSON Pitch / JSON Text)
+            // RENDER LINEUP PUBLIC (Hybrid Auto JSON / Manual)
             const lineupContainer = document.getElementById('md-lineup-container');
+            let lData = null; let formasi = '4-3-3'; let isJsonValid = false;
+            
             if(log && log.lineup) {
-                try {
-                    const lData = JSON.parse(log.lineup);
-                    lineupContainer.innerHTML = renderMiniPitch(lData, log.formasi, jadwal.cabang);
-                } catch(e) {}
+                try { lData = JSON.parse(log.lineup); formasi = log.formasi; isJsonValid = true; lineupContainer.innerHTML = renderMiniPitch(lData, formasi, jadwal.cabang); } catch(e) {}
             } else if (jadwal.lineup_manual && jadwal.lineup_manual !== '-') {
                 try {
-                    const parsedLineup = JSON.parse(jadwal.lineup_manual);
-                    if(parsedLineup.starters) {
-                        lineupContainer.innerHTML = `
-                        <div class="bg-brand-panel border border-white/5 p-5 md:p-6 rounded-3xl shadow-xl mt-2 animate-fade-in relative overflow-hidden">
-                            <h4 class="text-[10px] font-black text-brand-neon uppercase tracking-widest mb-4 border-b border-white/10 pb-2 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i> Starting XI</h4>
-                            <div class="flex flex-wrap gap-2.5 mb-6">
-                                ${parsedLineup.starters.map(n => `<span class="text-[9px] font-black text-white bg-brand-neon/20 border border-brand-neon/30 px-3 py-1.5 rounded-lg uppercase shadow-sm">${n}</span>`).join('')}
-                            </div>
-                            <h4 class="text-[10px] font-black text-brand-gold uppercase tracking-widest mb-4 border-b border-white/10 pb-2 flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4"></i> Cadangan</h4>
-                            <div class="flex flex-wrap gap-2">
-                                ${parsedLineup.bench.map(n => `<span class="text-[8px] font-bold text-gray-400 bg-black px-3 py-1.5 rounded-lg border border-white/10 uppercase">${n}</span>`).join('')}
-                            </div>
-                        </div>`;
-                    } else {
-                        lineupContainer.innerHTML = `<div class="bg-white/5 border border-white/10 p-4 rounded-xl text-[10px] text-gray-300 leading-relaxed whitespace-pre-wrap">${jadwal.lineup_manual}</div>`;
+                    const pLineup = JSON.parse(jadwal.lineup_manual);
+                    if(pLineup.pitch && pLineup.formasi) {
+                        isJsonValid = true;
+                        lineupContainer.innerHTML = renderMiniPitch(pLineup.pitch, pLineup.formasi, jadwal.cabang) + 
+                        `<div class="mt-6 bg-brand-panel p-5 rounded-2xl border border-white/5 shadow-lg"><h4 class="text-[10px] font-black text-brand-gold uppercase tracking-widest mb-3 border-b border-white/5 pb-2 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i> Pemain Cadangan</h4><div class="flex flex-wrap gap-2">${pLineup.bench.map(p => `<div class="bg-black border border-white/10 px-3 py-1.5 rounded-lg flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-white/10 overflow-hidden"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div><span class="text-[9px] font-bold text-gray-300 uppercase">${val(p.nama).split(' ')[0]}</span></div>`).join('')}</div></div>`;
                     }
-                } catch(e) {
-                    lineupContainer.innerHTML = `<div class="bg-white/5 border border-white/10 p-4 rounded-xl text-[10px] text-gray-300 leading-relaxed whitespace-pre-wrap">${jadwal.lineup_manual}</div>`;
-                }
-            } else {
-                lineupContainer.innerHTML = '<div class="text-center py-10"><i data-lucide="users" class="w-8 h-8 text-white/5 mx-auto mb-2"></i><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Belum ada data Line Up</p></div>';
+                } catch(e) {}
+            }
+            if(!isJsonValid) {
+                lineupContainer.innerHTML = (jadwal.lineup_manual && jadwal.lineup_manual !== '-') ? `<div class="bg-white/5 border border-white/10 p-5 rounded-2xl text-[10px] text-gray-300 leading-relaxed whitespace-pre-wrap shadow-inner">${jadwal.lineup_manual}</div>` : '<div class="text-center py-10"><i data-lucide="users" class="w-8 h-8 text-white/5 mx-auto mb-2"></i><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Belum ada data Line Up</p></div>';
             }
 
             // RENDER STATS (HYBRID JSON VISUALIZER / TEXT)
@@ -1781,110 +1791,207 @@
             </div>`;
         }
 
-        // --- POST-MATCH EDITOR LOGIC ---
-        // --- POST-MATCH EDITOR LOGIC ---
+        // --- POST-MATCH EDITOR LOGIC PRO ---
         let editMatchId = null;
-        let pmeSquadState = {}; // Menyimpan status pemain: 'starter', 'bench', 'out'
-
-        function renderPmeSquadSelector() {
-            const container = document.getElementById('pme-squad-selector');
-            const players = rawData[activeSport]?.pemain || [];
-            
-            container.innerHTML = players.map((p) => {
-                const state = pmeSquadState[p.nama] || 'out';
-                let borderClass = 'border-white/5 opacity-50 grayscale';
-                let badgeHTML = '';
-                
-                if(state === 'starter') { borderClass = 'border-brand-neon bg-brand-neon/10 opacity-100'; badgeHTML = '<span class="absolute top-1 right-1 bg-brand-neon text-white text-[6px] font-black px-1 rounded uppercase">XI</span>'; }
-                else if(state === 'bench') { borderClass = 'border-brand-gold bg-brand-gold/10 opacity-100'; badgeHTML = '<span class="absolute top-1 right-1 bg-brand-gold text-black text-[6px] font-black px-1 rounded uppercase">SUB</span>'; }
-
-                return `
-                <div onclick="togglePmeSquad('${p.nama}')" class="relative flex items-center gap-2 p-2 rounded-lg border ${borderClass} cursor-pointer transition-all select-none hover:scale-105">
-                    ${badgeHTML}
-                    <div class="w-6 h-6 rounded-full bg-black overflow-hidden shrink-0"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div>
-                    <div class="min-w-0"><p class="text-[8px] font-black text-white uppercase truncate">${val(p.nama).split(' ')[0]}</p><p class="text-[6px] text-gray-400 uppercase">${val(p.posisi)}</p></div>
-                </div>`;
-            }).join('');
-        }
-
-        function togglePmeSquad(nama) {
-            const current = pmeSquadState[nama] || 'out';
-            if(current === 'out') pmeSquadState[nama] = 'starter';
-            else if(current === 'starter') pmeSquadState[nama] = 'bench';
-            else pmeSquadState[nama] = 'out';
-            renderPmeSquadSelector();
-        }
+        let pmeLineup = {}; let pmeBench = []; let pmeEvents = [];
+        let pmeActiveSlot = null; // Bisa berupa index pitch (angka), 'bench', atau 'event'
 
         function openPostMatchEditor(matchId) {
             const jadwal = rawData.jadwal.find(j => String(j.id_match) === String(matchId));
-            if(!jadwal) return;
-            editMatchId = matchId;
+            if(!jadwal) return; editMatchId = matchId;
             
             document.getElementById('coach-match-selector').classList.add('hidden');
             document.getElementById('coach-post-match-panel').classList.remove('hidden'); document.getElementById('coach-post-match-panel').classList.add('flex');
             document.getElementById('pme-match-title').innerText = `VS ${jadwal.lawan} (${jadwal.tanggal})`;
             
-            // Masukkan data Match Events
-            document.getElementById('pme-gol').value = val(jadwal.pencetak_gol, '') !== '-' ? jadwal.pencetak_gol : '';
-            document.getElementById('pme-assist').value = val(jadwal.pencetak_assist, '') !== '-' ? jadwal.pencetak_assist : '';
-            document.getElementById('pme-kk').value = val(jadwal.kartu_kuning, '') !== '-' ? jadwal.kartu_kuning : '';
-            document.getElementById('pme-km').value = val(jadwal.kartu_merah, '') !== '-' ? jadwal.kartu_merah : '';
-
-            let statData = {};
-            try { statData = JSON.parse(jadwal.statistik_manual || '{}'); } catch(e) {}
-            ['pos', 'shot', 'sot', 'pass', 'acc', 'corn', 'off', 'foul'].forEach(key => {
+            const select = document.getElementById('pme-formation-select'); const forms = FORMATIONS[activeSport];
+            select.innerHTML = Object.keys(forms).map(k => `<option value="${k}">${k}</option>`).join('');
+            
+            // Dekode Data Lineup JSON
+            pmeLineup = {}; pmeBench = []; pmeEvents = [];
+            try {
+                const parsedLineup = JSON.parse(jadwal.lineup_manual || '{}');
+                if(parsedLineup.formasi) select.value = parsedLineup.formasi;
+                if(parsedLineup.pitch) pmeLineup = parsedLineup.pitch;
+                if(parsedLineup.bench) pmeBench = parsedLineup.bench;
+            } catch(e) {}
+            
+            // Dekode Data Event JSON
+            try { pmeEvents = JSON.parse(jadwal.live_events || '[]'); } catch(e) {}
+            
+            // Dekode Statistik JSON
+            let statData = {}; try { statData = JSON.parse(jadwal.statistik_manual || '{}'); } catch(e) {}
+            ['pos','shot','sot','pass','acc','corn','off','foul'].forEach(key => {
                 document.getElementById(`pme-${key}-h`).value = statData[`${key}_h`] || ''; document.getElementById(`pme-${key}-a`).value = statData[`${key}_a`] || '';
             });
-            
-            // Inisialisasi Visual Squad
-            pmeSquadState = {};
-            try {
-                const savedLineup = JSON.parse(jadwal.lineup_manual || '{}');
-                if(savedLineup.starters) savedLineup.starters.forEach(n => pmeSquadState[n] = 'starter');
-                if(savedLineup.bench) savedLineup.bench.forEach(n => pmeSquadState[n] = 'bench');
-            } catch(e) {}
-            renderPmeSquadSelector();
-            
+
+            switchPmeTab('skuad'); pmeActiveSlot = null; renderPmePitch(); renderPmeBench(); renderPmePool(); renderPmeEvents();
             lucide.createIcons();
         }
 
         function closePostMatchEditor() {
-            document.getElementById('coach-post-match-panel').classList.add('hidden');
-            document.getElementById('coach-post-match-panel').classList.remove('flex');
+            document.getElementById('coach-post-match-panel').classList.add('hidden'); document.getElementById('coach-post-match-panel').classList.remove('flex');
             document.getElementById('coach-match-selector').classList.remove('hidden');
-            document.getElementById('match-status-text').innerText = 'Pilih Pertandingan';
-            document.getElementById('match-status-text').classList.replace('text-brand-gold', 'text-brand-neon');
         }
 
-        async function savePostMatchStats() {
-            if(!confirm("Encode dan kirim seluruh data ke server?")) return;
-            const btn = document.querySelector('button[onclick="savePostMatchStats()"]');
-            const originalText = btn.innerHTML; btn.innerHTML = "Menyimpan..."; btn.disabled = true;
+        function switchPmeTab(tab) {
+            document.getElementById('pme-view-skuad').classList.toggle('hidden', tab !== 'skuad');
+            document.getElementById('pme-view-event').classList.toggle('hidden', tab !== 'event');
+            document.getElementById('pme-view-stats').classList.toggle('hidden', tab !== 'stats');
+            
+            const aCls = 'flex-1 py-2 text-[9px] font-black uppercase rounded-lg bg-brand-neon text-white transition-all';
+            const iCls = 'flex-1 py-2 text-[9px] font-bold uppercase rounded-lg text-gray-500 hover:text-white transition-all';
+            document.getElementById('pme-tab-skuad').className = tab === 'skuad' ? aCls : iCls;
+            document.getElementById('pme-tab-event').className = tab === 'event' ? aCls : iCls;
+            document.getElementById('pme-tab-stats').className = tab === 'stats' ? aCls : iCls;
+            
+            pmeActiveSlot = null; renderPmePool();
+        }
+
+        function changePmeFormation(key) { pmeLineup = {}; pmeBench = []; renderPmePitch(); renderPmeBench(); renderPmePool(); }
+
+        function renderPmePitch() {
+            const container = document.getElementById('pme-pitch');
+            container.className = `pitch-container ${activeSport === 'futsal' ? 'pitch-futsal' : 'pitch-football'}`;
+            const formKey = document.getElementById('pme-formation-select').value;
+            const slots = FORMATIONS[activeSport][formKey];
+            
+            container.innerHTML = `<div class="pitch-half pitch-line"></div><div class="pitch-circle pitch-line"></div><div class="pitch-line" style="top:0; left:20%; width:60%; height:18%; border-top:0;"></div><div class="pitch-line" style="bottom:0; left:20%; width:60%; height:18%; border-bottom:0;"></div>` + slots.map((s, i) => {
+                const p = pmeLineup[i];
+                if (p) return `<div onclick="pmeActiveSlot=${i}; renderPmePitch(); renderPmePool();" class="lineup-slot filled ${pmeActiveSlot === i ? 'active' : ''}" style="bottom:${s.b}; left:${s.l}; background-image:url('${val(p.link_foto)}')"><span class="lineup-slot-label bg-brand-neon border-brand-neon text-white">${val(p.nama).split(' ')[0]}</span></div>`;
+                return `<div onclick="pmeActiveSlot=${i}; renderPmePitch(); renderPmePool();" class="lineup-slot ${pmeActiveSlot === i ? 'active' : ''}" style="bottom:${s.b}; left:${s.l};"><i data-lucide="plus" class="w-4 h-4 text-white/50"></i><span class="lineup-slot-label bg-brand-blue border-brand-blue text-white">${s.role}</span></div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function renderPmeBench() {
+            const container = document.getElementById('pme-bench-container');
+            if(pmeBench.length === 0) { container.innerHTML = '<p class="text-[8px] text-gray-500 uppercase font-bold w-full text-center py-2">Belum ada cadangan dipilih</p>'; return; }
+            container.innerHTML = pmeBench.map((p, i) => `
+                <div class="flex items-center gap-2 bg-white/5 border border-white/10 pl-1 pr-3 py-1 rounded-lg">
+                    <div class="w-6 h-6 rounded bg-black overflow-hidden shrink-0"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div>
+                    <div><p class="text-[8px] font-black text-white uppercase">${val(p.nama).split(' ')[0]}</p><p class="text-[6px] font-bold text-brand-gold uppercase">${val(p.posisi)}</p></div>
+                    <button onclick="pmeBench.splice(${i}, 1); renderPmeBench(); renderPmePool();" class="ml-2 text-red-500 hover:text-red-400"><i data-lucide="x-circle" class="w-3 h-3"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderPmePool() {
+            const poolSec = document.getElementById('pme-pool-section');
+            const inst = document.getElementById('pme-pool-instruction');
+            const query = document.getElementById('pmeSearch') ? document.getElementById('pmeSearch').value.toLowerCase() : '';
+            
+            if (pmeActiveSlot === null) {
+                poolSec.style.opacity = '0.3'; poolSec.style.pointerEvents = 'none'; inst.innerText = 'Pilih slot/tombol di atas terlebih dahulu'; inst.className = 'text-[8px] font-bold text-gray-500 uppercase mt-0.5';
+            } else {
+                poolSec.style.opacity = '1'; poolSec.style.pointerEvents = 'auto';
+                let actionText = pmeActiveSlot === 'event' ? 'Pilih Pemain untuk Kejadian' : (pmeActiveSlot === 'bench' ? 'Pilih Pemain CADANGAN' : 'Pilih Pemain STARTER (XI)');
+                inst.innerText = actionText; inst.className = 'text-[9px] font-black text-brand-neon uppercase tracking-widest mt-0.5';
+            }
+            
+            const players = rawData[activeSport]?.pemain || []; 
+            const assignedIds = Object.values(pmeLineup).map(p => p.nomor + p.nama).concat(pmeBench.map(p => p.nomor + p.nama));
+            const filteredPlayers = players.filter(p => (val(p.nama) + val(p.posisi)).toLowerCase().includes(query));
+
+            document.getElementById('pme-pool-container').innerHTML = filteredPlayers.map((p) => {
+                const i = players.indexOf(p);
+                const isAssigned = assignedIds.includes(p.nomor + p.nama);
+                const isEventMode = pmeActiveSlot === 'event';
+                const canClick = isEventMode || !isAssigned; // Di mode event, semua bisa diklik
+                
+                return `
+                <div onclick="${canClick ? `assignPmePlayer(${i})` : ''}" class="flex flex-col items-center gap-2 transition-all ${!canClick ? 'opacity-20 grayscale cursor-not-allowed' : 'cursor-pointer hover:scale-105'}">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 ${!canClick ? 'border-gray-800' : 'border-white/10'} bg-black">
+                        <img src="${val(p.link_foto)}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[8px] font-black ${!canClick ? 'text-gray-600' : 'text-white'} uppercase line-clamp-1 w-16 leading-tight">${val(p.nama).split(' ')[0]}</p>
+                        <p class="text-[7px] ${!canClick ? 'text-gray-700' : 'text-brand-neon'} font-bold mt-0.5">${val(p.posisi)}</p>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function assignPmePlayer(idx) {
+            const p = rawData[activeSport].pemain[idx];
+            if (pmeActiveSlot === 'event') {
+                document.getElementById('pme-event-player-name').innerText = p.nama;
+                document.getElementById('pme-event-player-name').className = 'w-full bg-brand-neon/20 border border-brand-neon text-brand-neon font-black text-[10px] p-2.5 rounded-lg truncate text-left';
+                document.getElementById('pme-event-player-idx').value = idx;
+            } else if (pmeActiveSlot === 'bench') {
+                pmeBench.push(p); renderPmeBench();
+            } else if (pmeActiveSlot !== null) {
+                pmeLineup[pmeActiveSlot] = p; renderPmePitch();
+            }
+            pmeActiveSlot = null; document.getElementById('pmeSearch').value = ''; renderPmePool();
+        }
+
+        function addPmeEvent() {
+            const idx = document.getElementById('pme-event-player-idx').value;
+            if(!idx) return alert("Pilih pemain terlebih dahulu dari Bursa Pemain di bawah!");
+            const p = rawData[activeSport].pemain[idx];
+            const type = document.getElementById('pme-input-type').value;
+            const time = document.getElementById('pme-input-time').value || "0'";
+            
+            let bgStr = ''; let textStr = ''; let iconCol = ''; let iconName = 'activity';
+            if(type === 'Gol') { bgStr = 'bg-green-500/10 border-green-500/30'; textStr = 'text-green-400'; iconCol = 'text-green-500'; iconName = 'goal'; }
+            else if(type === 'Kartu Merah') { bgStr = 'bg-red-500/10 border-red-500/30'; textStr = 'text-red-400'; iconCol = 'text-red-500'; iconName = 'alert-triangle'; }
+            else if(type === 'Kartu Kuning') { bgStr = 'bg-yellow-500/10 border-yellow-500/30'; textStr = 'text-yellow-400'; iconCol = 'text-yellow-500'; iconName = 'alert-circle'; }
+            else if(type === 'Assist') { bgStr = 'bg-brand-neon/10 border-brand-neon/30'; textStr = 'text-brand-neon'; iconCol = 'text-brand-neon'; iconName = 'footprints'; }
+
+            pmeEvents.push({ time: time, type: type, detail: p.nama, icon: iconName, col: iconCol, bg: bgStr });
+            document.getElementById('pme-input-time').value = '';
+            document.getElementById('pme-event-player-name').innerText = 'Klik Pilih Pemain...';
+            document.getElementById('pme-event-player-name').className = 'w-full bg-white/5 border border-white/10 text-brand-gold font-bold text-[10px] p-2.5 rounded-lg truncate text-left hover:bg-white/10 transition-colors';
+            document.getElementById('pme-event-player-idx').value = '';
+            renderPmeEvents();
+        }
+
+        function renderPmeEvents() {
+            const container = document.getElementById('pme-events-list');
+            if(pmeEvents.length === 0) { container.innerHTML = '<p class="text-[9px] font-bold text-gray-500 uppercase text-center mt-4">Belum ada kejadian</p>'; return; }
+            
+            container.innerHTML = pmeEvents.map((ev, i) => `
+                <div class="flex items-center gap-3 p-2.5 rounded-xl border ${ev.bg} bg-black/50">
+                    <div class="w-6 h-6 rounded bg-black flex items-center justify-center shrink-0"><i data-lucide="${ev.icon}" class="w-3 h-3 ${ev.col}"></i></div>
+                    <div class="flex-1 min-w-0"><p class="text-[9px] font-black uppercase ${ev.textStr || ev.col}">${ev.type} <span class="text-gray-400">(${ev.time})</span></p><p class="text-[8px] text-white uppercase truncate">${ev.detail}</p></div>
+                    <button onclick="pmeEvents.splice(${i}, 1); renderPmeEvents();" class="text-red-500 hover:text-red-400 p-1"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        async function savePmeData() {
+            if(!confirm("Encode JSON dan kirim ke server?")) return;
+            const btn = document.querySelector('button[onclick="savePmeData()"]');
+            const originalText = btn.innerHTML; btn.innerHTML = "Menyimpan ke Database..."; btn.disabled = true;
 
             const statObj = {};
             ['pos', 'shot', 'sot', 'pass', 'acc', 'corn', 'off', 'foul'].forEach(key => {
                 statObj[`${key}_h`] = parseInt(document.getElementById(`pme-${key}-h`).value) || 0; statObj[`${key}_a`] = parseInt(document.getElementById(`pme-${key}-a`).value) || 0;
             });
 
-            // Format Squad jadi JSON
-            const starters = Object.keys(pmeSquadState).filter(k => pmeSquadState[k] === 'starter');
-            const bench = Object.keys(pmeSquadState).filter(k => pmeSquadState[k] === 'bench');
-            const lineupObj = { starters, bench };
+            // Otomatis Ekstrak Pencetak Gol/Assist dari Array Event untuk Kartu Jadwal Publik!
+            const golArr = pmeEvents.filter(e => e.type === 'Gol').map(e => e.detail.split(' ')[0]);
+            const assistArr = pmeEvents.filter(e => e.type === 'Assist').map(e => e.detail.split(' ')[0]);
+            const kkArr = pmeEvents.filter(e => e.type === 'Kartu Kuning').map(e => e.detail.split(' ')[0]);
+            const kmArr = pmeEvents.filter(e => e.type === 'Kartu Merah').map(e => e.detail.split(' ')[0]);
 
             const payload = { 
                 id_match: editMatchId, 
                 statistik_manual: JSON.stringify(statObj), 
-                lineup_manual: JSON.stringify(lineupObj),
-                pencetak_gol: document.getElementById('pme-gol').value,
-                pencetak_assist: document.getElementById('pme-assist').value,
-                kartu_kuning: document.getElementById('pme-kk').value,
-                kartu_merah: document.getElementById('pme-km').value
+                lineup_manual: JSON.stringify({ formasi: document.getElementById('pme-formation-select').value, pitch: pmeLineup, bench: pmeBench }),
+                live_events: JSON.stringify(pmeEvents), // Ini akan dibaca otomatis oleh Tab Timeline Publik!
+                pencetak_gol: golArr.join(', '),
+                pencetak_assist: assistArr.join(', '),
+                kartu_kuning: kkArr.join(', '),
+                kartu_merah: kmArr.join(', ')
             };
 
             try {
                 await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'save_post_match_stats', payload: payload }) });
-                alert("SUKSES! Data Laga berhasil diperbarui.");
-                closePostMatchEditor();
+                alert("SUKSES! Data Laga berhasil diperbarui."); closePostMatchEditor();
             } catch(e) { alert("Gagal menyimpan. Cek koneksi."); } finally { btn.innerHTML = originalText; btn.disabled = false; }
         }
         
