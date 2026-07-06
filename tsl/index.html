@@ -269,6 +269,7 @@
         <button onclick="switchTab('statistik', 'Statistik Pemain')" id="tab-btn-statistik" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Statistik</button>
         <button onclick="switchTab('pencarian', 'Pencarian TSL')" id="tab-btn-pencarian" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Cari</button>
         <button onclick="switchTab('bagan', 'Fase Gugur')" id="tab-btn-bagan" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Bagan</button>
+        <button onclick="switchTab('dreamteam', 'Dream Team')" id="tab-btn-dreamteam" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Dream Team</button>
     </div>
     <div id="view-home" class="hidden opacity-100 transition-opacity duration-300">
         
@@ -520,6 +521,45 @@
                         </div>
                     </div>
                     
+                </div>
+            </div>
+        </div>
+        <!-- TAB DREAM TEAM BUILDER -->
+        <div id="tab-dreamteam" class="tab-content hidden pt-[100px] px-4 md:px-8 max-w-3xl mx-auto page-enter min-h-[100dvh]">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4 border-b border-gray-200 dark:border-brand-dark-border pb-4 transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="w-1.5 h-6 bg-yellow-400 rounded-full shadow-[0_0_10px_#facc15]"></div>
+                    <h2 class="font-heading font-black text-2xl uppercase tracking-wide text-brand-black dark:text-white transition-colors">Lineup Builder</h2>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="resetDreamTeam()" class="px-4 py-2 text-[10px] font-bold rounded-lg bg-gray-100 dark:bg-brand-dark-surface text-brand-red border border-gray-200 dark:border-brand-dark-border uppercase hover:bg-red-50 dark:hover:bg-red-900/20 transition-all shadow-sm">Reset</button>
+                    <button onclick="bagikanGambar('dt-export-area', 'TSL_DreamTeam')" class="px-5 py-2 text-[10px] font-bold rounded-lg bg-brand-green text-white uppercase hover:bg-emerald-600 transition-all shadow-glow flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> Simpan Gambar
+                    </button>
+                </div>
+            </div>
+
+            <!-- AREA YANG AKAN DI-EKSPORT KE GAMBAR -->
+            <div id="dt-export-area" class="relative bg-white dark:bg-brand-dark-surface rounded-[2rem] shadow-soft border border-gray-200 dark:border-white/10 p-4 md:p-6 mb-24 overflow-hidden transition-colors">
+                <!-- Watermark Sponsor -->
+                <div class="absolute top-0 left-0 w-full bg-gradient-to-r from-brand-black via-gray-900 to-brand-black text-white px-6 py-4 flex justify-between items-center z-20 border-b-4 border-yellow-400">
+                    <div>
+                        <h3 class="font-heading font-black text-lg md:text-2xl uppercase tracking-widest italic text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500">Team of the Week</h3>
+                        <p class="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Trenggalek Student League</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[7px] text-gray-500 uppercase tracking-widest mb-1">Presented By</p>
+                        <div class="h-6 w-24 bg-white/10 rounded border border-white/20 flex items-center justify-center text-[8px] font-bold text-gray-400">LOGO SPONSOR</div>
+                    </div>
+                </div>
+
+                <!-- Lapangan -->
+                <div class="relative mt-16 md:mt-20 bg-brand-green/10 dark:bg-black/40 backdrop-blur-xl rounded-[1.5rem] p-2 border border-brand-green/20 dark:border-white/5 shadow-inner">
+                    <div class="football-pitch shadow-inner !min-h-[600px] md:!min-h-[800px] !rounded-[1rem]">
+                        <div class="pitch-line pitch-center-line"></div><div class="pitch-line pitch-circle"></div><div class="pitch-line pitch-penalty-top"></div><div class="pitch-line pitch-penalty-bottom"></div><div class="pitch-line pitch-goal-top"></div><div class="pitch-line pitch-goal-bottom"></div>
+                        <!-- Slot Pemain akan diinjeksi via JS di sini -->
+                        <div id="dt-pitch-slots" class="absolute inset-0 w-full h-full z-10"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -860,6 +900,35 @@
     </div>
 
         </div>
+    <!-- MODAL PEMILIH PEMAIN DREAM TEAM -->
+    <div id="modal-dt-pool" class="fixed inset-0 z-[150] hidden flex-col justify-end p-0 sm:p-4 items-center">
+        <div class="absolute inset-0 bg-brand-black/80 backdrop-blur-md cursor-pointer" onclick="tutupDtPool()"></div>
+        <div class="relative z-10 w-full max-w-md bg-white dark:bg-brand-dark-surface sm:rounded-[2rem] rounded-t-[2rem] shadow-2xl modal-enter border border-gray-200 dark:border-brand-dark-border flex flex-col max-h-[85vh] transition-colors duration-500 pb-safe">
+            <div class="p-5 border-b border-gray-100 dark:border-brand-dark-border shrink-0 flex justify-between items-center">
+                <div>
+                    <h3 class="font-heading font-black text-lg uppercase tracking-wide text-brand-black dark:text-white">Pilih Pemain</h3>
+                    <p class="text-[10px] font-bold text-brand-green uppercase tracking-widest" id="dt-pool-role">POSISI: -</p>
+                </div>
+                <button onclick="tutupDtPool()" class="w-8 h-8 bg-gray-100 dark:bg-brand-dark-bg hover:bg-brand-red hover:text-white rounded-full flex items-center justify-center transition-colors text-gray-500 font-bold">&times;</button>
+            </div>
+            
+            <div class="p-4 shrink-0 bg-gray-50 dark:bg-brand-dark-bg border-b border-gray-100 dark:border-brand-dark-border">
+                <div class="relative w-full shadow-sm rounded-xl overflow-hidden">
+                    <svg class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="dt-search" oninput="renderDtPool()" placeholder="Cari nama pemain..." class="w-full pl-10 pr-4 py-3 bg-white dark:bg-brand-dark-surface border border-gray-200 dark:border-brand-dark-border text-brand-black dark:text-white focus:ring-1 focus:ring-brand-green outline-none text-[11px] font-bold uppercase tracking-widest transition-all">
+                </div>
+            </div>
+            
+            <!-- Daftar Pemain -->
+            <div id="dt-pool-list" class="flex-1 overflow-y-auto hide-scroll p-2 divide-y divide-gray-50 dark:divide-brand-dark-border">
+            </div>
+            
+            <div class="p-4 border-t border-gray-100 dark:border-brand-dark-border shrink-0">
+                <button onclick="hapusDtSlot()" class="w-full py-3 rounded-xl bg-red-50 dark:bg-red-500/10 text-brand-red font-bold uppercase text-[10px] tracking-widest hover:bg-brand-red hover:text-white border border-red-200 dark:border-red-500/30 transition-colors focus:outline-none">Kosongkan Slot Ini</button>
+            </div>
+        </div>
+    </div>
+        
     <div id="modal-pelatih" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-brand-black/80 backdrop-blur-md cursor-pointer" onclick="tutupModalPelatih()"></div>
         <div id="kartu-pelatih-export" class="relative z-10 w-[320px] bg-white dark:bg-brand-dark-surface rounded-[2rem] shadow-2xl modal-enter overflow-hidden border border-white/10 dark:border-brand-dark-border transition-colors duration-500 shimmer-wrapper">
@@ -2914,7 +2983,142 @@
                 alert("Gagal membuat gambar. Pastikan internet Anda stabil.");
             } finally { document.body.style.cursor = originalCursor; }
         }
+        // ==========================================
+        // MESIN DREAM TEAM (LINEUP BUILDER)
+        // ==========================================
+        let dtLineup = {}; 
+        let activeDtSlot = null;
+        const dtFormation = [
+            { b: '6%', l: '50%', role: 'GK' },
+            { b: '20%', l: '30%', role: 'CB' }, { b: '20%', l: '70%', role: 'CB' },
+            { b: '25%', l: '12%', role: 'LB' }, { b: '25%', l: '88%', role: 'RB' },
+            { b: '42%', l: '50%', role: 'CDM' }, { b: '54%', l: '28%', role: 'CM' }, { b: '54%', l: '72%', role: 'CM' },
+            { b: '84%', l: '50%', role: 'ST' }, { b: '76%', l: '18%', role: 'LW' }, { b: '76%', l: '82%', role: 'RW' }
+        ];
 
+        function renderDtPitch() {
+            const container = document.getElementById('dt-pitch-slots');
+            if(!container) return;
+            let html = '';
+            dtFormation.forEach((pos, i) => {
+                const p = dtLineup[i];
+                if(p) {
+                    let logo = allKlasemenCache.find(t => getProp(t, 'klub') === getProp(p, 'tim'))?.logo || getAvatar(getProp(p, 'tim'), true);
+                    html += `
+                    <div class="absolute -translate-x-1/2 translate-y-1/2 flex flex-col items-center cursor-pointer hover:scale-110 transition-transform z-20 w-[22%] max-w-[90px]" style="bottom:${pos.b}; left:${pos.l};" onclick="openDtPool(${i})">
+                        <div class="relative w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-yellow-400 bg-white shadow-[0_5px_15px_rgba(0,0,0,0.3)]">
+                            <img src="${getProp(p, 'foto') || getAvatar(getProp(p, 'nama'))}" class="w-full h-full rounded-full object-cover">
+                            <img src="${logo}" class="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 rounded-full border border-gray-200 bg-white object-cover shadow-sm">
+                        </div>
+                        <div class="mt-1.5 bg-brand-black/90 backdrop-blur-md text-white text-[8px] md:text-[10px] font-bold px-2 py-1 rounded border border-white/20 uppercase tracking-widest truncate w-full text-center shadow-md export-safe-text">${getShortName(getProp(p, 'nama'))}</div>
+                    </div>`;
+                } else {
+                    html += `
+                    <div class="absolute -translate-x-1/2 translate-y-1/2 flex flex-col items-center cursor-pointer hover:scale-110 transition-transform z-10" style="bottom:${pos.b}; left:${pos.l};" onclick="openDtPool(${i})">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-dashed border-gray-400 dark:border-gray-500 bg-white/40 dark:bg-black/40 flex items-center justify-center backdrop-blur-sm shadow-sm">
+                            <svg class="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        </div>
+                        <div class="mt-1.5 bg-white/90 dark:bg-brand-dark-surface/90 text-brand-black dark:text-white text-[8px] md:text-[9px] font-bold px-2 py-0.5 rounded border border-gray-300 dark:border-brand-dark-border uppercase shadow-sm">${pos.role}</div>
+                    </div>`;
+                }
+            });
+            container.innerHTML = html;
+        }
+
+        function openDtPool(slotIdx) {
+            activeDtSlot = slotIdx;
+            document.getElementById('dt-pool-role').innerText = `POSISI: ${dtFormation[slotIdx].role}`;
+            document.getElementById('dt-search').value = '';
+            renderDtPool();
+            document.getElementById('modal-dt-pool').classList.remove('hidden');
+            document.getElementById('modal-dt-pool').classList.add('flex');
+            document.body.classList.add('modal-open');
+        }
+
+        function tutupDtPool() {
+            document.getElementById('modal-dt-pool').classList.add('hidden');
+            document.getElementById('modal-dt-pool').classList.remove('flex');
+            document.body.classList.remove('modal-open');
+            activeDtSlot = null;
+        }
+
+        function renderDtPool() {
+            const query = document.getElementById('dt-search').value.toLowerCase().trim();
+            const listEl = document.getElementById('dt-pool-list');
+            
+            // Filter pemain murni (tanpa pelatih)
+            let players = (rawData.Pemain || []).filter(x => {
+                let posCek = String(getProp(x,'posisi')).toUpperCase().replace(/\s+/g,'');
+                return !['PELATIH','COACH','HEADCOACH','MANAGER'].includes(posCek);
+            });
+
+            // Filter pencarian
+            if(query.length > 0) {
+                players = players.filter(p => String(getProp(p,'nama')).toLowerCase().includes(query) || String(getProp(p,'tim')).toLowerCase().includes(query));
+            }
+
+            // Filter agar pemain yang sudah di lapangan tidak bisa dipilih lagi
+            const assignedNames = Object.values(dtLineup).filter(p => p).map(p => getProp(p, 'nama') + getProp(p, 'tim'));
+
+            let html = '';
+            if(players.length === 0) {
+                html = '<div class="text-center p-6 text-[10px] text-gray-400 font-bold uppercase tracking-widest">Pemain tidak ditemukan</div>';
+            } else {
+                players.forEach(p => {
+                    let nm = getProp(p, 'nama'); let tim = getProp(p, 'tim');
+                    let isAssigned = assignedNames.includes(nm + tim);
+                    let logo = allKlasemenCache.find(t => getProp(t, 'klub') === tim)?.logo || getAvatar(tim, true);
+                    let foto = getProp(p, 'foto') || getAvatar(nm);
+                    let pos = getProp(p, 'posisi') || 'POS';
+
+                    html += `
+                    <div onclick="${isAssigned ? '' : `pilihPemainDt('${safeStr(nm)}', '${safeStr(tim)}')`}" class="flex items-center px-4 py-3 ${isAssigned ? 'opacity-30 grayscale cursor-not-allowed' : 'cursor-pointer hover:bg-gray-100 dark:hover:bg-brand-dark-surface transition-colors'} group">
+                        <div class="relative w-10 h-10 rounded-full shrink-0 border border-gray-200 dark:border-gray-700 bg-white">
+                            <img src="${foto}" class="w-full h-full object-cover rounded-full">
+                            <img src="${logo}" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border border-gray-200 bg-white object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0 pl-3">
+                            <h4 class="font-bold text-xs text-brand-black dark:text-white uppercase truncate ${isAssigned ? '' : 'group-hover:text-brand-green'}">${nm}</h4>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="text-[8px] font-bold text-gray-500 uppercase tracking-widest">${tim}</span>
+                                <span class="text-[7px] font-bold bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-1.5 py-[1px] rounded uppercase">${pos}</span>
+                            </div>
+                        </div>
+                        ${isAssigned ? '<span class="text-[8px] font-bold text-brand-red uppercase">Terpilih</span>' : '<span class="text-gray-300 dark:text-gray-600 group-hover:text-brand-green">➜</span>'}
+                    </div>`;
+                });
+            }
+            listEl.innerHTML = html;
+        }
+
+        function pilihPemainDt(namaPemain, namaTim) {
+            if(activeDtSlot === null) return;
+            let p = (rawData.Pemain||[]).find(x => String(getProp(x,'nama')).toLowerCase().trim() === String(namaPemain).toLowerCase().trim() && String(getProp(x,'tim')).toLowerCase().trim() === String(namaTim).toLowerCase().trim());
+            if(p) {
+                dtLineup[activeDtSlot] = p;
+                renderDtPitch();
+                tutupDtPool();
+            }
+        }
+
+        function hapusDtSlot() {
+            if(activeDtSlot !== null) {
+                dtLineup[activeDtSlot] = null;
+                renderDtPitch();
+                tutupDtPool();
+            }
+        }
+
+        function resetDreamTeam() {
+            if(confirm("Kosongkan seluruh pemain di lapangan?")) {
+                dtLineup = {};
+                renderDtPitch();
+            }
+        }
+        
+        // Render inisial lapangan saat web dimuat
+        document.addEventListener('DOMContentLoaded', () => { setTimeout(renderDtPitch, 500); });
+            
         // FIX: MESIN RADAR AUTO-REFRESH (Pengecek Notifikasi & Skor Real-time)
         // Berjalan otomatis setiap 30 detik di latar belakang
         setInterval(() => {
