@@ -262,14 +262,35 @@
             </button>
         </div>
     </div>
-    <div id="tsl-top-tabs" class="hidden fixed top-0 left-0 w-full z-[45] bg-white/90 dark:bg-brand-dark-surface/95 backdrop-blur-xl border-b border-gray-200 dark:border-brand-dark-border py-3 px-4 flex gap-3 overflow-x-auto hide-scroll safe-header transition-colors duration-500">
-        <button onclick="switchTab('beranda', 'Beranda')" id="tab-btn-beranda" class="top-tab-btn active px-5 py-2 rounded-full bg-brand-green text-white text-[10px] font-bold uppercase tracking-widest whitespace-nowrap shadow-sm transition-all">Beranda</button>
-        <button onclick="switchTab('jadwal', 'Jadwal Pertandingan')" id="tab-btn-jadwal" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Jadwal</button>
-        <button onclick="switchTab('klasemen', 'Papan Klasemen')" id="tab-btn-klasemen" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Klasemen</button>
-        <button onclick="switchTab('statistik', 'Statistik Pemain')" id="tab-btn-statistik" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Statistik</button>
-        <button onclick="switchTab('pencarian', 'Pencarian TSL')" id="tab-btn-pencarian" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Cari</button>
-        <button onclick="switchTab('bagan', 'Fase Gugur')" id="tab-btn-bagan" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Bagan</button>
-        <button onclick="switchTab('dreamteam', 'Dream Team')" id="tab-btn-dreamteam" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Dream Team</button>
+    <div id="tsl-top-tabs" class="hidden fixed z-[55] left-1/2 -translate-x-1/2 w-[95%] max-w-4xl bg-white/70 dark:bg-[#111111]/70 backdrop-blur-2xl border border-white/60 dark:border-white/10 p-1.5 rounded-[2rem] shadow-[0_15px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.6)] flex gap-1 overflow-x-auto hide-scroll transition-all duration-500 items-center" style="top: max(env(safe-area-inset-top, 16px), 16px);">
+        <button onclick="switchTab('beranda', 'Beranda')" id="tab-btn-beranda" class="top-tab-btn active flex items-center gap-1.5 px-4 md:px-6 py-3 rounded-full bg-brand-green text-white text-[9px] md:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap shadow-[0_0_15px_rgba(0,154,68,0.4)] transition-all shrink-0">
+            <svg class="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            Beranda
+        </button>
+        <button onclick="switchTab('jadwal', 'Jadwal')" id="tab-btn-jadwal" class="top-tab-btn flex items-center gap-1.5 px-4 md:px-5 py-3 rounded-full bg-transparent text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 text-[9px] md:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all shrink-0 border border-transparent">
+            <svg class="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            Jadwal
+        </button>
+        <button onclick="switchTab('klasemen', 'Klasemen')" id="tab-btn-klasemen" class="top-tab-btn flex items-center gap-1.5 px-4 md:px-5 py-3 rounded-full bg-transparent text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 text-[9px] md:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all shrink-0 border border-transparent">
+            <svg class="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+            Klasemen
+        </button>
+        <button onclick="switchTab('statistik', 'Statistik')" id="tab-btn-statistik" class="top-tab-btn flex items-center gap-1.5 px-4 md:px-5 py-3 rounded-full bg-transparent text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 text-[9px] md:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all shrink-0 border border-transparent">
+            <svg class="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+            Statistik
+        </button>
+        <button onclick="switchTab('pencarian', 'Cari')" id="tab-btn-pencarian" class="top-tab-btn flex items-center gap-1.5 px-4 md:px-5 py-3 rounded-full bg-transparent text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 text-[9px] md:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all shrink-0 border border-transparent">
+            <svg class="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            Cari
+        </button>
+        <button onclick="switchTab('bagan', 'Bagan')" id="tab-btn-bagan" class="top-tab-btn flex items-center gap-1.5 px-4 md:px-5 py-3 rounded-full bg-transparent text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 text-[9px] md:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all shrink-0 border border-transparent">
+            <svg class="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V3m0 4l3 3M8 7L5 10m11 11v-4m0 4l3-3m-3 3l-3-3"></path></svg>
+            Bagan
+        </button>
+        <button onclick="switchTab('dreamteam', 'Dream Team')" id="tab-btn-dreamteam" class="top-tab-btn flex items-center gap-1.5 px-4 md:px-5 py-3 rounded-full bg-transparent text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 text-[9px] md:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all shrink-0 border border-transparent">
+            <svg class="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+            Dream Team
+        </button>
     </div>
     <div id="view-home" class="hidden opacity-100 transition-opacity duration-300">
         
@@ -1289,14 +1310,20 @@
         }
 
         function setActiveNav(id) {
+            // 1. Reset semua tab ke mode non-aktif
             document.querySelectorAll('.top-tab-btn').forEach(btn => { 
-                btn.classList.remove('bg-brand-green', 'text-white', 'active', 'shadow-sm'); 
-                btn.classList.add('bg-gray-100', 'dark:bg-brand-dark-bg', 'text-gray-500', 'dark:text-brand-dark-muted'); 
+                btn.classList.remove('bg-brand-green', 'text-white', 'active', 'shadow-[0_0_15px_rgba(0,154,68,0.4)]'); 
+                btn.classList.add('bg-transparent', 'text-gray-500', 'dark:text-brand-dark-muted'); 
             });
+            
+            // 2. Aktifkan tab yang ditekan
             const activeBtn = document.getElementById('tab-btn-' + id);
             if(activeBtn) { 
-                activeBtn.classList.remove('bg-gray-100', 'dark:bg-brand-dark-bg', 'text-gray-500', 'dark:text-brand-dark-muted'); 
-                activeBtn.classList.add('bg-brand-green', 'text-white', 'active', 'shadow-sm'); 
+                activeBtn.classList.remove('bg-transparent', 'text-gray-500', 'dark:text-brand-dark-muted'); 
+                activeBtn.classList.add('bg-brand-green', 'text-white', 'active', 'shadow-[0_0_15px_rgba(0,154,68,0.4)]'); 
+                
+                // 3. Auto-Scroll Cerdas: Geser tab bar secara otomatis agar tombol aktif selalu ada di tengah layar HP
+                activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
         }
 
