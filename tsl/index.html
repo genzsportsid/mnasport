@@ -447,8 +447,8 @@
                     <h2 class="font-heading font-bold text-2xl uppercase tracking-wide text-brand-black dark:text-white transition-colors">Bagan Fase Gugur</h2>
                 </div>
                 <div class="flex bg-gray-100 dark:bg-brand-dark-bg rounded-lg p-1 shadow-inner transition-colors w-max">
-                    <button class="px-5 py-1.5 text-[10px] font-bold rounded-md text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white uppercase transition-all">SMP</button>
-                    <button class="px-5 py-1.5 text-[10px] font-bold rounded-md bg-white dark:bg-brand-dark-surface shadow-sm text-brand-black dark:text-white uppercase transition-all">SMA</button>
+                    <button onclick="switchLigaUI('SMP')" id="btn-bagan-smp" class="px-5 py-1.5 text-[10px] font-bold rounded-md text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white uppercase transition-all">SMP</button>
+                    <button onclick="switchLigaUI('SMA')" id="btn-bagan-sma" class="px-5 py-1.5 text-[10px] font-bold rounded-md bg-white dark:bg-brand-dark-surface shadow-sm text-brand-black dark:text-white uppercase transition-all">SMA</button>
                 </div>
             </div>
 
@@ -1279,7 +1279,8 @@
                     else { btnSmp.className = activeClass; btnSma.className = inactiveClass; }
                 }
             });
-            renderKlasemenTopSkor(); 
+            renderKlasemenTopSkor();
+                if(typeof renderBaganGugur === 'function') renderBaganGugur();
         }
 
         // FIX: MESIN LIVE STICKY HEADER (BOTTOM & AUTO-HIDE)
@@ -1525,7 +1526,81 @@
             document.getElementById('beranda-live-matches').innerHTML = html;
             updateLiveTimers(); 
         }
+        // --- MESIN BAGAN FASE GUGUR ---
+        function renderBaganGugur() {
+            let isMatch = (d) => { return String(getProp(d, 'Jenjang') || getProp(d, 'Liga') || 'SMA').trim().toUpperCase() === ligaAktif; };
+            let currentLeagueMatches = (jadwalCache || []).filter(isMatch);
 
+            // Fungsi cerdas pencari kode di Spreadsheet (Contoh: "SF1", "SF2", "FINAL")
+            const findMatch = (phaseCode) => {
+                return currentLeagueMatches.find(m => {
+                    let grup = String(getProp(m, 'grup') || '').toUpperCase().replace(/\s+/g, '');
+                    let jenis = String(getProp(m, 'jenis_match') || '').toUpperCase().replace(/\s+/g, '');
+                    return grup === phaseCode || jenis === phaseCode;
+                });
+            };
+
+            const sf1 = findMatch('SF1');
+            const sf2 = findMatch('SF2');
+            const final = findMatch('FINAL');
+
+            // Eksekutor Render UI
+            const fillBracketUI = (matchData, prefix) => {
+                let elTk = document.getElementById(`b-${prefix}-tk`); let elTn = document.getElementById(`b-${prefix}-tn`);
+                let elSk = document.getElementById(`b-${prefix}-sk`); let elSn = document.getElementById(`b-${prefix}-sn`);
+                let elBox = document.getElementById(`bagan-${prefix}`);
+
+                if (matchData) {
+                    let tk = getProp(matchData, 'tim_kiri') || 'TBD'; let tn = getProp(matchData, 'tim_kanan') || 'TBD';
+                    let skorStr = String(getProp(matchData, 'skor') || ""); let sKiri = "-", sKanan = "-";
+                    let status = String(getProp(matchData, 'status')||"").toUpperCase();
+                    let isStarted = status.includes('FT') || status.includes('LIVE') || status.includes('HT');
+                    
+                    if (isStarted && skorStr.includes('-')) {
+                        let parts = skorStr.split('-'); sKiri = parts[0].trim(); sKanan = parts[1].trim();
+                    }
+
+                    if(elTk) elTk.innerText = tk; if(elTn) elTn.innerText = tn;
+                    if(elSk) elSk.innerText = sKiri; if(elSn) elSn.innerText = sKanan;
+                    
+                    // Jadikan bagan bisa diklik langsung menuju Match Center
+                    if(elBox) elBox.onclick = () => bukaHalamanMatch(getProp(matchData, 'id_match'));
+                    
+                    // Efek Visual Menyorot Pemenang jika status FT
+                    let baseKiri = "text-xs font-bold uppercase transition-colors ";
+                    let baseKanan = "text-xs font-bold uppercase transition-colors ";
+                    let valKiri = "font-heading font-bold text-base transition-colors ";
+                    let valKanan = "font-heading font-bold text-base transition-colors ";
+                    
+                    if (status.includes('FT') && sKiri !== "-" && sKanan !== "-") {
+                        let k = parseInt(sKiri); let n = parseInt(sKanan);
+                        // Perbesar teks khusus untuk Final
+                        if(prefix === 'fin') { valKiri = valKiri.replace('text-base', 'text-xl font-black'); valKanan = valKanan.replace('text-base', 'text-xl font-black'); baseKiri = baseKiri.replace('text-xs', 'text-sm'); baseKanan = baseKanan.replace('text-xs', 'text-sm');}
+                        
+                        if (k > n) {
+                            if(elTk) elTk.className = baseKiri + "text-brand-black dark:text-white"; if(elSk) elSk.className = valKiri + "text-brand-black dark:text-white";
+                            if(elTn) elTn.className = baseKanan + "text-gray-400 dark:text-brand-dark-muted"; if(elSn) elSn.className = valKanan + "text-gray-400 dark:text-brand-dark-muted";
+                        } else if (n > k) {
+                            if(elTn) elTn.className = baseKanan + "text-brand-black dark:text-white"; if(elSn) elSn.className = valKanan + "text-brand-black dark:text-white";
+                            if(elTk) elTk.className = baseKiri + "text-gray-400 dark:text-brand-dark-muted"; if(elSk) elSk.className = valKiri + "text-gray-400 dark:text-brand-dark-muted";
+                        }
+                    } else {
+                         // Default Belum Main / Sedang Live
+                         if(prefix === 'fin') { valKiri = valKiri.replace('text-base', 'text-xl font-black'); valKanan = valKanan.replace('text-base', 'text-xl font-black'); baseKiri = baseKiri.replace('text-xs', 'text-sm'); baseKanan = baseKanan.replace('text-xs', 'text-sm');}
+                         if(elTk) elTk.className = baseKiri + "text-brand-black dark:text-white"; if(elSk) elSk.className = valKiri + "text-brand-black dark:text-white";
+                         if(elTn) elTn.className = baseKanan + "text-gray-500 dark:text-brand-dark-muted"; if(elSn) elSn.className = valKanan + "text-gray-500 dark:text-brand-dark-muted";
+                    }
+                } else {
+                    if(elTk) elTk.innerText = prefix === 'fin' ? 'Pemenang SF 1' : 'TBD';
+                    if(elTn) elTn.innerText = prefix === 'fin' ? 'Pemenang SF 2' : 'TBD';
+                    if(elSk) elSk.innerText = '-'; if(elSn) elSn.innerText = '-';
+                    if(elBox) elBox.onclick = null;
+                }
+            };
+
+            fillBracketUI(sf1, 'sf1'); fillBracketUI(sf2, 'sf2'); fillBracketUI(final, 'fin');
+        }
+            
         function renderKlasemenTopSkor() {
             let isMatch = (d) => { return String(getProp(d, 'Jenjang') || getProp(d, 'Liga') || 'SMA').trim().toUpperCase() === ligaAktif; };
             let dataKlasemen = (rawData.Klasemen || []).filter(isMatch);
