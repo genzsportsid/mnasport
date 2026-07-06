@@ -268,6 +268,7 @@
         <button onclick="switchTab('klasemen', 'Papan Klasemen')" id="tab-btn-klasemen" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Klasemen</button>
         <button onclick="switchTab('statistik', 'Statistik Pemain')" id="tab-btn-statistik" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Statistik</button>
         <button onclick="switchTab('pencarian', 'Pencarian TSL')" id="tab-btn-pencarian" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Cari</button>
+        <button onclick="switchTab('bagan', 'Fase Gugur')" id="tab-btn-bagan" class="top-tab-btn px-5 py-2 rounded-full bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white border border-gray-200 dark:border-brand-dark-border text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all">Bagan</button>
     </div>
     <div id="view-home" class="hidden opacity-100 transition-opacity duration-300">
         
@@ -434,6 +435,119 @@
                         <i data-lucide="search" class="w-8 h-8 text-brand-green/30"></i>
                     </div>
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Ketik nama pemain untuk mencari data Liga</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB BAGAN FASE GUGUR -->
+        <div id="tab-bagan" class="tab-content hidden pt-[100px] px-4 md:px-8 max-w-7xl mx-auto page-enter min-h-[100dvh]">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4 border-b border-gray-200 dark:border-brand-dark-border pb-4 transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="w-1.5 h-6 bg-brand-green rounded-full shadow-[0_0_10px_#009A44]"></div>
+                    <h2 class="font-heading font-bold text-2xl uppercase tracking-wide text-brand-black dark:text-white transition-colors">Bagan Fase Gugur</h2>
+                </div>
+                <div class="flex bg-gray-100 dark:bg-brand-dark-bg rounded-lg p-1 shadow-inner transition-colors w-max">
+                    <button class="px-5 py-1.5 text-[10px] font-bold rounded-md text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white uppercase transition-all">SMP</button>
+                    <button class="px-5 py-1.5 text-[10px] font-bold rounded-md bg-white dark:bg-brand-dark-surface shadow-sm text-brand-black dark:text-white uppercase transition-all">SMA</button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto hide-scroll bg-white/50 dark:bg-brand-dark-surface/50 backdrop-blur-xl rounded-[2rem] shadow-soft border border-gray-100 dark:border-brand-dark-border p-6 md:p-10 mb-24 transition-colors">
+                <div class="flex min-w-[850px] justify-between items-stretch relative">
+                    
+                    <!-- PEREMPAT FINAL (8 Tim) -->
+                    <div class="w-64 flex flex-col justify-around gap-6 relative z-10">
+                        <h3 class="text-center text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest mb-2">Perempat Final</h3>
+                        
+                        <!-- QF 1 -->
+                        <div class="bg-white dark:bg-brand-dark-surface border border-gray-200 dark:border-brand-dark-border rounded-xl overflow-hidden shadow-sm transition-colors">
+                            <div class="flex justify-between items-center p-3.5 border-b border-gray-100 dark:border-brand-dark-border">
+                                <span class="text-[11px] font-bold uppercase text-brand-black dark:text-white">Juara Grup A</span><span class="font-heading font-bold text-sm text-brand-black dark:text-white">-</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3.5">
+                                <span class="text-[11px] font-bold uppercase text-gray-500 dark:text-brand-dark-muted">Runner-up B</span><span class="font-heading font-bold text-sm text-gray-500 dark:text-brand-dark-muted">-</span>
+                            </div>
+                        </div>
+                        <!-- QF 2 -->
+                        <div class="bg-white dark:bg-brand-dark-surface border border-gray-200 dark:border-brand-dark-border rounded-xl overflow-hidden shadow-sm transition-colors">
+                            <div class="flex justify-between items-center p-3.5 border-b border-gray-100 dark:border-brand-dark-border">
+                                <span class="text-[11px] font-bold uppercase text-brand-black dark:text-white">Juara Grup C</span><span class="font-heading font-bold text-sm text-brand-black dark:text-white">-</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3.5">
+                                <span class="text-[11px] font-bold uppercase text-gray-500 dark:text-brand-dark-muted">Runner-up D</span><span class="font-heading font-bold text-sm text-gray-500 dark:text-brand-dark-muted">-</span>
+                            </div>
+                        </div>
+                        <!-- QF 3 -->
+                        <div class="bg-white dark:bg-brand-dark-surface border border-gray-200 dark:border-brand-dark-border rounded-xl overflow-hidden shadow-sm transition-colors">
+                            <div class="flex justify-between items-center p-3.5 border-b border-gray-100 dark:border-brand-dark-border">
+                                <span class="text-[11px] font-bold uppercase text-brand-black dark:text-white">Juara Grup B</span><span class="font-heading font-bold text-sm text-brand-black dark:text-white">-</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3.5">
+                                <span class="text-[11px] font-bold uppercase text-gray-500 dark:text-brand-dark-muted">Runner-up A</span><span class="font-heading font-bold text-sm text-gray-500 dark:text-brand-dark-muted">-</span>
+                            </div>
+                        </div>
+                        <!-- QF 4 -->
+                        <div class="bg-white dark:bg-brand-dark-surface border border-gray-200 dark:border-brand-dark-border rounded-xl overflow-hidden shadow-sm transition-colors">
+                            <div class="flex justify-between items-center p-3.5 border-b border-gray-100 dark:border-brand-dark-border">
+                                <span class="text-[11px] font-bold uppercase text-brand-black dark:text-white">Juara Grup D</span><span class="font-heading font-bold text-sm text-brand-black dark:text-white">-</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3.5">
+                                <span class="text-[11px] font-bold uppercase text-gray-500 dark:text-brand-dark-muted">Runner-up C</span><span class="font-heading font-bold text-sm text-gray-500 dark:text-brand-dark-muted">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KONEKTOR QF KE SF -->
+                    <div class="w-12 flex flex-col justify-around py-12 relative">
+                        <div class="absolute right-0 top-[16%] w-full h-[21%] border-t-2 border-r-2 border-b-2 border-gray-300 dark:border-brand-dark-border rounded-r-xl"></div>
+                        <div class="absolute right-0 bottom-[16%] w-full h-[21%] border-t-2 border-r-2 border-b-2 border-gray-300 dark:border-brand-dark-border rounded-r-xl"></div>
+                    </div>
+
+                    <!-- SEMI FINAL (4 Tim) -->
+                    <div class="w-64 flex flex-col justify-around gap-6 relative z-10 py-12">
+                        <h3 class="text-center text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest mb-2">Semi Final</h3>
+                        
+                        <!-- SF 1 -->
+                        <div class="bg-white dark:bg-brand-dark-surface border border-gray-200 dark:border-brand-dark-border rounded-xl overflow-hidden shadow-md transition-colors">
+                            <div class="flex justify-between items-center p-3.5 border-b border-gray-100 dark:border-brand-dark-border">
+                                <span class="text-[11px] font-bold uppercase text-brand-black dark:text-white">Pemenang QF 1</span><span class="font-heading font-bold text-sm text-brand-black dark:text-white">-</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3.5">
+                                <span class="text-[11px] font-bold uppercase text-gray-500 dark:text-brand-dark-muted">Pemenang QF 2</span><span class="font-heading font-bold text-sm text-gray-500 dark:text-brand-dark-muted">-</span>
+                            </div>
+                        </div>
+                        <!-- SF 2 -->
+                        <div class="bg-white dark:bg-brand-dark-surface border border-gray-200 dark:border-brand-dark-border rounded-xl overflow-hidden shadow-md transition-colors">
+                            <div class="flex justify-between items-center p-3.5 border-b border-gray-100 dark:border-brand-dark-border">
+                                <span class="text-[11px] font-bold uppercase text-brand-black dark:text-white">Pemenang QF 3</span><span class="font-heading font-bold text-sm text-brand-black dark:text-white">-</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3.5">
+                                <span class="text-[11px] font-bold uppercase text-gray-500 dark:text-brand-dark-muted">Pemenang QF 4</span><span class="font-heading font-bold text-sm text-gray-500 dark:text-brand-dark-muted">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KONEKTOR SF KE FINAL -->
+                    <div class="w-12 flex flex-col justify-center py-24 relative">
+                        <div class="absolute right-0 top-[26%] w-full h-[48%] border-t-2 border-r-2 border-b-2 border-brand-green rounded-r-xl shadow-[2px_0_10px_rgba(0,154,68,0.2)]"></div>
+                    </div>
+
+                    <!-- GRAND FINAL (2 Tim) -->
+                    <div class="w-72 flex flex-col justify-center gap-6 relative z-10">
+                        <div class="text-center mb-2">
+                            <div class="inline-block bg-gradient-to-r from-brand-gold to-yellow-500 text-brand-black text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full shadow-md mb-3 border border-yellow-300">🏆 GRAND FINAL</div>
+                            <h3 class="text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest">Stadion Menak Sopal</h3>
+                        </div>
+                        <div class="bg-white dark:bg-brand-dark-surface border-2 border-brand-green rounded-2xl overflow-hidden shadow-[0_15px_30px_rgba(0,154,68,0.15)] transform scale-105 transition-colors">
+                            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-brand-dark-border bg-brand-green/5">
+                                <span class="text-xs font-bold uppercase text-brand-black dark:text-white">Pemenang SF 1</span><span class="font-heading font-bold text-lg text-brand-black dark:text-white">-</span>
+                            </div>
+                            <div class="flex justify-between items-center p-4 bg-brand-green/5">
+                                <span class="text-xs font-bold uppercase text-gray-500 dark:text-brand-dark-muted">Pemenang SF 2</span><span class="font-heading font-bold text-lg text-gray-500 dark:text-brand-dark-muted">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>
