@@ -723,51 +723,51 @@
             </div>
         </div>
     </div>
-    <div id="modal-pemain" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-brand-black/80 backdrop-blur-md cursor-pointer" onclick="tutupModalPemain()"></div>
-        <div id="kartu-pemain-export" class="relative z-10 w-[320px] bg-white dark:bg-brand-dark-surface rounded-[2rem] shadow-2xl modal-enter overflow-hidden border border-white/10 dark:border-brand-dark-border transition-colors duration-500 shimmer-wrapper">
+    <div id="kartu-pemain-export" class="relative z-10 w-[300px] bg-white dark:bg-brand-dark-surface rounded-[2rem] shadow-2xl modal-enter overflow-hidden border border-gray-200 dark:border-brand-dark-border transition-colors duration-500">
             
-            <button data-html2canvas-ignore="true" onclick="bagikanGambar('kartu-pemain-export', 'PlayerCard')" class="absolute top-4 left-4 w-7 h-7 bg-black/20 hover:bg-brand-green hover:text-white rounded-full flex items-center justify-center transition-colors z-40 text-white backdrop-blur-md" title="Bagikan Kartu">
+            <!-- Tombol Aksi -->
+            <button data-html2canvas-ignore="true" onclick="bagikanGambar('kartu-pemain-export', 'PlayerCard')" class="absolute top-4 left-4 w-7 h-7 bg-gray-100 dark:bg-brand-dark-bg hover:bg-brand-green hover:text-white rounded-full flex items-center justify-center transition-colors z-40 text-gray-500 border border-gray-200 dark:border-brand-dark-border" title="Bagikan Kartu">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
             </button>
+            <button data-html2canvas-ignore="true" onclick="tutupModalPemain()" class="absolute top-4 right-4 w-7 h-7 bg-gray-100 dark:bg-brand-dark-bg hover:bg-brand-red hover:text-white rounded-full flex items-center justify-center transition-colors z-40 font-bold text-sm text-gray-500 border border-gray-200 dark:border-brand-dark-border">&times;</button>
+            
+            <!-- Bagian Atas (Foto & Identitas) -->
+            <div id="mp-header-bg" class="bg-gray-50 dark:bg-[#111111] pt-10 pb-6 px-6 text-center border-b border-gray-100 dark:border-brand-dark-border relative transition-colors">
+                <div id="mp-badge-topskor" class="hidden absolute top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-brand-black text-[8px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm border border-yellow-300 z-40">👑 Top Skor</div>
+                
+                <!-- Foto Berbingkai Rapi -->
+                <div class="w-24 h-24 mx-auto mb-4 rounded-[1rem] border-[3px] border-white dark:border-brand-dark-surface shadow-md overflow-hidden bg-gray-200 dark:bg-gray-800">
+                    <img id="mp-foto" src="" class="w-full h-full object-cover">
+                </div>
+                
+                <h2 id="mp-nama" class="font-heading font-bold text-lg md:text-xl text-brand-black dark:text-white uppercase leading-tight mb-2 export-safe-text px-2">NAMA PEMAIN</h2>
+                
+                <div class="flex items-center justify-center gap-2 cursor-pointer hover:opacity-80 transition-opacity mx-auto w-max bg-white dark:bg-brand-dark-surface px-3 py-1.5 rounded-full border border-gray-200 dark:border-brand-dark-border shadow-sm" onclick="tutupModalPemain(); bukaHalamanTim(document.getElementById('mp-tim-nama').innerText)">
+                    <img id="mp-tim-logo" src="" class="w-4 h-4 rounded-full border border-gray-100 dark:border-gray-700 bg-white object-cover">
+                    <p id="mp-tim-nama" class="text-[10px] font-bold text-gray-500 dark:text-brand-dark-muted uppercase tracking-widest export-safe-text line-clamp-1">KLUB</p>
+                </div>
+            </div>
+            
+            <!-- Bagian Bawah (Statistik) -->
+            <div class="p-5 bg-white dark:bg-brand-dark-surface transition-colors">
+                <div class="flex items-center justify-center gap-3 mb-5">
+                    <div class="bg-brand-green/10 text-brand-green px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-widest border border-brand-green/20" id="mp-posisi">POSISI</div>
+                    <div class="bg-gray-100 dark:bg-brand-dark-bg text-brand-black dark:text-white px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-widest border border-gray-200 dark:border-brand-dark-border">NO <span id="mp-nomor" class="text-brand-green ml-1">99</span></div>
+                </div>
 
-            <button data-html2canvas-ignore="true" onclick="tutupModalPemain()" class="absolute top-4 right-4 w-7 h-7 bg-black/20 hover:bg-brand-red hover:text-white rounded-full flex items-center justify-center transition-colors z-40 font-bold text-sm text-white backdrop-blur-md">&times;</button>
-            <div id="mp-header-bg" class="bg-gradient-to-b from-gray-900 to-brand-black h-36 absolute top-0 w-full rounded-b-[2rem] border-b-4 border-brand-green transition-colors duration-300"></div>
-            <div id="mp-badge-topskor" class="hidden absolute top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-brand-black text-[8px] font-bold px-2 py-1 rounded-full uppercase tracking-widest shadow-lg z-40 animate-pulse border border-yellow-300">👑 Top Skor</div>
-            
-            <div class="relative z-20 pt-6 px-6 text-center flex justify-between items-start">
-                <div class="text-left">
-                    <div id="mp-nomor" class="font-heading font-bold text-5xl text-brand-green leading-none drop-shadow-md transition-colors">99</div>
-                    <div class="text-[9px] font-bold text-white/50 uppercase tracking-[0.2em] mt-1 ml-1">NOMOR</div>
-                </div>
-                <div class="w-12 h-12 bg-white rounded-full p-0.5 shadow-lg cursor-pointer hover:scale-105 transition" onclick="tutupModalPemain()">
-                    <img id="mp-tim-logo" src="" class="w-full h-full object-cover rounded-full">
-                </div>
-            </div>
-            
-            <div class="relative w-full h-48 flex justify-center items-end z-10 -mt-10">
-                <img id="mp-foto" src="" class="h-[105%] w-auto object-contain object-bottom drop-shadow-[0_15px_15px_rgba(0,0,0,0.5)] z-10 bg-transparent border-none animate-float-player">
-            </div>
-            
-            <div class="relative z-20 pb-6 px-5 pt-4 text-center bg-white dark:bg-brand-dark-surface transition-colors">
-                <h2 id="mp-nama" class="font-heading font-bold text-xl md:text-2xl text-brand-black dark:text-white uppercase leading-tight mb-2 break-words text-balance export-safe-text">NAMA PEMAIN</h2>
-                <p id="mp-tim-nama" class="text-[10px] font-bold text-gray-500 dark:text-brand-dark-muted uppercase tracking-wider mb-4 cursor-pointer hover:text-brand-green dark:hover:text-brand-green transition-colors export-safe-text line-clamp-2 px-2" onclick="tutupModalPemain(); bukaHalamanTim(this.innerText)">KLUB</p>
-                
-                <div class="grid grid-cols-2 gap-2 border-t border-gray-100 dark:border-brand-dark-border pt-4 mb-4 transition-colors">
-                    <div class="flex flex-col items-center bg-gray-50 dark:bg-brand-dark-bg rounded-xl py-2 shadow-sm border border-gray-100 dark:border-brand-dark-border transition-colors"><span class="text-[8px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-0.5">Posisi</span><span class="font-heading font-bold text-sm text-brand-black dark:text-white export-safe-text" id="mp-posisi">POS</span></div>
-                    <div class="flex flex-col items-center bg-gray-50 dark:bg-brand-dark-bg rounded-xl py-2 shadow-sm border border-gray-100 dark:border-brand-dark-border transition-colors"><span class="text-[8px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-0.5">Tinggi</span><span class="font-heading font-bold text-sm text-brand-black dark:text-white export-safe-text" id="mp-tinggi">-</span></div>
-                    <div class="flex flex-col items-center bg-gray-50 dark:bg-brand-dark-bg rounded-xl py-2 shadow-sm border border-gray-100 dark:border-brand-dark-border transition-colors"><span class="text-[8px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-0.5">Lahir (Umur)</span><span class="font-heading font-bold text-[11px] text-brand-black dark:text-white mt-0.5 export-safe-text" id="mp-umur">-</span></div>
-                    <div class="flex flex-col items-center bg-gray-50 dark:bg-brand-dark-bg rounded-xl py-2 shadow-sm border border-gray-100 dark:border-brand-dark-border transition-colors"><span class="text-[8px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-0.5">Kaki Andalan</span><span class="font-heading font-bold text-sm text-brand-black dark:text-white export-safe-text" id="mp-kaki">-</span></div>
+                <div class="grid grid-cols-3 gap-2 border-t border-gray-100 dark:border-brand-dark-border pt-4 mb-4 transition-colors">
+                    <div class="flex flex-col items-center"><span class="text-[7px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">Tinggi</span><span class="font-heading font-bold text-xs text-brand-black dark:text-white export-safe-text" id="mp-tinggi">-</span></div>
+                    <div class="flex flex-col items-center border-x border-gray-100 dark:border-brand-dark-border"><span class="text-[7px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">Usia</span><span class="font-heading font-bold text-[10px] text-brand-black dark:text-white mt-0.5 export-safe-text text-center line-clamp-1 px-1" id="mp-umur">-</span></div>
+                    <div class="flex flex-col items-center"><span class="text-[7px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">Kaki</span><span class="font-heading font-bold text-xs text-brand-black dark:text-white export-safe-text" id="mp-kaki">-</span></div>
                 </div>
                 
-                <div class="flex justify-center gap-6 border-t border-gray-100 dark:border-brand-dark-border pt-4 transition-colors">
-                    <div class="flex flex-col items-center"><span class="text-[8px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">GOL</span><span class="font-heading font-bold text-xl text-brand-green leading-none export-safe-text" id="mp-gol">0</span></div>
-                    <div class="flex flex-col items-center"><span class="text-[8px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">KUNING</span><span class="font-heading font-bold text-xl text-yellow-500 leading-none export-safe-text" id="mp-kuning">0</span></div>
-                    <div class="flex flex-col items-center"><span class="text-[8px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">MERAH</span><span class="font-heading font-bold text-xl text-brand-red leading-none export-safe-text" id="mp-merah">0</span></div>
+                <div class="grid grid-cols-3 gap-2 bg-gray-50 dark:bg-brand-dark-bg rounded-xl p-3 border border-gray-100 dark:border-brand-dark-border transition-colors">
+                    <div class="flex flex-col items-center"><span class="text-[7px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">GOL</span><span class="font-heading font-black text-xl text-brand-green leading-none export-safe-text" id="mp-gol">0</span></div>
+                    <div class="flex flex-col items-center border-x border-gray-200 dark:border-gray-800"><span class="text-[7px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">KUNING</span><span class="font-heading font-black text-xl text-yellow-500 leading-none export-safe-text" id="mp-kuning">0</span></div>
+                    <div class="flex flex-col items-center"><span class="text-[7px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">MERAH</span><span class="font-heading font-black text-xl text-brand-red leading-none export-safe-text" id="mp-merah">0</span></div>
                 </div>
             </div>
         </div>
-    </div>
 
     <div id="modal-pelatih" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-brand-black/80 backdrop-blur-md cursor-pointer" onclick="tutupModalPelatih()"></div>
@@ -1516,8 +1516,9 @@
             let htmlPodium = '';
 
             // MESIN PEMBANGUN KARTU VERTIKAL TOP 3 (FULL WIDTH)
+            // MESIN PEMBANGUN KARTU VERTIKAL TOP 3 (SIMPLE ELEGANT)
             const buildVerticalCard = (pData, rank) => {
-                if(!pData) return ''; // Lewati jika data tidak ada
+                if(!pData) return ''; 
 
                 let nama = getProp(pData, 'Nama Pemain') || getProp(pData, 'nama');
                 let tim = getProp(pData, 'Tim') || getProp(pData, 'sekolah');
@@ -1525,53 +1526,47 @@
                 
                 let dataP = (rawData.Pemain || []).find(x => String(getProp(x, 'nama')).toLowerCase().trim() === String(nama).toLowerCase().trim() && String(getProp(x, 'tim')).toLowerCase().trim() === String(tim).toLowerCase().trim()); 
                 let foto = (dataP && getProp(dataP, 'foto')) ? getProp(dataP, 'foto') : getAvatar(nama);
-                let num = (dataP && getProp(dataP,'nomor') != null) ? getProp(dataP,'nomor') : '-';
                 let pos = (dataP && getProp(dataP,'posisi')) ? getProp(dataP,'posisi') : 'POS';
+                let logoT = dKlasemen.find(x => getProp(x, 'klub') === tim)?.logo || getAvatar(tim, true);
 
                 let isGold = rank === 1;
-                let badgeText = isGold ? '👑 MUSIM INI MVP' : (rank === 2 ? '🥈 PERINGKAT KE-2' : '🥉 PERINGKAT KE-3');
                 
-                // Tema Warna dinamis berdasarkan Rank
-                let cardClass = isGold ? 'from-yellow-400 via-yellow-500 to-amber-600 border-yellow-300' : 
-                                 (rank === 2 ? 'from-gray-400 via-gray-500 to-gray-600 border-gray-300' : 'from-orange-700 via-orange-800 to-orange-900 border-orange-600');
-                let textClass = 'text-white';
-                let badgeClass = isGold ? 'bg-black/80 text-yellow-400' : 'bg-black/60 text-white';
-                
-                // Efek animasi/glowing khusus Juara 1
-                let extraEffect = isGold ? 'shimmer-wrapper shadow-[0_15px_30px_-5px_rgba(245,158,11,0.5)] scale-100 hover:scale-[1.03] animate-glow' : 'shadow-xl';
+                // Tema Warna Dinamis: Bingkai khusus untuk peringkat 1, 2, 3
+                let cardClass = isGold ? 'border-yellow-400 bg-yellow-50/50 dark:bg-yellow-900/10' : 
+                                 (rank === 2 ? 'border-gray-300 bg-gray-50 dark:bg-gray-800/30' : 'border-orange-400 bg-orange-50/50 dark:bg-orange-900/10');
+                let rankColor = isGold ? 'text-yellow-500' : (rank === 2 ? 'text-gray-400' : 'text-orange-500');
+                let extraEffect = isGold ? 'shadow-[0_4px_15px_rgba(250,204,21,0.2)]' : 'shadow-sm';
 
                 return `
-                    <div class="relative w-full bg-gradient-to-r ${cardClass} rounded-3xl p-5 text-white ${extraEffect} transition-all duration-300 border focus:outline-none flex flex-row items-center gap-5 overflow-hidden group cursor-pointer" onclick="bukaModalPemain('${safeStr(nama)}', '${safeStr(tim)}')">
-                        <div class="hero-pattern absolute inset-0 opacity-10 pointer-events-none"></div>
+                    <div class="w-full rounded-2xl p-4 transition-all duration-300 border-2 ${cardClass} ${extraEffect} flex items-center gap-4 cursor-pointer hover:-translate-y-1" onclick="bukaModalPemain('${safeStr(nama)}', '${safeStr(tim)}')">
                         
-                        <div class="w-[45%] shrink-0 h-40 md:h-48 relative flex justify-center items-end -mb-5 z-10 pointer-events-none transition-transform duration-500 group-hover:scale-105">
-                            <img src="${foto}" class="h-[110%] w-auto object-contain object-bottom drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] filter brightness-110 contrast-110 animate-float-player">
+                        <!-- Angka Peringkat -->
+                        <div class="font-heading font-black text-2xl ${rankColor} w-6 text-center italic shrink-0">#${rank}</div>
+                        
+                        <!-- Foto Berbingkai -->
+                        <div class="w-14 h-14 shrink-0 rounded-xl overflow-hidden border border-gray-200 dark:border-brand-dark-border bg-white">
+                            <img src="${foto}" class="w-full h-full object-cover">
                         </div>
                         
-                        <div class="flex-1 flex flex-col justify-center items-start text-left relative z-20">
-                            <div class="${badgeClass} text-[7px] md:text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full inline-block mb-2 md:mb-3 shadow border border-white/10 ${isGold?'animate-pulse':''}">${badgeText}</div>
-                            
-                            <h2 class="font-heading font-bold text-xl md:text-2xl text-white uppercase leading-tight mb-1 export-safe-text drop-shadow-sm">${nama}</h2>
-                            <p class="text-white/70 text-[10px] md:text-xs font-bold uppercase tracking-wider mb-4 hover:text-white transition-colors export-safe-text line-clamp-1" onclick="event.stopPropagation(); bukaHalamanTim('${safeStr(tim)}')">${tim}</p>
-                            
-                            <div class="flex items-center gap-3 w-full pt-3 border-t border-white/20">
-                                <div class="flex flex-col items-center flex-1 bg-black/30 rounded-lg py-1 border border-white/10">
-                                    <span class="text-[7px] text-white/60 tracking-widest uppercase font-bold">Gol</span>
-                                    <span class="font-heading font-bold text-2xl text-white export-safe-text">${gol}</span>
-                                </div>
-                                <div class="flex flex-col items-center flex-1 bg-black/10 rounded-lg py-1 border border-white/5">
-                                    <span class="text-[7px] text-white/50 tracking-widest uppercase font-bold">No</span>
-                                    <span class="font-heading font-bold text-xl text-white/90 export-safe-text">${num}</span>
-                                </div>
-                                <div class="flex flex-col items-center flex-1 bg-black/10 rounded-lg py-1 border border-white/5">
-                                    <span class="text-[7px] text-white/50 tracking-widest uppercase font-bold">Pos</span>
-                                    <span class="font-heading font-bold text-base text-white/90 export-safe-text">${pos}</span>
-                                </div>
+                        <!-- Identitas Pemain -->
+                        <div class="flex-1 flex flex-col justify-center min-w-0">
+                            <h2 class="font-bold text-xs md:text-sm text-brand-black dark:text-white uppercase truncate mb-1">${nama}</h2>
+                            <div class="flex items-center gap-2 mb-1.5" onclick="event.stopPropagation(); bukaHalamanTim('${safeStr(tim)}')">
+                                <img src="${logoT}" class="w-3.5 h-3.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white">
+                                <p class="text-gray-500 dark:text-brand-dark-muted text-[9px] font-bold uppercase truncate hover:text-brand-green transition-colors">${tim}</p>
                             </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[8px] bg-white dark:bg-brand-dark-surface text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded border border-gray-200 dark:border-brand-dark-border uppercase font-bold tracking-widest">${pos}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Statistik Gol -->
+                        <div class="shrink-0 text-center bg-white dark:bg-brand-dark-surface px-3 md:px-4 py-2 rounded-xl border border-gray-100 dark:border-brand-dark-border shadow-sm">
+                            <div class="text-[7px] text-gray-400 uppercase tracking-widest font-bold mb-0.5">GOL</div>
+                            <div class="font-heading font-black text-xl text-brand-green leading-none">${gol}</div>
                         </div>
                     </div>`;
             };
-
             // Suntikkan Juara 1, 2, 3 ke Container (Tanpa KOSONG)
             if(dTS.length > 0) htmlPodium += buildVerticalCard(dTS[0], 1);
             if(dTS.length > 1) htmlPodium += buildVerticalCard(dTS[1], 2);
@@ -2173,13 +2168,11 @@
             let playerGol = parseInt(getProp(p, 'gol')) || 0;
             let isTopScorer = (playerGol > 0 && playerGol >= highestGol);
 
-            let headerBg = document.getElementById('mp-header-bg'); let nomorEl = document.getElementById('mp-nomor'); let badgeTs = document.getElementById('mp-badge-topskor');
+            let badgeTs = document.getElementById('mp-badge-topskor');
             if(isTopScorer) {
-                headerBg.className = "bg-gradient-to-b from-yellow-700 to-yellow-900 h-36 absolute top-0 w-full rounded-b-[2rem] border-b-4 border-yellow-400 transition-colors duration-300";
-                nomorEl.className = "font-heading font-bold text-5xl text-yellow-400 leading-none drop-shadow-md transition-colors"; badgeTs.classList.remove('hidden');
+                if(badgeTs) badgeTs.classList.remove('hidden');
             } else {
-                headerBg.className = "bg-gradient-to-b from-gray-900 to-brand-black h-36 absolute top-0 w-full rounded-b-[2rem] border-b-4 border-brand-green transition-colors duration-300";
-                nomorEl.className = "font-heading font-bold text-5xl text-brand-green leading-none drop-shadow-md transition-colors"; badgeTs.classList.add('hidden');
+                if(badgeTs) badgeTs.classList.add('hidden');
             }
 
             let elFoto = document.getElementById('mp-foto'); if(elFoto) elFoto.src = getProp(p, 'foto') ? getProp(p, 'foto') : getAvatar(namaPemain);
