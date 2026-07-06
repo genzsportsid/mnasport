@@ -723,7 +723,9 @@
             </div>
         </div>
     </div>
-    <div id="kartu-pemain-export" class="relative z-10 w-[300px] bg-white dark:bg-brand-dark-surface rounded-[2rem] shadow-2xl modal-enter overflow-hidden border border-gray-200 dark:border-brand-dark-border transition-colors duration-500">
+    <div id="modal-pemain" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-brand-black/80 backdrop-blur-md cursor-pointer" onclick="tutupModalPemain()"></div>
+        <div id="kartu-pemain-export" class="relative z-10 w-[300px] bg-white dark:bg-brand-dark-surface rounded-[2rem] shadow-2xl modal-enter overflow-hidden border border-gray-200 dark:border-brand-dark-border transition-colors duration-500">
             
             <!-- Tombol Aksi -->
             <button data-html2canvas-ignore="true" onclick="bagikanGambar('kartu-pemain-export', 'PlayerCard')" class="absolute top-4 left-4 w-7 h-7 bg-gray-100 dark:bg-brand-dark-bg hover:bg-brand-green hover:text-white rounded-full flex items-center justify-center transition-colors z-40 text-gray-500 border border-gray-200 dark:border-brand-dark-border" title="Bagikan Kartu">
@@ -768,6 +770,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
     <div id="modal-pelatih" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-brand-black/80 backdrop-blur-md cursor-pointer" onclick="tutupModalPelatih()"></div>
