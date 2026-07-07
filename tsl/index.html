@@ -1727,6 +1727,9 @@
         // ==========================================
         // MESIN DIREKTORI PEMAIN (BERANDA)
         // ==========================================
+        // ==========================================
+        // MESIN DIREKTORI PEMAIN (BERANDA)
+        // ==========================================
         function renderHomePlayerDir() {
             let container = document.getElementById('home-player-directory');
             let searchInput = document.getElementById('home-player-search');
@@ -1738,12 +1741,8 @@
             let players = (rawData.Pemain || []).filter(p => {
                 let timPemain = String(getProp(p, 'tim')).trim();
                 let klubCocok = allKlasemenCache.find(k => String(getProp(k, 'klub')).trim() === timPemain);
-                
-                // Pastikan tim pemain ada di liga yang sedang aktif
                 let isLigaCocok = klubCocok && String(getProp(klubCocok, 'Jenjang') || getProp(klubCocok, 'Liga')).toUpperCase() === ligaAktif;
-                // Keluarkan Pelatih dari bursa pemain
                 let isPelatih = ['PELATIH','COACH','HEADCOACH','MANAGER'].includes(String(getProp(p, 'posisi')).toUpperCase().replace(/\s+/g,''));
-                
                 return isLigaCocok && !isPelatih;
             });
 
@@ -1751,7 +1750,6 @@
             if (query.length > 0) {
                 players = players.filter(p => String(getProp(p, 'nama')).toLowerCase().includes(query) || String(getProp(p, 'tim')).toLowerCase().includes(query));
             } else {
-                // Urutkan abjad, dan batasi 60 orang agar layar HP tidak "ngelag" jika tidak ada pencarian
                 players = players.sort((a,b) => String(getProp(a,'nama')).localeCompare(String(getProp(b,'nama'))));
             }
 
@@ -1759,7 +1757,8 @@
             if (players.length === 0) {
                 html = `<div class="col-span-full py-16 flex flex-col items-center justify-center text-center"><span class="text-4xl mb-3 opacity-30">📭</span><span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pemain Tidak Ditemukan</span></div>`;
             } else {
-                let displayPlayers = query.length > 0 ? players : players.slice(0, 60);
+                // FIX: Selalu batasi maksimal 60 pemain agar HP tidak nge-lag saat mengetik
+                let displayPlayers = players.slice(0, 60);
                 
                 displayPlayers.forEach(p => {
                     let nama = getProp(p, 'nama'); let tim = getProp(p, 'tim'); let pos = getProp(p, 'posisi') || 'POS';
@@ -1784,8 +1783,8 @@
                     </div>`;
                 });
                 
-                if(players.length > 60 && query.length === 0) {
-                    html += `<div class="col-span-full py-6 text-center"><div class="inline-block px-4 py-2 bg-gray-100 dark:bg-brand-dark-bg border border-gray-200 dark:border-gray-800 rounded-full text-[9px] font-bold text-gray-400 uppercase tracking-widest shadow-inner cursor-default">Gunakan pencarian untuk melihat ${players.length - 60} pemain lainnya</div></div>`;
+                if(players.length > 60) {
+                    html += `<div class="col-span-full py-6 text-center"><div class="inline-block px-4 py-2 bg-gray-100 dark:bg-brand-dark-bg border border-gray-200 dark:border-gray-800 rounded-full text-[9px] font-bold text-gray-400 uppercase tracking-widest shadow-inner cursor-default">Menampilkan 60 data teratas. Ketik nama untuk mencari sisa ${players.length - 60} pemain.</div></div>`;
                 }
             }
             container.innerHTML = html;
