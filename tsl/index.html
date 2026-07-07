@@ -222,6 +222,22 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
             filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15)) !important;
         }
+        /* 🛡️ ENGINE ANIMASI LINEUP (EA FC STYLE) */
+        @keyframes dropInPitch { 
+            0% { opacity: 0; transform: translateY(-30px) scale(0.8); } 
+            100% { opacity: 1; transform: translateY(0) scale(1); } 
+        }
+        @keyframes slideInLeftPitch { 
+            0% { opacity: 0; transform: translateX(-40px); } 
+            100% { opacity: 1; transform: translateX(0); } 
+        }
+        @keyframes slideInRightPitch { 
+            0% { opacity: 0; transform: translateX(40px); } 
+            100% { opacity: 1; transform: translateX(0); } 
+        }
+        .pitch-player-anim { animation: dropInPitch 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; }
+        .slide-left-anim { animation: slideInLeftPitch 0.4s ease-out forwards; opacity: 0; }
+        .slide-right-anim { animation: slideInRightPitch 0.4s ease-out forwards; opacity: 0; }
     </style>
     
     <script>
@@ -820,7 +836,11 @@
                 </div>
 
                 <div class="bg-white dark:bg-brand-dark-surface md:rounded-2xl shadow-soft border-y md:border border-gray-100 dark:border-brand-dark-border overflow-hidden mb-6">
-                    <h4 class="text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest m-4 mb-2 text-center border-b border-gray-100 dark:border-brand-dark-border pb-4">BANGKU CADANGAN</h4>
+                    <h4 class="text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest m-4 mb-2 text-center border-b border-gray-100 dark:border-brand-dark-border pb-4 flex items-center justify-center gap-3">
+                        <span class="w-8 h-[1px] bg-gray-200 dark:bg-gray-700"></span> 
+                        Pemain Pengganti 
+                        <span class="w-8 h-[1px] bg-gray-200 dark:bg-gray-700"></span>
+                    </h4>
                     
                     <div class="flex flex-row divide-x divide-gray-100 dark:divide-brand-dark-border">
                         <div class="w-1/2 flex flex-col">
@@ -2902,6 +2922,9 @@
             if (typeof updateLiveHeader === 'function') updateLiveHeader();
         }
 
+        // ==========================================
+        // MESIN RENDER LINEUP & BENCH (EA FC TACTICAL STYLE)
+        // ==========================================
         function renderPitchAndBench(tk, tn, dataKiri, dataKanan, lKiri, lKanan, matchEvents = []) {
             let container = document.getElementById('mm-pitch-players');
             let infoHome = document.getElementById('mm-pitch-info-home'); 
@@ -2912,17 +2935,13 @@
             document.getElementById('mm-bench-title-kiri').innerText = tk; 
             document.getElementById('mm-bench-title-kanan').innerText = tn;
 
-            // 1. PINDAHKAN DETEKTIF PELATIH KE URUTAN PERTAMA
             const autoFetchCoach = (teamName, dLineup) => {
                 let coachNm = getProp(dLineup, 'pelatih');
                 let coachFt = getProp(dLineup, 'foto_pelatih');
                 
                 if (!coachNm || coachNm.trim() === '' || coachNm.trim() === '-') {
                     let coachDb = (rawData.Pemain||[]).find(x => String(getProp(x,'tim')).toLowerCase().trim() === teamName.toLowerCase().trim() && ['PELATIH','COACH','HEADCOACH','MANAGER'].includes(String(getProp(x,'posisi')).toUpperCase().replace(/\s+/g,'')));
-                    if (coachDb) {
-                        coachNm = getProp(coachDb, 'nama');
-                        coachFt = getProp(coachDb, 'foto');
-                    }
+                    if (coachDb) { coachNm = getProp(coachDb, 'nama'); coachFt = getProp(coachDb, 'foto'); }
                 }
                 
                 let finalName = coachNm && coachNm.trim() !== '' ? coachNm : '-';
@@ -2933,19 +2952,17 @@
             let coachHome = autoFetchCoach(tk, dataKiri);
             let coachAway = autoFetchCoach(tn, dataKanan);
 
-            // Tampilkan foto dan nama pelatih ke pinggir lapangan
             document.getElementById('mm-coach-kiri').innerText = coachHome.nama;
             document.getElementById('mm-coach-kiri-foto').src = coachHome.foto;
             document.getElementById('mm-coach-kanan').innerText = coachAway.nama;
             document.getElementById('mm-coach-kanan-foto').src = coachAway.foto;
 
-            // 2. BARU CEK APAKAH LINE-UP PEMAIN KOSONG ATAU TIDAK
             if(!dataKiri && !dataKanan) {
                 container.innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-brand-black dark:text-white font-bold text-[10px] uppercase tracking-widest text-center px-4">Lineup belum tersedia</div>';
                 infoHome.innerHTML = ''; infoAway.innerHTML = '';
                 bKiri.innerHTML = '<div class="text-[9px] text-gray-400 italic text-center py-4 w-full">Data kosong</div>'; 
                 bKanan.innerHTML = '<div class="text-[9px] text-gray-400 italic text-center py-4 w-full">Data kosong</div>';
-                return; // Berhenti menggambar lapangan, tapi pelatih sudah aman terpampang di atas!
+                return;
             }
 
             let pHomeRaw = getProp(dataKiri, 'starting_xi'); 
@@ -2954,64 +2971,34 @@
 
             fHomeRaw = String(fHomeRaw).replace(/'/g, '').trim(); fAwayRaw = String(fAwayRaw).replace(/'/g, '').trim();
 
-            document.getElementById('mm-pitch-info-home').innerHTML = `<div class="flex items-center gap-2"><img src="${lKiri}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"> <span class="text-brand-black dark:text-white transition-colors font-heading text-sm">${tk}</span></div><span class="bg-blue-600 text-white px-2 py-0.5 rounded-md shadow-sm font-bold text-xs">${fHomeRaw}</span>`;
-            document.getElementById('mm-pitch-info-away').innerHTML = `<div class="flex items-center gap-2"><img src="${lKanan}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"> <span class="text-brand-black dark:text-white transition-colors font-heading text-sm">${tn}</span></div><span class="bg-brand-red text-white px-2 py-0.5 rounded-md shadow-sm font-bold text-xs">${fAwayRaw}</span>`;
+            // UI/UX Upgrade: Neon Formation Badges
+            document.getElementById('mm-pitch-info-home').innerHTML = `<div class="flex items-center gap-2"><img src="${lKiri}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"> <span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tk}</span></div><div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fHomeRaw}</span></div>`;
+            
+            document.getElementById('mm-pitch-info-away').innerHTML = `<div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fAwayRaw}</span></div><div class="flex items-center gap-2"><span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tn}</span> <img src="${lKanan}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"></div>`;
 
             let homeNames = pHomeRaw ? pHomeRaw.split(',').map(s=>s.trim()) : []; let awayNames = pAwayRaw ? pAwayRaw.split(',').map(s=>s.trim()) : [];
             let htmlPitch = '';
 
-            // FIX: MESIN PENYORTIR POSISI (VERTICAL + HORIZONTAL PERSPEKTIF LAPANGAN)
             const sortLineupByPosition = (names, teamName, isTopTeam) => {
-                // Bobot: [Vertikal, Horizontal]
-                // Vertikal: 1=GK, 2=BEK, 3=TENGAH, 4=DEPAN
-                // Horizontal: 1=Kiri (L), 2=Tengah (C), 3=Kanan (R)
-                const posWeights = {
-                    'GK': [1, 2], 'KIPER': [1, 2],
-                    'LB': [2, 1], 'LWB': [2, 1],
-                    'CB': [2, 2], 'DEF': [2, 2], 'BEK': [2, 2],
-                    'RB': [2, 3], 'RWB': [2, 3],
-                    'LM': [3, 1], 
-                    'CM': [3, 2], 'CDM': [3, 2], 'CAM': [3, 2], 'MID': [3, 2], 'TENGAH': [3, 2],
-                    'RM': [3, 3], 
-                    'LW': [4, 1], 'LF': [4, 1],
-                    'ST': [4, 2], 'CF': [4, 2], 'SS': [4, 2], 'FWD': [4, 2], 'DEPAN': [4, 2],
-                    'RW': [4, 3], 'RF': [4, 3]
-                };
-                
+                const posWeights = { 'GK': [1, 2], 'KIPER': [1, 2], 'LB': [2, 1], 'LWB': [2, 1], 'CB': [2, 2], 'DEF': [2, 2], 'BEK': [2, 2], 'RB': [2, 3], 'RWB': [2, 3], 'LM': [3, 1], 'CM': [3, 2], 'CDM': [3, 2], 'CAM': [3, 2], 'MID': [3, 2], 'TENGAH': [3, 2], 'RM': [3, 3], 'LW': [4, 1], 'LF': [4, 1], 'ST': [4, 2], 'CF': [4, 2], 'SS': [4, 2], 'FWD': [4, 2], 'DEPAN': [4, 2], 'RW': [4, 3], 'RF': [4, 3] };
                 return names.sort((a, b) => {
-                    // Cari data pemain murni dari database
                     let pA = (rawData.Pemain||[]).find(x => String(getProp(x,'nama')).toLowerCase().trim() === a.toLowerCase().trim() && String(getProp(x,'tim')).toLowerCase().trim() === teamName.toLowerCase().trim());
                     let pB = (rawData.Pemain||[]).find(x => String(getProp(x,'nama')).toLowerCase().trim() === b.toLowerCase().trim() && String(getProp(x,'tim')).toLowerCase().trim() === teamName.toLowerCase().trim());
-                    
-                    // Hilangkan spasi berlebih untuk pencocokan yang aman (Contoh: " C B " menjadi "CB")
                     let posA = pA ? String(getProp(pA,'posisi')).toUpperCase().replace(/\s+/g, '') : '';
                     let posB = pB ? String(getProp(pB,'posisi')).toUpperCase().replace(/\s+/g, '') : '';
-                    
-                    let wA = posWeights[posA] || [5, 2]; // Lempar ke belakang & tengah jika posisi error/tak dikenali
-                    let wB = posWeights[posB] || [5, 2];
-                    
-                    // SORTING 1: Tarik vertikal sesuai baris (Kiper -> Bek -> Tengah -> Depan)
+                    let wA = posWeights[posA] || [5, 2]; let wB = posWeights[posB] || [5, 2];
                     if (wA[0] !== wB[0]) return wA[0] - wB[0];
-                    
-                    // SORTING 2: Tarik horizontal (Kiri -> Tengah -> Kanan)
-                    // Jika tim Home (berada di posisi Top/Menghadap ke bawah), maka kanan mereka (RB/RW) ada di KIRI LAYAR HP Anda (Reverse)
-                    // Jika tim Away (berada di posisi Bottom/Menghadap ke atas), maka kiri mereka (LB/LW) ada di KIRI LAYAR HP Anda (Normal)
-                    if (isTopTeam) {
-                        return wB[1] - wA[1];
-                    } else {
-                        return wA[1] - wB[1];
-                    }
+                    if (isTopTeam) return wB[1] - wA[1]; else return wA[1] - wB[1];
                 });
             };
 
-            // Aplikasikan otak sortir mutlak sebelum pemain dilukis ke lapangan
-            homeNames = sortLineupByPosition(homeNames, tk, true);  // Home = Tim Atas (Dibalik)
-            awayNames = sortLineupByPosition(awayNames, tn, false); // Away = Tim Bawah (Normal)
+            homeNames = sortLineupByPosition(homeNames, tk, true);  
+            awayNames = sortLineupByPosition(awayNames, tn, false); 
 
-            const createRow = (names, teamName, isAway=false) => {
-                // FIX: Jarak vertikal dijauhkan (py-3) dan justify-around agar merata sempurna
+            // FIX: Tambahkan sistem "Staggered Delay" lewat rowIdx
+            const createRow = (names, teamName, isAway=false, rowIdx=0) => {
                 let h = `<div class="flex flex-row justify-around items-center w-full relative z-10 px-0 py-3 md:py-5">`;
-                names.forEach(nm => {
+                names.forEach((nm, idx) => {
                     let nmLower = nm ? nm.toLowerCase().trim() : ''; let tLower = teamName ? teamName.toLowerCase().trim() : '';
                     let pData = (rawData.Pemain||[]).find(x => String(getProp(x,'nama')).toLowerCase().trim() === nmLower && String(getProp(x,'tim')).toLowerCase().trim() === tLower);
                     let f = (pData && getProp(pData,'foto')) ? getProp(pData,'foto') : getAvatar(nm);
@@ -3031,19 +3018,26 @@
                     else if (yellows > 0) { eventIcons += `<div class="w-1.5 h-2.5 md:w-2 md:h-3 bg-yellow-400 border border-yellow-600 rounded-[1px] shadow-sm transform -rotate-6 relative">${yellows>1?'<div class="absolute w-1.5 h-2.5 md:w-2 md:h-3 bg-red-500 border border-red-700 rounded-[1px] -right-1 -top-0.5"></div>':''}</div>`; }
                     let eventBadge = eventIcons !== '' ? `<div class="absolute -top-1.5 -left-2 md:-top-2 md:-left-2 flex items-center gap-0.5 z-20">${eventIcons}</div>` : '';
 
-                    // FIX: Ukuran Avatar dibesarkan dari w-10 ke w-12 (Mobile) & w-16 (Desktop). Lebar max container dilebarkan agar nama aman.
-                    h += `<div class="flex flex-col items-center cursor-pointer hover:scale-110 transition-transform w-[18%] max-w-[85px] md:max-w-[110px]" onclick="bukaModalPemain('${safeStr(pData ? getProp(pData,'nama') : nm)}', '${safeStr(teamName)}')"><div class="relative w-12 h-12 md:w-16 md:h-16 rounded-full ring-2 md:ring-[3px] ${ringColor} bg-white/50 dark:bg-black/50 backdrop-blur-sm p-0.5 flex items-center justify-center">${eventBadge}<img src="${f}" class="w-full h-full rounded-full object-cover bg-white"><div class="absolute -bottom-1.5 -right-1.5 md:-bottom-2 md:-right-2 ${numBg} text-[9px] md:text-[11px] font-bold w-5 h-5 md:w-7 md:h-7 rounded-full flex items-center justify-center shadow-md border border-white/20">${num}</div></div><div class="export-safe-text bg-white/90 dark:bg-black/70 backdrop-blur-md text-brand-black dark:text-white border border-gray-200 dark:border-white/10 text-[8px] sm:text-[10px] font-bold px-1.5 py-1 rounded mt-2 md:mt-3 w-full min-w-[60px] text-center shadow-sm uppercase transition-colors line-clamp-2 leading-tight break-words">${short}</div></div>`;
+                    // UI Animasi Drop-In (EA FC Style)
+                    let animDelay = (rowIdx * 100) + (idx * 50);
+
+                    h += `<div class="flex flex-col items-center cursor-pointer hover:scale-110 transition-transform w-[18%] max-w-[85px] md:max-w-[110px] pitch-player-anim" style="animation-delay: ${animDelay}ms;" onclick="bukaModalPemain('${safeStr(pData ? getProp(pData,'nama') : nm)}', '${safeStr(teamName)}')">
+                            <div class="relative w-12 h-12 md:w-16 md:h-16 rounded-full ring-2 md:ring-[3px] ${ringColor} bg-white/50 dark:bg-black/50 backdrop-blur-sm p-0.5 flex items-center justify-center">
+                                ${eventBadge}
+                                <img src="${f}" class="w-full h-full rounded-full object-cover bg-white">
+                                <div class="absolute -bottom-1.5 -right-1.5 md:-bottom-2 md:-right-2 ${numBg} text-[9px] md:text-[11px] font-bold w-5 h-5 md:w-7 md:h-7 rounded-full flex items-center justify-center shadow-md border border-white/20">${num}</div>
+                            </div>
+                            <div class="export-safe-text bg-white/90 dark:bg-black/70 backdrop-blur-md text-brand-black dark:text-white border border-gray-200 dark:border-white/10 text-[8px] sm:text-[10px] font-bold px-1.5 py-1 rounded mt-2 md:mt-3 w-full min-w-[60px] text-center shadow-sm uppercase transition-colors line-clamp-2 leading-tight break-words">${short}</div>
+                          </div>`;
                 });
                 h += `</div>`; return h;
             };
 
             let fH = fHomeRaw.split('-'); let hGK = homeNames.slice(0,1); let hDEF = homeNames.slice(1, 1+parseInt(fH[0]||4)); let hMID = homeNames.slice(1+parseInt(fH[0]||4), 1+parseInt(fH[0]||4)+parseInt(fH[1]||3)); let hFWD = homeNames.slice(1+parseInt(fH[0]||4)+parseInt(fH[1]||3));
-            
-            htmlPitch += `<div class="w-full flex flex-col justify-around h-1/2 pt-2 pb-10 md:pb-14 relative z-10">${createRow(hGK, tk, false)}${createRow(hDEF, tk, false)}${createRow(hMID, tk, false)}${createRow(hFWD, tk, false)}</div>`;
+            htmlPitch += `<div class="w-full flex flex-col justify-around h-1/2 pt-2 pb-10 md:pb-14 relative z-10">${createRow(hGK, tk, false, 0)}${createRow(hDEF, tk, false, 1)}${createRow(hMID, tk, false, 2)}${createRow(hFWD, tk, false, 3)}</div>`;
 
             let fA = fAwayRaw.split('-'); let aFWD = awayNames.slice(1+parseInt(fA[0]||4)+parseInt(fA[1]||3)); let aMID = awayNames.slice(1+parseInt(fA[0]||4), 1+parseInt(fA[0]||4)+parseInt(fA[1]||3)); let aDEF = awayNames.slice(1, 1+parseInt(fA[0]||4)); let aGK = awayNames.slice(0,1);
-            
-            htmlPitch += `<div class="w-full flex flex-col justify-around h-1/2 pt-10 md:pt-14 pb-2 relative z-10">${createRow(aFWD, tn, true)}${createRow(aMID, tn, true)}${createRow(aDEF, tn, true)}${createRow(aGK, tn, true)}</div>`;
+            htmlPitch += `<div class="w-full flex flex-col justify-around h-1/2 pt-10 md:pt-14 pb-2 relative z-10">${createRow(aFWD, tn, true, 4)}${createRow(aMID, tn, true, 5)}${createRow(aDEF, tn, true, 6)}${createRow(aGK, tn, true, 7)}</div>`;
             
             container.innerHTML = htmlPitch;
 
@@ -3060,7 +3054,7 @@
                 let h=''; 
                 let tLower = teamName ? teamName.toLowerCase().trim() : '';
                 
-                bArr.forEach(p => {
+                bArr.forEach((p, idx) => {
                     let nm = getProp(p,'nama'); let nmLower = nm ? nm.toLowerCase().trim() : '';
                     let num = getProp(p,'nomor')||'-'; let f = getProp(p,'foto') ? getProp(p,'foto') : getAvatar(nm);
                     let pos = getProp(p,'posisi')||'POS';
@@ -3076,10 +3070,12 @@
                     if (reds > 0) { eventIcons += `<div class="w-2 h-3 bg-red-500 border border-red-700 rounded-[1px] shadow-sm transform -rotate-6"></div>`; } 
                     else if (yellows > 0) { eventIcons += `<div class="w-2 h-3 bg-yellow-400 border border-yellow-600 rounded-[1px] shadow-sm transform -rotate-6 relative">${yellows>1?'<div class="absolute w-2 h-3 bg-red-500 border border-red-700 rounded-[1px] -right-1 -top-0.5"></div>':''}</div>`; }
                     
+                    let animDelay = idx * 60;
+                    let animClass = isAway ? 'slide-right-anim' : 'slide-left-anim';
+
                     if (!isAway) {
-                        // HOME (KIRI) - Desain Menghadap Kanan (Left-to-Right)
                         let eventBadge = eventIcons !== '' ? `<div class="flex items-center gap-1 ml-1.5">${eventIcons}</div>` : '';
-                        h += `<div class="flex items-center px-1.5 md:px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-brand-dark-bg cursor-pointer transition-colors group w-full" onclick="bukaModalPemain('${safeStr(nm)}', '${safeStr(teamName)}')">
+                        h += `<div class="flex items-center px-1.5 md:px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-brand-dark-bg cursor-pointer transition-colors group w-full ${animClass}" style="animation-delay: ${animDelay}ms;" onclick="bukaModalPemain('${safeStr(nm)}', '${safeStr(teamName)}')">
                                 <div class="w-4 md:w-6 text-center font-bold text-gray-400 dark:text-gray-500 text-[9px] md:text-xs shrink-0">${num}</div>
                                 <div class="relative w-7 h-7 md:w-10 md:h-10 rounded-full ring-2 ${ringColor} p-0.5 shrink-0 mx-1.5 md:mx-2"><img src="${f}" class="w-full h-full rounded-full object-cover bg-white"></div>
                                 <div class="flex-1 flex flex-col justify-center overflow-hidden text-left">
@@ -3088,14 +3084,10 @@
                                 </div>
                               </div>`;
                     } else {
-                        // AWAY (KANAN) - DESAIN MIRRORED SEMPURNA (Rata Kanan)
                         let eventBadge = eventIcons !== '' ? `<div class="flex items-center gap-1.5">${eventIcons}</div>` : '';
-                        
-                        h += `<div class="flex items-center px-1.5 md:px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-brand-dark-bg cursor-pointer transition-colors group w-full flex-row-reverse" onclick="bukaModalPemain('${safeStr(nm)}', '${safeStr(teamName)}')">
+                        h += `<div class="flex items-center px-1.5 md:px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-brand-dark-bg cursor-pointer transition-colors group w-full flex-row-reverse ${animClass}" style="animation-delay: ${animDelay}ms;" onclick="bukaModalPemain('${safeStr(nm)}', '${safeStr(teamName)}')">
                                 <div class="w-4 md:w-6 text-center font-bold text-gray-400 dark:text-gray-500 text-[9px] md:text-xs shrink-0">${num}</div>
-                                
                                 <div class="relative w-7 h-7 md:w-10 md:h-10 rounded-full ring-2 ${ringColor} p-0.5 shrink-0 mx-1.5 md:mx-2"><img src="${f}" class="w-full h-full rounded-full object-cover bg-white"></div>
-                                
                                 <div class="flex-1 flex flex-col justify-center items-end overflow-hidden text-right">
                                     <div class="flex items-center justify-end gap-1.5 w-full">
                                         ${eventBadge}
