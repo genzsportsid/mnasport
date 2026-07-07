@@ -686,17 +686,44 @@
 
         <div class="max-w-4xl mx-auto px-0 md:px-8 mt-4 safe-pb">
             <div id="ttab-overview" class="ttab-content block page-enter">
-                <div class="px-4 md:px-0">
-                    <div class="bg-white dark:bg-brand-dark-surface rounded-2xl shadow-soft border border-gray-100 dark:border-brand-dark-border p-4 md:p-6 mb-4 transition-colors">
-                        <h4 class="text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest mb-4 border-b border-gray-100 dark:border-brand-dark-border pb-2 transition-colors">Pertandingan Berikutnya</h4>
-                        <div id="tp-next-match" class="text-center py-4 text-xs font-bold text-gray-400 uppercase">Tidak ada jadwal</div>
-                    </div>
-                    <div class="bg-white dark:bg-brand-dark-surface rounded-2xl shadow-soft border border-gray-100 dark:border-brand-dark-border p-4 md:p-6 transition-colors">
-                        <h4 class="text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest mb-4 border-b border-gray-100 dark:border-brand-dark-border pb-2 transition-colors">Performa Tim</h4>
-                        <div id="tp-form" class="flex items-center justify-center gap-2 md:gap-4 overflow-x-auto hide-scroll py-2">
-                            <div class="text-xs font-bold text-gray-400 uppercase">Belum ada hasil</div>
+                <div class="px-4 md:px-0 space-y-4">
+                    
+                    <!-- TIKET VIP LAGA BERIKUTNYA -->
+                    <div class="relative bg-brand-black dark:bg-[#0a0a0a] rounded-[2rem] overflow-hidden shadow-xl border border-gray-800 transition-colors group">
+                        <!-- Glassmorphism Background & Grid -->
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30 mix-blend-overlay"></div>
+                        <div class="absolute -top-20 -right-20 w-40 h-40 bg-brand-green/30 blur-[50px] rounded-full group-hover:bg-brand-green/40 transition-colors pointer-events-none"></div>
+                        
+                        <div class="relative z-10 p-6 md:p-8">
+                            <div class="flex justify-between items-center mb-6">
+                                <h4 class="text-[10px] font-black text-brand-green uppercase tracking-widest flex items-center gap-2"><div class="w-1.5 h-1.5 bg-brand-green rounded-full shadow-[0_0_10px_#009A44] animate-pulse"></div> Laga Terdekat</h4>
+                                <div id="tp-next-match-date" class="text-[9px] font-bold text-gray-400 bg-white/10 border border-white/10 px-3 py-1 rounded-full uppercase tracking-widest backdrop-blur-sm">TBA</div>
+                            </div>
+                            <div id="tp-next-match" class="text-center py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Tidak ada jadwal</div>
                         </div>
                     </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- MOMENTUM PERFORMA -->
+                        <div class="bg-white dark:bg-brand-dark-surface rounded-3xl shadow-soft border border-gray-100 dark:border-brand-dark-border p-5 md:p-6 transition-colors">
+                            <h4 class="text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest mb-5 border-b border-gray-100 dark:border-brand-dark-border pb-3 flex items-center gap-2"><span class="text-brand-black dark:text-white">📈</span> FORM GUIDE</h4>
+                            <div id="tp-form" class="flex items-center justify-between gap-1 overflow-x-visible hide-scroll py-2">
+                                <div class="text-xs font-bold text-gray-400 uppercase w-full text-center">Belum ada hasil</div>
+                            </div>
+                        </div>
+                        
+                        <!-- POSISI KLASEMEN (QUICK VIEW) -->
+                        <div class="bg-gradient-to-br from-brand-green/10 to-transparent dark:from-brand-green/20 dark:to-transparent rounded-3xl shadow-soft border border-brand-green/20 p-5 md:p-6 transition-colors flex flex-col justify-center items-center relative overflow-hidden cursor-pointer group hover:border-brand-green/50" onclick="switchTeamTab('standings')">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl group-hover:scale-110 transition-transform duration-500">🏆</div>
+                            <h4 class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1 relative z-10">Posisi Klasemen</h4>
+                            <div class="flex items-baseline gap-2 relative z-10">
+                                <span class="font-heading font-black text-5xl text-brand-black dark:text-white tracking-tighter" id="tp-quick-rank">-</span>
+                                <span class="text-xs font-bold text-brand-green uppercase tracking-widest" id="tp-quick-group">GRUP</span>
+                            </div>
+                            <div class="mt-3 text-[9px] font-bold text-brand-black dark:text-white bg-white/50 dark:bg-black/20 border border-brand-green/20 px-4 py-1.5 rounded-full uppercase tracking-widest group-hover:bg-brand-green group-hover:text-white transition-colors relative z-10">Lihat Tabel Lengkap &rarr;</div>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
             <div id="ttab-topplayer" class="ttab-content hidden px-4 md:px-0 page-enter">
@@ -2362,31 +2389,82 @@
             let pastMatches = teamMatches.filter(m => String(getProp(m, 'status')).toUpperCase().includes('FT'));
             let upcomingMatches = teamMatches.filter(m => !String(getProp(m, 'status')).toUpperCase().includes('FT'));
 
+            // 1. TIKET VIP (NEXT MATCH)
             if(upcomingMatches.length > 0) {
                 let m = upcomingMatches[0]; let isKiri = getProp(m, 'tim_kiri') === namaKlub; let enemy = isKiri ? getProp(m, 'tim_kanan') : getProp(m, 'tim_kiri');
                 let enemyLogo = allKlasemenCache.find(t => getProp(t,'klub') === enemy)?.logo || getAvatar(enemy, true);
+                
                 let w = String(getProp(m, 'waktu')); let timeOnly = "TBA";
                 if (w.includes("T")) { let dObj = new Date(w); if(!isNaN(dObj.getTime())) timeOnly = String(dObj.getHours()).padStart(2, '0') + ":" + String(dObj.getMinutes()).padStart(2, '0'); } 
                 else { timeOnly = w.split(" - ")[1] || "TBA"; }
                 let ymd = parseToYMD(w); let dateHead = getFullDateHeader(ymd);
-                document.getElementById('tp-next-match').innerHTML = `<div class="flex flex-col items-center cursor-pointer group" onclick="bukaHalamanMatch('${safeStr(getProp(m, 'id_match'))}')"><div class="text-[9px] font-bold text-gray-500 dark:text-brand-dark-muted uppercase tracking-widest mb-3 border border-gray-200 dark:border-brand-dark-border px-3 py-1 rounded-full">${dateHead} • ${timeOnly}</div><img src="${enemyLogo}" class="w-12 h-12 rounded-full border border-gray-100 dark:border-gray-800 bg-white shadow-sm mb-2 group-hover:scale-110 transition-transform"><div class="text-xs font-bold uppercase text-brand-black dark:text-white transition-colors">${enemy}</div></div>`;
-            } else { document.getElementById('tp-next-match').innerHTML = '<div class="text-xs font-bold text-gray-400 dark:text-brand-dark-muted uppercase py-4">Tidak ada jadwal</div>'; }
+                
+                document.getElementById('tp-next-match-date').innerHTML = `${dateHead} &bull; ${timeOnly}`;
+                document.getElementById('tp-next-match').innerHTML = `
+                    <div class="flex items-center justify-between cursor-pointer group" onclick="bukaHalamanMatch('${safeStr(getProp(m, 'id_match'))}')">
+                        <div class="flex flex-col items-center w-[40%]">
+                            <div class="w-16 h-16 md:w-20 md:h-20 rounded-[22%] border-2 border-white/10 bg-white/5 backdrop-blur-sm p-2 mb-3 shadow-[0_5px_15px_rgba(0,0,0,0.5)] flex items-center justify-center group-hover:scale-105 transition-transform group-hover:border-brand-green/50">
+                                <img src="${getProp(timData, 'logo') || getAvatar(namaKlub, true)}" class="w-full h-full object-contain drop-shadow-lg">
+                            </div>
+                            <span class="text-[10px] md:text-xs font-bold text-white uppercase text-center line-clamp-2 leading-tight">${namaKlub}</span>
+                        </div>
+                        <div class="flex flex-col items-center justify-center w-[20%] relative z-10">
+                            <div class="font-heading font-black text-2xl md:text-3xl text-gray-500 italic drop-shadow-md">VS</div>
+                            <div class="text-[7px] text-brand-gold uppercase tracking-[0.2em] font-bold mt-1">Match Center</div>
+                        </div>
+                        <div class="flex flex-col items-center w-[40%]">
+                            <div class="w-16 h-16 md:w-20 md:h-20 rounded-[22%] border-2 border-white/10 bg-white/5 backdrop-blur-sm p-2 mb-3 shadow-[0_5px_15px_rgba(0,0,0,0.5)] flex items-center justify-center group-hover:scale-105 transition-transform group-hover:border-brand-red/50">
+                                <img src="${enemyLogo}" class="w-full h-full object-contain drop-shadow-lg">
+                            </div>
+                            <span class="text-[10px] md:text-xs font-bold text-white uppercase text-center line-clamp-2 leading-tight">${enemy}</span>
+                        </div>
+                    </div>
+                `;
+            } else { 
+                document.getElementById('tp-next-match-date').innerHTML = `TBA`;
+                document.getElementById('tp-next-match').innerHTML = '<div class="text-xs font-bold text-gray-500 uppercase py-8 flex flex-col items-center gap-2"><span class="text-3xl opacity-50">🏟️</span> Tidak ada jadwal laga terdekat</div>'; 
+            }
 
+            // 2. MOMENTUM TRACKER (FORM GUIDE)
             let formHtml = ''; let formList = pastMatches.slice(-5);
             if(formList.length > 0) {
-                formList.forEach(m => {
+                // Diurutkan dari Kiri (Laga Paling Lama) ke Kanan (Laga Terbaru)
+                formList.reverse().forEach(m => {
                     let isKiri = getProp(m, 'tim_kiri') === namaKlub; let enemy = isKiri ? getProp(m, 'tim_kanan') : getProp(m, 'tim_kiri');
                     let enemyLogo = allKlasemenCache.find(t => getProp(t,'klub') === enemy)?.logo || getAvatar(enemy, true);
                     let skorStr = String(getProp(m, 'skor')||""); let sKiri = 0, sKanan = 0;
                     if(skorStr.includes('-')) { let p = skorStr.split('-'); sKiri = parseInt(p[0].trim()); sKanan = parseInt(p[1].trim()); }
                     let myScore = isKiri ? sKiri : sKanan; let enScore = isKiri ? sKanan : sKiri;
-                    let formChar = 'D'; let bgClass = 'bg-gray-400 dark:bg-gray-600';
-                    if(myScore > enScore) { formChar = 'W'; bgClass = 'bg-brand-green'; } else if(myScore < enScore) { formChar = 'L'; bgClass = 'bg-brand-red'; }
-                    formHtml += `<div class="flex flex-col items-center gap-1.5 cursor-pointer hover:-translate-y-1 transition-transform" onclick="bukaHalamanMatch('${safeStr(getProp(m, 'id_match'))}')"><div class="${bgClass} text-white w-6 h-6 rounded flex items-center justify-center font-heading font-bold text-xs shadow-sm">${formChar}</div><div class="text-[9px] font-bold text-brand-black dark:text-white transition-colors">${myScore}-${enScore}</div><img src="${enemyLogo}" class="w-5 h-5 rounded-full border border-gray-100 dark:border-gray-800 bg-white object-cover mt-0.5"></div>`;
+                    
+                    let formChar = 'S'; let bgClass = 'bg-gray-400 dark:bg-gray-600 border-gray-500'; let textColor = 'text-white';
+                    if(myScore > enScore) { formChar = 'M'; bgClass = 'bg-brand-green border-brand-green shadow-[0_0_10px_rgba(0,154,68,0.4)]'; } 
+                    else if(myScore < enScore) { formChar = 'K'; bgClass = 'bg-brand-red border-brand-red shadow-[0_0_10px_rgba(239,68,68,0.4)]'; }
+                    
+                    formHtml += `
+                    <div class="flex flex-col items-center gap-2 cursor-pointer group hover:-translate-y-1 transition-transform w-1/5 relative z-10" onclick="bukaHalamanMatch('${safeStr(getProp(m, 'id_match'))}')">
+                        <span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-brand-black dark:group-hover:text-white transition-colors">${myScore}-${enScore}</span>
+                        <div class="${bgClass} ${textColor} w-8 h-8 md:w-10 md:h-10 rounded-[10px] flex items-center justify-center font-heading font-black text-xs md:text-sm border-2 z-10 relative">
+                            ${formChar}
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-brand-black text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">vs ${enemy}</div>
+                        </div>
+                        <div class="w-5 h-5 rounded-[4px] border border-gray-200 dark:border-gray-700 bg-white overflow-hidden shadow-sm -mt-1.5 z-20">
+                            <img src="${enemyLogo}" class="w-full h-full object-cover">
+                        </div>
+                    </div>`;
                 });
-            } else { formHtml = '<div class="text-xs font-bold text-gray-400 dark:text-brand-dark-muted uppercase">Belum ada hasil</div>'; }
+            } else { formHtml = '<div class="text-xs font-bold text-gray-400 uppercase w-full text-center py-4">Belum ada hasil</div>'; }
             document.getElementById('tp-form').innerHTML = formHtml;
 
+            // 3. PENGHITUNG RANKING KILAT (QUICK RANK)
+            let grupTim = getProp(timData, 'grup') || 'GLOBAL';
+            let jenjangTim = getProp(timData, 'Jenjang') || getProp(timData, 'Liga');
+            let dataSatuGrup = allKlasemenCache.filter(t => String(getProp(t, 'Jenjang')||getProp(t, 'Liga')).toUpperCase() === String(jenjangTim).toUpperCase() && (grupTim === 'GLOBAL' ? true : String(getProp(t, 'grup')).toUpperCase() === String(grupTim).toUpperCase()));
+            
+            // Hitung Rank Tim ini di dalam grupnya
+            let rankTim = dataSatuGrup.findIndex(t => getProp(t, 'klub') === namaKlub) + 1;
+            
+            document.getElementById('tp-quick-rank').innerText = rankTim > 0 ? '#' + rankTim : '-';
+            document.getElementById('tp-quick-group').innerText = grupTim === 'GLOBAL' ? 'KLASEMEN' : 'GRUP ' + grupTim;
             const roster = (rawData.Pemain||[]).filter(p => getProp(p, 'tim') === namaKlub);
             let topP = [...roster].sort((a,b) => (parseInt(getProp(b,'gol'))||0) - (parseInt(getProp(a,'gol'))||0)).slice(0,3);
             let topHtml = '';
