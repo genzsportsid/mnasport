@@ -1583,15 +1583,22 @@
         }
 
         // ==========================================
-        // MESIN LIVE MATCH HERO CAROUSEL (SMART ENGINE V2)
+        // MESIN LIVE MATCH HERO CAROUSEL (GLOBAL ENGINE V3)
         // ==========================================
         function renderLiveHeroCarousel() {
             const container = document.getElementById('beranda-live-matches');
             if(!container) return;
 
             try {
-                let isMatch = (d) => { return String(getProp(d, 'Jenjang') || getProp(d, 'Liga') || 'SMA').trim().toUpperCase() === ligaAktif; };
-                let currentLeagueMatches = (jadwalCache || []).filter(isMatch);
+                // FIX UTAMA: Filter 'isMatch' (SMP/SMA) DICABUT TOTAL!
+                // Hero Carousel Beranda sekarang bersifat GLOBAL seperti aplikasi FotMob,
+                // menampilkan laga terpanas dari SEMUA kategori, sehingga mustahil kosong!
+                let currentLeagueMatches = jadwalCache || [];
+
+                if (currentLeagueMatches.length === 0) {
+                    container.innerHTML = '<div class="w-full flex flex-col items-center justify-center py-10 opacity-50"><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Menyiapkan jadwal...</p></div>';
+                    return;
+                }
 
                 let todayYMD = formatYMD(new Date());
 
@@ -1643,9 +1650,11 @@
                     displayMatches = displayMatches.slice(0, 5);
                 }
                 
-                // Update Judul (Hari Ini / Laga Terdekat) di HTML secara otomatis
-                let titleEl = container.previousElementSibling?.querySelector('h2');
-                if(titleEl) titleEl.innerText = titleText;
+                // Update Judul (Hari Ini / Laga Terdekat) secara aman
+                if (container.previousElementSibling) {
+                    let titleEl = container.previousElementSibling.querySelector('h2');
+                    if(titleEl) titleEl.innerText = titleText;
+                }
 
                 if(displayMatches.length === 0) {
                     container.innerHTML = '<div class="w-full flex flex-col items-center justify-center py-10 opacity-50"><svg class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Belum ada jadwal Liga</p></div>';
@@ -1655,8 +1664,13 @@
                 let html = '';
                 displayMatches.forEach(m => {
                     let tKiri = getProp(m, 'tim_kiri') || 'TBD'; let tKanan = getProp(m, 'tim_kanan') || 'TBD';
-                    let lKiri = allKlasemenCache.find(t => getProp(t, 'klub') === tKiri)?.logo || getAvatar(tKiri, true);
-                    let lKanan = allKlasemenCache.find(t => getProp(t, 'klub') === tKanan)?.logo || getAvatar(tKanan, true);
+                    
+                    // FIX: Pengambilan logo dibuat sangat aman dari error javascript
+                    let objKiri = allKlasemenCache.find(t => getProp(t, 'klub') === tKiri);
+                    let lKiri = (objKiri && getProp(objKiri, 'logo')) ? getProp(objKiri, 'logo') : getAvatar(tKiri, true);
+                    
+                    let objKanan = allKlasemenCache.find(t => getProp(t, 'klub') === tKanan);
+                    let lKanan = (objKanan && getProp(objKanan, 'logo')) ? getProp(objKanan, 'logo') : getAvatar(tKanan, true);
                     
                     let skor = String(getProp(m, 'skor') || 'VS');
                     let sKiri = skor.includes('-') ? skor.split('-')[0].trim() : '-';
@@ -1667,6 +1681,9 @@
                     let isFT = status.includes('FT');
                     let matchId = safeStr(getProp(m, 'id_match'));
                     let kickoffMs = parseIndoDate(getProp(m, 'waktu'));
+                    
+                    // Deteksi Kategori Laga
+                    let catLaga = getProp(m, 'Jenjang') || getProp(m, 'Liga') || 'TSL 2026';
 
                     let statusBadge = '';
                     if (isLive) {
@@ -1688,7 +1705,7 @@
                             <div class="flex justify-between items-center mb-6">
                                 ${statusBadge}
                                 <div class="text-[8px] font-bold text-gray-400 uppercase tracking-[0.2em] bg-white/5 px-2.5 py-1 rounded-md border border-white/10 backdrop-blur-md flex items-center gap-1.5">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-brand-gold"></span> TSL 2026
+                                    <span class="w-1.5 h-1.5 rounded-full ${String(catLaga).toUpperCase().includes('SMP') ? 'bg-blue-500' : 'bg-brand-gold'}"></span> ${catLaga}
                                 </div>
                             </div>
                             <div class="flex justify-between items-center gap-2 mb-6">
