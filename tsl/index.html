@@ -175,6 +175,40 @@
         /* 🛡️ ANTI-FLASH PENCARIAN (0 DETIK) */
         html.direct-search #tsl-lock-screen { display: none !important; }
         html.direct-search #view-search { display: block !important; opacity: 1 !important; z-index: 999 !important; }
+        /* 🛡️ ENGINE LOGO PRESISI (GLOBAL FIX) */
+        /* Mengubah semua logo sekolah/klub agar presisi 100% dan tidak terpotong */
+        #tp-logo, #tp-logo-mini, 
+        #mm-logo-kiri, #mm-logo-kanan, #mm-logo-kiri-mini, #mm-logo-kanan-mini,
+        #grid-klub-beranda img,
+        #klasemen-container img,
+        #fotmob-match-list img,
+        #tp-match-list img,
+        img#mp-tim-logo,
+        #dt-pitch-slots img.absolute,
+        #tabel-top-skor img[class*="w-4"],
+        #top-skor-vertical-container img[class*="w-3.5"],
+        #search-results img.bg-white {
+            object-fit: contain !important;
+            background-color: #ffffff !important;
+        }
+
+        /* Memberikan ruang lega (Auto-Padding) untuk Logo Ukuran Kecil */
+        #tp-logo-mini, #mm-logo-kiri-mini, #mm-logo-kanan-mini, 
+        #klasemen-container img, #fotmob-match-list img, 
+        #tp-match-list img, img#mp-tim-logo, #dt-pitch-slots img.absolute,
+        #tabel-top-skor img[class*="w-4"], #top-skor-vertical-container img[class*="w-3.5"] {
+            padding: 2.5px !important;
+        }
+
+        /* Memberikan ruang lega (Auto-Padding) untuk Logo Ukuran Menengah di Pencarian */
+        #search-results img.bg-white {
+            padding: 4px !important;
+        }
+
+        /* Memberikan ruang lega (Auto-Padding) untuk Logo Ukuran Besar di Header & Beranda */
+        #tp-logo, #mm-logo-kiri, #mm-logo-kanan, #grid-klub-beranda img {
+            padding: 8px !important;
+        }
     </style>
     
     <script>
