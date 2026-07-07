@@ -2584,11 +2584,17 @@
 
                 const renderGroup = (title, arr) => {
                     if(arr.length === 0) return '';
-                    // Header Posisi (Nempel di atas saat discroll)
-                    let h = `<div class="bg-gray-200/90 dark:bg-[#18181b]/90 backdrop-blur-md px-5 py-2.5 text-[10px] font-black text-brand-black dark:text-white uppercase tracking-widest border-y border-gray-300 dark:border-brand-dark-border transition-colors sticky z-20 shadow-sm" style="top: calc(max(env(safe-area-inset-top), 48px) + 72px);">${title}</div>`;
                     
-                    // Grid Layout
-                    h += `<div class="grid grid-cols-2 md:grid-cols-3 gap-3 p-4">`;
+                    // FIX: Cabut mode 'sticky' agar tidak menabrak/menutupi foto pemain saat di-scroll. 
+                    // Kita ubah menjadi Divider Label yang statis, lega, dan elegan.
+                    let h = `
+                    <div class="flex items-center gap-3 px-5 py-3 bg-gray-100/50 dark:bg-black/20 border-y border-gray-200 dark:border-brand-dark-border mt-2 first:mt-0">
+                        <div class="w-1.5 h-4 bg-brand-green rounded-full shadow-[0_0_8px_rgba(0,154,68,0.5)]"></div>
+                        <h4 class="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">${title}</h4>
+                    </div>`;
+                    
+                    // Grid Layout (Ditambah padding agar ada jarak napas yang pas)
+                    h += `<div class="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 pt-5 pb-6">`;
                     
                     arr.forEach(p => {
                         let nama = getProp(p, 'nama'); let f = getProp(p, 'foto') ? getProp(p, 'foto') : getAvatar(nama); let gol = parseInt(getProp(p,'gol')) || 0; let no = getProp(p,'nomor') || '-'; let pos = getProp(p,'posisi') || '-';
