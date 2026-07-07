@@ -770,12 +770,20 @@
             <button onclick="switchMatchTab('h2h')" id="btn-mtab-h2h" class="team-tab-btn focus:outline-none pt-3">H2H</button>
         </div>
 
-        <div class="max-w-4xl mx-auto px-0 md:px-8 mt-4 safe-pb">
-            <div id="mtab-fakta" class="mtab-content block page-enter">
+        <div id="mtab-fakta" class="mtab-content block page-enter">
                 <div class="px-4 md:px-0">
-                    <div class="bg-white dark:bg-brand-dark-surface rounded-2xl shadow-soft border border-gray-100 dark:border-brand-dark-border p-5">
-                        <h4 class="text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest mb-4 border-b border-gray-100 dark:border-brand-dark-border pb-2">TIMELINE KEJADIAN</h4>
-                        <div id="mm-events" class="space-y-2"></div>
+                    <div class="bg-white dark:bg-brand-dark-surface rounded-2xl shadow-soft border border-gray-100 dark:border-brand-dark-border p-5 md:p-8">
+                        <h4 class="text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest mb-8 border-b border-gray-100 dark:border-brand-dark-border pb-4 text-center flex items-center justify-center gap-3">
+                            <span class="w-8 h-[1px] bg-gray-200 dark:bg-gray-700"></span> 
+                            Timeline Kejadian 
+                            <span class="w-8 h-[1px] bg-gray-200 dark:bg-gray-700"></span>
+                        </h4>
+                        
+                        <div class="relative w-full max-w-lg mx-auto py-2">
+                            <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-0.5 bg-gradient-to-b from-transparent via-gray-200 dark:via-gray-800 to-transparent z-0"></div>
+                            
+                            <div id="mm-events" class="relative z-10 flex flex-col gap-5 md:gap-7"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2736,18 +2744,95 @@
             let ds = (rawData.Stat_Match || []).filter(x => String(getProp(x, 'id_match')) === String(idMatch));
             let dl = (rawData.Lineup || []).filter(x => String(getProp(x, 'id_match')) === String(idMatch));
 
-            // EVENT & GOALSCORERS
+            // EVENT & GOALSCORERS (MOMENTUM TIMELINE KACA)
             if(de.length > 0 && getProp(de[0],'menit')) {
+                // Urutkan kejadian berdasarkan menit (dari peluit awal ke peluit akhir)
+                let sortedEvents = [...de].sort((a,b) => parseInt(getProp(a,'menit')) - parseInt(getProp(b,'menit')));
+                
                 let he = ''; let gsKiri = ''; let gsKanan = '';
-                de.forEach(ev => {
-                    let isK = getProp(ev,'tim') === tk; let jns = String(getProp(ev,'jenis')).toUpperCase(); let ic = jns ==='GOL'?'⚽':(jns==='KUNING'?'🟨':'🟥');
+                
+                // Tambahkan ikon peluit mulai (Kick Off)
+                he += `<div class="flex justify-center mb-2"><div class="bg-gray-100 dark:bg-brand-dark-bg text-gray-400 dark:text-gray-500 text-[8px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-gray-200 dark:border-gray-800 shadow-sm z-10">KICK OFF</div></div>`;
+
+                sortedEvents.forEach((ev, idx) => {
+                    let isK = getProp(ev,'tim') === tk; 
+                    let jns = String(getProp(ev,'jenis')).toUpperCase(); 
+                    
+                    // Deteksi Ikon & Efek Glow Berdasarkan Jenis Kejadian
+                    let ic = ''; let icBg = ''; let icShadow = '';
+                    if(jns === 'GOL') { ic = '⚽'; icBg = 'bg-brand-green/10 border-brand-green/30 text-brand-green'; icShadow = 'shadow-[0_0_15px_rgba(0,154,68,0.3)]'; }
+                    else if(jns === 'KUNING') { ic = '<div class="w-2.5 h-3.5 bg-yellow-400 rounded-[1px] shadow-sm border border-yellow-500"></div>'; icBg = 'bg-yellow-400/10 border-yellow-400/30'; icShadow = 'shadow-[0_0_15px_rgba(250,204,21,0.2)]'; }
+                    else if(jns === 'MERAH') { ic = '<div class="w-2.5 h-3.5 bg-red-500 rounded-[1px] shadow-sm border border-red-600"></div>'; icBg = 'bg-red-500/10 border-red-500/30'; icShadow = 'shadow-[0_0_15px_rgba(239,68,68,0.3)]'; }
+                    else if(jns === 'BUNUH DIRI' || jns === 'OG') { ic = '⚽'; icBg = 'bg-red-500/10 border-red-500/30 text-red-500'; icShadow = 'shadow-[0_0_15px_rgba(239,68,68,0.3)]'; }
+                    else { ic = '⏱️'; icBg = 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500'; icShadow = 'shadow-sm'; }
+                    
                     let pmn = getProp(ev,'pemain'); let mnt = getProp(ev,'menit');
-                    if(jns === 'GOL') { if(isK) gsKiri += `<div>${pmn} <span class="text-gray-400">${mnt}'</span></div>`; else gsKanan += `<div><span class="text-gray-400">${mnt}'</span> ${pmn}</div>`; }
-                    if(isK) he += `<div class="flex items-center text-[10px]"><div class="w-1/2 text-right pr-3 font-bold cursor-pointer hover:text-brand-green transition-colors uppercase text-brand-black dark:text-white" onclick="bukaModalPemain('${safeStr(pmn)}', '${safeStr(tk)}')">${pmn} <span class="ml-1.5 bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded text-[9px] border border-gray-200 dark:border-brand-dark-border">${mnt}'</span></div><div class="w-6 text-center text-xs">${ic}</div><div class="w-1/2 pl-3"></div></div>`;
-                    else he += `<div class="flex items-center text-[10px]"><div class="w-1/2 pr-3"></div><div class="w-6 text-center text-xs">${ic}</div><div class="w-1/2 pl-3 font-bold cursor-pointer hover:text-brand-red transition-colors uppercase text-brand-black dark:text-white" onclick="bukaModalPemain('${safeStr(pmn)}', '${safeStr(tn)}')"><span class="mr-1.5 bg-gray-100 dark:bg-brand-dark-bg text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded text-[9px] border border-gray-200 dark:border-brand-dark-border">${mnt}'</span> ${pmn}</div></div>`;
-                }); document.getElementById('mm-events').innerHTML = he;
-                if(gsKiri !== '' || gsKanan !== '') { document.getElementById('mm-scorer-kiri').innerHTML = gsKiri; document.getElementById('mm-scorer-kanan').innerHTML = gsKanan; document.getElementById('mm-goalscorers').classList.remove('hidden'); }
-            } else { document.getElementById('mm-events').innerHTML = '<div class="text-center text-[9px] uppercase tracking-widest font-bold text-gray-400 dark:text-brand-dark-muted py-4">Tidak ada kejadian dicatat.</div>'; }
+                    
+                    // Rekap Nama Pencetak Gol di Header Atas
+                    if(jns === 'GOL' || jns === 'BUNUH DIRI' || jns === 'OG') { 
+                        if(isK) gsKiri += `<div>${pmn} <span class="text-gray-400 font-bold ml-1">${mnt}'</span></div>`; 
+                        else gsKanan += `<div><span class="text-gray-400 font-bold mr-1">${mnt}'</span> ${pmn}</div>`; 
+                    }
+                    
+                    // Efek Animasi Staggered (Bergiliran dari bawah ke atas)
+                    let animDelay = idx * 100; 
+                    
+                    if(isK) {
+                        // Kejadian Tim Tuan Rumah (Home/Kiri)
+                        he += `
+                        <div class="flex items-center w-full group opacity-0 translate-y-4" style="animation: pageFadeIn 0.5s ease-out ${animDelay}ms forwards;">
+                            <div class="w-1/2 flex flex-col items-end pr-4 md:pr-6 text-right cursor-pointer" onclick="bukaModalPemain('${safeStr(pmn)}', '${safeStr(tk)}')">
+                                <span class="font-bold text-[10px] md:text-xs uppercase text-brand-black dark:text-white group-hover:text-brand-green transition-colors">${pmn}</span>
+                                <span class="text-[8px] font-bold text-gray-400 mt-0.5 tracking-widest uppercase">${jns}</span>
+                            </div>
+                            <div class="relative flex justify-center items-center w-8 shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-white dark:bg-brand-dark-surface border ${icBg} flex justify-center items-center ${icShadow} z-10 scale-90 group-hover:scale-110 transition-transform duration-300">
+                                    <span class="text-xs flex items-center justify-center">${ic}</span>
+                                </div>
+                            </div>
+                            <div class="w-1/2 flex items-center pl-4 md:pl-6">
+                                <span class="font-heading font-black text-sm md:text-base text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-brand-dark-bg px-2 py-0.5 rounded-md border border-gray-200 dark:border-gray-800 shadow-sm">${mnt}'</span>
+                            </div>
+                        </div>`;
+                    } else {
+                        // Kejadian Tim Tamu (Away/Kanan)
+                        he += `
+                        <div class="flex items-center w-full group opacity-0 translate-y-4" style="animation: pageFadeIn 0.5s ease-out ${animDelay}ms forwards;">
+                            <div class="w-1/2 flex justify-end items-center pr-4 md:pr-6">
+                                <span class="font-heading font-black text-sm md:text-base text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-brand-dark-bg px-2 py-0.5 rounded-md border border-gray-200 dark:border-gray-800 shadow-sm">${mnt}'</span>
+                            </div>
+                            <div class="relative flex justify-center items-center w-8 shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-white dark:bg-brand-dark-surface border ${icBg} flex justify-center items-center ${icShadow} z-10 scale-90 group-hover:scale-110 transition-transform duration-300">
+                                    <span class="text-xs flex items-center justify-center">${ic}</span>
+                                </div>
+                            </div>
+                            <div class="w-1/2 flex flex-col items-start pl-4 md:pl-6 text-left cursor-pointer" onclick="bukaModalPemain('${safeStr(pmn)}', '${safeStr(tn)}')">
+                                <span class="font-bold text-[10px] md:text-xs uppercase text-brand-black dark:text-white group-hover:text-brand-red transition-colors">${pmn}</span>
+                                <span class="text-[8px] font-bold text-gray-400 mt-0.5 tracking-widest uppercase">${jns}</span>
+                            </div>
+                        </div>`;
+                    }
+                }); 
+                
+                // Tambahkan ikon peluit akhir (Full Time) jika status pertandingan sudah FT
+                let mStatus = String(getProp(m, 'status')).toUpperCase();
+                if(mStatus.includes('FT')) {
+                    he += `<div class="flex justify-center mt-2 opacity-0 translate-y-4" style="animation: pageFadeIn 0.5s ease-out ${sortedEvents.length * 100}ms forwards;"><div class="bg-brand-black text-white dark:bg-white dark:text-brand-black text-[8px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full shadow-sm z-10">FULL TIME</div></div>`;
+                }
+                
+                // Tembakkan ke layar
+                document.getElementById('mm-events').innerHTML = he;
+                if(gsKiri !== '' || gsKanan !== '') { 
+                    document.getElementById('mm-scorer-kiri').innerHTML = gsKiri; 
+                    document.getElementById('mm-scorer-kanan').innerHTML = gsKanan; 
+                    document.getElementById('mm-goalscorers').classList.remove('hidden'); 
+                } else {
+                    document.getElementById('mm-goalscorers').classList.add('hidden'); 
+                }
+            } else { 
+                document.getElementById('mm-events').innerHTML = '<div class="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 dark:text-gray-600 py-10"><svg class="w-10 h-10 mx-auto mb-3 text-gray-300 dark:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>Belum ada kejadian dicatat.</div>'; 
+                document.getElementById('mm-goalscorers').classList.add('hidden');
+            }
             
             // STATS (ANIMASI DINAMIS TUG-OF-WAR)
             if(typeof renderPremiumStats === 'function') {
