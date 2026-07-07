@@ -1725,10 +1725,7 @@
         }
 
         // ==========================================
-        // MESIN DIREKTORI PEMAIN (BERANDA)
-        // ==========================================
-        // ==========================================
-        // MESIN DIREKTORI PEMAIN (BERANDA)
+        // MESIN DIREKTORI PEMAIN (BERANDA - ANTI BUG)
         // ==========================================
         function renderHomePlayerDir() {
             let container = document.getElementById('home-player-directory');
@@ -1737,16 +1734,21 @@
 
             let query = (searchInput ? searchInput.value : '').toLowerCase().trim();
             
-            // 1. Ambil & Saring Pemain sesuai Liga Aktif (SMP/SMA)
+            // 1. Saring Pemain (Toleransi Kesalahan Ketik Tinggi)
             let players = (rawData.Pemain || []).filter(p => {
-                let timPemain = String(getProp(p, 'tim')).trim();
-                let klubCocok = allKlasemenCache.find(k => String(getProp(k, 'klub')).trim() === timPemain);
-                let isLigaCocok = klubCocok && String(getProp(klubCocok, 'Jenjang') || getProp(klubCocok, 'Liga')).toUpperCase() === ligaAktif;
+                let timPemain = String(getProp(p, 'tim')).trim().toLowerCase();
                 let isPelatih = ['PELATIH','COACH','HEADCOACH','MANAGER'].includes(String(getProp(p, 'posisi')).toUpperCase().replace(/\s+/g,''));
-                return isLigaCocok && !isPelatih;
+                if (isPelatih) return false; // Buang pelatih dari bursa
+
+                // Deteksi cerdas lintas tabel
+                let klubCocok = allKlasemenCache.find(k => String(getProp(k, 'klub')).trim().toLowerCase() === timPemain);
+                let ligaPemain = klubCocok ? String(getProp(klubCocok, 'Jenjang') || getProp(klubCocok, 'Liga')).toUpperCase() : String(getProp(p, 'Jenjang') || getProp(p, 'Liga')).toUpperCase();
+                
+                // Jika kolom liga kosong/typo di Sheets, kita asumsikan masuk untuk mencegah pemain hilang
+                return (ligaPemain === ligaAktif || ligaPemain === '' || ligaPemain === 'UNDEFINED');
             });
 
-            // 2. Filter Berdasarkan Teks Pencarian
+            // 2. Mesin Pencarian Real-Time
             if (query.length > 0) {
                 players = players.filter(p => String(getProp(p, 'nama')).toLowerCase().includes(query) || String(getProp(p, 'tim')).toLowerCase().includes(query));
             } else {
@@ -1757,13 +1759,14 @@
             if (players.length === 0) {
                 html = `<div class="col-span-full py-16 flex flex-col items-center justify-center text-center"><span class="text-4xl mb-3 opacity-30">📭</span><span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pemain Tidak Ditemukan</span></div>`;
             } else {
-                // FIX: Selalu batasi maksimal 60 pemain agar HP tidak nge-lag saat mengetik
                 let displayPlayers = players.slice(0, 60);
                 
                 displayPlayers.forEach(p => {
                     let nama = getProp(p, 'nama'); let tim = getProp(p, 'tim'); let pos = getProp(p, 'posisi') || 'POS';
                     let f = getProp(p, 'foto') ? getProp(p, 'foto') : getAvatar(nama);
-                    let l = allKlasemenCache.find(t => getProp(t, 'klub') === tim)?.logo || getAvatar(tim, true);
+                    
+                    // Ambil logo klub dengan pencocokan nama yang kebal huruf besar/kecil
+                    let l = allKlasemenCache.find(t => String(getProp(t, 'klub')).trim().toLowerCase() === String(tim).trim().toLowerCase())?.logo || getAvatar(tim, true);
                     
                     html += `
                     <div class="flex items-center bg-gray-50 dark:bg-brand-dark-bg border border-gray-100 dark:border-gray-800 p-2.5 rounded-2xl cursor-pointer hover:border-brand-gold dark:hover:border-brand-gold hover:shadow-md transition-all group hover:-translate-y-0.5" onclick="bukaModalPemain('${safeStr(nama)}', '${safeStr(tim)}')">
