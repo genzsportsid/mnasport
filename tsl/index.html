@@ -725,9 +725,8 @@
                     <div class="bg-brand-black dark:bg-[#000] p-4 rounded-2xl shadow-sm text-center col-span-2 sm:col-span-4 mt-2 transition-colors border border-gray-800 dark:border-brand-dark-border"><div class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">REKOR (M-S-K)</div><div class="font-heading font-bold text-4xl text-white"><span id="tps-m" class="text-brand-green">0</span> - <span id="tps-s" class="text-yellow-500">0</span> - <span id="tps-k" class="text-brand-red">0</span></div></div>
                 </div>
             </div>
-            <div id="ttab-squad" class="ttab-content hidden bg-white dark:bg-brand-dark-surface md:rounded-2xl shadow-soft border-y md:border border-gray-100 dark:border-brand-dark-border transition-colors page-enter">
-                <div class="flex items-center px-5 py-3 bg-gray-50 dark:bg-brand-dark-bg border-b border-gray-100 dark:border-brand-dark-border text-[9px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest transition-colors"><div class="w-8 text-center">NO</div><div class="flex-1 px-3">PEMAIN</div><div class="w-12 text-center">POS</div><div class="w-10 text-center">GOL</div></div>
-                <div id="tp-squad-list" class="divide-y divide-gray-50 dark:divide-brand-dark-border transition-colors"></div>
+            <div id="ttab-squad" class="ttab-content hidden bg-white dark:bg-brand-dark-surface md:rounded-2xl shadow-soft border-y md:border border-gray-100 dark:border-brand-dark-border transition-colors page-enter overflow-hidden">
+                <div id="tp-squad-list" class="transition-colors pb-4 bg-gray-50 dark:bg-brand-dark-bg"></div>
             </div>
         </div>
     </div>
@@ -2392,11 +2391,49 @@
             let topP = [...roster].sort((a,b) => (parseInt(getProp(b,'gol'))||0) - (parseInt(getProp(a,'gol'))||0)).slice(0,3);
             let topHtml = '';
             if(topP.length > 0 && (parseInt(getProp(topP[0],'gol'))||0) > 0) {
-                topP.forEach(p => {
-                    let nama = getProp(p, 'nama'); let f = getProp(p, 'foto') ? getProp(p, 'foto') : getAvatar(nama); let gol = getProp(p,'gol')||0;
-                    if(parseInt(gol) > 0) { topHtml += `<div class="flex items-center px-5 py-3 hover:bg-gray-50 dark:hover:bg-brand-dark-bg cursor-pointer transition-colors border-b border-gray-50 dark:border-brand-dark-border" onclick="bukaModalPemain('${safeStr(nama)}', '${safeStr(namaKlub)}')"><img src="${f}" class="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-800 shadow-sm object-cover bg-white mr-3"><div class="flex-1 font-bold text-xs uppercase text-brand-black dark:text-white truncate transition-colors">${nama}</div><div class="font-heading font-bold text-lg text-brand-green">${gol}</div></div>`; }
+                topP.forEach((p, index) => {
+                    let nama = getProp(p, 'nama'); let f = getProp(p, 'foto') ? getProp(p, 'foto') : getAvatar(nama); let gol = getProp(p,'gol')||0; let pos = getProp(p,'posisi')||'POS';
+                    
+                    if(parseInt(gol) > 0) {
+                        if (index === 0) {
+                            // KARTU MVP (TOP SCORER #1)
+                            topHtml += `
+                            <div class="bg-gradient-to-br from-brand-green/20 dark:from-brand-green/30 to-transparent p-5 md:p-6 border-b border-brand-green/20 flex items-center gap-4 cursor-pointer relative overflow-hidden group transition-colors" onclick="bukaModalPemain('${safeStr(nama)}', '${safeStr(namaKlub)}')">
+                                <div class="absolute top-0 right-0 w-32 h-32 bg-brand-green/20 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+                                
+                                <div class="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl border-2 border-brand-green shadow-[0_10px_20px_rgba(0,154,68,0.3)] bg-white overflow-hidden shrink-0 group-hover:scale-105 transition-transform z-10">
+                                    <img src="${f}" class="w-full h-full object-cover">
+                                    <div class="absolute bottom-0 left-0 w-full bg-brand-black/90 backdrop-blur-md text-[8px] md:text-[9px] text-brand-gold text-center py-0.5 font-black uppercase tracking-widest border-t border-brand-gold/50">TOP SKOR</div>
+                                </div>
+                                
+                                <div class="flex-1 relative z-10 min-w-0">
+                                    <h3 class="font-heading font-black text-lg md:text-xl uppercase text-brand-black dark:text-white leading-tight mb-2 group-hover:text-brand-green transition-colors truncate">${nama}</h3>
+                                    <div class="inline-block bg-white/80 dark:bg-brand-dark-surface border border-gray-200 dark:border-gray-700 text-brand-black dark:text-gray-300 text-[9px] font-bold px-2.5 py-1 rounded-md shadow-sm uppercase tracking-widest">${pos}</div>
+                                </div>
+                                
+                                <div class="shrink-0 text-center relative z-10 bg-white/50 dark:bg-black/20 p-3 rounded-xl border border-white/50 dark:border-gray-800 backdrop-blur-sm">
+                                    <div class="text-[8px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest mb-0.5">Gol</div>
+                                    <div class="font-heading font-black text-3xl md:text-4xl text-brand-green drop-shadow-md leading-none">${gol}</div>
+                                </div>
+                            </div>`;
+                        } else {
+                            // LIST REGULER (PERINGKAT 2 DST)
+                            topHtml += `
+                            <div class="flex items-center px-5 py-3.5 hover:bg-gray-50 dark:hover:bg-brand-dark-bg cursor-pointer transition-colors border-b border-gray-50 dark:border-brand-dark-border group" onclick="bukaModalPemain('${safeStr(nama)}', '${safeStr(namaKlub)}')">
+                                <div class="w-6 text-center font-black text-gray-300 dark:text-gray-600 text-xs italic shrink-0 group-hover:text-brand-green transition-colors">#${index+1}</div>
+                                <div class="relative w-10 h-10 md:w-12 md:h-12 mx-3 shrink-0 rounded-full border border-gray-200 dark:border-gray-700 bg-white shadow-sm overflow-hidden group-hover:scale-110 transition-transform">
+                                    <img src="${f}" class="w-full h-full object-cover">
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="font-bold text-xs md:text-sm uppercase text-brand-black dark:text-white truncate transition-colors group-hover:text-brand-green">${nama}</div>
+                                    <div class="text-[8px] font-bold text-gray-400 uppercase mt-0.5 tracking-widest">${pos}</div>
+                                </div>
+                                <div class="font-heading font-black text-xl text-brand-black dark:text-white group-hover:text-brand-green transition-colors bg-gray-50 dark:bg-brand-dark-surface px-3 py-1 rounded-lg border border-gray-100 dark:border-gray-800">${gol}</div>
+                            </div>`;
+                        }
+                    }
                 });
-            } else { topHtml = '<div class="p-6 text-center text-xs font-bold text-gray-400 dark:text-brand-dark-muted uppercase">Belum ada pencetak gol</div>'; }
+            } else { topHtml = '<div class="p-10 text-center text-xs font-bold text-gray-400 dark:text-brand-dark-muted uppercase flex flex-col items-center gap-3"><span class="text-3xl opacity-50">⚽</span> Belum ada pencetak gol</div>'; }
             document.getElementById('tp-top-scorers').innerHTML = topHtml;
 
             let matchHtml = '';
@@ -2491,9 +2528,43 @@
             } else { stdHtml = '<tr><td colspan="10" class="p-10 text-center text-xs font-bold text-gray-400 dark:text-brand-dark-muted uppercase">Data klasemen belum tersedia</td></tr>'; }
             document.getElementById('tp-standings-body').innerHTML = stdHtml;
 
-            document.getElementById('tps-gm').innerText = getProp(timData,'gm') || 0; document.getElementById('tps-gk').innerText = getProp(timData,'gk') || 0;
-            let sg = getProp(timData,'sg'); document.getElementById('tps-sg').innerText = parseInt(sg)>0 ? '+'+sg : (sg||0); document.getElementById('tps-pts').innerText = getProp(timData,'poin') || 0;
-            document.getElementById('tps-m').innerText = getProp(timData,'menang') || 0; document.getElementById('tps-s').innerText = getProp(timData,'seri') || 0; document.getElementById('tps-k').innerText = getProp(timData,'kalah') || 0;
+            // MESIN ANIMASI LIVE COUNTING STATS
+            const animateNum = (id, targetVal, isSG = false) => {
+                let obj = document.getElementById(id);
+                if (!obj) return;
+                
+                let target = parseInt(targetVal) || 0;
+                let start = 0;
+                let duration = 1000; // 1 detik animasi
+                let startTimestamp = null;
+
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    const easeOutQuart = 1 - Math.pow(1 - progress, 4); // Efek melambat di akhir
+                    
+                    let currentVal = Math.floor(easeOutQuart * (target - start) + start);
+                    
+                    if (isSG && currentVal > 0) obj.innerText = '+' + currentVal;
+                    else obj.innerText = currentVal;
+
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    } else {
+                        obj.innerText = (isSG && target > 0) ? '+' + target : target;
+                    }
+                };
+                window.requestAnimationFrame(step);
+            };
+
+            // Picu Animasi Angka Statistik
+            animateNum('tps-gm', getProp(timData,'gm')); 
+            animateNum('tps-gk', getProp(timData,'gk'));
+            animateNum('tps-sg', getProp(timData,'sg'), true); 
+            animateNum('tps-pts', getProp(timData,'poin'));
+            animateNum('tps-m', getProp(timData,'menang')); 
+            animateNum('tps-s', getProp(timData,'seri')); 
+            animateNum('tps-k', getProp(timData,'kalah'));
 
             let sqHtml = '';
             if(roster.length > 0) {
@@ -2513,22 +2584,44 @@
 
                 const renderGroup = (title, arr) => {
                     if(arr.length === 0) return '';
-                    let h = `<div class="bg-gray-100/80 dark:bg-brand-dark-surface/50 px-5 py-2 text-[10px] font-bold text-brand-green uppercase tracking-widest border-y border-gray-200 dark:border-white/10 transition-colors">${title}</div>`;
+                    // Header Posisi (Nempel di atas saat discroll)
+                    let h = `<div class="bg-gray-200/90 dark:bg-[#18181b]/90 backdrop-blur-md px-5 py-2.5 text-[10px] font-black text-brand-black dark:text-white uppercase tracking-widest border-y border-gray-300 dark:border-brand-dark-border transition-colors sticky z-20 shadow-sm" style="top: calc(max(env(safe-area-inset-top), 48px) + 72px);">${title}</div>`;
+                    
+                    // Grid Layout
+                    h += `<div class="grid grid-cols-2 md:grid-cols-3 gap-3 p-4">`;
+                    
                     arr.forEach(p => {
-                        let nama = getProp(p, 'nama'); let f = getProp(p, 'foto') ? getProp(p, 'foto') : getAvatar(nama); let gol = getProp(p,'gol') || 0; let no = getProp(p,'nomor') || '-'; let pos = getProp(p,'posisi') || '-';
-                        
-                        // Pelatih tidak butuh nomor punggung dan gol
+                        let nama = getProp(p, 'nama'); let f = getProp(p, 'foto') ? getProp(p, 'foto') : getAvatar(nama); let gol = parseInt(getProp(p,'gol')) || 0; let no = getProp(p,'nomor') || '-'; let pos = getProp(p,'posisi') || '-';
                         let isPelatih = title === 'PELATIH';
-                        let numEl = isPelatih ? `<div class="w-8 text-center text-sm">👔</div>` : `<div class="w-8 text-center font-bold text-gray-400 dark:text-gray-500 text-[10px] group-hover:text-brand-green transition-colors">${no}</div>`;
-                        let golEl = isPelatih ? `<div class="w-10 text-center text-transparent">-</div>` : `<div class="w-10 text-center font-heading font-bold text-sm ${parseInt(gol) > 0 ? 'text-brand-green' : 'text-gray-300 dark:text-gray-600'} transition-colors">${parseInt(gol) > 0 ? gol : '-'}</div>`;
+                        let actionClick = isPelatih ? `bukaModalPelatih('${safeStr(nama)}')` : `bukaModalPemain('${safeStr(nama)}', '${safeStr(namaKlub)}')`;
                         
-                        h += `<div onclick="bukaModalPemain('${safeStr(nama)}', '${safeStr(namaKlub)}')" class="flex items-center px-5 py-2.5 hover:bg-gray-50 dark:hover:bg-brand-dark-bg border-b border-gray-50 dark:border-brand-dark-border cursor-pointer transition-colors group">
-                                ${numEl}
-                                <div class="flex-1 flex items-center gap-3 px-3"><img src="${f}" class="w-8 h-8 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"><div class="font-bold text-[11px] uppercase text-brand-black dark:text-white group-hover:text-brand-green truncate transition-colors">${nama}</div></div>
-                                <div class="w-12 text-center text-[8px] font-bold text-gray-500 dark:text-gray-400 uppercase bg-gray-100 dark:bg-brand-dark-bg py-0.5 rounded transition-colors">${pos}</div>
-                                ${golEl}
-                              </div>`;
+                        let golBadge = gol > 0 ? `<div class="absolute -top-1.5 -right-1.5 bg-brand-green text-white text-[8px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-md border border-white dark:border-gray-800 z-10">⚽${gol}</div>` : '';
+
+                        h += `
+                        <div onclick="${actionClick}" class="bg-white dark:bg-brand-dark-surface border border-gray-200 dark:border-gray-800 rounded-[1rem] p-3 flex flex-col items-center gap-2 cursor-pointer hover:border-brand-green dark:hover:border-brand-green hover:shadow-lg transition-all duration-300 group overflow-hidden relative shadow-sm hover:-translate-y-1">
+                            <div class="absolute inset-0 bg-gradient-to-br from-brand-green/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            
+                            <div class="relative w-14 h-14 md:w-16 md:h-16 mt-1">
+                                ${golBadge}
+                                <div class="w-full h-full rounded-full border-2 border-gray-100 dark:border-gray-700 bg-white overflow-hidden shadow-sm group-hover:scale-105 transition-transform group-hover:border-brand-green/50">
+                                    <img src="${f}" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                            
+                            <div class="w-full text-center mt-1">
+                                <h4 class="font-bold text-[10px] md:text-xs uppercase text-brand-black dark:text-white truncate group-hover:text-brand-green transition-colors">${nama}</h4>
+                                <div class="flex items-center justify-center gap-1.5 mt-1.5">
+                                    ${isPelatih ? 
+                                        `<span class="text-[8px] font-bold text-brand-gold bg-brand-gold/10 px-2 py-0.5 rounded border border-brand-gold/20 uppercase tracking-widest">MANAGER</span>` 
+                                        : 
+                                        `<span class="text-[8px] font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-brand-dark-bg px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 uppercase">${pos}</span>
+                                         <span class="text-[9px] font-black text-brand-green ml-0.5">#${no}</span>`
+                                    }
+                                </div>
+                            </div>
+                        </div>`;
                     });
+                    h += `</div>`;
                     return h;
                 };
 
