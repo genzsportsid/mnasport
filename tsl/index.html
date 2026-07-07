@@ -1562,7 +1562,6 @@
                 document.getElementById('stat-total-pemain').innerText = purePlayers.length > 0 ? purePlayers.length : '-';
                 
                 renderBerandaClubs(allKlasemenCache); 
-                renderBerandaLiveMatches();
                 initFotmobCalendar(); 
                 switchLigaUI(ligaAktif);
                 renderSponsors();
@@ -1583,91 +1582,64 @@
             else { document.getElementById('grid-klub-beranda').innerHTML = htmlTopBar; }
         }
 
-        function renderBerandaLiveMatches() {
-            let todayYMD = formatYMD(new Date());
-            let todaysMatches = jadwalCache.filter(m => parseToYMD(getProp(m, 'waktu')) === todayYMD);
-            
-            let html = '';
-            if(todaysMatches.length === 0) {
-                html = '<div class="text-center w-full text-[10px] font-bold text-gray-400 uppercase tracking-widest py-4">Tidak ada pertandingan hari ini</div>';
-            } else {
-                todaysMatches.sort((a,b) => parseIndoDate(getProp(a,'waktu')) - parseIndoDate(getProp(b,'waktu')));
-                
-                todaysMatches.forEach(m => {
-                    let id = safeStr(getProp(m, 'id_match')); let tk = getProp(m, 'tim_kiri'); let tn = getProp(m, 'tim_kanan');
-                    let lKiri = allKlasemenCache.find(t => getProp(t,'klub') === tk)?.logo || getAvatar(tk, true);
-                    let lKanan = allKlasemenCache.find(t => getProp(t,'klub') === tn)?.logo || getAvatar(tn, true);
-                    
-                    let w = String(getProp(m, 'waktu')); let timeOnly = "TBA";
-                    if (w.includes("T")) { let dObj = new Date(w); if(!isNaN(dObj.getTime())) timeOnly = String(dObj.getHours()).padStart(2, '0') + ":" + String(dObj.getMinutes()).padStart(2, '0'); } 
-                    else { timeOnly = w.split(" - ")[1] || "TBA"; }
-                    
-                    // LOGIKA SKOR BERANDA
-                    let status = String(getProp(m, 'status')||"").toUpperCase(); 
-                    let isPast = status.includes('FT'); 
-                    let isLive = status.includes('LIVE') || status.includes('HT');
-                    let isStarted = isPast || isLive;
-                    let skorStr = String(getProp(m, 'skor')||"").toUpperCase(); 
-                    let sKiri = "", sKanan = "";
-                    if(isStarted && skorStr.includes('-')) { 
-                        let parts = skorStr.split('-'); sKiri = parts[0].trim(); sKanan = parts[1].trim(); 
-                    }
-                    
-                    let kickoffMs = parseIndoDate(w);
-                    
-                    html += `
-                    <div id="beranda-match-card-${id}" onclick="bukaHalamanMatch('${id}')" class="min-w-[260px] md:min-w-[300px] w-full max-w-[350px] bg-white dark:bg-brand-dark-surface rounded-2xl p-4 border border-gray-100 dark:border-brand-dark-border shadow-sm cursor-pointer hover:border-brand-green dark:hover:border-brand-green transition-colors snap-center group relative overflow-hidden flex-shrink-0">
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-brand-dark-bg px-2 py-0.5 rounded border border-gray-100 dark:border-brand-dark-border">LIGA ${getProp(m, 'Jenjang')||''}</span>
-                            <span id="beranda-timer-${id}" data-matchid="${id}" data-kickoff="${kickoffMs}" data-status="${status}" class="live-timer-badge text-[10px] md:text-[11px] font-heading font-bold px-2 py-0.5 rounded-lg border transition-colors min-w-[50px] text-center ${isPast ? 'text-gray-400 dark:text-brand-dark-muted border-transparent bg-gray-50/50 dark:bg-brand-dark-bg/50' : 'text-brand-black dark:text-white border-gray-200 dark:border-brand-dark-border bg-gray-50 dark:bg-brand-dark-bg'}">${isPast ? 'FT' : timeOnly}</span>
-                        </div>
-                        <div class="flex justify-between items-center space-y-2">
-                            <div class="w-[35%] flex flex-col items-center text-center">
-                                <img src="${lKiri}" class="w-10 h-10 rounded-full bg-white object-cover shadow-sm border border-gray-100 dark:border-gray-800 mb-2 group-hover:scale-110 transition-transform">
-                                <span class="text-[10px] font-bold uppercase truncate w-full text-brand-black dark:text-white transition-colors">${tk}</span>
-                            </div>
-                            <div class="w-[30%] flex flex-col items-center justify-center">
-                                <div class="text-2xl font-heading font-bold ${isLive ? 'text-red-600 dark:text-red-500' : 'text-brand-black dark:text-white'} tracking-widest transition-colors ${!isStarted ? 'text-transparent' : ''}">${sKiri || '-'}<span class="text-gray-300 dark:text-gray-700 mx-1">-</span>${sKanan || '-'}</div>
-                            </div>
-                            <div class="w-[35%] flex flex-col items-center text-center">
-                                <img src="${lKanan}" class="w-10 h-10 rounded-full bg-white object-cover shadow-sm border border-gray-100 dark:border-gray-800 mb-2 group-hover:scale-110 transition-transform">
-                                <span class="text-[10px] font-bold uppercase truncate w-full text-brand-black dark:text-white transition-colors">${tn}</span>
-                            </div>
-                        </div>
-                    </div>`;
-                });
-            }
-            document.getElementById('beranda-live-matches').innerHTML = html;
-            updateLiveTimers(); 
-        }
-
         // ==========================================
-        // MESIN LIVE MATCH HERO CAROUSEL (FOTMOB STYLE)
+        // MESIN LIVE MATCH HERO CAROUSEL (SMART ENGINE)
         // ==========================================
         function renderLiveHeroCarousel() {
             const container = document.getElementById('beranda-live-matches');
             if(!container) return;
 
-            // 1. Ambil jadwal sesuai liga aktif (SMP/SMA)
             let isMatch = (d) => { return String(getProp(d, 'Jenjang') || getProp(d, 'Liga') || 'SMA').trim().toUpperCase() === ligaAktif; };
             let currentLeagueMatches = (jadwalCache || []).filter(isMatch);
 
-            // 2. Filter: Prioritaskan pertandingan LIVE, HT, lalu jadwal hari ini/terdekat
+            let todayYMD = formatYMD(new Date());
+
+            // 1. Prioritas Utama: Laga LIVE / HT
             let liveMatches = currentLeagueMatches.filter(m => {
                 let s = String(getProp(m, 'status') || '').toUpperCase();
                 return s.includes('LIVE') || s.includes('HT');
             });
             
-            let upcomingMatches = currentLeagueMatches.filter(m => {
+            // 2. Prioritas Kedua: Laga Hari Ini (Belum main atau sudah FT)
+            let todaysMatches = currentLeagueMatches.filter(m => {
+                let ymd = parseToYMD(getProp(m, 'waktu'));
                 let s = String(getProp(m, 'status') || '').toUpperCase();
-                return !s.includes('LIVE') && !s.includes('HT') && !s.includes('FT');
+                return ymd === todayYMD && !s.includes('LIVE') && !s.includes('HT');
             });
 
-            // Ambil maksimal 5 pertandingan untuk ditampilkan di Carousel
-            let displayMatches = [...liveMatches, ...upcomingMatches].slice(0, 5);
+            // 3. Prioritas Ketiga: Laga Berikutnya (Upcoming)
+            let upcomingMatches = currentLeagueMatches.filter(m => {
+                let ymd = parseToYMD(getProp(m, 'waktu'));
+                let s = String(getProp(m, 'status') || '').toUpperCase();
+                return ymd !== todayYMD && !s.includes('LIVE') && !s.includes('HT') && !s.includes('FT');
+            });
+            
+            // 4. Cadangan Terakhir: Laga yang sudah lewat (Past Matches)
+            let pastMatches = currentLeagueMatches.filter(m => {
+                let ymd = parseToYMD(getProp(m, 'waktu'));
+                let s = String(getProp(m, 'status') || '').toUpperCase();
+                return ymd !== todayYMD && s.includes('FT');
+            });
+
+            // Urutkan Jadwal
+            todaysMatches.sort((a,b) => parseIndoDate(getProp(a,'waktu')) - parseIndoDate(getProp(b,'waktu')));
+            upcomingMatches.sort((a,b) => parseIndoDate(getProp(a,'waktu')) - parseIndoDate(getProp(b,'waktu')));
+            pastMatches.sort((a,b) => parseIndoDate(getProp(b,'waktu')) - parseIndoDate(getProp(a,'waktu'))); // Yang terbaru di atas
+
+            // Logika Penggabungan Cerdas agar Carousel tidak pernah Blank
+            let displayMatches = [...liveMatches, ...todaysMatches];
+            if (displayMatches.length === 0) {
+                if (upcomingMatches.length > 0) {
+                    displayMatches = upcomingMatches.slice(0, 5);
+                } else {
+                    displayMatches = pastMatches.slice(0, 5); 
+                }
+            } else {
+                displayMatches = displayMatches.slice(0, 5);
+            }
 
             if(displayMatches.length === 0) {
-                container.innerHTML = '<div class="w-full flex flex-col items-center justify-center py-10 opacity-50"><svg class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Belum ada laga terdekat</p></div>';
+                container.innerHTML = '<div class="w-full flex flex-col items-center justify-center py-10 opacity-50"><svg class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Belum ada jadwal Liga</p></div>';
                 return;
             }
 
@@ -1685,11 +1657,20 @@
                 let isLive = status.includes('LIVE') || status.includes('HT');
                 let isFT = status.includes('FT');
                 let matchId = getProp(m, 'id_match');
+                let kickoffMs = parseIndoDate(getProp(m, 'waktu'));
 
-                // Lencana Status (Berdentang Merah jika LIVE)
-                let statusBadge = isLive 
-                    ? `<div class="flex items-center gap-1.5 bg-brand-red text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-[0_0_10px_rgba(210,39,48,0.6)] animate-pulse"><div class="w-1.5 h-1.5 bg-white rounded-full"></div> ${status}</div>` 
-                    : `<div class="bg-white/10 dark:bg-black/30 text-brand-black dark:text-white border border-gray-200 dark:border-white/10 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest backdrop-blur-sm">${status || 'Segera'}</div>`;
+                // Deteksi Waktu & Status Badge
+                let statusBadge = '';
+                if (isLive) {
+                    statusBadge = `<div data-matchid="${matchId}" data-kickoff="${kickoffMs}" data-status="${status}" class="live-timer-badge flex items-center gap-1.5 bg-brand-red text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-[0_0_10px_rgba(210,39,48,0.6)]"><div class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div> <span>${status}</span></div>`;
+                } else if (isFT) {
+                    statusBadge = `<div class="bg-white/10 dark:bg-black/30 text-brand-black dark:text-white border border-gray-200 dark:border-white/10 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest backdrop-blur-sm">FT</div>`;
+                } else {
+                    let w = String(getProp(m, 'waktu')); let timeOnly = "TBA";
+                    if (w.includes("T")) { let dObj = new Date(w); if(!isNaN(dObj.getTime())) timeOnly = String(dObj.getHours()).padStart(2, '0') + ":" + String(dObj.getMinutes()).padStart(2, '0'); } 
+                    else { timeOnly = w.split(" - ")[1] || "TBA"; }
+                    statusBadge = `<div data-matchid="${matchId}" data-kickoff="${kickoffMs}" data-status="${status}" class="live-timer-badge bg-white/10 dark:bg-black/30 text-brand-black dark:text-white border border-gray-200 dark:border-white/10 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest backdrop-blur-sm">${timeOnly}</div>`;
+                }
 
                 html += `
                 <div onclick="bukaHalamanMatch('${matchId}')" class="snap-center shrink-0 w-[85vw] md:w-[400px] relative rounded-[2rem] overflow-hidden cursor-pointer group shadow-lg border border-gray-200 dark:border-white/5 transition-transform hover:-translate-y-1">
@@ -1744,6 +1725,9 @@
                 </div>`;
             });
             container.innerHTML = html;
+            
+            // Panggil ulang timer agar lencana waktu langsung berdetak!
+            updateLiveTimers();
         }
             
         // --- MESIN BAGAN FASE GUGUR ---
