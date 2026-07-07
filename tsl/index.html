@@ -850,9 +850,22 @@
                 </div>
             </div>
             <div id="mtab-h2h" class="mtab-content hidden page-enter px-4 md:px-0">
-                <div class="bg-white dark:bg-brand-dark-surface rounded-2xl shadow-soft border border-gray-100 dark:border-brand-dark-border p-5">
-                    <h4 class="text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest mb-4 border-b border-gray-100 dark:border-brand-dark-border pb-2">HEAD TO HEAD</h4>
+                <div class="bg-white dark:bg-brand-dark-surface rounded-2xl shadow-soft border border-gray-100 dark:border-brand-dark-border p-5 md:p-8">
+                    
+                    <h4 class="text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest mb-6 border-b border-gray-100 dark:border-brand-dark-border pb-4 text-center flex items-center justify-center gap-3">
+                        <span class="w-8 h-[1px] bg-gray-200 dark:bg-gray-700"></span> 
+                        Jejak Performa 
+                        <span class="w-8 h-[1px] bg-gray-200 dark:bg-gray-700"></span>
+                    </h4>
+                    <div id="mm-form-guide" class="mb-10"></div>
+                    
+                    <h4 class="text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest mb-6 border-b border-gray-100 dark:border-brand-dark-border pb-4 text-center flex items-center justify-center gap-3">
+                        <span class="w-8 h-[1px] bg-gray-200 dark:bg-gray-700"></span> 
+                        Head to Head 
+                        <span class="w-8 h-[1px] bg-gray-200 dark:bg-gray-700"></span>
+                    </h4>
                     <div id="mm-h2h-list" class="divide-y divide-gray-50 dark:divide-brand-dark-border"></div>
+                    
                 </div>
             </div>
         </div>
@@ -2691,51 +2704,92 @@
 
             switchMatchTab('fakta');
 
+            // ==========================================
+            // MESIN JEJAK PERFORMA & HEAD-TO-HEAD
+            // ==========================================
+            
+            // 1. GENERATOR FORM GUIDE (5 Laga Terakhir Masing-masing Tim Secara Umum)
+            const getTeamForm = (teamName) => {
+                let matches = jadwalCache.filter(x => String(getProp(x, 'status')).toUpperCase().includes('FT') && (getProp(x, 'tim_kiri') === teamName || getProp(x, 'tim_kanan') === teamName));
+                matches.sort((a,b) => parseIndoDate(getProp(b,'waktu')) - parseIndoDate(getProp(a,'waktu')));
+                
+                let formHtml = '';
+                let last5 = matches.slice(0, 5).reverse(); // Dibalik agar urutan waktu membacanya dari Kiri (Lama) -> Kanan (Baru)
+                
+                if(last5.length === 0) {
+                    return '<div class="text-[9px] font-bold text-gray-400">Belum ada data</div>';
+                }
+                
+                last5.forEach(h => {
+                    let sKr = 0, sKn = 0; let skorStr = getProp(h,'skor');
+                    if(skorStr.includes('-')) { let p = skorStr.split('-'); sKr=parseInt(p[0]); sKn=parseInt(p[1]); }
+                    
+                    let isKiri = getProp(h, 'tim_kiri') === teamName;
+                    let enemy = isKiri ? getProp(h, 'tim_kanan') : getProp(h, 'tim_kiri');
+                    let myScore = isKiri ? sKr : sKn;
+                    let enScore = isKiri ? sKn : sKr;
+                    
+                    let formChar = 'S'; let bgClass = 'bg-gray-400 dark:bg-gray-600';
+                    if (myScore > enScore) { formChar = 'M'; bgClass = 'bg-brand-green'; }
+                    else if (myScore < enScore) { formChar = 'K'; bgClass = 'bg-brand-red'; }
+                    
+                    formHtml += `
+                    <div class="relative group cursor-pointer" onclick="bukaHalamanMatch('${safeStr(getProp(h, 'id_match'))}')">
+                        <div class="w-6 h-6 rounded-[4px] flex items-center justify-center text-[10px] font-bold text-white shadow-sm transition-transform hover:-translate-y-1 ${bgClass}">${formChar}</div>
+                        
+                        <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-brand-black dark:bg-[#000] text-white text-[9px] px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50 shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-gray-700">
+                            <span class="text-gray-400 uppercase tracking-widest text-[7px] block mb-0.5">vs ${enemy}</span>
+                            <span class="font-bold">${myScore} - ${enScore}</span>
+                            <div class="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-700"></div>
+                        </div>
+                    </div>`;
+                });
+                return formHtml;
+            };
+
+            let formGuideHtml = `
+                <div class="flex flex-col gap-3">
+                    <div class="flex justify-between items-center bg-gray-50 dark:bg-brand-dark-bg p-3 md:px-5 md:py-4 rounded-xl border border-gray-100 dark:border-brand-dark-border transition-colors">
+                        <div class="flex items-center gap-3">
+                            <img src="${lKiri}" class="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-800 bg-white object-cover shadow-sm shrink-0">
+                            <span class="text-[11px] font-bold uppercase text-brand-black dark:text-white line-clamp-1 max-w-[90px] md:max-w-[150px]">${tk}</span>
+                        </div>
+                        <div class="flex gap-1.5">${getTeamForm(tk)}</div>
+                    </div>
+                    <div class="flex justify-between items-center bg-gray-50 dark:bg-brand-dark-bg p-3 md:px-5 md:py-4 rounded-xl border border-gray-100 dark:border-brand-dark-border transition-colors">
+                        <div class="flex gap-1.5">${getTeamForm(tn)}</div>
+                        <div class="flex items-center gap-3 text-right">
+                            <span class="text-[11px] font-bold uppercase text-brand-black dark:text-white line-clamp-1 max-w-[90px] md:max-w-[150px]">${tn}</span>
+                            <img src="${lKanan}" class="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-800 bg-white object-cover shadow-sm shrink-0">
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('mm-form-guide').innerHTML = formGuideHtml;
+
+
+            // 2. GENERATOR HEAD-TO-HEAD (Rekor Pertemuan Langsung Kedua Tim)
             let h2hHtml = '';
             let pastH2H = jadwalCache.filter(x => String(getProp(x, 'status')).toUpperCase().includes('FT') && ((getProp(x, 'tim_kiri') === tk && getProp(x, 'tim_kanan') === tn) || (getProp(x, 'tim_kiri') === tn && getProp(x, 'tim_kanan') === tk)));
             
             if(pastH2H.length > 0) {
                 pastH2H.sort((a,b) => parseIndoDate(getProp(b,'waktu')) - parseIndoDate(getProp(a,'waktu')));
                 
-                // Membuat Baris Form W-D-L di Atas Daftar H2H
-                let tkForm='', tnForm='';
-                pastH2H.slice(0,5).reverse().forEach(h => {
-                    let sKr = 0, sKn = 0; let skorStr = getProp(h,'skor');
-                    if(skorStr.includes('-')) { let p = skorStr.split('-'); sKr=parseInt(p[0]); sKn=parseInt(p[1]); }
-                    let myG_tk = getProp(h,'tim_kiri') === tk ? sKr : sKn; let enG_tk = getProp(h,'tim_kiri') === tk ? sKn : sKr;
-                    let myG_tn = getProp(h,'tim_kiri') === tn ? sKr : sKn; let enG_tn = getProp(h,'tim_kiri') === tn ? sKn : sKr;
-                    
-                    if (myG_tk > enG_tk) tkForm += '<div class="w-5 h-5 rounded bg-brand-green text-white flex items-center justify-center text-[9px] font-bold shadow-sm">W</div>';
-                    else if (myG_tk < enG_tk) tkForm += '<div class="w-5 h-5 rounded bg-brand-red text-white flex items-center justify-center text-[9px] font-bold shadow-sm">L</div>';
-                    else tkForm += '<div class="w-5 h-5 rounded bg-gray-400 text-white flex items-center justify-center text-[9px] font-bold shadow-sm">D</div>';
-
-                    if (myG_tn > enG_tn) tnForm += '<div class="w-5 h-5 rounded bg-brand-green text-white flex items-center justify-center text-[9px] font-bold shadow-sm">W</div>';
-                    else if (myG_tn < enG_tn) tnForm += '<div class="w-5 h-5 rounded bg-brand-red text-white flex items-center justify-center text-[9px] font-bold shadow-sm">L</div>';
-                    else tnForm += '<div class="w-5 h-5 rounded bg-gray-400 text-white flex items-center justify-center text-[9px] font-bold shadow-sm">D</div>';
-                });
-
-                h2hHtml = `
-                    <div class="flex justify-between items-center mb-6 bg-gray-50 dark:bg-brand-dark-bg p-3 rounded-xl border border-gray-100 dark:border-brand-dark-border">
-                        <div class="flex flex-col items-start gap-2"><span class="text-[9px] font-bold uppercase text-gray-500">${tk}</span><div class="flex gap-1">${tkForm}</div></div>
-                        <div class="flex flex-col items-end gap-2"><span class="text-[9px] font-bold uppercase text-gray-500">${tn}</span><div class="flex gap-1">${tnForm}</div></div>
-                    </div>`;
-
-                // Render List Sejarah Pertandingan
                 pastH2H.forEach(h => {
                     let dateStr = parseToYMD(getProp(h, 'waktu')); dateStr = dateStr ? dateStr.split('-').reverse().join('/') : '-';
                     let hTimKiri = getProp(h,'tim_kiri'); let hTimKanan = getProp(h,'tim_kanan');
                     
                     h2hHtml += `<div class="flex justify-between items-center py-4 border-b border-gray-100 dark:border-brand-dark-border group hover:bg-gray-50 dark:hover:bg-brand-dark-bg transition-colors px-2 md:px-4 rounded-xl cursor-pointer" onclick="bukaHalamanMatch('${safeStr(getProp(h, 'id_match'))}')">
-                        <div class="w-[35%] flex items-center justify-end text-right"><span class="font-bold text-xs md:text-sm text-brand-black dark:text-white truncate ${hTimKiri === tk ? 'text-brand-green' : ''}">${hTimKiri}</span></div>
-                        <div class="w-[30%] flex flex-col items-center justify-center">
-                            <span class="bg-gray-100 dark:bg-brand-dark-surface border border-gray-200 dark:border-white/10 px-3 py-1 rounded-lg font-heading font-bold text-sm text-brand-black dark:text-white shadow-sm tracking-widest mb-1.5">${getProp(h,'skor')}</span>
-                            <div class="text-[7px] md:text-[8px] text-gray-400 dark:text-brand-dark-muted font-bold tracking-widest uppercase">${dateStr}</div>
+                        <div class="w-[35%] flex items-center justify-end text-right"><span class="font-bold text-[11px] md:text-sm text-brand-black dark:text-white line-clamp-2 ${hTimKiri === tk ? 'text-brand-green' : ''}">${hTimKiri}</span></div>
+                        <div class="w-[30%] flex flex-col items-center justify-center px-2">
+                            <span class="bg-gray-100 dark:bg-brand-dark-surface border border-gray-200 dark:border-white/10 px-3 py-1 rounded-lg font-heading font-bold text-xs md:text-sm text-brand-black dark:text-white shadow-sm tracking-widest mb-1.5">${getProp(h,'skor')}</span>
+                            <div class="text-[7px] md:text-[8px] text-gray-400 dark:text-brand-dark-muted font-bold tracking-widest uppercase text-center">${dateStr}</div>
                         </div>
-                        <div class="w-[35%] flex items-center justify-start text-left"><span class="font-bold text-xs md:text-sm text-brand-black dark:text-white truncate ${hTimKanan === tk ? 'text-brand-green' : ''}">${hTimKanan}</span></div>
+                        <div class="w-[35%] flex items-center justify-start text-left"><span class="font-bold text-[11px] md:text-sm text-brand-black dark:text-white line-clamp-2 ${hTimKanan === tk ? 'text-brand-green' : ''}">${hTimKanan}</span></div>
                     </div>`;
                 });
             } else { 
-                h2hHtml = '<div class="text-center text-xs font-bold text-gray-400 dark:text-brand-dark-muted uppercase py-4">Belum pernah bertemu</div>'; 
+                h2hHtml = '<div class="text-center text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase py-8"><span class="text-2xl block mb-3 opacity-50">🤝</span>Belum pernah bertemu sebelumnya</div>'; 
             }
             document.getElementById('mm-h2h-list').innerHTML = h2hHtml;
 
