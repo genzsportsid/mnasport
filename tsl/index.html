@@ -175,8 +175,7 @@
         /* 🛡️ ANTI-FLASH PENCARIAN (0 DETIK) */
         html.direct-search #tsl-lock-screen { display: none !important; }
         html.direct-search #view-search { display: block !important; opacity: 1 !important; z-index: 999 !important; }
-        /* 🛡️ ENGINE LOGO PRESISI (GLOBAL FIX) */
-        /* Mengubah semua logo sekolah/klub agar presisi 100% dan tidak terpotong */
+        /* 🛡️ ENGINE LOGO PRESISI & GLASSMORPHISM (GLOBAL FIX) */
         #tp-logo, #tp-logo-mini, 
         #mm-logo-kiri, #mm-logo-kanan, #mm-logo-kiri-mini, #mm-logo-kanan-mini,
         #grid-klub-beranda img,
@@ -189,25 +188,41 @@
         #top-skor-vertical-container img[class*="w-3.5"],
         #search-results img.bg-white {
             object-fit: contain !important;
-            background-color: #ffffff !important;
+            /* Efek Kaca Transparan (Glassmorphism) ala Hero Carousel */
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            /* Border Tipis Kaca & Bayangan 3D Wadah */
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+            /* Efek Drop Shadow 3D yang menempel langsung ke gambar logo */
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)) !important;
+            border-radius: 50% !important;
         }
 
-        /* Memberikan ruang lega (Auto-Padding) untuk Logo Ukuran Kecil */
-        #tp-logo-mini, #mm-logo-kiri-mini, #mm-logo-kanan-mini, 
-        #klasemen-container img, #fotmob-match-list img, 
-        #tp-match-list img, img#mp-tim-logo, #dt-pitch-slots img.absolute,
-        #tabel-top-skor img[class*="w-4"], #top-skor-vertical-container img[class*="w-3.5"] {
-            padding: 2.5px !important;
+        /* Penyesuaian Ruang Lega (Padding) Proporsional */
+        #tabel-top-skor img[class*="w-4"], #top-skor-vertical-container img[class*="w-3.5"], img#mp-tim-logo {
+            padding: 2.5px !important; 
         }
-
-        /* Memberikan ruang lega (Auto-Padding) untuk Logo Ukuran Menengah di Pencarian */
-        #search-results img.bg-white {
-            padding: 4px !important;
+        #tp-logo-mini, #mm-logo-kiri-mini, #mm-logo-kanan-mini, #klasemen-container img, #fotmob-match-list img, #tp-match-list img, #search-results img.bg-white, #dt-pitch-slots img.absolute {
+            padding: 5px !important;
         }
-
-        /* Memberikan ruang lega (Auto-Padding) untuk Logo Ukuran Besar di Header & Beranda */
         #tp-logo, #mm-logo-kiri, #mm-logo-kanan, #grid-klub-beranda img {
-            padding: 8px !important;
+            padding: 10px !important;
+        }
+
+        /* Failsafe: Mode Terang (Light Mode) agar logo tidak tembus pandang di latar putih */
+        html:not(.dark) #tp-logo, html:not(.dark) #tp-logo-mini, 
+        html:not(.dark) #mm-logo-kiri, html:not(.dark) #mm-logo-kanan, html:not(.dark) #mm-logo-kiri-mini, html:not(.dark) #mm-logo-kanan-mini,
+        html:not(.dark) #grid-klub-beranda img, html:not(.dark) #klasemen-container img,
+        html:not(.dark) #fotmob-match-list img, html:not(.dark) #tp-match-list img,
+        html:not(.dark) img#mp-tim-logo, html:not(.dark) #dt-pitch-slots img.absolute,
+        html:not(.dark) #tabel-top-skor img[class*="w-4"], html:not(.dark) #top-skor-vertical-container img[class*="w-3.5"],
+        html:not(.dark) #search-results img.bg-white {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)) !important;
         }
     </style>
     
