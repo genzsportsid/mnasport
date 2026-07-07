@@ -829,9 +829,16 @@
             </div>
 
             <div id="mtab-stats" class="mtab-content hidden page-enter px-4 md:px-0">
-                <div class="bg-white dark:bg-brand-dark-surface rounded-2xl shadow-soft border border-gray-100 dark:border-brand-dark-border p-5">
-                    <h4 class="text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest mb-6 border-b border-gray-100 dark:border-brand-dark-border pb-2 text-center">STATISTIK TIM</h4>
-                    <div id="mm-stats" class="max-w-2xl mx-auto px-4 py-2 space-y-1"></div>
+                <div class="bg-white dark:bg-brand-dark-surface rounded-2xl shadow-soft border border-gray-100 dark:border-brand-dark-border p-5 md:p-8">
+                    <h4 class="text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest mb-6 border-b border-gray-100 dark:border-brand-dark-border pb-4 text-center flex items-center justify-center gap-3">
+                        <span class="w-8 h-[1px] bg-gray-200 dark:bg-gray-700"></span> 
+                        Perbandingan Laga 
+                        <span class="w-8 h-[1px] bg-gray-200 dark:bg-gray-700"></span>
+                    </h4>
+                    
+                    <div id="premium-stats-container" class="max-w-2xl mx-auto space-y-3">
+                        <div class="text-center text-[10px] text-gray-400 animate-pulse py-10 uppercase font-bold tracking-widest">Menganalisis Data...</div>
+                    </div>
                 </div>
             </div>
             <div id="mtab-h2h" class="mtab-content hidden page-enter px-4 md:px-0">
@@ -2742,57 +2749,10 @@
                 if(gsKiri !== '' || gsKanan !== '') { document.getElementById('mm-scorer-kiri').innerHTML = gsKiri; document.getElementById('mm-scorer-kanan').innerHTML = gsKanan; document.getElementById('mm-goalscorers').classList.remove('hidden'); }
             } else { document.getElementById('mm-events').innerHTML = '<div class="text-center text-[9px] uppercase tracking-widest font-bold text-gray-400 dark:text-brand-dark-muted py-4">Tidak ada kejadian dicatat.</div>'; }
             
-            // STATS (ANIMASI DINAMIS & HIGHLIGHT PEMENANG)
-            if(ds.length > 0 && getProp(ds[0],'pos_kiri')) {
-                let s = ds[0]; 
-                const bb = (l, kr, kn, idPrefix) => {
-                    let vKr = parseFloat(kr) || 0;
-                    let vKn = parseFloat(kn) || 0;
-                    
-                    let isPct = (l === 'POSSESSION' || l === 'ACCURACY');
-                    let valKiri = isPct ? kr + '%' : kr;
-                    let valKanan = isPct ? kn + '%' : kn;
-
-                    // Logika Background Highlight untuk Pemenang Stats
-                    // Home Unggul: Background Hijau, Tulisan Putih
-                    // Away Unggul: Background Merah, Tulisan Putih
-                    // Seri: Tanpa Background, Tulisan Normal
-                    let bgKiri = vKr > vKn ? 'bg-brand-green text-white px-3 py-1 rounded-lg shadow-sm font-bold' : 'text-gray-500 dark:text-brand-dark-muted font-medium';
-                    let bgKanan = vKn > vKr ? 'bg-brand-red text-white px-3 py-1 rounded-lg shadow-sm font-bold' : 'text-gray-500 dark:text-brand-dark-muted font-medium';
-                    
-                    if (vKr === vKn) {
-                        bgKiri = 'text-brand-black dark:text-white font-bold';
-                        bgKanan = 'text-brand-black dark:text-white font-bold';
-                    }
-
-                    return `
-                    <div class="flex items-center justify-between py-4 border-b border-gray-50 dark:border-brand-dark-border last:border-none transition-colors">
-                        <div class="w-1/4 flex justify-start items-center h-8">
-                            <span class="text-base md:text-lg transition-all duration-300 ${bgKiri}">${valKiri}</span>
-                        </div>
-
-                        <div class="flex-1 text-center">
-                            <span class="uppercase text-[9px] md:text-[10px] font-bold tracking-[0.2em] text-gray-400 dark:text-gray-500">${l}</span>
-                        </div>
-
-                        <div class="w-1/4 flex justify-end items-center h-8 text-right">
-                            <span class="text-base md:text-lg transition-all duration-300 ${bgKanan}">${valKanan}</span>
-                        </div>
-                    </div>`;
-                };
-                
-                document.getElementById('mm-stats').innerHTML = bb('POSSESSION', getProp(s,'pos_kiri'), getProp(s,'pos_kanan'), 'pos') + bb('SHOTS', getProp(s,'shot_kiri'), getProp(s,'shot_kanan'), 'sht') + bb('ON TARGET', getProp(s,'target_kiri'), getProp(s,'target_kanan'), 'tgt') + bb('PASSES', getProp(s,'pass_kiri'), getProp(s,'pass_kanan'), 'pas') + bb('ACCURACY', getProp(s,'acc_kiri'), getProp(s,'acc_kanan'), 'acc');
-                
-                setTimeout(() => {
-                    ['pos', 'sht', 'tgt', 'pas', 'acc'].forEach(idPrefix => {
-                        let elKiri = document.getElementById(`stat-kiri-${idPrefix}`);
-                        let elKanan = document.getElementById(`stat-kanan-${idPrefix}`);
-                        if(elKiri) elKiri.style.width = elKiri.getAttribute('data-w');
-                        if(elKanan) elKanan.style.width = elKanan.getAttribute('data-w');
-                    });
-                }, 50);
-                
-            } else { document.getElementById('mm-stats').innerHTML = '<div class="text-center text-[9px] uppercase tracking-widest font-bold text-gray-400 dark:text-brand-dark-muted py-4">Statistik belum tersedia.</div>'; }
+            // STATS (ANIMASI DINAMIS TUG-OF-WAR)
+            if(typeof renderPremiumStats === 'function') {
+                renderPremiumStats(ds.length > 0 ? ds[0] : null);
+            }
 
             // LINEUP
             let pKiri = [], pKanan = [];
@@ -3326,7 +3286,78 @@
         
         // Render inisial lapangan saat web dimuat
         document.addEventListener('DOMContentLoaded', () => { setTimeout(renderDtPitch, 500); });
-            
+
+        // ==========================================
+        // MESIN STATISTIK TARIK-TAMBANG (TUG-OF-WAR)
+        // ==========================================
+        function renderPremiumStats(statData) {
+            let container = document.getElementById('premium-stats-container');
+            if(!container) return;
+
+            // Cek apakah data kosong
+            if (!statData || !getProp(statData, 'pos_kiri')) {
+                container.innerHTML = '<div class="text-center text-[10px] text-gray-400 dark:text-gray-600 uppercase tracking-widest py-10 font-bold"><svg class="w-10 h-10 mx-auto mb-3 text-gray-300 dark:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>Data statistik belum direkam</div>';
+                return;
+            }
+
+            const buildBar = (label, keyPrefix, isPercentage = false) => {
+                let valKiri = parseFloat(getProp(statData, `${keyPrefix}_kiri`)) || 0;
+                let valKanan = parseFloat(getProp(statData, `${keyPrefix}_kanan`)) || 0;
+                let total = valKiri + valKanan;
+
+                // Hitung lebar bar (%)
+                let pctKiri = total === 0 ? 50 : (valKiri / total) * 100;
+                let pctKanan = total === 0 ? 50 : (valKanan / total) * 100;
+
+                if(isPercentage) {
+                    pctKiri = valKiri || 50; pctKanan = valKanan || 50;
+                }
+
+                // Warna Dinamis: Pemenang akan menyala (Neon)
+                let colKiri = valKiri > valKanan ? 'bg-brand-green shadow-[0_0_12px_rgba(0,154,68,0.7)] z-10' : (valKiri === valKanan ? 'bg-gray-400 dark:bg-gray-500' : 'bg-gray-200 dark:bg-gray-800');
+                let colKanan = valKanan > valKiri ? 'bg-brand-gold shadow-[0_0_12px_rgba(215,182,125,0.7)] z-10' : (valKiri === valKanan ? 'bg-gray-400 dark:bg-gray-500' : 'bg-gray-200 dark:bg-gray-800');
+
+                // Teks Warna Dinamis
+                let textColKiri = valKiri > valKanan ? 'text-brand-green' : (valKiri === valKanan ? 'text-brand-black dark:text-white' : 'text-gray-400 dark:text-gray-600');
+                let textColKanan = valKanan > valKiri ? 'text-brand-gold' : (valKiri === valKanan ? 'text-brand-black dark:text-white' : 'text-gray-400 dark:text-gray-600');
+
+                let displayKiri = valKiri + (isPercentage ? '%' : '');
+                let displayKanan = valKanan + (isPercentage ? '%' : '');
+
+                return `
+                <div class="mb-5 group cursor-default">
+                    <div class="flex justify-between items-end mb-1.5 px-1">
+                        <span class="font-heading font-black text-sm md:text-base ${textColKiri} transition-transform group-hover:-translate-y-1 group-hover:scale-110 duration-300">${displayKiri}</span>
+                        <span class="text-[9px] md:text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">${label}</span>
+                        <span class="font-heading font-black text-sm md:text-base ${textColKanan} transition-transform group-hover:-translate-y-1 group-hover:scale-110 duration-300">${displayKanan}</span>
+                    </div>
+                    <div class="flex h-2.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden border border-gray-200 dark:border-white/10 p-[1px]">
+                        <div class="stat-bar-animate h-full rounded-l-full ${colKiri} transition-all duration-1000 ease-out" style="width: 0%;" data-target="${pctKiri}%"></div>
+                        <div class="h-full w-1 shrink-0 bg-transparent"></div>
+                        <div class="stat-bar-animate h-full rounded-r-full ${colKanan} transition-all duration-1000 ease-out" style="width: 0%;" data-target="${pctKanan}%"></div>
+                    </div>
+                </div>
+                `;
+            };
+
+            // Rakit statistik sesuai kolom di Google Sheets Anda
+            let html = '';
+            html += buildBar('Penguasaan Bola', 'pos', true);
+            html += buildBar('Tembakan', 'shot', false);
+            html += buildBar('Tepat Sasaran', 'target', false);
+            html += buildBar('Total Umpan', 'pass', false);
+            html += buildBar('Akurasi Umpan', 'acc', true);
+
+            container.innerHTML = html;
+
+            // Trigger Animasi (Bar memanjang dari tengah)
+            setTimeout(() => {
+                const bars = container.querySelectorAll('.stat-bar-animate');
+                bars.forEach(bar => {
+                    bar.style.width = bar.getAttribute('data-target');
+                });
+            }, 50);
+        }
         // FIX: MESIN RADAR AUTO-REFRESH (Pengecek Notifikasi & Skor Real-time)
         // Berjalan otomatis setiap 30 detik di latar belakang
         setInterval(() => {
