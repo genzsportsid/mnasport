@@ -1394,6 +1394,7 @@
             });
             renderKlasemenTopSkor();
                 if(typeof renderBaganGugur === 'function') renderBaganGugur();
+                if(typeof renderLiveHeroCarousel === 'function') renderLiveHeroCarousel();
         }
 
         // FIX: MESIN LIVE STICKY HEADER (BOTTOM & AUTO-HIDE)
@@ -1639,6 +1640,112 @@
             document.getElementById('beranda-live-matches').innerHTML = html;
             updateLiveTimers(); 
         }
+
+        // ==========================================
+        // MESIN LIVE MATCH HERO CAROUSEL (FOTMOB STYLE)
+        // ==========================================
+        function renderLiveHeroCarousel() {
+            const container = document.getElementById('beranda-live-matches');
+            if(!container) return;
+
+            // 1. Ambil jadwal sesuai liga aktif (SMP/SMA)
+            let isMatch = (d) => { return String(getProp(d, 'Jenjang') || getProp(d, 'Liga') || 'SMA').trim().toUpperCase() === ligaAktif; };
+            let currentLeagueMatches = (jadwalCache || []).filter(isMatch);
+
+            // 2. Filter: Prioritaskan pertandingan LIVE, HT, lalu jadwal hari ini/terdekat
+            let liveMatches = currentLeagueMatches.filter(m => {
+                let s = String(getProp(m, 'status') || '').toUpperCase();
+                return s.includes('LIVE') || s.includes('HT');
+            });
+            
+            let upcomingMatches = currentLeagueMatches.filter(m => {
+                let s = String(getProp(m, 'status') || '').toUpperCase();
+                return !s.includes('LIVE') && !s.includes('HT') && !s.includes('FT');
+            });
+
+            // Ambil maksimal 5 pertandingan untuk ditampilkan di Carousel
+            let displayMatches = [...liveMatches, ...upcomingMatches].slice(0, 5);
+
+            if(displayMatches.length === 0) {
+                container.innerHTML = '<div class="w-full flex flex-col items-center justify-center py-10 opacity-50"><svg class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Belum ada laga terdekat</p></div>';
+                return;
+            }
+
+            let html = '';
+            displayMatches.forEach(m => {
+                let tKiri = getProp(m, 'tim_kiri') || 'TBD'; let tKanan = getProp(m, 'tim_kanan') || 'TBD';
+                let lKiri = allKlasemenCache.find(t => getProp(t, 'klub') === tKiri)?.logo || getAvatar(tKiri, true);
+                let lKanan = allKlasemenCache.find(t => getProp(t, 'klub') === tKanan)?.logo || getAvatar(tKanan, true);
+                
+                let skor = String(getProp(m, 'skor') || 'VS');
+                let sKiri = skor.includes('-') ? skor.split('-')[0].trim() : '-';
+                let sKanan = skor.includes('-') ? skor.split('-')[1].trim() : '-';
+                
+                let status = String(getProp(m, 'status') || '').toUpperCase();
+                let isLive = status.includes('LIVE') || status.includes('HT');
+                let isFT = status.includes('FT');
+                let matchId = getProp(m, 'id_match');
+
+                // Lencana Status (Berdentang Merah jika LIVE)
+                let statusBadge = isLive 
+                    ? `<div class="flex items-center gap-1.5 bg-brand-red text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-[0_0_10px_rgba(210,39,48,0.6)] animate-pulse"><div class="w-1.5 h-1.5 bg-white rounded-full"></div> ${status}</div>` 
+                    : `<div class="bg-white/10 dark:bg-black/30 text-brand-black dark:text-white border border-gray-200 dark:border-white/10 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest backdrop-blur-sm">${status || 'Segera'}</div>`;
+
+                html += `
+                <div onclick="bukaHalamanMatch('${matchId}')" class="snap-center shrink-0 w-[85vw] md:w-[400px] relative rounded-[2rem] overflow-hidden cursor-pointer group shadow-lg border border-gray-200 dark:border-white/5 transition-transform hover:-translate-y-1">
+                    
+                    <div class="absolute inset-0 bg-[#0a0a0a] z-0"></div>
+                    <div class="absolute inset-0 bg-gradient-to-br from-brand-green/20 via-transparent to-brand-green/5 z-0 opacity-50 group-hover:opacity-100 transition-opacity duration-700"></div>
+                    
+                    <div class="relative z-10 p-6 flex flex-col h-full justify-between bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] bg-opacity-20">
+                        
+                        <div class="flex justify-between items-center mb-6">
+                            ${statusBadge}
+                            <div class="text-[8px] font-bold text-gray-400 uppercase tracking-[0.2em] bg-white/5 px-2.5 py-1 rounded-md border border-white/10 backdrop-blur-md flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-gold"></span> TSL 2026
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center gap-2 mb-6">
+                            <div class="flex flex-col items-center w-[35%]">
+                                <div class="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 p-2 mb-3 shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center">
+                                    <img src="${lKiri}" class="w-full h-full object-contain drop-shadow-lg">
+                                </div>
+                                <span class="text-[9px] md:text-[10px] font-bold text-white uppercase text-center line-clamp-2 leading-tight h-7">${tKiri}</span>
+                            </div>
+                            
+                            <div class="flex flex-col items-center justify-center w-[30%]">
+                                ${(isLive || isFT) && skor.includes('-') 
+                                    ? `<div class="font-heading font-black text-4xl md:text-5xl text-white tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] flex items-center gap-2">
+                                         <span>${sKiri}</span><span class="text-xl text-gray-500 font-normal pb-2">-</span><span>${sKanan}</span>
+                                       </div>` 
+                                    : `<div class="font-heading font-black text-2xl md:text-3xl text-gray-600 italic drop-shadow-md">VS</div>`
+                                }
+                            </div>
+                            
+                            <div class="flex flex-col items-center w-[35%]">
+                                <div class="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 p-2 mb-3 shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center">
+                                    <img src="${lKanan}" class="w-full h-full object-contain drop-shadow-lg">
+                                </div>
+                                <span class="text-[9px] md:text-[10px] font-bold text-white uppercase text-center line-clamp-2 leading-tight h-7">${tKanan}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-auto pt-4 border-t border-white/10 flex justify-between items-center">
+                            <div class="flex items-center gap-1.5 text-brand-green">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                <span class="text-[8px] md:text-[9px] font-bold text-gray-300 uppercase tracking-widest">Stdn. Menak Sopal</span>
+                            </div>
+                            <div class="flex items-center gap-1 text-[7px] text-brand-gold uppercase tracking-[0.2em] font-bold group-hover:translate-x-1 transition-transform">
+                                Match Center <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+            
         // --- MESIN BAGAN FASE GUGUR ---
         function renderBaganGugur() {
             let isMatch = (d) => { return String(getProp(d, 'Jenjang') || getProp(d, 'Liga') || 'SMA').trim().toUpperCase() === ligaAktif; };
@@ -1719,6 +1826,7 @@
             let dataKlasemen = (rawData.Klasemen || []).filter(isMatch);
             let dataTopSkor = (rawData.TopSkor || []).filter(isMatch);
             renderKlasemen(dataKlasemen); renderTopSkor(dataTopSkor, dataKlasemen);
+                if(typeof renderLiveHeroCarousel === 'function') renderLiveHeroCarousel();
         }
 
         let klasemenMode = 'simple';
