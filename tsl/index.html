@@ -1012,56 +1012,90 @@
             </div>
         </div>
     </div>
-    <div id="modal-pemain" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-brand-black/80 backdrop-blur-md cursor-pointer" onclick="tutupModalPemain()"></div>
-        <div id="kartu-pemain-export" class="relative z-10 w-[300px] bg-white dark:bg-brand-dark-surface rounded-[2rem] shadow-2xl modal-enter overflow-hidden border border-gray-200 dark:border-brand-dark-border transition-colors duration-500">
+    <div id="modal-pemain" class="fixed inset-0 z-[160] hidden flex-col justify-end sm:justify-center items-center p-0 sm:p-4">
+        <div class="absolute inset-0 bg-brand-black/60 dark:bg-black/80 backdrop-blur-md cursor-pointer transition-opacity" onclick="tutupModalPemain()"></div>
+        
+        <div id="kartu-pemain-export" class="relative z-10 w-full max-w-md bg-white dark:bg-[#0a0a0a] sm:rounded-[2rem] rounded-t-[2rem] shadow-2xl modal-enter overflow-hidden border border-gray-200 dark:border-white/10 transition-colors duration-500 pb-safe sm:pb-0">
             
-            <!-- Tombol Aksi -->
-            <button data-html2canvas-ignore="true" onclick="bagikanGambar('kartu-pemain-export', 'PlayerCard')" class="absolute top-4 left-4 w-7 h-7 bg-gray-100 dark:bg-brand-dark-bg hover:bg-brand-green hover:text-white rounded-full flex items-center justify-center transition-colors z-40 text-gray-500 border border-gray-200 dark:border-brand-dark-border" title="Bagikan Kartu">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+            <button data-html2canvas-ignore="true" onclick="bagikanGambar('kartu-pemain-export', 'PlayerCard')" class="absolute top-4 left-4 w-8 h-8 bg-black/20 hover:bg-brand-green hover:text-white rounded-full flex items-center justify-center transition-colors z-40 text-white backdrop-blur-md border border-white/20" title="Bagikan Kartu">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
             </button>
-            <button data-html2canvas-ignore="true" onclick="tutupModalPemain()" class="absolute top-4 right-4 w-7 h-7 bg-gray-100 dark:bg-brand-dark-bg hover:bg-brand-red hover:text-white rounded-full flex items-center justify-center transition-colors z-40 font-bold text-sm text-gray-500 border border-gray-200 dark:border-brand-dark-border">&times;</button>
+            <button data-html2canvas-ignore="true" onclick="tutupModalPemain()" class="absolute top-4 right-4 w-8 h-8 bg-black/20 hover:bg-brand-red hover:text-white rounded-full flex items-center justify-center transition-colors z-40 font-bold text-lg text-white backdrop-blur-md border border-white/20">&times;</button>
             
-            <!-- Bagian Atas (Foto & Identitas) -->
-            <div id="mp-header-bg" class="bg-gray-50 dark:bg-[#111111] pt-10 pb-6 px-6 text-center border-b border-gray-100 dark:border-brand-dark-border relative transition-colors">
-                <div id="mp-badge-topskor" class="hidden absolute top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-brand-black text-[8px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm border border-yellow-300 z-40">👑 Top Skor</div>
+            <div class="relative w-full h-36 bg-gray-900 overflow-hidden">
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 dark:opacity-50 mix-blend-overlay"></div>
+                <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-48 h-48 bg-brand-green/40 blur-[40px] rounded-full pointer-events-none"></div>
                 
-                <!-- Foto Berbingkai Rapi -->
-                <div class="w-24 h-24 mx-auto mb-4 rounded-[1rem] border-[3px] border-white dark:border-brand-dark-surface shadow-md overflow-hidden bg-gray-200 dark:bg-gray-800">
-                    <img id="mp-foto" src="" class="w-full h-full object-cover">
+                <div class="absolute right-[-20px] top-[-10px] w-48 h-48 opacity-[0.15] pointer-events-none flex items-center justify-center">
+                    <img id="mp-tim-watermark" src="" class="w-full h-full object-contain grayscale">
                 </div>
                 
-                <h2 id="mp-nama" class="font-heading font-bold text-lg md:text-xl text-brand-black dark:text-white uppercase leading-tight mb-2 export-safe-text px-2">NAMA PEMAIN</h2>
-                
-                <div class="flex items-center justify-center gap-2 cursor-pointer hover:opacity-80 transition-opacity mx-auto w-max bg-white dark:bg-brand-dark-surface px-3 py-1.5 rounded-full border border-gray-200 dark:border-brand-dark-border shadow-sm" onclick="tutupModalPemain(); bukaHalamanTim(document.getElementById('mp-tim-nama').innerText)">
-                    <img id="mp-tim-logo" src="" class="w-4 h-4 rounded-full border border-gray-100 dark:border-gray-700 bg-white object-cover">
-                    <p id="mp-tim-nama" class="text-[10px] font-bold text-gray-500 dark:text-brand-dark-muted uppercase tracking-widest export-safe-text line-clamp-1">KLUB</p>
+                <div id="mp-badge-topskor" class="hidden absolute top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-brand-black text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-[0_0_15px_rgba(250,204,21,0.5)] border border-yellow-200 z-40 flex items-center gap-1.5">
+                    <span>👑</span> TOP SKOR
                 </div>
             </div>
             
-            <!-- Bagian Bawah (Statistik) -->
-            <div class="p-5 bg-white dark:bg-brand-dark-surface transition-colors">
-                <div class="flex items-center justify-center gap-3 mb-5">
-                    <div class="bg-brand-green/10 text-brand-green px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-widest border border-brand-green/20" id="mp-posisi">POSISI</div>
-                    <div class="bg-gray-100 dark:bg-brand-dark-bg text-brand-black dark:text-white px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-widest border border-gray-200 dark:border-brand-dark-border">NO <span id="mp-nomor" class="text-brand-green ml-1">99</span></div>
-                </div>
-
-                <div class="grid grid-cols-3 gap-2 border-t border-gray-100 dark:border-brand-dark-border pt-4 mb-4 transition-colors">
-                    <div class="flex flex-col items-center"><span class="text-[7px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">Tinggi</span><span class="font-heading font-bold text-xs text-brand-black dark:text-white export-safe-text" id="mp-tinggi">-</span></div>
-                    <div class="flex flex-col items-center border-x border-gray-100 dark:border-brand-dark-border"><span class="text-[7px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">Usia</span><span class="font-heading font-bold text-[10px] text-brand-black dark:text-white mt-0.5 export-safe-text text-center line-clamp-1 px-1" id="mp-umur">-</span></div>
-                    <div class="flex flex-col items-center"><span class="text-[7px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">Kaki</span><span class="font-heading font-bold text-xs text-brand-black dark:text-white export-safe-text" id="mp-kaki">-</span></div>
+            <div class="relative px-6 -mt-16 pb-5 text-center z-20 border-b border-gray-100 dark:border-white/5">
+                <div class="relative inline-block mx-auto mb-3 group">
+                    <div class="w-28 h-28 md:w-32 md:h-32 rounded-[2rem] bg-white dark:bg-[#111] p-1.5 shadow-2xl border border-gray-200 dark:border-gray-800 rotate-3 group-hover:rotate-0 transition-transform duration-300">
+                        <img id="mp-foto" src="" class="w-full h-full object-cover rounded-[1.5rem] bg-gray-100 dark:bg-gray-800 -rotate-3 group-hover:rotate-0 transition-transform duration-300">
+                    </div>
+                    <div id="mp-nomor" class="absolute -bottom-2 -left-2 bg-brand-black dark:bg-white text-white dark:text-brand-black w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-xl font-heading font-black text-sm md:text-base border-2 border-white dark:border-[#0a0a0a] shadow-lg rotate-[-10deg] group-hover:rotate-0 transition-transform duration-300">99</div>
+                    <div class="absolute -bottom-2 -right-2 bg-brand-green text-white px-2.5 py-1 flex items-center justify-center rounded-xl border-2 border-white dark:border-[#0a0a0a] shadow-lg rotate-[10deg] group-hover:rotate-0 transition-transform duration-300">
+                        <span id="mp-posisi" class="text-[9px] md:text-[10px] font-bold uppercase tracking-widest">POS</span>
+                    </div>
                 </div>
                 
-                <div class="grid grid-cols-3 gap-2 bg-gray-50 dark:bg-brand-dark-bg rounded-xl p-3 border border-gray-100 dark:border-brand-dark-border transition-colors">
-                    <div class="flex flex-col items-center"><span class="text-[7px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">GOL</span><span class="font-heading font-black text-xl text-brand-green leading-none export-safe-text" id="mp-gol">0</span></div>
-                    <div class="flex flex-col items-center border-x border-gray-200 dark:border-gray-800"><span class="text-[7px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">KUNING</span><span class="font-heading font-black text-xl text-yellow-500 leading-none export-safe-text" id="mp-kuning">0</span></div>
-                    <div class="flex flex-col items-center"><span class="text-[7px] text-gray-400 dark:text-gray-500 tracking-widest uppercase font-bold mb-1">MERAH</span><span class="font-heading font-black text-xl text-brand-red leading-none export-safe-text" id="mp-merah">0</span></div>
+                <h2 id="mp-nama" class="font-heading font-black text-2xl md:text-3xl text-brand-black dark:text-white uppercase leading-tight mb-3 export-safe-text drop-shadow-sm tracking-tight">NAMA PEMAIN</h2>
+                
+                <div class="flex items-center justify-center gap-2 cursor-pointer hover:-translate-y-1 transition-transform mx-auto w-max bg-gray-50 dark:bg-white/5 px-4 py-2 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm" onclick="tutupModalPemain(); bukaHalamanTim(document.getElementById('mp-tim-nama').innerText)">
+                    <img id="mp-tim-logo" src="" class="w-5 h-5 rounded-full border border-gray-200 dark:border-gray-700 bg-white object-cover shadow-sm">
+                    <p id="mp-tim-nama" class="text-[10px] md:text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-widest export-safe-text line-clamp-1">KLUB</p>
+                </div>
+            </div>
+            
+            <div class="p-6 bg-white dark:bg-transparent relative z-20">
+                <div class="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <div class="w-1.5 h-1.5 bg-brand-green rounded-full"></div> Atribut Fisik
+                </div>
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <div class="bg-gray-50 dark:bg-white/5 rounded-2xl p-3 border border-gray-100 dark:border-white/5 flex flex-col items-center justify-center shadow-sm">
+                        <span class="text-[8px] text-gray-400 uppercase tracking-widest font-bold mb-1">Tinggi</span>
+                        <span class="font-heading font-black text-sm text-brand-black dark:text-white export-safe-text" id="mp-tinggi">-</span>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-white/5 rounded-2xl p-3 border border-gray-100 dark:border-white/5 flex flex-col items-center justify-center shadow-sm">
+                        <span class="text-[8px] text-gray-400 uppercase tracking-widest font-bold mb-1">Usia</span>
+                        <span class="font-heading font-black text-[10px] text-brand-black dark:text-white mt-0.5 export-safe-text text-center line-clamp-2 px-1 leading-tight" id="mp-umur">-</span>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-white/5 rounded-2xl p-3 border border-gray-100 dark:border-white/5 flex flex-col items-center justify-center shadow-sm">
+                        <span class="text-[8px] text-gray-400 uppercase tracking-widest font-bold mb-1">Kaki</span>
+                        <span class="font-heading font-black text-sm text-brand-black dark:text-white export-safe-text" id="mp-kaki">-</span>
+                    </div>
+                </div>
+                
+                <div class="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <div class="w-1.5 h-1.5 bg-brand-gold rounded-full"></div> Performa Liga
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-gradient-to-br from-brand-green/10 to-brand-green/5 dark:from-brand-green/20 dark:to-transparent rounded-2xl p-4 border border-brand-green/20 flex flex-col items-center justify-center relative overflow-hidden group shadow-sm">
+                        <div class="absolute -right-2 -bottom-2 text-4xl opacity-10 group-hover:scale-110 transition-transform duration-300 grayscale">⚽</div>
+                        <span class="text-[8px] text-brand-green uppercase tracking-widest font-bold mb-1 relative z-10">GOL</span>
+                        <span class="font-heading font-black text-3xl text-brand-green leading-none export-safe-text relative z-10 drop-shadow-sm" id="mp-gol">0</span>
+                    </div>
+                    <div class="bg-gradient-to-br from-yellow-400/10 to-yellow-400/5 dark:from-yellow-400/20 dark:to-transparent rounded-2xl p-4 border border-yellow-400/20 flex flex-col items-center justify-center relative overflow-hidden group shadow-sm">
+                        <div class="absolute -right-3 -bottom-3 text-5xl opacity-10 group-hover:scale-110 transition-transform duration-300 grayscale">🟨</div>
+                        <span class="text-[8px] text-yellow-500 uppercase tracking-widest font-bold mb-1 relative z-10">KUNING</span>
+                        <span class="font-heading font-black text-3xl text-yellow-500 leading-none export-safe-text relative z-10 drop-shadow-sm" id="mp-kuning">0</span>
+                    </div>
+                    <div class="bg-gradient-to-br from-red-500/10 to-red-500/5 dark:from-red-500/20 dark:to-transparent rounded-2xl p-4 border border-red-500/20 flex flex-col items-center justify-center relative overflow-hidden group shadow-sm">
+                        <div class="absolute -right-3 -bottom-3 text-5xl opacity-10 group-hover:scale-110 transition-transform duration-300 grayscale">🟥</div>
+                        <span class="text-[8px] text-brand-red uppercase tracking-widest font-bold mb-1 relative z-10">MERAH</span>
+                        <span class="font-heading font-black text-3xl text-brand-red leading-none export-safe-text relative z-10 drop-shadow-sm" id="mp-merah">0</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-        </div>
     <!-- MODAL PEMILIH PEMAIN DREAM TEAM -->
     <div id="modal-dt-pool" class="fixed inset-0 z-[150] hidden flex-col justify-end p-0 sm:p-4 items-center">
         <div class="absolute inset-0 bg-brand-black/80 backdrop-blur-md cursor-pointer" onclick="tutupDtPool()"></div>
@@ -2896,9 +2930,9 @@
             // FIX: Deteksi apakah yang diklik adalah Pelatih. Jika ya, belokkan ke Kartu Manager.
             let posCek = String(getProp(p,'posisi')).toUpperCase().replace(/\s+/g,'');
             if(['PELATIH','COACH','HEADCOACH','MANAGER'].includes(posCek)) {
-                bukaModalPelatih(namaPemain);
-                return; // Hentikan proses render modal pemain biasa
+                bukaModalPelatih(namaPemain); return; 
             }
+            
             let nmTim = getProp(p, 'tim'); let t = allKlasemenCache.find(x => getProp(x, 'klub') === nmTim); let logo = t && getProp(t, 'logo') ? getProp(t, 'logo') : getAvatar(nmTim, true);
 
             let jenjang = getProp(p, 'Jenjang') || (t ? getProp(t, 'Jenjang') : currentJenjang);
@@ -2908,16 +2942,17 @@
             let isTopScorer = (playerGol > 0 && playerGol >= highestGol);
 
             let badgeTs = document.getElementById('mp-badge-topskor');
-            if(isTopScorer) {
-                if(badgeTs) badgeTs.classList.remove('hidden');
-            } else {
-                if(badgeTs) badgeTs.classList.add('hidden');
-            }
+            if(isTopScorer) { if(badgeTs) badgeTs.classList.remove('hidden'); } 
+            else { if(badgeTs) badgeTs.classList.add('hidden'); }
 
             let elFoto = document.getElementById('mp-foto'); if(elFoto) elFoto.src = getProp(p, 'foto') ? getProp(p, 'foto') : getAvatar(namaPemain);
             let elNama = document.getElementById('mp-nama'); if(elNama) elNama.innerText = namaPemain;
             let elTimNama = document.getElementById('mp-tim-nama'); if(elTimNama) elTimNama.innerText = nmTim || "Tanpa Klub";
             let elTimLogo = document.getElementById('mp-tim-logo'); if(elTimLogo) elTimLogo.src = logo;
+            
+            // INJEKSI BARU: Menyuntikkan Logo Klub ke Watermark Raksasa di Latar Belakang
+            let elTimWatermark = document.getElementById('mp-tim-watermark'); if(elTimWatermark) elTimWatermark.src = logo;
+
             let elPosisi = document.getElementById('mp-posisi'); if(elPosisi) elPosisi.innerText = getProp(p,'posisi') || "POS";
             let elTinggi = document.getElementById('mp-tinggi'); if(elTinggi) elTinggi.innerText = getProp(p,'tinggi') ? getProp(p,'tinggi') + ' cm' : "-";
             let elKaki = document.getElementById('mp-kaki'); if(elKaki) elKaki.innerText = getProp(p,'kaki') || "-";
