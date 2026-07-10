@@ -550,11 +550,11 @@
         </div>
 
         <!-- TAB BAGAN FASE GUGUR -->
-        <div id="tab-bagan" class="tab-content hidden pt-[100px] px-4 md:px-8 max-w-7xl mx-auto page-enter min-h-[100dvh]">
-            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4 border-b border-gray-200 dark:border-brand-dark-border pb-4 transition-colors">
+        <div id="tab-bagan" class="tab-content hidden pt-[100px] px-4 md:px-8 max-w-5xl mx-auto page-enter min-h-[100dvh]">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-10 gap-4 border-b border-gray-200 dark:border-brand-dark-border pb-4 transition-colors">
                 <div class="flex items-center gap-3">
                     <div class="w-1.5 h-6 bg-brand-green rounded-full shadow-[0_0_10px_#009A44]"></div>
-                    <h2 class="font-heading font-black text-2xl uppercase tracking-wide text-brand-black dark:text-white transition-colors">Bagan Fase Gugur</h2>
+                    <h2 class="font-heading font-black text-2xl uppercase tracking-wide text-brand-black dark:text-white transition-colors">Fase Gugur</h2>
                 </div>
                 <div class="flex bg-gray-100 dark:bg-brand-dark-bg rounded-lg p-1 shadow-inner transition-colors w-max border border-gray-200 dark:border-brand-dark-border">
                     <button onclick="switchLigaUI('SMP')" id="btn-bagan-smp" class="px-5 py-1.5 text-[10px] font-bold rounded-md text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white uppercase transition-all">SMP</button>
@@ -562,70 +562,30 @@
                 </div>
             </div>
 
-            <!-- Kanvas Transparan -->
-            <div class="overflow-x-auto hide-scroll bg-white/50 dark:bg-brand-dark-surface/30 backdrop-blur-2xl rounded-[2rem] shadow-soft border border-gray-200/50 dark:border-white/5 p-8 md:p-12 mb-24 transition-colors">
+            <div class="w-full pb-24 transition-colors">
                 
-                <!-- KANVAS GRID PRESISI FINAL FOUR -->
-                <div class="grid grid-cols-[280px_40px_320px] md:grid-cols-[280px_60px_340px] items-center justify-center min-w-[700px] mx-auto">
-                    
-                    <!-- KOLOM 1: SEMI FINAL -->
-                    <div class="flex flex-col gap-12 relative z-20">
-                        <div class="absolute -top-10 left-0 w-full text-center">
-                            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">SEMI FINAL</span>
-                        </div>
-                        
-                        <!-- SF 1 (Tinggi Terkunci: 104px) -->
-                        <div id="bagan-sf1" class="h-[104px] bg-white dark:bg-brand-dark-surface border border-gray-200 dark:border-brand-dark-border rounded-xl overflow-hidden shadow-sm hover:border-brand-green dark:hover:border-brand-green transition-all cursor-pointer flex flex-col group hover:-translate-y-1">
-                            <div class="flex-1 flex justify-between items-center px-4 border-b border-gray-50 dark:border-white/5">
-                                <span class="text-xs font-bold uppercase text-brand-black dark:text-white truncate pr-2 transition-colors" id="b-sf1-tk">Juara Grup A</span>
-                                <span class="font-heading font-black text-base text-brand-black dark:text-white transition-colors" id="b-sf1-sk">-</span>
-                            </div>
-                            <div class="flex-1 flex justify-between items-center px-4 bg-gray-50/50 dark:bg-black/20">
-                                <span class="text-xs font-bold uppercase text-gray-500 dark:text-brand-dark-muted truncate pr-2 transition-colors" id="b-sf1-tn">Runner-up B</span>
-                                <span class="font-heading font-black text-base text-gray-500 dark:text-brand-dark-muted transition-colors" id="b-sf1-sn">-</span>
-                            </div>
-                        </div>
-                        
-                        <!-- SF 2 (Tinggi Terkunci: 104px) -->
-                        <div id="bagan-sf2" class="h-[104px] bg-white dark:bg-brand-dark-surface border border-gray-200 dark:border-brand-dark-border rounded-xl overflow-hidden shadow-sm hover:border-brand-green dark:hover:border-brand-green transition-all cursor-pointer flex flex-col group hover:-translate-y-1">
-                            <div class="flex-1 flex justify-between items-center px-4 border-b border-gray-50 dark:border-white/5">
-                                <span class="text-xs font-bold uppercase text-brand-black dark:text-white truncate pr-2 transition-colors" id="b-sf2-tk">Juara Grup B</span>
-                                <span class="font-heading font-black text-base text-brand-black dark:text-white transition-colors" id="b-sf2-sk">-</span>
-                            </div>
-                            <div class="flex-1 flex justify-between items-center px-4 bg-gray-50/50 dark:bg-black/20">
-                                <span class="text-xs font-bold uppercase text-gray-500 dark:text-brand-dark-muted truncate pr-2 transition-colors" id="b-sf2-tn">Runner-up A</span>
-                                <span class="font-heading font-black text-base text-gray-500 dark:text-brand-dark-muted transition-colors" id="b-sf2-sn">-</span>
-                            </div>
-                        </div>
+                <div class="mb-14">
+                    <div class="flex items-center justify-center gap-4 mb-6">
+                        <span class="w-12 h-[1px] bg-gray-300 dark:bg-gray-700"></span>
+                        <h3 class="font-heading font-black text-lg md:text-xl text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] text-center">Semi Final</h3>
+                        <span class="w-12 h-[1px] bg-gray-300 dark:bg-gray-700"></span>
                     </div>
-
-                    <!-- KOLOM 2: KONEKTOR MATEMATIS -->
-                    <!-- Tinggi konektor = Setengah Kotak Atas (52) + Gap (48) + Setengah Kotak Bawah (52) = 152px -->
-                    <div class="h-[152px] w-full flex items-center relative opacity-50 dark:opacity-100">
-                        <div class="w-1/2 h-full border-y-2 border-r-2 border-gray-300 dark:border-brand-dark-border rounded-r-xl"></div>
-                        <div class="w-1/2 h-0.5 bg-brand-green shadow-[0_0_10px_#009A44]"></div>
+                    <div id="bagan-semifinal-container" class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
+                        <div class="text-center text-[10px] font-bold tracking-widest text-gray-400 uppercase py-10 animate-pulse col-span-full">Menyiapkan Bagan...</div>
                     </div>
-
-                    <!-- KOLOM 3: GRAND FINAL -->
-                    <div class="relative z-20 pl-4 md:pl-6">
-                        <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-max text-center z-30">
-                            <span class="inline-block bg-gradient-to-r from-brand-gold to-yellow-500 text-brand-black text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-md border border-yellow-300">🏆 GRAND FINAL</span>
-                        </div>
-                        
-                        <div id="bagan-final" class="bg-white dark:bg-brand-dark-surface border-2 border-brand-green rounded-2xl overflow-hidden shadow-[0_15px_30px_rgba(0,154,68,0.15)] transform scale-105 transition-all hover:scale-110 cursor-pointer flex flex-col h-[130px]">
-                            <div class="bg-brand-green/10 dark:bg-brand-green/20 px-4 py-2 text-[9px] font-bold text-brand-green uppercase tracking-widest border-b border-brand-green/20 text-center">Stadion Menak Sopal</div>
-                            <div class="flex-1 flex justify-between items-center px-5 border-b border-gray-50 dark:border-white/5">
-                                <span class="text-sm font-bold uppercase text-brand-black dark:text-white truncate pr-2 transition-colors" id="b-fin-tk">Pemenang SF 1</span>
-                                <span class="font-heading font-black text-xl text-brand-black dark:text-white transition-colors" id="b-fin-sk">-</span>
-                            </div>
-                            <div class="flex-1 flex justify-between items-center px-5 bg-gray-50/50 dark:bg-black/20">
-                                <span class="text-sm font-bold uppercase text-gray-500 dark:text-brand-dark-muted truncate pr-2 transition-colors" id="b-fin-tn">Pemenang SF 2</span>
-                                <span class="font-heading font-black text-xl text-gray-500 dark:text-brand-dark-muted transition-colors" id="b-fin-sn">-</span>
-                            </div>
-                        </div>
-                    </div>
-                    
                 </div>
+
+                <div class="mb-8">
+                    <div class="flex items-center justify-center gap-4 mb-8 relative">
+                        <div class="absolute inset-0 bg-brand-gold/10 blur-2xl rounded-full"></div>
+                        <span class="w-12 md:w-24 h-[1px] bg-brand-gold/40"></span>
+                        <h3 class="font-heading font-black text-2xl md:text-3xl text-brand-gold uppercase tracking-[0.2em] text-center drop-shadow-md relative z-10 flex items-center gap-3"><span class="text-3xl md:text-4xl">🏆</span> Grand Final</h3>
+                        <span class="w-12 md:w-24 h-[1px] bg-brand-gold/40"></span>
+                    </div>
+                    <div id="bagan-final-container" class="max-w-2xl mx-auto">
+                        </div>
+                </div>
+
             </div>
         </div>
         <!-- TAB DREAM TEAM BUILDER -->
@@ -1997,12 +1957,14 @@
             }
         }
             
-        // --- MESIN BAGAN FASE GUGUR ---
+        // ==========================================
+        // MESIN BAGAN FASE GUGUR (VERTICAL STAGE CARDS)
+        // ==========================================
         function renderBaganGugur() {
             let isMatch = (d) => { return String(getProp(d, 'Jenjang') || getProp(d, 'Liga') || 'SMA').trim().toUpperCase() === ligaAktif; };
             let currentLeagueMatches = (jadwalCache || []).filter(isMatch);
 
-            // Fungsi cerdas pencari kode di Spreadsheet (Contoh: "SF1", "SF2", "FINAL")
+            // Pencari kode di Spreadsheet ("SF1", "SF2", "FINAL")
             const findMatch = (phaseCode) => {
                 return currentLeagueMatches.find(m => {
                     let grup = String(getProp(m, 'grup') || '').toUpperCase().replace(/\s+/g, '');
@@ -2015,61 +1977,113 @@
             const sf2 = findMatch('SF2');
             const final = findMatch('FINAL');
 
-            // Eksekutor Render UI
-            const fillBracketUI = (matchData, prefix) => {
-                let elTk = document.getElementById(`b-${prefix}-tk`); let elTn = document.getElementById(`b-${prefix}-tn`);
-                let elSk = document.getElementById(`b-${prefix}-sk`); let elSn = document.getElementById(`b-${prefix}-sn`);
-                let elBox = document.getElementById(`bagan-${prefix}`);
+            // Pabrik Pembuat Kartu Premium
+            const buildCard = (matchData, titleFallbackKiri, titleFallbackKanan, isFinal = false) => {
+                let tk = titleFallbackKiri, tn = titleFallbackKanan;
+                let lKiri = getAvatar(tk, true), lKanan = getAvatar(tn, true);
+                let skor = "VS", sKiri = "-", sKanan = "-";
+                let statusBadge = `<div class="bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border border-gray-300 dark:border-gray-700 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest shadow-sm">TBA</div>`;
+                let clickAction = "";
+                let isLive = false; let isFT = false; let matchId = "";
 
                 if (matchData) {
-                    let tk = getProp(matchData, 'tim_kiri') || 'TBD'; let tn = getProp(matchData, 'tim_kanan') || 'TBD';
-                    let skorStr = String(getProp(matchData, 'skor') || ""); let sKiri = "-", sKanan = "-";
-                    let status = String(getProp(matchData, 'status')||"").toUpperCase();
-                    let isStarted = status.includes('FT') || status.includes('LIVE') || status.includes('HT');
+                    tk = getProp(matchData, 'tim_kiri') || titleFallbackKiri;
+                    tn = getProp(matchData, 'tim_kanan') || titleFallbackKanan;
                     
-                    if (isStarted && skorStr.includes('-')) {
-                        let parts = skorStr.split('-'); sKiri = parts[0].trim(); sKanan = parts[1].trim();
-                    }
-
-                    if(elTk) elTk.innerText = tk; if(elTn) elTn.innerText = tn;
-                    if(elSk) elSk.innerText = sKiri; if(elSn) elSn.innerText = sKanan;
+                    let objKiri = allKlasemenCache.find(t => String(getProp(t, 'klub')).trim().toLowerCase() === String(tk).trim().toLowerCase());
+                    lKiri = (objKiri && getProp(objKiri, 'logo')) ? getProp(objKiri, 'logo') : getAvatar(tk, true);
                     
-                    // Jadikan bagan bisa diklik langsung menuju Match Center
-                    if(elBox) elBox.onclick = () => bukaHalamanMatch(getProp(matchData, 'id_match'));
+                    let objKanan = allKlasemenCache.find(t => String(getProp(t, 'klub')).trim().toLowerCase() === String(tn).trim().toLowerCase());
+                    lKanan = (objKanan && getProp(objKanan, 'logo')) ? getProp(objKanan, 'logo') : getAvatar(tn, true);
                     
-                    // Efek Visual Menyorot Pemenang jika status FT
-                    let baseKiri = "text-xs font-bold uppercase transition-colors ";
-                    let baseKanan = "text-xs font-bold uppercase transition-colors ";
-                    let valKiri = "font-heading font-bold text-base transition-colors ";
-                    let valKanan = "font-heading font-bold text-base transition-colors ";
+                    skor = String(getProp(matchData, 'skor') || 'VS');
+                    sKiri = skor.includes('-') ? skor.split('-')[0].trim() : '-';
+                    sKanan = skor.includes('-') ? skor.split('-')[1].trim() : '-';
                     
-                    if (status.includes('FT') && sKiri !== "-" && sKanan !== "-") {
-                        let k = parseInt(sKiri); let n = parseInt(sKanan);
-                        // Perbesar teks khusus untuk Final
-                        if(prefix === 'fin') { valKiri = valKiri.replace('text-base', 'text-xl font-black'); valKanan = valKanan.replace('text-base', 'text-xl font-black'); baseKiri = baseKiri.replace('text-xs', 'text-sm'); baseKanan = baseKanan.replace('text-xs', 'text-sm');}
-                        
-                        if (k > n) {
-                            if(elTk) elTk.className = baseKiri + "text-brand-black dark:text-white"; if(elSk) elSk.className = valKiri + "text-brand-black dark:text-white";
-                            if(elTn) elTn.className = baseKanan + "text-gray-400 dark:text-brand-dark-muted"; if(elSn) elSn.className = valKanan + "text-gray-400 dark:text-brand-dark-muted";
-                        } else if (n > k) {
-                            if(elTn) elTn.className = baseKanan + "text-brand-black dark:text-white"; if(elSn) elSn.className = valKanan + "text-brand-black dark:text-white";
-                            if(elTk) elTk.className = baseKiri + "text-gray-400 dark:text-brand-dark-muted"; if(elSk) elSk.className = valKiri + "text-gray-400 dark:text-brand-dark-muted";
-                        }
+                    let status = String(getProp(matchData, 'status') || '').toUpperCase();
+                    isLive = status.includes('LIVE') || status.includes('HT');
+                    isFT = status.includes('FT');
+                    matchId = safeStr(getProp(matchData, 'id_match'));
+                    let kickoffMs = parseIndoDate(getProp(matchData, 'waktu'));
+                    
+                    if (isLive) {
+                        statusBadge = `<div data-matchid="${matchId}" data-kickoff="${kickoffMs}" data-status="${status}" class="live-timer-badge flex items-center gap-1.5 bg-brand-red text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-[0_0_10px_rgba(210,39,48,0.6)]"><div class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div> <span>${status}</span></div>`;
+                    } else if (isFT) {
+                        statusBadge = `<div class="bg-white/10 dark:bg-black/30 text-brand-black dark:text-white border border-gray-200 dark:border-white/10 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest backdrop-blur-sm">FT</div>`;
                     } else {
-                         // Default Belum Main / Sedang Live
-                         if(prefix === 'fin') { valKiri = valKiri.replace('text-base', 'text-xl font-black'); valKanan = valKanan.replace('text-base', 'text-xl font-black'); baseKiri = baseKiri.replace('text-xs', 'text-sm'); baseKanan = baseKanan.replace('text-xs', 'text-sm');}
-                         if(elTk) elTk.className = baseKiri + "text-brand-black dark:text-white"; if(elSk) elSk.className = valKiri + "text-brand-black dark:text-white";
-                         if(elTn) elTn.className = baseKanan + "text-gray-500 dark:text-brand-dark-muted"; if(elSn) elSn.className = valKanan + "text-gray-500 dark:text-brand-dark-muted";
+                        let w = String(getProp(matchData, 'waktu')); let timeOnly = "TBA";
+                        if (w.includes("T")) { let dObj = new Date(w); if(!isNaN(dObj.getTime())) timeOnly = String(dObj.getHours()).padStart(2, '0') + ":" + String(dObj.getMinutes()).padStart(2, '0'); } 
+                        else { timeOnly = w.split(" - ")[1] || "TBA"; }
+                        statusBadge = `<div data-matchid="${matchId}" data-kickoff="${kickoffMs}" data-status="${status}" class="live-timer-badge bg-white/10 dark:bg-black/30 text-brand-black dark:text-white border border-gray-200 dark:border-white/10 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest backdrop-blur-sm">${timeOnly}</div>`;
                     }
-                } else {
-                    if(elTk) elTk.innerText = prefix === 'fin' ? 'Pemenang SF 1' : 'TBD';
-                    if(elTn) elTn.innerText = prefix === 'fin' ? 'Pemenang SF 2' : 'TBD';
-                    if(elSk) elSk.innerText = '-'; if(elSn) elSn.innerText = '-';
-                    if(elBox) elBox.onclick = null;
+                    clickAction = `onclick="bukaHalamanMatch('${matchId}')" class="cursor-pointer hover:-translate-y-1 transition-transform"`;
                 }
+
+                // Styling Khusus: Jika Grand Final, efek glow dan ukurannya dibesarkan!
+                let glowClass = isFinal ? "group-hover:opacity-100 to-brand-gold/15 dark:to-brand-gold/10" : "group-hover:opacity-100 to-brand-green/10 dark:to-brand-green/5";
+                let sizeClass = isFinal ? "p-6 md:p-8" : "p-5 md:p-6";
+                let logoSize = isFinal ? "w-16 h-16 md:w-20 md:h-20" : "w-14 h-14 md:w-16 md:h-16";
+                let textSize = isFinal ? "text-[10px] md:text-xs" : "text-[9px] md:text-[10px]";
+                let vsSize = isFinal ? "text-4xl md:text-5xl" : "text-3xl md:text-4xl";
+                let borderFinal = isFinal ? "border-brand-gold/40 shadow-[0_10px_30px_rgba(215,182,125,0.2)]" : "border-gray-200 dark:border-white/10 shadow-xl";
+                
+                // Mewarnai Skor pemenang jadi Hijau jika FT
+                let winKiri = (isFT && parseInt(sKiri) > parseInt(sKanan)) ? 'text-brand-green' : (isFT && parseInt(sKiri) < parseInt(sKanan) ? 'text-gray-500' : 'text-white');
+                let winKanan = (isFT && parseInt(sKanan) > parseInt(sKiri)) ? 'text-brand-green' : (isFT && parseInt(sKanan) < parseInt(sKiri) ? 'text-gray-500' : 'text-white');
+
+                return `
+                <div ${clickAction} style="${!matchData ? 'cursor: default;' : ''}" class="w-full relative rounded-[2rem] overflow-hidden group ${borderFinal} border">
+                    <div class="absolute inset-0 bg-[#0a0a0a] z-0"></div>
+                    <div class="absolute inset-0 bg-gradient-to-br from-brand-green/20 via-transparent ${glowClass} z-0 opacity-50 transition-opacity duration-700"></div>
+                    
+                    <div class="relative z-10 ${sizeClass} flex flex-col h-full justify-between bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] bg-opacity-20">
+                        
+                        <div class="flex justify-between items-center mb-6">
+                            ${statusBadge}
+                            <div class="text-[8px] font-bold text-gray-400 uppercase tracking-[0.2em] bg-white/5 px-2.5 py-1 rounded-md border border-white/10 backdrop-blur-md flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full ${isFinal ? 'bg-brand-gold' : 'bg-brand-green'}"></span> ${isFinal ? 'GRAND FINAL' : 'SEMIFINAL'}
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center gap-2">
+                            <div class="flex flex-col items-center w-[35%]">
+                                <div class="${logoSize} rounded-full bg-white/10 backdrop-blur-sm border border-white/20 p-2 mb-3 shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center">
+                                    <img src="${lKiri}" class="w-full h-full object-contain drop-shadow-lg">
+                                </div>
+                                <span class="${textSize} font-bold text-white uppercase text-center line-clamp-2 leading-tight h-7">${tk}</span>
+                            </div>
+                            
+                            <div class="flex flex-col items-center justify-center w-[30%]">
+                                ${(isLive || isFT) && skor.includes('-') 
+                                    ? `<div class="font-heading font-black ${vsSize} tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] flex items-center gap-2">
+                                         <span class="${winKiri}">${sKiri}</span>
+                                         <span class="text-xl text-gray-500 font-normal pb-2">-</span>
+                                         <span class="${winKanan}">${sKanan}</span>
+                                       </div>` 
+                                    : `<div class="font-heading font-black text-2xl md:text-3xl text-gray-600 italic drop-shadow-md">VS</div>`
+                                }
+                            </div>
+                            
+                            <div class="flex flex-col items-center w-[35%]">
+                                <div class="${logoSize} rounded-full bg-white/10 backdrop-blur-sm border border-white/20 p-2 mb-3 shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center">
+                                    <img src="${lKanan}" class="w-full h-full object-contain drop-shadow-lg">
+                                </div>
+                                <span class="${textSize} font-bold text-white uppercase text-center line-clamp-2 leading-tight h-7">${tn}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
             };
 
-            fillBracketUI(sf1, 'sf1'); fillBracketUI(sf2, 'sf2'); fillBracketUI(final, 'fin');
+            // Suntikkan ke HTML
+            let sfCont = document.getElementById('bagan-semifinal-container');
+            let finCont = document.getElementById('bagan-final-container');
+
+            if(sfCont) sfCont.innerHTML = buildCard(sf1, 'Juara Grup A', 'Runner-up B') + buildCard(sf2, 'Juara Grup B', 'Runner-up A');
+            if(finCont) finCont.innerHTML = buildCard(final, 'Pemenang SF 1', 'Pemenang SF 2', true);
+            
+            // Panggil ulang timer agar badge waktu langsung bergerak
+            if(typeof updateLiveTimers === 'function') updateLiveTimers();
         }
             
         function renderKlasemenTopSkor() {
