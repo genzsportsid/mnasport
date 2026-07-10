@@ -4048,7 +4048,8 @@
 
             // 3. Eksekusi Kirim Data ke Google Sheets di Latar Belakang (Tanpa Loading Screen!)
             try {
-                await fetch(API_URL, {
+                // FIX: Menggunakan BASE_API yang benar sesuai deklarasi di atas
+                await fetch(BASE_API, {
                     redirect: "follow",
                     method: 'POST',
                     headers: {
