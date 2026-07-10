@@ -4049,7 +4049,11 @@
             // 3. Eksekusi Kirim Data ke Google Sheets di Latar Belakang (Tanpa Loading Screen!)
             try {
                 await fetch(API_URL, {
+                    redirect: "follow",
                     method: 'POST',
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8"
+                    },
                     body: JSON.stringify({
                         action: 'submit_vote',
                         payload: { id_match: idMatch, choice: choice }
