@@ -69,7 +69,7 @@
         .timeline-line { position: absolute; left: 19px; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.1); z-index: 0; }
     </style>
 </head>
-<body class="bg-brand-dark lg:pb-0 pb-32">
+<body class="bg-brand-dark pb-10">
 
     <!-- HEADER GLOBAL -->
     <header class="fixed top-0 w-full z-50 glass-panel border-b border-white/5 pt-safe">
@@ -518,21 +518,6 @@
     <!-- MODAL DOSSIER PEMAIN -->
     <div id="playerModal" class="fixed inset-0 z-[150] hidden flex items-center justify-center p-4"><div class="absolute inset-0 bg-brand-dark/95 backdrop-blur-xl" onclick="closeModal()"></div><div id="modalContent" class="w-full max-w-sm glass-panel border border-white/10 rounded-[2.5rem] overflow-hidden relative z-10 modal-enter shadow-2xl"></div></div>
     <div id="fullProfilePage" class="fixed inset-0 z-[200] hidden bg-brand-dark h-[100dvh] w-full overflow-y-auto overscroll-contain transition-transform duration-500 translate-x-full"></div>
-
-    <nav class="fixed bottom-0 w-full z-[110] bg-brand-surface/95 backdrop-blur-2xl border-t border-white/5 pb-safe transition-colors" id="bottom-nav">
-        <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
-            <a href="/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-gold transition-colors">
-                <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i><span class="text-[9px] font-bold uppercase tracking-wider">Operator</span>
-            </a>
-            <a href="/tsl/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-green-500 transition-colors">
-                <i data-lucide="trophy" class="w-5 h-5 mb-1"></i><span class="text-[9px] font-bold uppercase tracking-wider">TSL Liga</span>
-            </a>
-            <button class="flex flex-col items-center justify-center w-full h-full text-brand-neon transition-colors relative">
-                <div class="absolute -top-1 w-8 h-1 bg-brand-neon rounded-b-full"></div>
-                <i data-lucide="shield" class="w-5 h-5 mb-1"></i><span class="text-[9px] font-bold uppercase tracking-wider">MNA FC</span>
-            </button>
-        </div>
-    </nav>
 
     <script>
         // PASTIKAN API_URL INI BENAR MENGARAH KE DEPLOYMENT APPS SCRIPT ANDA
