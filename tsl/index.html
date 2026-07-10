@@ -486,37 +486,19 @@
         </div>
 
         <div id="tab-statistik" class="tab-content hidden pt-[100px] px-4 md:px-8 max-w-7xl mx-auto page-enter min-h-[100dvh]">
-            <div class="flex flex-row justify-between items-center mb-6 gap-4 border-b border-gray-200 dark:border-brand-dark-border pb-4 transition-colors">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4 border-b border-gray-200 dark:border-brand-dark-border pb-4 transition-colors">
                 <div class="flex items-center gap-3">
-                    <div class="w-1.5 h-6 bg-brand-black dark:bg-white rounded-full transition-colors"></div>
-                    <h2 class="font-heading font-bold text-2xl uppercase tracking-wide text-brand-black dark:text-white transition-colors">Statistik Pemain</h2>
+                    <div class="w-1.5 h-6 bg-brand-gold rounded-full shadow-[0_0_10px_#facc15] transition-colors"></div>
+                    <h2 class="font-heading font-black text-2xl uppercase tracking-wide text-brand-black dark:text-white transition-colors">Pusat Statistik</h2>
                 </div>
-                <div class="flex bg-gray-100 dark:bg-brand-dark-bg rounded-lg p-1 shadow-inner transition-colors">
-                    <button onclick="switchLigaUI('SMP')" id="btn-stat-smp" class="px-5 py-1.5 text-[10px] font-bold rounded-md text-gray-500 hover:text-brand-black dark:hover:text-white uppercase transition-all">SMP</button>
-                    <button onclick="switchLigaUI('SMA')" id="btn-stat-sma" class="px-5 py-1.5 text-[10px] font-bold rounded-md bg-white shadow-sm text-brand-black dark:text-white uppercase transition-all">SMA</button>
+                <div class="flex bg-gray-100 dark:bg-brand-dark-bg rounded-lg p-1 shadow-inner transition-colors border border-gray-200 dark:border-brand-dark-border w-max">
+                    <button onclick="switchLigaUI('SMP')" id="btn-stat-smp" class="px-5 py-1.5 text-[10px] font-bold rounded-md text-gray-500 dark:text-brand-dark-muted hover:text-brand-black dark:hover:text-white uppercase transition-all">SMP</button>
+                    <button onclick="switchLigaUI('SMA')" id="btn-stat-sma" class="px-5 py-1.5 text-[10px] font-bold rounded-md bg-white dark:bg-brand-dark-surface shadow-sm text-brand-black dark:text-white uppercase transition-all">SMA</button>
                 </div>
             </div>
 
-            <div class="flex flex-col pb-24 mt-8 lg:mt-16 max-w-xl mx-auto w-full">
-                <div id="top-skor-vertical-container" class="flex flex-col gap-5 mb-10 px-4 md:px-0">
-                    <div class="text-center animate-pulse text-[10px] uppercase font-bold tracking-widest text-gray-400 dark:text-brand-dark-muted py-10 bg-white dark:bg-brand-dark-surface rounded-2xl border border-gray-100 dark:border-brand-dark-border">Menyiapkan Podium Vertikal...</div>
-                </div>
-                <div class="bg-white dark:bg-brand-dark-surface rounded-[2rem] shadow-soft border border-gray-100 dark:border-brand-dark-border overflow-hidden transition-colors duration-500">
-                    <div class="overflow-x-auto hide-scroll h-full">
-                        <table class="w-full text-left whitespace-nowrap h-full relative">
-                            <thead class="bg-gray-50 dark:bg-brand-dark-bg text-gray-400 dark:text-brand-dark-muted text-[9px] uppercase font-bold tracking-[0.15em] border-b border-gray-100 dark:border-brand-dark-border transition-colors">
-                                <tr>
-                                    <th class="px-5 py-4 sticky left-0 bg-gray-50 dark:bg-brand-dark-bg z-10 transition-colors shadow-[2px_0_5px_rgba(0,0,0,0.02)] min-w-[200px]">Pemain</th>
-                                    <th class="px-5 py-4 hidden sm:table-cell">Tim</th>
-                                    <th class="px-5 py-4 text-center text-brand-black dark:text-white transition-colors">Gol</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabel-top-skor" class="divide-y divide-gray-50 dark:divide-brand-dark-border text-[11px] transition-colors">
-                                <tr><td colspan="3" class="p-10 text-center animate-pulse text-gray-400 text-[10px] tracking-widest font-bold uppercase">Memuat Statistik...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div id="global-stats-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 md:gap-6 pb-24 mt-8 w-full">
+                <div class="col-span-full py-20 text-center animate-pulse text-[10px] font-bold uppercase tracking-widest text-gray-400">Menarik Data Analytics...</div>
             </div>
         </div>
         <div id="tab-pencarian" class="tab-content hidden pt-[100px] px-4 md:px-8 max-w-3xl mx-auto page-enter min-h-[100dvh]">
@@ -2143,97 +2125,198 @@
             }
         }
 
+        // ==========================================
+        // MESIN PUSAT STATISTIK (FOTMOB DASHBOARD ENGINE)
+        // ==========================================
         function renderTopSkor(dTS, dKlasemen) {
-            // FIX: Urutkan mutlak berdasarkan gol terbanyak terlebih dahulu
+            const container = document.getElementById('global-stats-container');
+            if(!container) return;
+
+            // --- 1. PENGOLAHAN DATA ANALITIK ---
+            
+            // A. Top Skor (Pemain)
             dTS.sort((a,b) => (parseInt(getProp(b, 'Gol') || getProp(b, 'gol')) || 0) - (parseInt(getProp(a, 'Gol') || getProp(a, 'gol')) || 0));
 
-            const container = document.getElementById('top-skor-vertical-container');
-            if(!container) return;
-            let htmlPodium = '';
+            let currentLeaguePlayers = (rawData.Pemain || []).filter(p => dKlasemen.some(k => String(getProp(k, 'klub')).toLowerCase().trim() === String(getProp(p, 'tim')).toLowerCase().trim()));
 
-            // MESIN PEMBANGUN KARTU VERTIKAL TOP 3 (FULL WIDTH)
-            // MESIN PEMBANGUN KARTU VERTIKAL TOP 3 (SIMPLE ELEGANT)
-            const buildVerticalCard = (pData, rank) => {
-                if(!pData) return ''; 
+            // B. Perhitungan Clean Sheets / Nirbobol (Tim)
+            let teamCS = {};
+            dKlasemen.forEach(k => teamCS[getProp(k, 'klub')] = 0);
+            
+            let ftMatches = (jadwalCache || []).filter(m => String(getProp(m, 'status')).toUpperCase().includes('FT') && String(getProp(m, 'Jenjang') || getProp(m, 'Liga')).toUpperCase() === ligaAktif);
+            
+            ftMatches.forEach(m => {
+                let tk = getProp(m, 'tim_kiri'); let tn = getProp(m, 'tim_kanan');
+                let skor = String(getProp(m, 'skor'));
+                if(skor.includes('-')) {
+                    let p = skor.split('-'); let sKiri = parseInt(p[0].trim()); let sKanan = parseInt(p[1].trim());
+                    // Tim Kiri Clean Sheet jika Tim Kanan mencetak 0 gol
+                    if(sKanan === 0 && teamCS[tk] !== undefined) teamCS[tk]++;
+                    // Tim Kanan Clean Sheet jika Tim Kiri mencetak 0 gol
+                    if(sKiri === 0 && teamCS[tn] !== undefined) teamCS[tn]++;
+                }
+            });
+            let csArray = Object.keys(teamCS).map(k => ({ klub: k, cs: teamCS[k] })).filter(x => x.cs > 0).sort((a,b) => b.cs - a.cs);
 
-                let nama = getProp(pData, 'Nama Pemain') || getProp(pData, 'nama');
-                let tim = getProp(pData, 'Tim') || getProp(pData, 'sekolah');
-                let gol = getProp(pData, 'Gol') || getProp(pData, 'gol');
-                
-                let dataP = (rawData.Pemain || []).find(x => String(getProp(x, 'nama')).toLowerCase().trim() === String(nama).toLowerCase().trim() && String(getProp(x, 'tim')).toLowerCase().trim() === String(tim).toLowerCase().trim()); 
-                let foto = (dataP && getProp(dataP, 'foto')) ? getProp(dataP, 'foto') : getAvatar(nama);
-                let pos = (dataP && getProp(dataP,'posisi')) ? getProp(dataP,'posisi') : 'POS';
-                let logoT = dKlasemen.find(x => getProp(x, 'klub') === tim)?.logo || getAvatar(tim, true);
+            // C. Perhitungan Kartu / Agresivitas (Tim)
+            let teamCards = {};
+            dKlasemen.forEach(k => teamCards[getProp(k, 'klub')] = { y: 0, r: 0 });
+            currentLeaguePlayers.forEach(p => {
+                let t = getProp(p, 'tim');
+                if(teamCards[t]) {
+                    teamCards[t].y += parseInt(getProp(p, 'kuning')) || 0;
+                    teamCards[t].r += parseInt(getProp(p, 'merah')) || 0;
+                }
+            });
+            // Rumus Kekasaran: Merah dihitung 3 poin, Kuning 1 poin.
+            let cardArray = Object.keys(teamCards).map(k => ({ klub: k, y: teamCards[k].y, r: teamCards[k].r, total: teamCards[k].y + (teamCards[k].r * 3) })).filter(x => x.total > 0).sort((a,b) => b.total - a.total);
 
-                let isGold = rank === 1;
-                
-                // Tema Warna Dinamis: Bingkai khusus untuk peringkat 1, 2, 3
-                let cardClass = isGold ? 'border-yellow-400 bg-yellow-50/50 dark:bg-yellow-900/10' : 
-                                 (rank === 2 ? 'border-gray-300 bg-gray-50 dark:bg-gray-800/30' : 'border-orange-400 bg-orange-50/50 dark:bg-orange-900/10');
-                let rankColor = isGold ? 'text-yellow-500' : (rank === 2 ? 'text-gray-400' : 'text-orange-500');
-                let extraEffect = isGold ? 'shadow-[0_4px_15px_rgba(250,204,21,0.2)]' : 'shadow-sm';
+            // D. Bad Boys / Pemain Paling Kasar (Pemain)
+            let badBoys = [...currentLeaguePlayers]
+                .map(p => ({
+                    nama: getProp(p, 'nama'), tim: getProp(p, 'tim'), foto: getProp(p, 'foto'),
+                    y: parseInt(getProp(p, 'kuning'))||0, r: parseInt(getProp(p, 'merah'))||0,
+                    score: (parseInt(getProp(p, 'kuning'))||0) + ((parseInt(getProp(p, 'merah'))||0)*3)
+                }))
+                .filter(x => x.score > 0)
+                .sort((a,b) => b.score - a.score);
 
+
+            // --- 2. PABRIK WIDGET HTML ---
+            const buildWidget = (title, icon, iconColor, contentHtml) => {
                 return `
-                    <div class="w-full rounded-2xl p-4 transition-all duration-300 border-2 ${cardClass} ${extraEffect} flex items-center gap-4 cursor-pointer hover:-translate-y-1" onclick="bukaModalPemain('${safeStr(nama)}', '${safeStr(tim)}')">
-                        
-                        <!-- Angka Peringkat -->
-                        <div class="font-heading font-black text-2xl ${rankColor} w-6 text-center italic shrink-0">#${rank}</div>
-                        
-                        <!-- Foto Berbingkai -->
-                        <div class="w-14 h-14 shrink-0 rounded-xl overflow-hidden border border-gray-200 dark:border-brand-dark-border bg-white">
+                <div class="bg-white dark:bg-brand-dark-surface rounded-[2rem] shadow-soft border border-gray-100 dark:border-brand-dark-border overflow-hidden flex flex-col h-[450px] transition-colors">
+                    <div class="p-5 border-b border-gray-50 dark:border-white/5 flex items-center gap-4 bg-gray-50/50 dark:bg-black/20 shrink-0">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl ${iconColor} flex items-center justify-center text-xl shadow-inner border border-white/20 dark:border-white/5 shrink-0">${icon}</div>
+                        <h3 class="font-heading font-black text-xs md:text-sm uppercase tracking-widest text-brand-black dark:text-white leading-tight">${title}</h3>
+                    </div>
+                    <div class="flex-1 overflow-y-auto hide-scroll p-3 flex flex-col gap-2">
+                        ${contentHtml}
+                    </div>
+                </div>`;
+            };
+
+            // WIDGET 1: Top Skor (Podium Vertikal)
+            let htmlTopSkor = '';
+            if (dTS.length === 0) {
+                htmlTopSkor = `<div class="m-auto text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest py-10">Belum ada pencetak gol</div>`;
+            } else {
+                const buildTSCard = (pData, rank) => {
+                    let nama = getProp(pData, 'Nama Pemain') || getProp(pData, 'nama'); let tim = getProp(pData, 'Tim') || getProp(pData, 'sekolah'); let gol = getProp(pData, 'Gol') || getProp(pData, 'gol');
+                    let dataP = (rawData.Pemain || []).find(x => String(getProp(x, 'nama')).toLowerCase().trim() === String(nama).toLowerCase().trim() && String(getProp(x, 'tim')).toLowerCase().trim() === String(tim).toLowerCase().trim()); 
+                    let foto = (dataP && getProp(dataP, 'foto')) ? getProp(dataP, 'foto') : getAvatar(nama); let pos = (dataP && getProp(dataP,'posisi')) ? getProp(dataP,'posisi') : 'POS';
+                    
+                    let logoObj = dKlasemen.find(x => getProp(x, 'klub') === tim);
+                    let logoT = (logoObj && getProp(logoObj, 'logo')) ? getProp(logoObj, 'logo') : getAvatar(tim, true);
+
+                    let isGold = rank === 1;
+                    let cardClass = isGold ? 'border-yellow-400 bg-yellow-50/50 dark:bg-yellow-900/10 shadow-[0_4px_15px_rgba(250,204,21,0.2)]' : (rank === 2 ? 'border-gray-300 bg-gray-50 dark:bg-gray-800/30' : (rank === 3 ? 'border-orange-400 bg-orange-50/50 dark:bg-orange-900/10' : 'border-gray-100 dark:border-brand-dark-border bg-white dark:bg-transparent hover:bg-gray-50 dark:hover:bg-white/5'));
+                    let rankColor = isGold ? 'text-yellow-500 text-2xl' : (rank === 2 ? 'text-gray-400 text-xl' : (rank === 3 ? 'text-orange-500 text-xl' : 'text-gray-300 dark:text-gray-600 text-sm'));
+
+                    return `
+                    <div class="w-full rounded-2xl p-3 transition-all duration-300 border ${isGold ? 'border-2' : ''} ${cardClass} flex items-center gap-3 cursor-pointer hover:-translate-y-1 group" onclick="bukaModalPemain('${safeStr(nama)}', '${safeStr(tim)}')">
+                        <div class="font-heading font-black ${rankColor} w-6 text-center italic shrink-0 group-hover:scale-110 transition-transform">#${rank}</div>
+                        <div class="w-12 h-12 shrink-0 rounded-xl overflow-hidden border border-gray-200 dark:border-brand-dark-border bg-white">
                             <img src="${foto}" class="w-full h-full object-cover">
                         </div>
-                        
-                        <!-- Identitas Pemain -->
-                        <div class="flex-1 flex flex-col justify-center min-w-0">
-                            <h2 class="font-bold text-xs md:text-sm text-brand-black dark:text-white uppercase truncate mb-1">${nama}</h2>
-                            <div class="flex items-center gap-2 mb-1.5" onclick="event.stopPropagation(); bukaHalamanTim('${safeStr(tim)}')">
-                                <img src="${logoT}" class="w-3.5 h-3.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white">
-                                <p class="text-gray-500 dark:text-brand-dark-muted text-[9px] font-bold uppercase truncate hover:text-brand-green transition-colors">${tim}</p>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-[8px] bg-white dark:bg-brand-dark-surface text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded border border-gray-200 dark:border-brand-dark-border uppercase font-bold tracking-widest">${pos}</span>
+                        <div class="flex-1 flex flex-col justify-center min-w-0 pr-2">
+                            <h2 class="font-bold text-[11px] md:text-xs text-brand-black dark:text-white uppercase truncate mb-0.5 group-hover:text-brand-green transition-colors">${nama}</h2>
+                            <div class="flex items-center gap-1.5 mb-1 text-[8px] md:text-[9px] font-bold text-gray-500 dark:text-brand-dark-muted uppercase truncate">
+                                <img src="${logoT}" class="w-3.5 h-3.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white object-contain shrink-0"> ${tim}
                             </div>
                         </div>
-                        
-                        <!-- Statistik Gol -->
-                        <div class="shrink-0 text-center bg-white dark:bg-brand-dark-surface px-3 md:px-4 py-2 rounded-xl border border-gray-100 dark:border-brand-dark-border shadow-sm">
+                        <div class="shrink-0 text-center ${isGold ? 'bg-white dark:bg-black/20' : 'bg-gray-50 dark:bg-black/20'} px-3 py-1.5 rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
                             <div class="text-[7px] text-gray-400 uppercase tracking-widest font-bold mb-0.5">GOL</div>
-                            <div class="font-heading font-black text-xl text-brand-green leading-none">${gol}</div>
+                            <div class="font-heading font-black text-lg text-brand-green leading-none drop-shadow-sm">${gol}</div>
                         </div>
                     </div>`;
-            };
-            // Suntikkan Juara 1, 2, 3 ke Container (Tanpa KOSONG)
-            if(dTS.length > 0) htmlPodium += buildVerticalCard(dTS[0], 1);
-            if(dTS.length > 1) htmlPodium += buildVerticalCard(dTS[1], 2);
-            if(dTS.length > 2) htmlPodium += buildVerticalCard(dTS[2], 3);
-
-            if(htmlPodium === '') htmlPodium = `<div class="text-center text-xs font-bold text-gray-400 dark:text-brand-dark-muted uppercase py-10 bg-white dark:bg-brand-dark-surface rounded-3xl border border-gray-100 dark:border-brand-dark-border transition-colors">Data belum tersedia</div>`;
-            container.innerHTML = htmlPodium;
-
-            // RENDER TABEL (Mulai dari Ranking ke-4)
-            let htmlTS = '';
-            for(let i = 3; i < Math.min(dTS.length, 10); i++) {
-                let nm = getProp(dTS[i], 'Nama Pemain') || getProp(dTS[i], 'nama');
-                if(nm) {
-                    let t = getProp(dTS[i], 'Tim') || getProp(dTS[i], 'sekolah');
-                    let pRow = (rawData.Pemain || []).find(x => String(getProp(x, 'nama')).toLowerCase().trim() === String(nm).toLowerCase().trim() && String(getProp(x, 'tim')).toLowerCase().trim() === String(t).toLowerCase().trim()); 
-                    let f = (pRow && getProp(pRow, 'foto')) ? getProp(pRow, 'foto') : getAvatar(nm); 
-                    let logoT = dKlasemen.find(x => getProp(x, 'klub') === t)?.logo || getAvatar(t, true);
-                    
-                    htmlTS += `<tr class="hover:bg-gray-50 dark:hover:bg-brand-dark-surface/50 cursor-pointer transition-colors border-b border-gray-50 dark:border-brand-dark-border group" onclick="bukaModalPemain('${safeStr(nm)}', '${safeStr(t)}')">
-                        <td class="px-5 py-4 font-bold uppercase flex items-center gap-3 sticky left-0 bg-white dark:bg-brand-dark-surface z-10 group-hover:bg-gray-50 dark:group-hover:bg-brand-dark-surface/50 text-brand-black dark:text-white transition-colors shadow-[2px_0_5px_rgba(0,0,0,0.02)] border-r border-gray-100 dark:border-brand-dark-border min-w-[200px]">
-                            <span class="text-gray-400 dark:text-brand-dark-muted w-4 text-right text-[11px]">${i + 1}</span>
-                            <img src="${f}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-brand-dark-border shadow-sm">
-                            <span class="truncate group-hover:text-brand-green text-[11px]">${nm}</span>
-                        </td>
-                        <td class="px-5 py-4 hidden sm:table-cell text-gray-500 dark:text-brand-dark-muted text-[9px] uppercase font-bold tracking-widest transition-colors"><div class="flex items-center gap-2"><img src="${logoT}" class="w-4 h-4 rounded-full border border-gray-100 dark:border-brand-dark-border bg-white shadow-sm"> ${t}</div></td>
-                        <td class="px-5 py-4 text-center font-heading font-bold text-lg text-brand-green">${getProp(dTS[i], 'Gol') || getProp(dTS[i], 'gol')}</td>
-                    </tr>`;
-                }
+                };
+                dTS.slice(0, 10).forEach((p, i) => htmlTopSkor += buildTSCard(p, i+1));
             }
-            if(htmlTS === '') htmlTS = '<tr><td colspan="3" class="p-10 text-center text-gray-400 dark:text-brand-dark-muted text-[10px] font-bold uppercase tracking-widest">Pemain lainnya belum tersedia.</td></tr>';
-            document.getElementById('tabel-top-skor').innerHTML = htmlTS;
+
+            // WIDGET 2: Clean Sheets (Tim)
+            let htmlCS = '';
+            if (csArray.length === 0) { htmlCS = `<div class="m-auto text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest py-10">Belum ada nirbobol</div>`; }
+            else {
+                csArray.slice(0, 10).forEach((item, idx) => {
+                    let logoObj = dKlasemen.find(x => getProp(x, 'klub') === item.klub);
+                    let logo = (logoObj && getProp(logoObj, 'logo')) ? getProp(logoObj, 'logo') : getAvatar(item.klub, true);
+                    
+                    htmlCS += `
+                    <div class="flex items-center justify-between p-3 rounded-2xl border border-transparent hover:border-gray-200 dark:hover:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors group" onclick="bukaHalamanTim('${safeStr(item.klub)}')">
+                        <div class="flex items-center gap-3 min-w-0 pr-2">
+                            <span class="font-heading font-black text-sm text-gray-300 dark:text-gray-600 w-4 text-center italic shrink-0 group-hover:text-blue-500 transition-colors">#${idx+1}</span>
+                            <img src="${logo}" class="w-10 h-10 rounded-[22%] border border-gray-200 dark:border-gray-700 bg-white object-contain p-1 shadow-sm group-hover:scale-110 transition-transform shrink-0">
+                            <span class="text-[11px] md:text-xs font-bold uppercase text-brand-black dark:text-white group-hover:text-blue-500 transition-colors truncate">${item.klub}</span>
+                        </div>
+                        <div class="flex flex-col items-center shrink-0 bg-blue-50 dark:bg-blue-500/10 px-3 py-1 rounded-xl border border-blue-100 dark:border-blue-500/20">
+                            <span class="text-[7px] font-bold text-blue-400 dark:text-blue-500 uppercase tracking-widest mb-0.5">MATCH</span>
+                            <span class="font-heading font-black text-lg leading-none text-blue-500">${item.cs}</span>
+                        </div>
+                    </div>`;
+                });
+            }
+
+            // WIDGET 3: Agresivitas Tim (Kartu)
+            let htmlTeamCards = '';
+            if (cardArray.length === 0) { htmlTeamCards = `<div class="m-auto text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest py-10">Belum ada pelanggaran</div>`; }
+            else {
+                cardArray.slice(0, 10).forEach((item, idx) => {
+                    let logoObj = dKlasemen.find(x => getProp(x, 'klub') === item.klub);
+                    let logo = (logoObj && getProp(logoObj, 'logo')) ? getProp(logoObj, 'logo') : getAvatar(item.klub, true);
+
+                    htmlTeamCards += `
+                    <div class="flex items-center justify-between p-3 rounded-2xl border border-transparent hover:border-gray-200 dark:hover:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors group" onclick="bukaHalamanTim('${safeStr(item.klub)}')">
+                        <div class="flex items-center gap-3 min-w-0 pr-2">
+                            <span class="font-heading font-black text-sm text-gray-300 dark:text-gray-600 w-4 text-center italic shrink-0 group-hover:text-orange-500 transition-colors">#${idx+1}</span>
+                            <img src="${logo}" class="w-10 h-10 rounded-[22%] border border-gray-200 dark:border-gray-700 bg-white object-contain p-1 shadow-sm group-hover:scale-110 transition-transform shrink-0">
+                            <span class="text-[11px] md:text-xs font-bold uppercase text-brand-black dark:text-white group-hover:text-orange-500 transition-colors truncate">${item.klub}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0 bg-white dark:bg-brand-dark-bg px-2 py-1.5 rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
+                            <div class="flex items-center gap-1 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded border border-yellow-200 dark:border-yellow-700"><div class="w-2.5 h-3.5 bg-yellow-400 border border-yellow-500 rounded-[2px] shadow-sm transform -rotate-6"></div><span class="font-bold text-[11px] text-yellow-600 dark:text-yellow-500 ml-0.5">${item.y}</span></div>
+                            <div class="flex items-center gap-1 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded border border-red-200 dark:border-red-700"><div class="w-2.5 h-3.5 bg-red-500 border border-red-600 rounded-[2px] shadow-sm transform -rotate-6"></div><span class="font-bold text-[11px] text-red-600 dark:text-red-500 ml-0.5">${item.r}</span></div>
+                        </div>
+                    </div>`;
+                });
+            }
+
+            // WIDGET 4: Pemain Terkasar (Pemain)
+            let htmlPlayerCards = '';
+            if (badBoys.length === 0) { htmlPlayerCards = `<div class="m-auto text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest py-10">Belum ada pelanggaran</div>`; }
+            else {
+                badBoys.slice(0, 10).forEach((item, idx) => {
+                    let logoObj = dKlasemen.find(x => getProp(x, 'klub') === item.tim);
+                    let logo = (logoObj && getProp(logoObj, 'logo')) ? getProp(logoObj, 'logo') : getAvatar(item.tim, true);
+                    let foto = item.foto || getAvatar(item.nama);
+                    
+                    htmlPlayerCards += `
+                    <div class="flex items-center justify-between p-3 rounded-2xl border border-transparent hover:border-gray-200 dark:hover:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors group" onclick="bukaModalPemain('${safeStr(item.nama)}', '${safeStr(item.tim)}')">
+                        <div class="flex items-center gap-3 min-w-0 pr-2">
+                            <span class="font-heading font-black text-sm text-gray-300 dark:text-gray-600 w-4 text-center italic shrink-0 group-hover:text-brand-red transition-colors">#${idx+1}</span>
+                            <div class="relative w-10 h-10 shrink-0">
+                                <img src="${foto}" class="w-full h-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white object-cover shadow-sm group-hover:scale-105 transition-transform">
+                                <img src="${logo}" class="absolute -bottom-1.5 -right-1.5 w-5 h-5 rounded-full border border-gray-200 dark:border-gray-600 bg-white object-contain shadow-sm p-0.5">
+                            </div>
+                            <div class="flex flex-col ml-1 min-w-0">
+                                <span class="text-[10px] md:text-[11px] font-bold uppercase text-brand-black dark:text-white group-hover:text-brand-red transition-colors truncate">${item.nama}</span>
+                                <span class="text-[7px] text-gray-400 font-bold tracking-widest uppercase truncate mt-0.5">${item.tim}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0 bg-white dark:bg-brand-dark-bg px-2 py-1.5 rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
+                            ${item.y > 0 ? `<div class="flex items-center gap-1"><div class="w-2.5 h-3.5 bg-yellow-400 border border-yellow-500 rounded-[2px] shadow-sm transform -rotate-6"></div><span class="font-bold text-[11px] text-gray-600 dark:text-gray-300 ml-0.5">${item.y}</span></div>` : ''}
+                            ${item.r > 0 ? `<div class="flex items-center gap-1 ml-1"><div class="w-2.5 h-3.5 bg-red-500 border border-red-600 rounded-[2px] shadow-sm transform -rotate-6"></div><span class="font-bold text-[11px] text-gray-600 dark:text-gray-300 ml-0.5">${item.r}</span></div>` : ''}
+                        </div>
+                    </div>`;
+                });
+            }
+
+            // Tembakkan semua ke layar (Dalam bentuk Grid Layout)
+            container.innerHTML = `
+                ${buildWidget('Pencetak Gol', '⚽', 'bg-brand-green/10 text-brand-green', htmlTopSkor)}
+                ${buildWidget('Nirbobol (Clean Sheets)', '🛡️', 'bg-blue-500/10 text-blue-500', htmlCS)}
+                ${buildWidget('Tim Agresif (Kartu)', '⚠️', 'bg-orange-500/10 text-orange-500', htmlTeamCards)}
+                ${buildWidget('Pemain Terkasar', '🟨', 'bg-brand-red/10 text-brand-red', htmlPlayerCards)}
+            `;
         }
 
         function setSearchFilter(filter) {
