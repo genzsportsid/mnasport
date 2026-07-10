@@ -1,0 +1,2033 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>MNA FC | Pro Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-blue': '#1d4ed8', 'brand-neon': '#3b82f6', 'brand-gold': '#d7b67d',
+                        'brand-dark': '#050505', 'brand-surface': '#0a0a0a', 'brand-panel': '#111111'
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+        body { background-color: #050505; color: #ffffff; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .glass-panel { background: rgba(17, 17, 17, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .player-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .player-card:hover { transform: translateY(-5px); border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2); }
+        
+        /* TACTICAL PITCH ENGINE */
+        .pitch-wrapper { position: relative; width: 100%; max-width: 380px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 1.5px solid rgba(255, 255, 255, 0.15); box-shadow: inset 0 0 40px rgba(0,0,0,0.5); }
+        .pitch-wrapper::before { content: ""; display: block; padding-top: 145%; }
+        .pitch-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: all 0.5s ease; }
+        .pitch-football { background: #061c06; background-image: repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(255,255,255,0.02) 10%, rgba(255,255,255,0.02) 20%); }
+        .pitch-futsal { background: #091324; background-image: repeating-linear-gradient(0deg, transparent, transparent 10%, rgba(255,255,255,0.02) 10%, rgba(255,255,255,0.02) 20%); }
+        .pitch-line { position: absolute; border: 1.5px solid rgba(255, 255, 255, 0.2); }
+        .pitch-half { top: 0; left: 0; width: 100%; height: 50%; border-bottom: 1.5px solid rgba(255, 255, 255, 0.2); }
+        .pitch-circle { top: 50%; left: 50%; width: 20%; aspect-ratio: 1/1; border-radius: 50%; transform: translate(-50%, -50%); }
+        
+        .position-zone { position: absolute; transform: translate(-50%, 50%); border-radius: 12px; pointer-events: none; z-index: 5; opacity: 0.7; }
+        .player-marker { position: absolute; width: 34px; height: 34px; border: 2px solid white; border-radius: 50%; transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 9px; font-weight: 900; color: white; text-shadow: 0px 1px 3px rgba(0,0,0,0.8); z-index: 10; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .player-marker-alt { position: absolute; width: 30px; height: 30px; border: 2px dashed rgba(255,255,255,0.7); border-radius: 50%; transform: translate(-50%, 50%); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 8px; font-weight: 800; color: rgba(255,255,255,0.8); z-index: 9; opacity: 0.6; }
+
+        /* LINEUP BUILDER */
+        .lineup-slot { position: absolute; width: 40px; height: 40px; border-radius: 50%; transform: translate(-50%, 50%); z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); border: 2px dashed rgba(255,255,255,0.5); backdrop-filter: blur(4px); cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .lineup-slot:hover { border-color: white; transform: translate(-50%, 50%) scale(1.05); }
+        .lineup-slot.active { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); transform: translate(-50%, 50%) scale(1.15); background: rgba(59, 130, 246, 0.3); z-index: 30; }
+        .lineup-slot.filled { border-style: solid; border-color: white; background-size: cover; background-position: center; border-width: 2px; }
+        .lineup-slot-label { position: absolute; bottom: -16px; white-space: nowrap; font-size: 8px; font-weight: 900; background: rgba(0,0,0,0.9); padding: 2px 6px; border-radius: 4px; color: white; border: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .pool-card { min-width: 70px; width: 70px; transition: all 0.2s; cursor: pointer; }
+        .pool-card:hover { transform: translateY(-3px); }
+        .pool-card:active { transform: scale(0.95); }
+        .pool-card.disabled { opacity: 0.2; pointer-events: none; filter: grayscale(100%); }
+
+        .stagger-item { animation: fadeUp 0.5s ease forwards; opacity: 0; transform: translateY(15px); }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        
+        .page-slide-in { transform: translateX(0) !important; }
+        
+        /* Animasi Berkedip FotMob Live */
+        .live-pulse { animation: pulseLive 1.5s infinite; }
+        @keyframes pulseLive { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
+        
+        /* Timeline Line FotMob */
+        .timeline-line { position: absolute; left: 19px; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.1); z-index: 0; }
+    </style>
+</head>
+<body class="bg-brand-dark lg:pb-0 pb-32">
+
+    <!-- HEADER GLOBAL -->
+    <header class="fixed top-0 w-full z-50 glass-panel border-b border-white/5 pt-safe">
+        <div class="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-brand-blue flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.4)]"><span class="font-black text-white text-xs">M</span></div>
+                <h1 class="font-black text-lg italic tracking-tighter uppercase text-white hidden sm:block" id="brand-name">MNA FC</h1>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <div id="main-nav-tabs" class="flex bg-white/5 p-1 rounded-xl border border-white/10">
+                    <button onclick="switchMode('squad')" id="tab-squad" class="px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all bg-brand-blue text-white shadow-lg">Squad</button>
+                    <button onclick="switchMode('matches')" id="tab-matches" class="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all text-gray-500 hover:text-white">Jadwal</button>
+                    <button onclick="switchMode('gallery')" id="tab-gallery" class="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all text-gray-500 hover:text-white">Media</button>
+                </div>
+                <button id="btn-lock" onclick="openCoachGate()" class="p-2 ml-1 bg-brand-panel rounded-xl border border-white/10 text-brand-gold hover:bg-brand-gold hover:text-black transition-all shadow-lg group relative">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                    <span class="absolute -bottom-8 right-0 bg-black text-[8px] px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Coach Access</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-24 px-5 max-w-7xl mx-auto pb-10">
+        
+        <!-- SPORT SWITCHER -->
+        <div id="sport-dashboard-container" class="block animate-fade-in max-w-4xl mx-auto">
+            <div class="flex gap-2 mb-6 bg-brand-panel p-1.5 rounded-2xl border border-white/5">
+                <button id="btn-fc" onclick="switchSport('mnafc')" class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all bg-brand-blue text-white shadow-lg"><i data-lucide="circle-dot" class="w-4 h-4"></i> Sepak Bola</button>
+                <button id="btn-futsal" onclick="switchSport('futsal')" class="flex-1 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all text-gray-500 hover:text-white"><i data-lucide="zap" class="w-4 h-4"></i> Futsal</button>
+            </div>
+        </div>
+
+        <!-- VIEW: SQUAD -->
+        <div id="view-squad" class="block animate-fade-in max-w-4xl mx-auto">
+            <!-- STATISTIK -->
+            <div class="glass-panel rounded-3xl p-6 md:p-8 mb-6 border border-white/5 relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-64 h-64 bg-brand-blue/10 blur-[80px] rounded-full"></div>
+                <div class="grid grid-cols-3 gap-4 relative z-10">
+                    <div><p class="text-[9px] md:text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Win Rate</p><p id="win-rate" class="text-3xl md:text-5xl font-black text-brand-neon">0%</p></div>
+                    <div class="pl-4 border-l border-white/10"><p class="text-[9px] md:text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">W-S-K</p><p id="match-record" class="text-3xl md:text-5xl font-black text-white">0-0-0</p></div>
+                    <div class="pl-4 border-l border-white/10"><p class="text-[9px] md:text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Goal Diff</p><p id="goal-diff" class="text-3xl md:text-5xl font-black text-brand-gold">+0</p></div>
+                </div>
+            </div>
+
+            <!-- FILTER SQUAD -->
+            <div class="sticky top-16 z-40 bg-brand-dark/95 backdrop-blur-xl py-4 -mx-5 px-5 mb-4 border-b border-white/5">
+                <div class="relative flex-1 mb-4">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+                    <input type="text" id="playerSearch" oninput="runFilter()" placeholder="Cari pemain, instansi..." class="w-full bg-brand-panel border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm font-medium outline-none focus:border-brand-neon transition-colors text-white placeholder-gray-600">
+                </div>
+                <div id="filter-football" class="flex gap-2 overflow-x-auto hide-scroll pb-1">
+                    <button onclick="setPosFilter('ALL', this, 'mnafc')" class="pos-btn-fc bg-brand-blue text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase border border-brand-blue transition-all whitespace-nowrap">Semua</button>
+                    <button onclick="setPosFilter('GK', this, 'mnafc')" class="pos-btn-fc text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">GK</button>
+                    <button onclick="setPosFilter('DEF', this, 'mnafc')" class="pos-btn-fc text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">DEF</button>
+                    <button onclick="setPosFilter('MID', this, 'mnafc')" class="pos-btn-fc text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">MID</button>
+                    <button onclick="setPosFilter('FWD', this, 'mnafc')" class="pos-btn-fc text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">FWD</button>
+                </div>
+                <div id="filter-futsal" class="hidden gap-2 overflow-x-auto hide-scroll pb-1">
+                    <button onclick="setPosFilter('ALL', this, 'futsal')" class="pos-btn-fs bg-brand-blue text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase border border-brand-blue transition-all whitespace-nowrap">Semua</button>
+                    <button onclick="setPosFilter('GK', this, 'futsal')" class="pos-btn-fs text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">GK</button>
+                    <button onclick="setPosFilter('ANC', this, 'futsal')" class="pos-btn-fs text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">Anchor</button>
+                    <button onclick="setPosFilter('FLK', this, 'futsal')" class="pos-btn-fs text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">Flank</button>
+                    <button onclick="setPosFilter('PVT', this, 'futsal')" class="pos-btn-fs text-gray-500 bg-brand-panel px-6 py-2 rounded-xl text-[10px] font-bold uppercase border border-white/10 transition-all whitespace-nowrap">Pivot</button>
+                </div>
+            </div>
+            
+            <div id="playerGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-12"></div>
+        </div>
+
+        <!-- VIEW: MATCHES (FOTMOB STYLE PUBLIK) -->
+        <div id="view-matches" class="hidden animate-fade-in max-w-4xl mx-auto">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-white/10 pb-4">
+                <div class="flex items-center justify-between w-full sm:w-auto gap-4">
+                    <h2 class="text-sm font-black uppercase tracking-widest text-brand-neon">Jadwal & Live Score</h2>
+                    <div id="live-indicator" class="hidden items-center gap-2 bg-red-500/10 border border-red-500/30 px-3 py-1 rounded-full">
+                        <span class="w-2 h-2 bg-red-500 rounded-full live-pulse"></span>
+                        <span class="text-[8px] font-black text-red-500 uppercase tracking-widest">LIVE</span>
+                    </div>
+                </div>
+                <div class="relative w-full sm:w-64 shrink-0">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500"></i>
+                    <input type="text" id="matchSearchPublic" oninput="renderPublicMatches()" placeholder="Cari lawan, tanggal, venue..." class="w-full bg-brand-panel border border-white/10 rounded-xl py-2 pl-9 pr-3 text-[10px] font-medium outline-none focus:border-brand-neon transition-colors text-white placeholder-gray-600 shadow-inner">
+                </div>
+            </div>
+            <div id="public-match-list" class="space-y-4">
+                <!-- Diisi via JS -->
+            </div>
+        </div>
+
+        <!-- VIEW: GALLERY -->
+        <div id="view-gallery" class="hidden animate-fade-in max-w-7xl mx-auto">
+            <div class="sticky top-16 z-40 bg-brand-dark/95 backdrop-blur-xl py-4 -mx-5 px-5 mb-4 border-b border-white/5">
+                <div class="relative w-full max-w-4xl mx-auto">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+                    <input type="text" id="mediaSearch" oninput="runMediaFilter()" placeholder="Cari kegiatan media..." class="w-full bg-brand-panel border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm font-medium outline-none focus:border-brand-neon transition-colors text-white placeholder-gray-600">
+                </div>
+            </div>
+            <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"></div>
+        </div>
+        
+        <!-- PRO COACH DASHBOARD -->
+        <div id="view-coach-dashboard" class="hidden animate-fade-in">
+            <!-- Header Coach Area -->
+            <div class="bg-brand-panel border border-brand-gold/30 p-4 rounded-2xl flex flex-wrap justify-between items-center gap-4 mb-6 shadow-lg">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center justify-center w-12 h-12 bg-black rounded-xl border border-brand-gold/50">
+                        <i data-lucide="shield-check" class="w-6 h-6 text-brand-gold"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm md:text-base font-black text-white uppercase tracking-widest leading-tight" id="coach-sport-label">MNA FC Coach</h2>
+                        <p class="text-[10px] text-brand-neon font-bold uppercase tracking-widest" id="match-status-text">Pilih Pertandingan</p>
+                    </div>
+                </div>
+                
+                <div id="match-scoreboard" class="hidden items-center gap-6 px-6 py-2 bg-black rounded-xl border border-white/10">
+                    <div class="text-center relative">
+                        <button onclick="correctScore('home')" class="absolute -left-6 top-1 text-red-500 hover:bg-red-500/20 rounded-full p-0.5"><i data-lucide="minus-circle" class="w-4 h-4"></i></button>
+                        <p class="text-[8px] text-gray-500 uppercase font-black">HOME</p><p class="text-2xl font-black text-white" id="score-home">0</p>
+                    </div>
+                    <div class="text-center cursor-pointer" onclick="toggleTimer()">
+                        <p class="text-[8px] text-gray-500 uppercase font-black mb-1">TIMER</p>
+                        <p class="text-xl font-black text-brand-gold bg-white/5 px-3 py-1 rounded border border-white/10" id="match-timer">00:00</p>
+                    </div>
+                    <div class="text-center relative">
+                        <button onclick="correctScore('away')" class="absolute -right-6 top-1 text-red-500 hover:bg-red-500/20 rounded-full p-0.5"><i data-lucide="minus-circle" class="w-4 h-4"></i></button>
+                        <p class="text-[8px] text-gray-500 uppercase font-black">AWAY</p><p class="text-2xl font-black text-red-400" id="score-away">0</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="btn-start-match" onclick="startLiveMatch()" class="hidden bg-brand-neon hover:bg-blue-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors shadow-[0_0_15px_rgba(59,130,246,0.3)]">Mulai Match</button>
+                    <!-- TOMBOL ABSENSI DITAMBAHKAN KEMBALI DI SINI -->
+                    <button onclick="openAttendancePanel()" class="bg-white/5 hover:bg-white/10 border border-white/10 text-brand-neon px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-colors"><i data-lucide="clipboard-check" class="w-4 h-4 inline pb-0.5"></i> Absensi</button>
+                    <button onclick="closeCoachDashboard()" class="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-colors"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+
+            <!-- COACH FLOW 1: SELECT MATCH -->
+            <div id="coach-match-selector" class="max-w-3xl mx-auto space-y-4 animate-fade-in">
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-white/10 pb-3 mb-4">
+                    <h3 class="text-xs font-black uppercase text-brand-gold">1. Pilih Jadwal Pertandingan</h3>
+                    
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <div class="flex gap-1 bg-black p-1 rounded-lg border border-white/10 shrink-0">
+                            <button onclick="switchSport('mnafc')" id="coach-btn-fc" class="px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest transition-all bg-brand-blue text-white">Sepak Bola</button>
+                            <button onclick="switchSport('futsal')" id="coach-btn-futsal" class="px-3 py-1 rounded text-[8px] font-bold uppercase tracking-widest transition-all text-gray-500 hover:text-white">Futsal</button>
+                        </div>
+                        <div class="relative w-full sm:w-40">
+                            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500"></i>
+                            <input type="text" id="matchSearchCoach" oninput="renderCoachMatchList()" placeholder="Cari jadwal..." class="w-full bg-black border border-white/10 rounded-lg py-1.5 pl-8 pr-3 text-[10px] font-medium outline-none focus:border-brand-neon transition-colors text-white placeholder-gray-600">
+                        </div>
+                    </div>
+                </div>
+                <div id="coach-schedule-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    </div>
+            </div>
+            <!-- COACH FLOW 2 & 3: LINEUP BUILDER & LIVE TRACKER -->
+            <div id="coach-active-match-panel" class="hidden grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
+                
+                <!-- KOLOM KIRI (TACTICAL PITCH) -->
+                <div class="lg:col-span-5 flex flex-col">
+                    <div class="bg-brand-panel p-5 rounded-[2rem] border border-white/10 shadow-xl sticky top-24">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-[10px] font-black text-white uppercase tracking-widest">Vs <span id="active-opponent-label" class="text-brand-gold"></span></h3>
+                            <select id="formation-select" onchange="changeFormation(this.value)" class="bg-black border border-white/10 text-white text-[10px] font-bold uppercase rounded-lg py-1.5 px-3 outline-none focus:border-brand-neon cursor-pointer"></select>
+                        </div>
+                        
+                        <div class="pitch-wrapper">
+                            <div id="lineup-pitch" class="pitch-container pitch-football">
+                                <div class="pitch-half pitch-line"></div><div class="pitch-circle pitch-line"></div>
+                                <div class="pitch-line" style="top:0; left:20%; width:60%; height:18%; border-top:0;"></div>
+                                <div class="pitch-line" style="bottom:0; left:20%; width:60%; height:18%; border-bottom:0;"></div>
+                                <div id="lineup-slots-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KOLOM KANAN (KONTROL PELATIH) -->
+                <div class="lg:col-span-7 flex flex-col gap-6">
+                    
+                    <!-- PANEL SETUP LINEUP (Sebelum Mulai) -->
+                    <div id="coach-setup-panel" class="bg-brand-panel p-5 rounded-3xl border border-white/10 shadow-lg block">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 border-b border-white/5 pb-4">
+                            <div>
+                                <h3 class="text-xs font-black text-white uppercase tracking-widest">Bursa Skuad</h3>
+                                <p class="text-[9px] font-bold text-gray-500 uppercase mt-1" id="lineup-instruction">1. Ketuk slot formasi di lapangan</p>
+                            </div>
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <input type="text" id="lineupSearch" oninput="renderLineupPool()" placeholder="Cari pemain..." class="bg-black border border-white/10 text-[10px] px-3 py-2 rounded-lg text-white outline-none focus:border-brand-neon w-full sm:w-40">
+                                <button onclick="resetLineup()" class="text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest hover:bg-red-500/20 transition-all whitespace-nowrap"><i data-lucide="trash-2" class="w-3 h-3 inline"></i> Reset</button>
+                            </div>
+                        </div>
+                        
+                        <div id="lineup-pool" class="flex flex-wrap lg:grid lg:grid-cols-5 gap-3 overflow-y-auto max-h-[400px] hide-scroll opacity-30 pointer-events-none transition-opacity duration-300">
+                        </div>
+                    </div>
+
+                    <!-- PANEL LIVE TRACKER (Setelah Mulai) -->
+                    <div id="coach-live-panel" class="hidden flex-col gap-6">
+                        
+                        <!-- Action Pad Gol -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="triggerAction('goal_home')" class="action-btn bg-gradient-to-br from-green-600/30 to-green-900/40 border border-green-500/50 text-green-400 p-6 rounded-3xl flex flex-col items-center justify-center gap-3 hover:border-green-400 shadow-[0_0_30px_rgba(34,197,94,0.15)]">
+                                <i data-lucide="goal" class="w-10 h-10 drop-shadow-md"></i><span class="text-sm font-black uppercase tracking-widest text-white">Goal Scored</span>
+                            </button>
+                            <button onclick="triggerAction('goal_away')" class="action-btn bg-gradient-to-br from-red-600/30 to-red-900/40 border border-red-500/50 text-red-400 p-6 rounded-3xl flex flex-col items-center justify-center gap-3 hover:border-red-400 shadow-[0_0_30px_rgba(239,68,68,0.15)]">
+                                <i data-lucide="shield-alert" class="w-10 h-10 drop-shadow-md"></i><span class="text-sm font-black uppercase tracking-widest text-white">Conceded</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Action Pad Pelanggaran & Sub -->
+                        <div class="grid grid-cols-4 sm:grid-cols-6 gap-3">
+                            <button onclick="triggerAction('assist')" class="action-btn bg-brand-panel border border-white/10 p-3 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5"><i data-lucide="footprints" class="w-5 h-5 text-brand-neon"></i><span class="text-[9px] font-bold uppercase text-gray-300">Assist</span></button>
+                            <button onclick="triggerAction('sub')" class="action-btn bg-brand-panel border border-white/10 p-3 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5"><i data-lucide="arrow-left-right" class="w-5 h-5 text-brand-gold"></i><span class="text-[9px] font-bold uppercase text-gray-300">Sub</span></button>
+                            <button onclick="triggerAction('yellow')" class="action-btn bg-brand-panel border border-white/10 p-3 rounded-2xl flex flex-col items-center justify-center gap-2 hover:border-yellow-500/50"><div class="w-4 h-5 bg-yellow-400 rounded shadow-sm"></div><span class="text-[9px] font-bold uppercase text-gray-300">Yellow</span></button>
+                            <button onclick="triggerAction('red')" class="action-btn bg-brand-panel border border-white/10 p-3 rounded-2xl flex flex-col items-center justify-center gap-2 hover:border-red-500/50"><div class="w-4 h-5 bg-red-600 rounded shadow-sm"></div><span class="text-[9px] font-bold uppercase text-gray-300">Red</span></button>
+                            <button onclick="triggerAction('pen_won')" class="action-btn col-span-2 sm:col-span-1 bg-brand-panel border border-white/10 p-3 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5"><i data-lucide="target" class="w-5 h-5 text-green-400"></i><span class="text-[9px] font-bold uppercase text-gray-300">Pen Won</span></button>
+                            <button onclick="triggerAction('pen_miss')" class="action-btn col-span-2 sm:col-span-1 bg-brand-panel border border-white/10 p-3 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5"><i data-lucide="x-circle" class="w-5 h-5 text-red-400"></i><span class="text-[9px] font-bold uppercase text-gray-300">Pen Miss</span></button>
+                        </div>
+
+                        <!-- Match Log (Timeline) -->
+                        <div class="bg-[#050505] border border-white/10 rounded-3xl p-5 flex-1 min-h-[250px] shadow-inner flex flex-col">
+                            <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-white/5 pb-3 mb-4 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4"></i> Match Timeline</h3>
+                            <div id="event-log" class="overflow-y-auto hide-scroll flex-1 space-y-3">
+                                <div class="text-center mt-10"><p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Belum ada kejadian tercatat</p></div>
+                            </div>
+                        </div>
+
+                        <button onclick="endLiveMatch()" class="w-full bg-gradient-to-r from-red-600/80 to-red-900/90 hover:from-red-500 hover:to-red-700 text-white py-4 mt-2 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all">
+                            <i data-lucide="save" class="w-4 h-4 inline pb-0.5 mr-1"></i> Akhiri Match (FT) & Simpan
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COACH FLOW 5: POST-MATCH EDITOR PRO -->
+            <div id="coach-post-match-panel" class="hidden flex-col gap-6 max-w-4xl mx-auto animate-fade-in w-full pb-10">
+                <div class="bg-brand-panel p-5 md:p-6 rounded-[2rem] border border-white/10 shadow-xl">
+                    <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-4">
+                        <div><h3 class="text-xs font-black text-white uppercase tracking-widest">Post-Match Editor</h3><p class="text-[9px] font-bold text-brand-gold uppercase mt-1" id="pme-match-title">VS Lawan</p></div>
+                        <button onclick="closePostMatchEditor()" class="text-gray-500 hover:text-white bg-white/5 p-2 rounded-xl transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>
+
+                    <!-- TABS EDITOR -->
+                    <div class="flex border border-white/10 mb-5 bg-black rounded-xl p-1 gap-1">
+                        <button onclick="switchPmeTab('skuad')" id="pme-tab-skuad" class="flex-1 py-2 text-[9px] font-black uppercase rounded-lg bg-brand-neon text-white transition-all">1. Skuad</button>
+                        <button onclick="switchPmeTab('event')" id="pme-tab-event" class="flex-1 py-2 text-[9px] font-bold uppercase rounded-lg text-gray-500 hover:text-white transition-all">2. Kejadian</button>
+                        <button onclick="switchPmeTab('stats')" id="pme-tab-stats" class="flex-1 py-2 text-[9px] font-bold uppercase rounded-lg text-gray-500 hover:text-white transition-all">3. Statistik</button>
+                    </div>
+
+                    <!-- TAB 1: SKUAD & FORMASI -->
+                    <div id="pme-view-skuad" class="block space-y-4">
+                        <div class="flex items-center justify-between bg-black p-3 rounded-xl border border-white/5">
+                            <label class="text-[10px] font-black text-brand-gold uppercase tracking-widest">Formasi Starting XI</label>
+                            <select id="pme-formation-select" onchange="changePmeFormation(this.value)" class="bg-white/10 border border-white/10 text-white text-[10px] py-1.5 px-3 rounded-lg outline-none cursor-pointer"></select>
+                        </div>
+                        <div class="pitch-wrapper mx-auto"><div id="pme-pitch" class="pitch-container pitch-football"></div></div>
+                        <div>
+                            <div class="flex justify-between items-end border-b border-white/5 pb-2 mb-3 mt-4">
+                                <h4 class="text-[10px] font-black text-white uppercase tracking-widest">Cadangan (Bench)</h4>
+                                <button onclick="pmeActiveSlot = 'bench'; renderPmePool();" class="text-[8px] bg-white/10 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-white/20 transition-all uppercase"><i data-lucide="plus" class="w-3 h-3 inline"></i> Tambah Sub</button>
+                            </div>
+                            <div id="pme-bench-container" class="flex flex-wrap gap-2 min-h-[50px] bg-black/50 p-3 rounded-xl border border-white/5"></div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: KEJADIAN (EVENTS) -->
+                    <div id="pme-view-event" class="hidden space-y-4">
+                        <div class="bg-black border border-white/10 p-4 rounded-xl shadow-inner">
+                            <h4 class="text-[10px] font-black text-brand-neon uppercase mb-3 flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4"></i> Tambah Kejadian Laga</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+                                <div class="sm:col-span-1">
+                                    <label class="text-[8px] text-gray-500 uppercase font-bold block mb-1">1. Pilih Pemain</label>
+                                    <button onclick="pmeActiveSlot = 'event'; renderPmePool();" id="pme-btn-select-player" class="w-full bg-white/5 border border-white/10 text-brand-gold font-bold text-[10px] p-2.5 rounded-lg truncate text-left hover:bg-white/10 transition-colors">Klik Pilih Pemain...</button>
+                                    <input type="hidden" id="pme-event-player-idx">
+                                </div>
+                                <div class="sm:col-span-1">
+                                    <label class="text-[8px] text-gray-500 uppercase font-bold block mb-1">2. Jenis</label>
+                                    <select id="pme-input-type" class="w-full bg-white/5 border border-white/10 text-white text-[10px] p-2.5 rounded-lg outline-none cursor-pointer">
+                                        <option value="Gol">Gol</option><option value="Assist">Assist</option><option value="Kartu Kuning">Kartu Kuning</option><option value="Kartu Merah">Kartu Merah</option>
+                                    </select>
+                                </div>
+                                <div class="sm:col-span-1">
+                                    <label class="text-[8px] text-gray-500 uppercase font-bold block mb-1">3. Menit (Contoh: 45')</label>
+                                    <input type="text" id="pme-input-time" placeholder="45'" class="w-full bg-white/5 border border-white/10 text-white text-[10px] font-black p-2.5 rounded-lg text-center outline-none focus:border-brand-neon">
+                                </div>
+                                <div class="sm:col-span-1"><button onclick="addPmeEvent()" class="w-full bg-brand-neon text-white px-3 py-2.5 text-[10px] font-black uppercase rounded-lg hover:bg-blue-600 transition-all shadow-lg">Tambah</button></div>
+                            </div>
+                        </div>
+                        <div id="pme-events-list" class="space-y-2 max-h-60 overflow-y-auto hide-scroll p-1"></div>
+                    </div>
+
+                    <!-- TAB 3: STATISTIK -->
+                    <div id="pme-view-stats" class="hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-black border border-white/10 p-5 rounded-2xl">
+                            <div class="space-y-3">
+                                <h4 class="text-[10px] font-black text-brand-neon uppercase tracking-widest text-center border-b border-white/5 pb-2">MNA FC</h4>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Penguasaan (%)</label><input type="number" id="pme-pos-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tembakan</label><input type="number" id="pme-shot-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tepat Sasaran</label><input type="number" id="pme-sot-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Total Umpan</label><input type="number" id="pme-pass-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Akurasi Umpan (%)</label><input type="number" id="pme-acc-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tendangan Sudut</label><input type="number" id="pme-corn-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Offside</label><input type="number" id="pme-off-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Pelanggaran</label><input type="number" id="pme-foul-h" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-brand-neon outline-none"></div>
+                            </div>
+                            <div class="space-y-3">
+                                <h4 class="text-[10px] font-black text-red-400 uppercase tracking-widest text-center border-b border-white/5 pb-2">LAWAN</h4>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Penguasaan (%)</label><input type="number" id="pme-pos-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tembakan</label><input type="number" id="pme-shot-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tepat Sasaran</label><input type="number" id="pme-sot-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Total Umpan</label><input type="number" id="pme-pass-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Akurasi Umpan (%)</label><input type="number" id="pme-acc-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Tendangan Sudut</label><input type="number" id="pme-corn-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Offside</label><input type="number" id="pme-off-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                                <div class="flex items-center justify-between"><label class="text-[9px] font-bold text-gray-400 uppercase">Pelanggaran</label><input type="number" id="pme-foul-a" class="w-14 bg-white/5 border border-white/10 text-white font-black text-center text-[10px] py-1.5 rounded focus:border-red-500 outline-none"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SHARED PLAYER POOL -->
+                    <div id="pme-pool-section" class="mt-6 pt-5 border-t border-white/5 opacity-30 pointer-events-none transition-opacity duration-300">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4">
+                            <div><h4 class="text-[10px] font-black text-white uppercase tracking-widest">Bursa Pemain</h4><p class="text-[8px] font-bold text-brand-gold uppercase mt-0.5" id="pme-pool-instruction">Klik slot di atas terlebih dahulu</p></div>
+                            <div class="relative w-full sm:w-48"><i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500"></i><input type="text" id="pmeSearch" oninput="renderPmePool()" placeholder="Cari nama / posisi..." class="w-full bg-black border border-white/10 rounded-xl py-2 pl-9 pr-3 text-[10px] text-white outline-none focus:border-brand-neon shadow-inner"></div>
+                        </div>
+                        <div id="pme-pool-container" class="flex flex-wrap lg:grid lg:grid-cols-5 gap-3 overflow-y-auto max-h-[300px] hide-scroll"></div>
+                    </div>
+
+                    <button onclick="savePmeData()" class="w-full bg-gradient-to-r from-brand-neon to-brand-blue hover:from-blue-500 hover:to-blue-700 text-white py-4 mt-6 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all flex justify-center items-center gap-2">
+                        <i data-lucide="upload-cloud" class="w-4 h-4"></i> Encode & Simpan Seluruh Data Laga
+                    </button>
+                </div>
+            </div>
+            
+            <!-- COACH FLOW 4: ABSENSI -->
+            <div id="coach-attendance-panel" class="hidden flex-col gap-4 max-w-3xl mx-auto animate-fade-in w-full pb-10">
+                <div class="bg-brand-panel p-5 rounded-[2rem] border border-white/10 shadow-xl">
+                    <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-4">
+                        <div>
+                            <h3 class="text-xs font-black text-white uppercase tracking-widest">Absensi Skuad</h3>
+                            <p class="text-[9px] font-bold text-brand-neon uppercase mt-1">Default: Semua Hadir</p>
+                        </div>
+                        <select id="tipe-sesi-absen" class="bg-black border border-white/10 text-white text-[10px] font-bold uppercase rounded-lg py-2 px-3 outline-none focus:border-brand-neon cursor-pointer">
+                            <option value="Latihan">Latihan</option>
+                            <option value="Uji Coba">Uji Coba</option>
+                            <option value="Turnamen">Turnamen</option>
+                        </select>
+                    </div>
+                    
+                    <div class="relative w-full mb-4">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+                        <input type="text" id="attendanceSearch" oninput="renderAttendanceList()" placeholder="Cari nama pemain untuk diabsen..." class="w-full bg-black border border-white/10 rounded-xl py-3 pl-12 pr-4 text-xs font-medium outline-none focus:border-brand-neon transition-colors text-white placeholder-gray-600">
+                    </div>
+
+                    <div id="attendance-list" class="space-y-3 max-h-[60vh] overflow-y-auto hide-scroll pb-2 px-1">
+                        <!-- Diisi via JS -->
+                    </div>
+
+                    <button onclick="submitAttendance()" class="w-full bg-gradient-to-r from-brand-blue to-brand-neon hover:from-blue-600 hover:to-blue-500 text-white py-4 mt-6 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
+                        <i data-lucide="save" class="w-4 h-4 inline pb-0.5 mr-1"></i> Simpan Data Absensi
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+
+    </main>
+
+    <!-- MODAL PEMILIH PEMAIN (Action Selector & Sub-In) -->
+    <div id="actionModal" class="fixed inset-0 z-[250] hidden flex flex-col justify-end lg:justify-center lg:items-center p-0 lg:p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeActionModal()"></div>
+        <div class="relative bg-brand-panel border-t border-x border-white/10 lg:border lg:rounded-3xl rounded-t-[2rem] p-6 w-full lg:max-w-2xl mx-auto z-10 modal-enter pb-safe shadow-2xl flex flex-col max-h-[85vh]">
+            <h3 id="action-title" class="text-lg lg:text-xl font-black text-white uppercase tracking-widest mb-4 text-center drop-shadow-md flex-shrink-0">Pilih Pemain</h3>
+            
+            <div id="action-search-container" class="hidden mb-4 flex-shrink-0 px-2">
+                <input type="text" id="actionSearch" oninput="renderSubInPool()" placeholder="Cari pemain pengganti..." class="w-full bg-black border border-white/10 rounded-xl py-3 px-4 text-xs text-white outline-none focus:border-brand-neon">
+            </div>
+
+            <div id="action-player-list" class="grid grid-cols-4 lg:grid-cols-6 gap-4 overflow-y-auto hide-scroll px-2 pb-2 flex-1">
+                <!-- Diisi via JS -->
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-white/10 text-center flex-shrink-0">
+                <button onclick="closeActionModal()" class="bg-white/5 hover:bg-white/10 border border-white/10 px-8 py-3 rounded-xl text-[10px] font-bold text-white uppercase tracking-widest transition-all">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL MATCH CENTER (DETAIL MATCH FOTMOB STYLE) -->
+    <div id="matchDetailModal" class="fixed inset-0 z-[250] hidden flex flex-col justify-end lg:justify-center lg:items-center p-0 lg:p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeMatchDetail()"></div>
+        <div class="relative bg-[#0a0a0a] border-t border-x border-white/10 lg:border lg:rounded-3xl rounded-t-[2rem] w-full lg:max-w-md mx-auto z-10 modal-enter pb-safe shadow-2xl h-[85vh] flex flex-col overflow-hidden">
+            
+            <div class="bg-brand-panel border-b border-white/5 pt-6 pb-5 px-6 relative shrink-0">
+                <button onclick="closeMatchDetail()" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors bg-white/5 p-1.5 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <div class="text-center mb-4">
+                    <span id="md-status" class="text-[9px] font-black bg-white/10 text-white px-2 py-0.5 rounded uppercase tracking-widest">FT</span>
+                    <!-- TAG INI YANG SEBELUMNYA HILANG -->
+                    <p id="md-date" class="text-[9px] text-gray-500 uppercase font-bold mt-2 tracking-wider">Tanggal • Venue</p>
+                </div>
+                <div class="flex justify-between items-center gap-4">
+                    <div class="w-1/3 flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-brand-blue flex items-center justify-center text-white font-black text-2xl shadow-lg border border-brand-blue/50">M</div><h3 class="text-[10px] md:text-xs font-black text-white uppercase text-center leading-tight">MNA FC</h3></div>
+                    <div class="w-1/3 text-center flex flex-col items-center"><p class="text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-md" id="md-score">0 - 0</p></div>
+                    <div class="w-1/3 flex flex-col items-center gap-2"><div class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 font-black text-2xl shadow-lg">?</div><h3 class="text-[10px] md:text-xs font-black text-gray-400 uppercase text-center leading-tight line-clamp-2" id="md-lawan">Lawan</h3></div>
+                </div>
+            </div>
+
+            <div class="flex border-b border-white/5 shrink-0 px-4 bg-brand-surface">
+                <button onclick="switchMatchTab('timeline')" id="tab-md-timeline" class="flex-1 py-3.5 text-[10px] font-black uppercase tracking-widest text-brand-neon border-b-2 border-brand-neon transition-colors">Timeline</button>
+                <button onclick="switchMatchTab('lineup')" id="tab-md-lineup" class="flex-1 py-3.5 text-[10px] font-bold uppercase tracking-widest text-gray-600 border-b-2 border-transparent transition-colors">Line Up</button>
+                <button onclick="switchMatchTab('stats')" id="tab-md-stats" class="flex-1 py-3.5 text-[10px] font-bold uppercase tracking-widest text-gray-600 border-b-2 border-transparent transition-colors">Stats</button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto hide-scroll bg-[#050505] p-5 relative">
+                <div id="md-view-timeline" class="block">
+                    <div class="absolute left-[39px] md:left-[43px] top-8 bottom-8 w-[2px] bg-white/5 rounded-full"></div>
+                    <div id="md-events-container" class="space-y-6 relative z-10"></div>
+                </div>
+                <div id="md-view-lineup" class="hidden">
+                    <div id="md-lineup-container" class="w-full"></div>
+                </div>
+                <div id="md-view-stats" class="hidden">
+                    <div id="md-stats-container" class="space-y-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL LOGIN PELATIH -->
+    <div id="gateModal" class="fixed inset-0 z-[300] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeCoachGate()"></div>
+        <div class="relative bg-[#0a0a0a] p-8 rounded-[2rem] border border-brand-gold/30 shadow-[0_0_50px_rgba(215,182,125,0.15)] w-full max-w-xs z-10 text-center modal-enter">
+            <i data-lucide="lock" class="w-12 h-12 text-brand-gold mx-auto mb-4 drop-shadow-lg"></i>
+            <h2 class="text-xl font-black uppercase text-white tracking-widest mb-1">Coach Area</h2>
+            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-8">Otorisasi Level 1</p>
+            
+            <input type="password" id="coach-pin" maxlength="4" placeholder="••••" class="w-full text-center text-4xl font-black tracking-[0.5em] bg-black border border-white/10 text-brand-gold rounded-2xl py-4 outline-none focus:border-brand-gold focus:shadow-[0_0_20px_rgba(215,182,125,0.2)] mb-6 transition-all placeholder-gray-800">
+            
+            <button onclick="verifyPin()" class="w-full py-4 bg-brand-gold text-black font-black uppercase text-xs tracking-widest rounded-xl hover:bg-white transition-colors shadow-lg">Akses Dashboard</button>
+        </div>
+    </div>
+
+    <!-- MODAL DOSSIER PEMAIN -->
+    <div id="playerModal" class="fixed inset-0 z-[150] hidden flex items-center justify-center p-4"><div class="absolute inset-0 bg-brand-dark/95 backdrop-blur-xl" onclick="closeModal()"></div><div id="modalContent" class="w-full max-w-sm glass-panel border border-white/10 rounded-[2.5rem] overflow-hidden relative z-10 modal-enter shadow-2xl"></div></div>
+    <div id="fullProfilePage" class="fixed inset-0 z-[200] hidden bg-brand-dark h-[100dvh] w-full overflow-y-auto overscroll-contain transition-transform duration-500 translate-x-full"></div>
+
+    <nav class="fixed bottom-0 w-full z-[110] bg-brand-surface/95 backdrop-blur-2xl border-t border-white/5 pb-safe transition-colors" id="bottom-nav">
+        <div class="flex justify-around items-center h-16 max-w-md mx-auto px-2">
+            <a href="/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-gold transition-colors">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1"></i><span class="text-[9px] font-bold uppercase tracking-wider">Operator</span>
+            </a>
+            <a href="/tsl/" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-green-500 transition-colors">
+                <i data-lucide="trophy" class="w-5 h-5 mb-1"></i><span class="text-[9px] font-bold uppercase tracking-wider">TSL Liga</span>
+            </a>
+            <button class="flex flex-col items-center justify-center w-full h-full text-brand-neon transition-colors relative">
+                <div class="absolute -top-1 w-8 h-1 bg-brand-neon rounded-b-full"></div>
+                <i data-lucide="shield" class="w-5 h-5 mb-1"></i><span class="text-[9px] font-bold uppercase tracking-wider">MNA FC</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        // PASTIKAN API_URL INI BENAR MENGARAH KE DEPLOYMENT APPS SCRIPT ANDA
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyjnfuOzPD5wu124WU_h86p8TjdNt7ll9iHgmd2w6mOnaHbMQs-ee6ShoVw3U5F_CZdcg/exec'; 
+        let rawData = { mnafc: { pemain: [], statistik: {} }, futsal: { pemain: [], statistik: {} }, galeri: [], jadwal: [], match_log: [] };
+        let activeSport = 'mnafc'; 
+        let activePos = 'ALL';
+        let livePollingInterval = null; 
+
+        const val = (d, f = "-") => (d === "" || d === null || d === undefined) ? f : d;
+        // AUTOMATED MATCH BADGE COLOR ENGINE
+        function getMatchBadge(jenis) {
+            const type = val(jenis, '').trim();
+            if (!type || type === '-') return ''; 
+            const typeUpper = type.toUpperCase();
+
+            // Koleksi Palet Warna Premium (UI Safe)
+            const palettes = [
+                'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                'bg-red-500/10 text-red-400 border-red-500/20',
+                'bg-brand-gold/10 text-brand-gold border-brand-gold/20',
+                'bg-purple-500/10 text-purple-400 border-purple-500/20',
+                'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                'bg-orange-500/10 text-orange-400 border-orange-500/20',
+                'bg-pink-500/10 text-pink-400 border-pink-500/20',
+                'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'
+            ];
+
+            // Algoritma Deterministik Hash String
+            let hash = 0;
+            for (let i = 0; i < typeUpper.length; i++) {
+                hash = typeUpper.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            
+            const colorIndex = Math.abs(hash) % palettes.length;
+            const selectedColor = palettes[colorIndex];
+
+            return `<span class="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded border ${selectedColor} inline-block shadow-sm">${typeUpper}</span>`;
+        }
+        
+        function parseIndoDate(dateStr) {
+            if (!dateStr || dateStr === '-') return null;
+            let cleanStr = String(dateStr).trim().split(' ')[0].split('T')[0];
+            const parts = cleanStr.split(/[\/\-]/);
+            if (parts.length === 3) {
+                let p1 = parseInt(parts[0], 10); let p2 = parseInt(parts[1], 10); let p3 = parseInt(parts[2], 10);
+                if (p1 > 1000) { return new Date(p1, p2 - 1, p3); } 
+                else { let day = p1; let month = p2 - 1; let year = p3; if (month > 11) { day = p2; month = p1 - 1; } if (year < 100) { year += (year > 50 ? 1900 : 2000); } return new Date(year, month, day); }
+            }
+            const attempt = new Date(dateStr); return isNaN(attempt) ? null : attempt;
+        }
+
+        function processPlayerData(players) {
+            if(!players) return [];
+            return players.map(p => {
+                const birthDate = parseIndoDate(p.tanggal_lahir);
+                p.tanggal_lahir_format = '-'; p.umur_detail = '-'; p.kategori_auto = '-';
+                if (birthDate) {
+                    p.tanggal_lahir_format = `${String(birthDate.getDate()).padStart(2, '0')}/${String(birthDate.getMonth() + 1).padStart(2, '0')}/${String(birthDate.getFullYear()).slice(-2)}`;
+                    const today = new Date(); let years = today.getFullYear() - birthDate.getFullYear(); let months = today.getMonth() - birthDate.getMonth(); let days = today.getDate() - birthDate.getDate();
+                    if (days < 0) { months--; const lm = new Date(today.getFullYear(), today.getMonth(), 0); days += lm.getDate(); }
+                    if (months < 0) { years--; months += 12; }
+                    p.umur_detail = `${years}th ${months}bln`;
+                    p.kategori_auto = years < 16 ? 'U-15' : (years <= 17 ? 'U-17' : 'SENIOR');
+                }
+                return p;
+            });
+        }
+
+        async function init() {
+            lucide.createIcons();
+            const cache = localStorage.getItem('mnafc_multisport_cache');
+            if (cache) { 
+                rawData = JSON.parse(cache); 
+                if(rawData.mnafc && rawData.mnafc.pemain) rawData.mnafc.pemain = processPlayerData(rawData.mnafc.pemain);
+                if(rawData.futsal && rawData.futsal.pemain) rawData.futsal.pemain = processPlayerData(rawData.futsal.pemain);
+                updateUI(); if(rawData.galeri) renderGallery(rawData.galeri); renderPublicMatches();
+            }
+            
+            fetchLiveDatabase(); 
+            
+            // SMART POLLING: Menjaga skor di halaman publik tetap ter-update
+            livePollingInterval = setInterval(() => {
+                if(!document.getElementById('view-matches').classList.contains('hidden') || matchState.mode === 'live') {
+                    fetchLiveDatabase(true);
+                }
+            }, 30000); 
+        }
+
+        async function fetchLiveDatabase(isPolling = false) {
+            try {
+                const res = await fetch(`${API_URL}?t=${Date.now()}`);
+                const data = await res.json();
+                
+                // Mencegah error jika data mentah gagal di load
+                if(data.mnafc && data.mnafc.pemain) data.mnafc.pemain = processPlayerData(data.mnafc.pemain);
+                if(data.futsal && data.futsal.pemain) data.futsal.pemain = processPlayerData(data.futsal.pemain);
+                
+                rawData = data;
+                localStorage.setItem('mnafc_multisport_cache', JSON.stringify(data));
+
+                calculateAutoStats();
+                
+                if(isPolling) {
+                    renderPublicMatches(); 
+                } else {
+                    updateUI(); if(rawData.galeri) renderGallery(rawData.galeri); renderPublicMatches();
+                }
+            } catch (e) { console.error("Gagal sinkronisasi data:", e); }
+        }
+
+        // --- SISTEM LOGIN PELATIH ---
+        const SECRET_PIN = '2026';
+
+        function openCoachGate() {
+            document.getElementById('gateModal').classList.remove('hidden');
+            document.getElementById('coach-pin').value = '';
+            document.getElementById('coach-pin').focus();
+        }
+        function closeCoachGate() { document.getElementById('gateModal').classList.add('hidden'); }
+
+        function verifyPin() {
+            const input = document.getElementById('coach-pin');
+            if (input.value === SECRET_PIN) {
+                closeCoachGate();
+                openCoachDashboard();
+            } else {
+                input.classList.add('shake', 'border-red-500', 'text-red-500');
+                setTimeout(() => input.classList.remove('shake', 'border-red-500', 'text-red-500'), 500);
+            }
+        }
+
+        // --- PRO COACH DASHBOARD LOGIC ---
+        let matchState = { id: null, lawan: '', time: 0, timerId: null, isRunning: false, home: 0, away: 0, events: [], mode: 'select' };
+        let trackerLineup = {}; 
+
+        function openCoachDashboard() {
+            document.getElementById('view-squad').classList.add('hidden');
+            document.getElementById('view-matches').classList.add('hidden');
+            document.getElementById('view-gallery').classList.add('hidden');
+            document.getElementById('sport-dashboard-container').classList.add('hidden');
+            document.getElementById('main-nav-tabs').classList.add('hidden');
+            document.getElementById('btn-lock').classList.add('hidden');
+            document.getElementById('bottom-nav').classList.add('translate-y-full'); 
+            
+            document.getElementById('view-coach-dashboard').classList.remove('hidden');
+            document.getElementById('coach-sport-label').innerText = activeSport === 'mnafc' ? 'MNA FC Coach' : 'MNA FUTSAL Coach';
+            
+            matchState.mode = 'select';
+            matchState.home = 0; matchState.away = 0; matchState.events = [];
+            
+            document.getElementById('coach-match-selector').classList.remove('hidden');
+            document.getElementById('coach-attendance-panel').classList.add('hidden');
+            const pmePanel = document.getElementById('coach-post-match-panel');
+            if(pmePanel) { pmePanel.classList.add('hidden'); pmePanel.classList.remove('flex'); }
+            document.getElementById('coach-active-match-panel').classList.add('hidden');
+            document.getElementById('match-scoreboard').classList.add('hidden');
+            document.getElementById('btn-start-match').classList.add('hidden');
+            
+            renderCoachMatchList();
+        }
+
+        function closeCoachDashboard() {
+            if(matchState.mode === 'live' && !confirm("Yakin ingin keluar? Match sedang berjalan.")) return;
+            if(matchState.isRunning) toggleTimer();
+            
+            document.getElementById('view-coach-dashboard').classList.add('hidden');
+            document.getElementById('main-nav-tabs').classList.remove('hidden');
+            document.getElementById('btn-lock').classList.remove('hidden');
+            document.getElementById('sport-dashboard-container').classList.remove('hidden');
+            document.getElementById('bottom-nav').classList.remove('translate-y-full');
+            
+            switchMode('squad'); 
+        }
+
+        function renderCoachMatchList() {
+            const list = document.getElementById('coach-schedule-list');
+            const query = document.getElementById('matchSearchCoach') ? document.getElementById('matchSearchCoach').value.toLowerCase() : '';
+            
+            if(!rawData.jadwal || rawData.jadwal.length === 0) { 
+                list.innerHTML = '<p class="text-[10px] text-gray-500 uppercase font-bold">Belum ada jadwal di database.</p>'; return; 
+            }
+            
+            // FILTER: Hapus filter status agar jadwal Selesai (FT) juga muncul untuk di-edit
+            const activeMatches = rawData.jadwal.filter(j => {
+                const matchSport = val(j.cabang, 'mnafc').toLowerCase();
+                const searchStr = (val(j.lawan) + val(j.tanggal) + val(j.tempat)).toLowerCase();
+                return matchSport === activeSport && searchStr.includes(query);
+            });
+            
+            if(activeMatches.length === 0) {
+                 list.innerHTML = `<p class="text-[10px] text-gray-500 uppercase font-bold">${query ? 'Jadwal tidak ditemukan.' : 'Belum ada agenda untuk divisi ini.'}</p>`; return;
+            }
+
+            // Sorting: Yang Pending/Live di atas, FT di bawah
+            activeMatches.sort((a, b) => {
+                const scoreA = a.status === 'LIVE' ? 3 : (a.status === 'Pending' ? 2 : 1);
+                const scoreB = b.status === 'LIVE' ? 3 : (b.status === 'Pending' ? 2 : 1);
+                if (scoreA !== scoreB) return scoreB - scoreA;
+                return (parseIndoDate(a.tanggal) || new Date(0)) - (parseIndoDate(b.tanggal) || new Date(0));
+            });
+
+            list.innerHTML = activeMatches.map(j => {
+                const badgeHTML = typeof getMatchBadge === 'function' ? getMatchBadge(j.jenis_match) : '';
+                const isFT = j.status === 'FT' || j.status === 'Selesai';
+                // LOGIKA PINTAR: Jika Selesai -> Buka Editor, Jika Belum -> Buka Live Tracker
+                const clickAction = isFT ? `openPostMatchEditor('${j.id_match}')` : `selectMatchToCoach('${j.id_match}', '${j.lawan}')`;
+                
+                return `
+                <div onclick="${clickAction}" class="bg-brand-panel border border-white/5 p-4 rounded-2xl cursor-pointer hover:border-brand-neon transition-all flex flex-col gap-3 shadow-md relative overflow-hidden group">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            ${badgeHTML}
+                            ${val(j.kategori_umur, '') !== '-' && j.kategori_umur ? `<span class="bg-brand-neon/10 text-brand-neon border border-brand-neon/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider text-[8px]">${j.kategori_umur}</span>` : ''}
+                        </div>
+                        <span class="text-[8px] font-black uppercase tracking-widest ${isFT ? 'text-brand-gold bg-brand-gold/10' : (j.status === 'LIVE' ? 'text-red-500 bg-red-500/10' : 'text-gray-400 bg-white/5')} px-2 py-0.5 rounded shrink-0">${isFT ? 'EDIT DATA' : val(j.status, 'Pending')}</span>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-brand-gold font-bold uppercase tracking-wide mb-0.5">${j.tanggal} • ${j.waktu}</p>
+                        <h4 class="text-sm font-black text-white uppercase truncate group-hover:text-brand-neon transition-colors">VS ${j.lawan}</h4>
+                    </div>
+                </div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+        
+        function selectMatchToCoach(id, lawan) {
+            matchState.id = id; matchState.lawan = lawan;
+            matchState.mode = 'setup'; matchState.home = 0; matchState.away = 0; matchState.time = 0; matchState.events = [];
+            
+            document.getElementById('coach-match-selector').classList.add('hidden');
+            document.getElementById('coach-attendance-panel').classList.add('hidden');
+            document.getElementById('coach-active-match-panel').classList.remove('hidden');
+            document.getElementById('coach-active-match-panel').classList.add('grid');
+            
+            document.getElementById('active-opponent-label').innerText = lawan;
+            document.getElementById('btn-start-match').classList.remove('hidden');
+            document.getElementById('coach-setup-panel').classList.remove('hidden');
+            document.getElementById('coach-live-panel').classList.add('hidden');
+            
+            initLineupBuilder();
+        }
+
+        function startLiveMatch() {
+            const slotsCount = FORMATIONS[activeSport][currentFormationKey].length;
+            if (Object.keys(lineupData).length < slotsCount) {
+                if(!confirm(`Lineup belum lengkap (${Object.keys(lineupData).length}/${slotsCount}). Yakin mulai match?`)) return;
+            }
+
+            matchState.mode = 'live';
+            trackerLineup = JSON.parse(JSON.stringify(lineupData));
+
+            document.getElementById('coach-setup-panel').classList.add('hidden');
+            document.getElementById('coach-live-panel').classList.remove('hidden');
+            document.getElementById('coach-live-panel').classList.add('flex');
+            
+            document.getElementById('match-scoreboard').classList.remove('hidden');
+            document.getElementById('match-scoreboard').classList.add('flex');
+            document.getElementById('btn-start-match').classList.add('hidden');
+            
+            document.getElementById('match-status-text').innerText = 'Live Match Tracker';
+            document.getElementById('match-status-text').classList.replace('text-brand-neon', 'text-red-500');
+
+            document.getElementById('score-home').innerText = '0';
+            document.getElementById('score-away').innerText = '0';
+            document.getElementById('event-log').innerHTML = '';
+
+            renderTrackerPitch();
+            syncLiveStateToServer('LIVE');
+        }
+
+        function toggleTimer() {
+            const timerEl = document.getElementById('match-timer');
+            if (matchState.isRunning) {
+                clearInterval(matchState.timerId);
+                matchState.isRunning = false;
+                timerEl.classList.replace('text-brand-neon', 'text-brand-gold');
+            } else {
+                matchState.isRunning = true;
+                timerEl.classList.replace('text-brand-gold', 'text-brand-neon');
+                matchState.timerId = setInterval(() => {
+                    matchState.time++;
+                    const m = String(Math.floor(matchState.time / 60)).padStart(2, '0');
+                    const s = String(matchState.time % 60).padStart(2, '0');
+                    timerEl.innerText = `${m}:${s}`;
+                    
+                    // Sync waktu ke server tiap 60 detik (1 menit)
+                    if (matchState.time % 60 === 0 && matchState.mode === 'live') {
+                        syncLiveStateToServer('LIVE');
+                    }
+                }, 1000);
+            }
+        }
+
+        function getMatchMinute() { return Math.floor(matchState.time / 60) + "'"; }
+
+        function correctScore(team) {
+            if(team === 'home' && matchState.home > 0) {
+                matchState.home--;
+                document.getElementById('score-home').innerText = matchState.home;
+                syncLiveStateToServer('LIVE'); 
+            }
+            if(team === 'away' && matchState.away > 0) {
+                matchState.away--;
+                document.getElementById('score-away').innerText = matchState.away;
+                syncLiveStateToServer('LIVE'); 
+            }
+        }
+
+        function syncLiveStateToServer(status) {
+            if(!matchState.id) return;
+            const payload = {
+                id_match: matchState.id,
+                status: status,
+                skor_kita: matchState.home,
+                skor_lawan: matchState.away,
+                timer: getMatchMinute(), 
+                events: matchState.events 
+            };
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'update_live_match', payload: payload })
+            }).catch(e => console.error("Gagal sinkron live state", e));
+        }
+
+        function renderTrackerPitch() {
+            const container = document.getElementById('lineup-slots-container');
+            const slotsDef = FORMATIONS[activeSport][currentFormationKey];
+            
+            container.innerHTML = slotsDef.map((s, i) => {
+                const p = trackerLineup[i];
+                if(p) {
+                    return `<div class="lineup-slot filled border-brand-neon pointer-events-none" style="bottom:${s.b}; left:${s.l}; background-image:url('${val(p.link_foto)}')"><span class="lineup-slot-label bg-brand-neon border-brand-neon">${val(p.nama).split(' ')[0]}</span></div>`;
+                } else {
+                    return `<div class="lineup-slot pointer-events-none" style="bottom:${s.b}; left:${s.l};"><span class="lineup-slot-label bg-black">${s.role}</span></div>`;
+                }
+            }).join('');
+        }
+
+        // --- ACTION ENGINE ---
+        let currentActionType = '';
+        let playerOutSlot = null; 
+
+        function triggerAction(type) {
+            currentActionType = type;
+            const titleEl = document.getElementById('action-title');
+            
+            if(type === 'goal_away') {
+                logEvent('red', 'Kebobolan', 'Gol oleh Tim Lawan', 'shield-alert');
+                matchState.away++; document.getElementById('score-away').innerText = matchState.away; 
+                syncLiveStateToServer('LIVE'); 
+                return;
+            }
+            
+            document.getElementById('action-search-container').classList.add('hidden');
+
+            const listEl = document.getElementById('action-player-list');
+            listEl.innerHTML = '';
+
+            let titleTxt = ''; let color = '';
+            if(type === 'goal_home') { titleTxt = 'Pencetak Gol'; color = 'text-green-400'; }
+            else if(type === 'assist') { titleTxt = 'Pemberi Assist'; color = 'text-brand-neon'; }
+            else if(type === 'yellow') { titleTxt = 'Kartu Kuning'; color = 'text-yellow-400'; }
+            else if(type === 'red') { titleTxt = 'Kartu Merah'; color = 'text-red-500'; }
+            else if(type === 'pen_won') { titleTxt = 'Dapat Penalti'; color = 'text-green-400'; }
+            else if(type === 'pen_miss') { titleTxt = 'Gagal Penalti'; color = 'text-red-400'; }
+            else if(type === 'sub') { titleTxt = 'Pilih Pemain KELUAR'; color = 'text-brand-gold'; }
+
+            titleEl.className = `text-lg lg:text-xl font-black uppercase tracking-widest mb-4 text-center drop-shadow-md ${color}`;
+            titleEl.innerText = titleTxt;
+
+            Object.keys(trackerLineup).forEach(idx => {
+                const p = trackerLineup[idx];
+                if(p) {
+                    listEl.innerHTML += `
+                    <div onclick="executeAction('${idx}')" class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform">
+                        <div class="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-white/10 bg-black overflow-hidden shadow-lg"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div>
+                        <p class="text-[9px] font-black text-white uppercase text-center leading-tight line-clamp-1 w-full px-1">${val(p.nama).split(' ')[0]}</p>
+                    </div>`;
+                }
+            });
+
+            document.getElementById('actionModal').classList.remove('hidden');
+        }
+
+        function executeAction(slotIdx) {
+            if (currentActionType === 'sub') {
+                playerOutSlot = slotIdx;
+                currentActionType = 'sub_in';
+                
+                document.getElementById('action-title').innerText = 'Pemain MASUK (Sub In)';
+                document.getElementById('action-title').className = 'text-lg lg:text-xl font-black uppercase tracking-widest mb-4 text-center drop-shadow-md text-brand-neon';
+                
+                document.getElementById('action-search-container').classList.remove('hidden');
+                document.getElementById('actionSearch').value = '';
+                
+                renderSubInPool(); 
+                return; 
+            }
+
+            const p = trackerLineup[slotIdx];
+            closeActionModal();
+
+            if (currentActionType === 'goal_home') {
+                logEvent('green', 'Gol', p.nama, 'goal');
+                matchState.home++; document.getElementById('score-home').innerText = matchState.home;
+                syncLiveStateToServer('LIVE'); 
+            } else if (currentActionType === 'assist') {
+                logEvent('blue', 'Assist', p.nama, 'footprints');
+            } else if (currentActionType === 'yellow') {
+                logEvent('yellow', 'Kartu Kuning', p.nama, 'alert-circle');
+            } else if (currentActionType === 'red') {
+                logEvent('red', 'Kartu Merah', p.nama, 'alert-triangle');
+            } else if (currentActionType === 'pen_won') {
+                logEvent('green', 'Penalti Didapat', p.nama, 'target');
+            } else if (currentActionType === 'pen_miss') {
+                logEvent('red', 'Penalti Gagal', p.nama, 'x-circle');
+            }
+        }
+
+        function renderSubInPool() {
+            const listEl = document.getElementById('action-player-list');
+            const query = document.getElementById('actionSearch') ? document.getElementById('actionSearch').value.toLowerCase() : '';
+            listEl.innerHTML = '';
+            
+            const allPlayers = rawData[activeSport].pemain;
+            const activeIds = Object.values(trackerLineup).filter(player => player).map(player => player.nomor + player.nama);
+            
+            allPlayers.forEach((benchPlayer, originalIdx) => {
+                const searchTxt = (val(benchPlayer.nama) + val(benchPlayer.posisi)).toLowerCase();
+                if(!activeIds.includes(benchPlayer.nomor + benchPlayer.nama) && searchTxt.includes(query)) {
+                    listEl.innerHTML += `
+                    <div onclick="executeSubIn('${originalIdx}')" class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform">
+                        <div class="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-white/10 bg-black overflow-hidden hover:border-brand-neon transition-all shadow-lg"><img src="${val(benchPlayer.link_foto)}" class="w-full h-full object-cover"></div>
+                        <p class="text-[9px] font-black text-white uppercase text-center leading-tight line-clamp-1 w-full px-1">${val(benchPlayer.nama).split(' ')[0]}</p>
+                        <p class="text-[7px] text-brand-neon font-bold">${val(benchPlayer.posisi)}</p>
+                    </div>`;
+                }
+            });
+        }
+
+        function executeSubIn(benchIdx) {
+            const pOut = trackerLineup[playerOutSlot];
+            const pIn = rawData[activeSport].pemain[benchIdx];
+            
+            trackerLineup[playerOutSlot] = pIn;
+            logEvent('blue', 'Substitusi', `IN: ${pIn.nama.split(' ')[0]} | OUT: ${pOut.nama.split(' ')[0]}`, 'arrow-left-right');
+            
+            renderTrackerPitch();
+            closeActionModal();
+        }
+
+        function logEvent(colorScheme, title, desc, iconName) {
+            const minute = getMatchMinute();
+            let bgStr = ''; let textStr = ''; let iconCol = '';
+            if(colorScheme === 'green') { bgStr = 'bg-green-500/10 border-green-500/30'; textStr = 'text-green-400'; iconCol = 'text-green-500'; }
+            else if(colorScheme === 'red') { bgStr = 'bg-red-500/10 border-red-500/30'; textStr = 'text-red-400'; iconCol = 'text-red-500'; }
+            else if(colorScheme === 'yellow') { bgStr = 'bg-yellow-500/10 border-yellow-500/30'; textStr = 'text-yellow-400'; iconCol = 'text-yellow-500'; }
+            else if(colorScheme === 'blue') { bgStr = 'bg-brand-neon/10 border-brand-neon/30'; textStr = 'text-brand-neon'; iconCol = 'text-brand-neon'; }
+
+            matchState.events.push({ time: minute, type: title, detail: desc, icon: iconName, col: iconCol, bg: bgStr });
+            
+            const logEl = document.getElementById('event-log');
+            if(matchState.events.length === 1) logEl.innerHTML = ''; 
+            
+            const itemHTML = `
+            <div class="flex items-center gap-3 p-3 rounded-xl border ${bgStr} animate-fade-in shadow-sm bg-black/50">
+                <div class="w-8 h-8 rounded-lg bg-black flex flex-shrink-0 items-center justify-center border border-white/5"><i data-lucide="${iconName}" class="w-4 h-4 ${iconCol}"></i></div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-end mb-0.5">
+                        <h4 class="text-[10px] font-black uppercase tracking-widest ${textStr}">${title}</h4>
+                        <span class="text-[8px] font-bold text-gray-400 bg-white/5 px-2 py-0.5 rounded ml-2 flex-shrink-0">${minute}</span>
+                    </div>
+                    <p class="text-[9px] text-white uppercase truncate">${desc}</p>
+                </div>
+            </div>`;
+            logEl.insertAdjacentHTML('afterbegin', itemHTML); 
+            lucide.createIcons();
+            
+            if(matchState.mode === 'live') {
+                syncLiveStateToServer('LIVE');
+            }
+        }
+
+        function closeActionModal() { document.getElementById('actionModal').classList.add('hidden'); }
+
+        async function endLiveMatch() {
+            if(!confirm("Akhiri pertandingan (Full Time) dan simpan log data?")) return;
+            
+            const btn = document.querySelector('button[onclick="endLiveMatch()"]');
+            const originalText = btn.innerHTML; btn.innerHTML = "Menyimpan ke Database..."; btn.disabled = true;
+
+            const payload = { 
+                id_match: matchState.id, 
+                tanggal: new Date().toLocaleDateString('id-ID'), 
+                cabang: activeSport, 
+                lawan: matchState.lawan, 
+                skor_kita: matchState.home, 
+                skor_lawan: matchState.away, 
+                events: matchState.events,
+                formasi: currentFormationKey,
+                lineup: trackerLineup
+            };
+
+            try {
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'save_match', payload: payload }) });
+                syncLiveStateToServer('FT'); 
+                alert("Match Selesai! Log tersimpan.");
+                closeCoachDashboard(); 
+            } catch(e) { alert("Gagal mengirim ke server."); } 
+            finally { btn.innerHTML = originalText; btn.disabled = false; }
+        }
+
+        // ==========================================
+        // DATA & ENGINE PUBLIC
+        // ==========================================
+        
+        const FORMATIONS = {
+            mnafc: {
+                '4-3-3': [{ b: '8%', l: '50%', role: 'GK' }, { b: '22%', l: '35%', role: 'CB' }, { b: '22%', l: '65%', role: 'CB' }, { b: '26%', l: '15%', role: 'LB' }, { b: '26%', l: '85%', role: 'RB' }, { b: '45%', l: '50%', role: 'CDM' }, { b: '55%', l: '30%', role: 'CM' }, { b: '55%', l: '70%', role: 'CM' }, { b: '82%', l: '50%', role: 'ST' }, { b: '78%', l: '18%', role: 'LW' }, { b: '78%', l: '82%', role: 'RW' }],
+                '4-4-2': [{ b: '8%', l: '50%', role: 'GK' }, { b: '22%', l: '35%', role: 'CB' }, { b: '22%', l: '65%', role: 'CB' }, { b: '26%', l: '15%', role: 'LB' }, { b: '26%', l: '85%', role: 'RB' }, { b: '48%', l: '35%', role: 'CM' }, { b: '48%', l: '65%', role: 'CM' }, { b: '55%', l: '15%', role: 'LM' }, { b: '55%', l: '85%', role: 'RM' }, { b: '80%', l: '40%', role: 'CF' }, { b: '80%', l: '60%', role: 'CF' }],
+                '3-5-2': [{ b: '8%', l: '50%', role: 'GK' }, { b: '20%', l: '30%', role: 'CB' }, { b: '20%', l: '50%', role: 'CB' }, { b: '20%', l: '70%', role: 'CB' }, { b: '40%', l: '35%', role: 'CM' }, { b: '40%', l: '65%', role: 'CM' }, { b: '55%', l: '15%', role: 'LWB' }, { b: '55%', l: '85%', role: 'RWB' }, { b: '55%', l: '50%', role: 'CAM' }, { b: '80%', l: '40%', role: 'ST' }, { b: '80%', l: '60%', role: 'ST' }]
+            },
+            futsal: {
+                '1-2-1 (Diamond)': [{ b: '8%', l: '50%', role: 'GK' }, { b: '30%', l: '50%', role: 'ANC' }, { b: '55%', l: '20%', role: 'FLK' }, { b: '55%', l: '80%', role: 'FLK' }, { b: '80%', l: '50%', role: 'PVT' }],
+                '2-2 (Square)': [{ b: '8%', l: '50%', role: 'GK' }, { b: '35%', l: '30%', role: 'DEF' }, { b: '35%', l: '70%', role: 'DEF' }, { b: '70%', l: '30%', role: 'ATT' }, { b: '70%', l: '70%', role: 'ATT' }],
+                '3-1 (Pyramid)': [{ b: '8%', l: '50%', role: 'GK' }, { b: '35%', l: '20%', role: 'FLK' }, { b: '25%', l: '50%', role: 'ANC' }, { b: '35%', l: '80%', role: 'FLK' }, { b: '75%', l: '50%', role: 'PVT' }]
+            }
+        };
+
+        function switchSport(sport) {
+            activeSport = sport; activePos = 'ALL'; 
+            document.getElementById('btn-fc').className = sport === 'mnafc' ? "flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all bg-brand-blue text-white shadow-lg" : "flex-1 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all text-gray-500 hover:text-white";
+            document.getElementById('btn-futsal').className = sport === 'futsal' ? "flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all bg-brand-blue text-white shadow-lg" : "flex-1 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all text-gray-500 hover:text-white";
+            document.getElementById('brand-name').innerText = sport === 'mnafc' ? 'MNA FC' : 'MNA FUTSAL';
+            
+            // Mengubah style tombol mini di Coach Area
+            const coachBtnFc = document.getElementById('coach-btn-fc');
+            const coachBtnFutsal = document.getElementById('coach-btn-futsal');
+            if(coachBtnFc && coachBtnFutsal) {
+                coachBtnFc.className = sport === 'mnafc' ? "px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest transition-all bg-brand-blue text-white" : "px-3 py-1 rounded text-[8px] font-bold uppercase tracking-widest transition-all text-gray-500 hover:text-white";
+                coachBtnFutsal.className = sport === 'futsal' ? "px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest transition-all bg-brand-blue text-white" : "px-3 py-1 rounded text-[8px] font-bold uppercase tracking-widest transition-all text-gray-500 hover:text-white";
+            }
+            
+            document.getElementById('filter-football').className = sport === 'mnafc' ? "flex gap-2 overflow-x-auto hide-scroll pb-1" : "hidden";
+            document.getElementById('filter-futsal').className = sport === 'futsal' ? "flex gap-2 overflow-x-auto hide-scroll pb-1" : "hidden";
+            
+            document.querySelectorAll('.pos-btn-fc, .pos-btn-fs').forEach(b => {
+                b.classList.remove('bg-brand-blue', 'text-white', 'font-black', 'border-brand-blue');
+                b.classList.add('bg-brand-panel', 'text-gray-500', 'font-bold', 'border-white/10');
+            });
+            const activeBtn = sport === 'mnafc' ? document.querySelector('.pos-btn-fc') : document.querySelector('.pos-btn-fs');
+            if(activeBtn) {
+                activeBtn.classList.remove('bg-brand-panel', 'text-gray-500', 'font-bold', 'border-white/10');
+                activeBtn.classList.add('bg-brand-blue', 'text-white', 'font-black', 'border-brand-blue');
+            }
+            
+            updateUI(); 
+            renderPublicMatches(); // Panggil render ulang jadwal publik
+            
+            // Panggil render ulang layar pelatih jika sedang dibuka
+            if(!document.getElementById('coach-match-selector').classList.contains('hidden')) renderCoachMatchList();
+            if(!document.getElementById('coach-attendance-panel').classList.contains('hidden')) openAttendancePanel(); 
+        }
+        
+        function switchMode(mode) {
+            const isSquad = mode === 'squad'; const isMatches = mode === 'matches'; const isGallery = mode === 'gallery';
+            
+            document.getElementById('view-squad').classList.toggle('hidden', !isSquad);
+            document.getElementById('view-matches').classList.toggle('hidden', !isMatches);
+            document.getElementById('view-gallery').classList.toggle('hidden', !isGallery);
+            document.getElementById('sport-dashboard-container').classList.toggle('hidden', isGallery); 
+            
+            const activeClass = "px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all bg-brand-blue text-white shadow-lg";
+            const inactiveClass = "px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all text-gray-500 hover:text-white";
+            document.getElementById('tab-squad').className = isSquad ? activeClass : inactiveClass;
+            document.getElementById('tab-matches').className = isMatches ? activeClass : inactiveClass;
+            document.getElementById('tab-gallery').className = isGallery ? activeClass : inactiveClass;
+
+            if(isMatches) renderPublicMatches();
+        }
+
+        function updateUI() {
+            if(!rawData[activeSport]) return;
+            renderStats(rawData[activeSport].statistik);
+            runFilter();
+        }
+
+        function renderStats(s) {
+            const m = parseInt(val(s.menang, 0)), s_ = parseInt(val(s.seri, 0)), k = parseInt(val(s.kalah, 0));
+            const total = m + s_ + k;
+            document.getElementById('win-rate').innerText = (total > 0 ? Math.round((m/total)*100) : 0) + '%';
+            document.getElementById('match-record').innerText = `${m}-${s_}-${k}`;
+            const diff = parseInt(val(s.gol_masuk, 0)) - parseInt(val(s.gol_kemasukan, 0));
+            document.getElementById('goal-diff').innerText = (diff >= 0 ? '+' : '') + diff;
+        }
+
+        function getCoords(pos) {
+            const p = val(pos).toUpperCase().trim();
+            if(!p || p === '-') return []; 
+            const colors = { F: {bg: 'rgba(239,68,68,0.4)', m: '#ef4444'}, M: {bg: 'rgba(34,197,94,0.4)', m: '#22c55e'}, D: {bg: 'rgba(59,130,246,0.4)', m: '#3b82f6'}, G: {bg: 'rgba(234,179,8,0.4)', m: '#eab308'}};
+            const positions = {
+                'GK': { b: '8%', l: '50%', w: '40%', h: '15%', c: colors.G }, 'CB': { b: '22%', l: '50%', w: '45%', h: '18%', c: colors.D }, 'LB': { b: '26%', l: '15%', w: '30%', h: '35%', c: colors.D }, 'RB': { b: '26%', l: '85%', w: '30%', h: '35%', c: colors.D }, 'LWB': { b: '35%', l: '15%', w: '30%', h: '30%', c: colors.D }, 'RWB': { b: '35%', l: '85%', w: '30%', h: '30%', c: colors.D }, 'CDM': { b: '42%', l: '50%', w: '45%', h: '18%', c: colors.M }, 'CM': { b: '52%', l: '50%', w: '45%', h: '18%', c: colors.M }, 'LM': { b: '55%', l: '15%', w: '30%', h: '30%', c: colors.M }, 'RM': { b: '55%', l: '85%', w: '30%', h: '30%', c: colors.M }, 'CAM': { b: '65%', l: '50%', w: '45%', h: '15%', c: colors.M }, 'LW': { b: '78%', l: '18%', w: '30%', h: '25%', c: colors.F }, 'RW': { b: '78%', l: '82%', w: '30%', h: '25%', c: colors.F }, 'LWG': { b: '78%', l: '18%', w: '30%', h: '25%', c: colors.F }, 'RWG': { b: '78%', l: '82%', w: '30%', h: '25%', c: colors.F }, 'CF': { b: '78%', l: '50%', w: '40%', h: '15%', c: colors.F }, 'ST': { b: '88%', l: '50%', w: '40%', h: '15%', c: colors.F },
+                'ANC': { b: '25%', l: '50%', w: '50%', h: '20%', c: colors.D }, 'FLK-L': { b: '50%', l: '15%', w: '25%', h: '40%', c: colors.M }, 'FLK-R': { b: '50%', l: '85%', w: '25%', h: '40%', c: colors.M }, 'FLK': { b: '50%', l: '50%', w: '70%', h: '30%', c: colors.M }, 'PVT': { b: '80%', l: '50%', w: '50%', h: '20%', c: colors.F }
+            };
+            const parts = p.split('/').map(x => x.trim()); let results = [];
+            parts.forEach(part => { if (positions[part]) results.push({...positions[part], label: part}); });
+            if (results.length === 0) results.push({ b: '50%', l: '50%', w: '40%', h: '20%', c: {bg: 'rgba(156,163,175,0.4)', m: '#9ca3af'}, label: p });
+            return results;
+        }
+
+        function runFilter() {
+            const query = document.getElementById('playerSearch').value.toLowerCase();
+            if(!rawData[activeSport] || !rawData[activeSport].pemain) return;
+            const list = rawData[activeSport].pemain;
+            const filtered = list.filter(p => {
+                const searchTxt = (val(p.nama) + val(p.sekolah) + val(p.posisi)).toLowerCase().includes(query);
+                const pos = val(p.posisi).toUpperCase();
+                let cat = 'LAIN';
+                if (activeSport === 'mnafc') {
+                    if (['GK'].includes(pos)) cat = 'GK'; else if (['CB','LB','RB','LWB','RWB'].some(x => pos.includes(x))) cat = 'DEF'; else if (['CM','CDM','CAM','LM','RM'].some(x => pos.includes(x))) cat = 'MID'; else if (['ST','CF','LW','RW','RWG','LWG','SS'].some(x => pos.includes(x))) cat = 'FWD';
+                } else {
+                    if (['GK'].includes(pos)) cat = 'GK'; else if (pos.includes('ANC')) cat = 'ANC'; else if (['FLK', 'FLK-L', 'FLK-R'].some(x => pos.includes(x))) cat = 'FLK'; else if (pos.includes('PVT')) cat = 'PVT';
+                }
+                return searchTxt && (activePos === 'ALL' || cat === activePos);
+            });
+            renderPlayers(filtered);
+        }
+
+        function setPosFilter(pos, btn, targetSport) {
+            activePos = pos;
+            const btnClass = targetSport === 'mnafc' ? '.pos-btn-fc' : '.pos-btn-fs';
+            document.querySelectorAll(btnClass).forEach(b => {
+                b.classList.remove('bg-brand-blue', 'text-white', 'font-black', 'border-brand-blue');
+                b.classList.add('bg-brand-panel', 'text-gray-500', 'font-bold', 'border-white/10');
+            });
+            btn.classList.remove('bg-brand-panel', 'text-gray-500', 'font-bold', 'border-white/10');
+            btn.classList.add('bg-brand-blue', 'text-white', 'font-black', 'border-brand-blue');
+            runFilter();
+        }
+
+        function renderPlayers(list) {
+            const grid = document.getElementById('playerGrid');
+            if (list.length === 0) { 
+                grid.innerHTML = `<div class="col-span-full py-16 text-center text-[10px] font-black text-gray-500 uppercase tracking-widest border border-dashed border-white/10 rounded-2xl">Kosong</div>`; 
+                return; 
+            }
+            
+            grid.innerHTML = list.map((p, i) => `
+                <div onclick="showPreview(${rawData[activeSport].pemain.indexOf(p)})" class="player-card glass-panel rounded-[2rem] p-5 flex items-center gap-4 relative overflow-hidden cursor-pointer stagger-item border border-white/5" style="animation-delay: ${i*0.05}s">
+                    <div class="absolute -right-2 -bottom-6 text-8xl font-black italic text-white/5 pointer-events-none">${val(p.nomor, '0')}</div>
+                    <div class="w-16 h-16 rounded-xl overflow-hidden bg-white/10 shrink-0 border border-white/10 z-10"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div>
+                    <div class="flex-1 min-w-0 z-10">
+                        <div class="flex justify-between items-start mb-1">
+                            <h4 class="text-sm font-black uppercase text-white truncate w-32 md:w-auto">${val(p.nama)}</h4>
+                            <span class="text-[9px] font-black bg-brand-neon/20 text-brand-neon px-2 py-0.5 rounded border border-brand-neon/20 flex-shrink-0">${val(p.posisi)}</span>
+                        </div>
+                        <p class="text-[8px] font-bold text-gray-500 uppercase tracking-widest mt-1 truncate">${val(p.sekolah)}</p>
+                        <div class="grid grid-cols-4 gap-1 mt-3 pt-3 border-t border-white/5 text-center">
+                            <div><p class="text-[6px] text-gray-500 uppercase tracking-wider mb-0.5">Usia</p><p class="text-[9px] font-bold text-white uppercase">${val(p.umur_detail, '-')}</p></div>
+                            <div class="border-l border-white/5"><p class="text-[6px] text-gray-500 uppercase tracking-wider mb-0.5">Kat</p><p class="text-[9px] font-bold text-white uppercase">${val(p.kategori_auto, '-')}</p></div>
+                            <div class="border-l border-white/5"><p class="text-[6px] text-gray-500 uppercase tracking-wider mb-0.5">Kaki</p><p class="text-[9px] font-bold text-white uppercase">${val(p.kaki)}</p></div>
+                            <div class="border-l border-white/5"><p class="text-[6px] text-gray-500 uppercase tracking-wider mb-0.5">Gol</p><p class="text-[9px] font-black text-brand-gold">${val(p.gol_total, 0)}</p></div>
+                        </div>
+                    </div>
+                </div>`).join('');
+            lucide.createIcons();
+        }
+
+        function showPreview(idx) {
+            const p = rawData[activeSport].pemain[idx];
+            document.getElementById('modalContent').innerHTML = `
+                <div class="relative bg-brand-surface p-6">
+                    <button onclick="closeModal()" class="absolute top-5 right-5 text-white/50"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    <div class="flex gap-5 items-center mb-6">
+                        <div class="w-24 h-24 rounded-2xl overflow-hidden border-2 border-brand-neon shadow-2xl shadow-brand-neon/20"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div>
+                        <div>
+                            <h2 class="text-xl font-black uppercase text-white leading-none">${val(p.nama)}</h2>
+                            <p class="text-[10px] font-bold text-brand-neon mt-2 uppercase tracking-widest">#${val(p.nomor)} • ${val(p.posisi)}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 mt-6">
+                        <div class="bg-white/5 p-3 rounded-xl text-center flex flex-col justify-center">
+                            <p class="text-[7px] text-gray-500 uppercase">Kategori / Umur</p>
+                            <p class="text-[10px] font-bold text-white uppercase mt-0.5">${val(p.kategori_auto, '-')}</p>
+                            <p class="text-[7px] font-bold text-brand-neon mt-0.5">${val(p.umur_detail, '-')}</p>
+                        </div>
+                        <div class="bg-white/5 p-3 rounded-xl text-center flex flex-col justify-center"><p class="text-[7px] text-gray-500 uppercase">Gol</p><p class="text-[10px] font-black text-brand-gold mt-1">${val(p.gol, 0)}</p></div>
+                        <div class="bg-white/5 p-3 rounded-xl text-center flex flex-col justify-center"><p class="text-[7px] text-gray-500 uppercase">Kaki</p><p class="text-[10px] font-bold text-white uppercase mt-1">${val(p.kaki)}</p></div>
+                    </div>
+                    <button onclick="bukaDossier(${idx})" class="w-full bg-brand-neon text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-brand-neon/30 mt-6">Buka Dossier Pemain</button>
+                </div>`;
+            document.getElementById('playerModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            lucide.createIcons();
+        }
+
+        function bukaDossier(idx) {
+            closeModal();
+            const p = rawData[activeSport].pemain[idx];
+            const coords = getCoords(p.posisi);
+            const altCoords = getCoords(val(p.posisi_alt, ''));
+            const isFutsal = activeSport === 'futsal';
+            
+            let markers = coords.map(c => `<div class="position-zone" style="bottom:${c.b}; left:${c.l}; width:${c.w}; height:${c.h}; background:${c.c.bg};"></div><div class="player-marker" style="bottom:${c.b}; left:${c.l}; background:${c.c.m}; box-shadow:0 0 15px ${c.c.m};">${c.label}</div>`).join('');
+            markers += altCoords.map(c => `<div class="player-marker-alt" style="bottom:${c.b}; left:${c.l}; background:${c.c.m};">${c.label}</div>`).join('');
+            const altBadgeHTML = (val(p.posisi_alt, '') && val(p.posisi_alt, '') !== '-') ? `<span class="text-xs font-black bg-white/5 text-gray-300 border border-white/10 px-4 py-1.5 rounded-lg uppercase shadow-sm">ALT: ${val(p.posisi_alt)}</span>` : '';
+
+            const page = document.getElementById('fullProfilePage');
+            page.innerHTML = `
+                <div class="sticky top-0 z-50 glass-panel border-b border-white/10 px-5 py-4 flex items-center justify-between">
+                    <button onclick="tutupDossier()" class="text-gray-400 text-[10px] font-black uppercase tracking-widest flex items-center gap-1"><i data-lucide="chevron-left" class="w-4 h-4"></i> Kembali</button>
+                    <span class="text-[9px] font-black text-brand-neon uppercase tracking-widest">${activeSport === 'mnafc' ? 'Football' : 'Futsal'} Dossier</span>
+                </div>
+                <div class="p-6 space-y-8 pb-32 max-w-4xl mx-auto">
+                    <div class="text-center">
+                        <div class="w-32 h-32 mx-auto rounded-[2.5rem] overflow-hidden border-2 border-brand-neon shadow-2xl mb-4"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div>
+                        <h2 class="text-3xl font-black uppercase text-white tracking-tighter">${val(p.nama)}</h2>
+                        <div class="flex flex-wrap justify-center items-center gap-2 mt-3">
+                            <span class="text-xs font-black text-brand-neon bg-brand-neon/10 px-3 py-1 rounded-lg uppercase border border-brand-neon/20">POS: ${val(p.posisi)}</span>
+                            ${altBadgeHTML}
+                            <span class="text-xs font-black bg-white/10 text-white border border-white/10 px-4 py-1.5 rounded-lg uppercase shadow-sm">#${val(p.nomor, '0')}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel p-6 rounded-[2rem] border border-white/5">
+                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="crosshair" class="w-4 h-4 text-brand-neon"></i> Tactical View</h3>
+                        <div class="pitch-wrapper">
+                            <div class="pitch-container ${isFutsal ? 'pitch-futsal' : 'pitch-football'}">
+                                <div class="pitch-half pitch-line"></div><div class="pitch-circle pitch-line"></div>
+                                <div class="pitch-line" style="top:0; left:20%; width:60%; height:18%; border-top:0;"></div>
+                                <div class="pitch-line" style="bottom:0; left:20%; width:60%; height:18%; border-bottom:0;"></div>
+                                ${markers}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-[2rem] border border-white/5">
+                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4 text-brand-neon"></i> Biometrik & Fisik</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-white/5 p-4 rounded-2xl border border-white/5"><p class="text-[8px] text-gray-500 uppercase font-black mb-1">Tgl Lahir / Usia</p><p class="text-sm font-black text-white">${val(p.tanggal_lahir_format, '-')}</p><p class="text-[9px] font-bold text-brand-neon mt-1">${val(p.umur_detail, '-')}</p></div>
+                            <div class="bg-white/5 p-4 rounded-2xl border border-white/5"><p class="text-[8px] text-gray-500 uppercase font-black mb-1">Kategori Tim</p><p class="text-sm font-black text-white uppercase">${val(p.kategori_auto, '-')}</p></div>
+                            <div class="bg-white/5 p-4 rounded-2xl border border-white/5"><p class="text-[8px] text-gray-500 uppercase font-bold mb-1">Tinggi / Berat</p><p class="text-sm font-black text-white">${val(p.tinggi, '-')} cm / ${val(p.berat, '-')} kg</p></div>
+                            <div class="bg-white/5 p-4 rounded-2xl border border-white/5 text-center flex flex-col justify-center"><p class="text-[8px] text-gray-500 uppercase font-bold mb-1">Kaki Dominan</p><p class="text-sm font-black text-white uppercase">${val(p.kaki, '-')}</p></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="glass-panel p-6 rounded-[2rem] border border-white/5 flex flex-col justify-center">
+                            <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="award" class="w-4 h-4 text-brand-gold"></i> Rekor Performa</h3>
+                            <div class="bg-brand-gold/10 border border-brand-gold/20 p-8 rounded-2xl text-center flex-1 flex flex-col justify-center"><p class="text-[10px] text-brand-gold uppercase font-bold tracking-widest mb-2">Total Gol / Poin</p><p class="text-6xl font-black text-brand-gold drop-shadow-[0_0_15px_rgba(215,182,125,0.4)]">${val(p.gol, 0)}</p></div>
+                        </div>
+                        <div class="glass-panel p-6 rounded-[2rem] border border-white/5 flex flex-col justify-center">
+                            <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="graduation-cap" class="w-4 h-4 text-brand-neon"></i> Afiliasi Akademik</h3>
+                            <div class="bg-white/5 p-8 rounded-2xl text-center border border-white/5 flex-1 flex flex-col justify-center"><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-2">Instansi / Sekolah</p><p class="text-xs font-black text-white uppercase line-clamp-2 mt-1 leading-tight">${val(p.sekolah)}</p></div>
+                        </div>
+                    </div>
+                </div>`;
+            page.classList.remove('hidden'); document.body.style.overflow = 'hidden';
+            setTimeout(() => page.classList.add('page-slide-in'), 10); lucide.createIcons();
+        }
+
+        // --- PUBLIC MATCH CENTER (JADWAL FOTMOB STYLE) ---
+        function renderPublicMatches() {
+            const list = document.getElementById('public-match-list');
+            const ind = document.getElementById('live-indicator');
+            const query = document.getElementById('matchSearchPublic') ? document.getElementById('matchSearchPublic').value.toLowerCase() : '';
+            
+            if(!rawData.jadwal || rawData.jadwal.length === 0) { 
+                list.innerHTML = '<div class="text-center py-16 border border-dashed border-white/10 rounded-2xl"><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Belum ada jadwal pertandingan</p></div>'; 
+                if(ind) ind.classList.add('hidden');
+                return; 
+            }
+            
+            // 1. FILTER CABANG & PENCARIAN TEKS (Lawan, Tanggal, Tempat, Jenis Match)
+            const filteredMatches = rawData.jadwal.filter(j => {
+                const matchSport = val(j.cabang, 'mnafc').toLowerCase();
+                const searchStr = (val(j.lawan) + val(j.tanggal) + val(j.tempat) + val(j.jenis_match)).toLowerCase();
+                return matchSport === activeSport && searchStr.includes(query);
+            });
+
+            if(filteredMatches.length === 0) {
+                list.innerHTML = `<div class="text-center py-16 border border-dashed border-white/10 rounded-2xl"><p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">${query ? 'Pencarian tidak ditemukan' : 'Belum ada pertandingan di divisi ini'}</p></div>`; 
+                if(ind) ind.classList.add('hidden');
+                return; 
+            }
+
+            // 2. ALGORITMA SORTIR (LIVE -> Pending -> FT)
+            filteredMatches.sort((a, b) => {
+                const scoreA = a.status === 'LIVE' ? 3 : (a.status === 'Pending' ? 2 : 1);
+                const scoreB = b.status === 'LIVE' ? 3 : (b.status === 'Pending' ? 2 : 1);
+                if (scoreA !== scoreB) return scoreB - scoreA; 
+
+                const dateA = parseIndoDate(a.tanggal) || new Date(0);
+                const dateB = parseIndoDate(b.tanggal) || new Date(0);
+                
+                return a.status === 'Pending' ? dateA - dateB : dateB - dateA;
+            });
+
+            let isAnyLive = false;
+            
+            // 3. RENDER UI FOTMOB STYLE
+            list.innerHTML = filteredMatches.map(j => {
+                if(j.status === 'LIVE') isAnyLive = true;
+                const isLive = j.status === 'LIVE'; const isFT = j.status === 'FT' || j.status === 'Selesai'; const hasScore = isLive || isFT;
+                
+                // Gunakan getMatchBadge jika fungsi ada, jika tidak kosongkan
+                const badgeHTML = typeof getMatchBadge === 'function' ? getMatchBadge(j.jenis_match) : '';
+                
+                return `
+                <div class="bg-brand-panel border ${isLive ? 'border-red-500/30 bg-gradient-to-r from-red-950/10 to-transparent' : 'border-white/5'} p-4 md:p-5 rounded-2xl flex flex-col gap-4 hover:border-white/10 transition-all shadow-lg relative overflow-hidden stagger-item">
+                    <div class="flex justify-between items-center text-[10px]">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            ${badgeHTML}
+                            ${val(j.kategori_umur, '') !== '-' && j.kategori_umur ? `<span class="bg-brand-neon/10 text-brand-neon border border-brand-neon/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider text-[8px]">${j.kategori_umur}</span>` : ''}
+                        </div>
+                        <div class="flex items-center gap-2 font-semibold shrink-0">
+                            <span class="text-gray-400 hidden sm:inline-block">${j.tanggal}</span>
+                            <span class="w-1 h-1 bg-gray-800 rounded-full hidden sm:inline-block"></span>
+                            <span class="text-brand-gold">${j.waktu}</span>
+                            ${isLive ? `<span class="bg-red-500 text-white font-black px-2 py-0.5 rounded text-[8px] tracking-wider animate-pulse ml-1">${val(j.live_timer, 'LIVE')}</span>` : ''}
+                            ${isFT ? `<span class="bg-white/10 text-gray-500 font-bold px-1.5 py-0.5 rounded text-[8px] tracking-widest ml-1">FT</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between py-2.5 border-y border-white/5 bg-black/10 rounded-xl px-4">
+                        <div class="flex items-center gap-3 w-5/12 min-w-0">
+                            <div class="w-7 h-7 rounded-lg bg-brand-blue flex items-center justify-center text-white font-black text-xs shrink-0 shadow-md">M</div>
+                            <span class="font-black text-xs md:text-sm text-white uppercase tracking-tight truncate">MNA FC</span>
+                        </div>
+                        <div class="w-2/12 flex justify-center shrink-0">
+                            ${hasScore ? `<div class="bg-black/60 border border-white/10 px-3 py-1 rounded-xl font-mono text-base md:text-lg font-black tracking-tight flex items-center gap-2 shadow-inner"><span class="${isLive ? 'text-red-500' : 'text-white'}">${j.skor_kita || 0}</span><span class="text-gray-600 font-sans text-xs">:</span><span class="text-gray-400">${j.skor_lawan || 0}</span></div>` : `<div class="bg-white/5 border border-white/5 px-3 py-1 rounded-full text-[9px] font-black text-gray-500 uppercase tracking-widest">VS</div>`}
+                        </div>
+                        <div class="flex items-center gap-3 w-5/12 justify-end text-right min-w-0">
+                            <span class="font-bold text-xs md:text-sm text-gray-300 uppercase tracking-tight truncate">${j.lawan}</span>
+                            <div class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 font-black text-xs shrink-0">?</div>
+                        </div>
+                    </div>
+
+                    ${(val(j.pencetak_gol, '') !== '-' || val(j.kartu_merah, '') !== '-' || val(j.kartu_kuning, '') !== '-') && hasScore ? `
+                <div class="px-4 md:px-5 py-2.5 bg-black/30 border-y border-white/5 flex flex-col gap-1.5">
+                    ${val(j.pencetak_gol, '') !== '-' && j.pencetak_gol ? `<div class="flex items-start gap-2"><i data-lucide="goal" class="w-3 h-3 text-green-400 mt-0.5 shrink-0"></i><p class="text-[9px] font-bold text-gray-300 leading-tight">${j.pencetak_gol}</p></div>` : ''}
+                    ${val(j.kartu_merah, '') !== '-' && j.kartu_merah ? `<div class="flex items-start gap-2"><div class="w-2.5 h-3.5 bg-red-500 rounded shadow-sm mt-0.5 shrink-0"></div><p class="text-[9px] font-bold text-gray-300 leading-tight">${j.kartu_merah}</p></div>` : ''}
+                </div>` : ''}
+                    
+                    <div class="flex justify-between items-center text-[10px] text-gray-500">
+                        <div class="flex items-center gap-1.5 min-w-0"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-600 shrink-0"></i><span class="uppercase font-medium tracking-wide truncate">${j.tempat}</span></div>
+                        ${hasScore ? `<button onclick="openMatchDetail('${j.id_match}')" class="bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white text-gray-300 px-3 py-1.5 rounded-xl font-black uppercase tracking-widest text-[9px] transition-all flex items-center gap-1 shadow-sm">Timeline <i data-lucide="chevron-right" class="w-3 h-3"></i></button>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+            
+            if(ind) { isAnyLive ? ind.classList.remove('hidden') || ind.classList.add('flex') : ind.classList.add('hidden') || ind.classList.remove('flex'); }
+            lucide.createIcons();
+        }
+
+        // FOTMOB STYLE STAT BAR BUILDER
+        function buildStatBarHTML(label, homeVal, awayVal, isPct = false) {
+            let h = parseFloat(homeVal) || 0;
+            let a = parseFloat(awayVal) || 0;
+            let total = h + a;
+            let hPct = total > 0 ? (h / total) * 100 : 50;
+            let aPct = total > 0 ? (a / total) * 100 : 50;
+            
+            // Pewarnaan dinamis: Menang = Biru/Neon, Kalah = Merah, Seri = Abu-abu
+            let hCol = h > a ? 'bg-brand-neon' : (h === a ? 'bg-gray-400' : 'bg-gray-700');
+            let aCol = a > h ? 'bg-red-500' : (h === a ? 'bg-gray-400' : 'bg-gray-700');
+            let hText = h > a ? 'text-white font-black' : (h === a ? 'text-gray-300 font-bold' : 'text-gray-500');
+            let aText = a > h ? 'text-white font-black' : (h === a ? 'text-gray-300 font-bold' : 'text-gray-500');
+            
+            let displayH = isPct ? h + '%' : h;
+            let displayA = isPct ? a + '%' : a;
+
+            return `
+            <div class="mb-4 group">
+                <div class="flex justify-between items-center mb-1.5 px-1">
+                    <span class="w-10 text-left text-[11px] ${hText}">${displayH}</span>
+                    <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest text-center flex-1 group-hover:text-white transition-colors">${label}</span>
+                    <span class="w-10 text-right text-[11px] ${aText}">${displayA}</span>
+                </div>
+                <div class="flex items-center justify-center gap-1.5 w-full h-1.5">
+                    <div class="flex-1 bg-white/5 rounded-l-full h-full flex justify-end overflow-hidden">
+                        <div class="${hCol} h-full rounded-l-full transition-all duration-1000 ease-out shadow-[0_0_10px_currentColor]" style="width: ${hPct}%"></div>
+                    </div>
+                    <div class="flex-1 bg-white/5 rounded-r-full h-full flex justify-start overflow-hidden">
+                        <div class="${aCol} h-full rounded-r-full transition-all duration-1000 ease-out shadow-[0_0_10px_currentColor]" style="width: ${aPct}%"></div>
+                    </div>
+                </div>
+            </div>`;
+        }
+        
+        // --- FUNGSI UNTUK MEMBUKA MODAL EVENT TIMELINE ---
+        function openMatchDetail(matchId) {
+            const jadwal = rawData.jadwal.find(j => String(j.id_match) === String(matchId));
+            const log = rawData.match_log ? rawData.match_log.find(l => String(l.id_match) === String(matchId)) : null;
+            
+            if(!jadwal) return;
+            
+            document.getElementById('md-lawan').innerText = jadwal.lawan;
+            document.getElementById('md-score').innerText = `${jadwal.skor_kita || 0} - ${jadwal.skor_lawan || 0}`;
+            const dateEl = document.getElementById('md-date');
+            if(dateEl) dateEl.innerText = `${jadwal.tanggal} • ${val(jadwal.tempat, 'Venue')}`;
+            
+            const statusEl = document.getElementById('md-status');
+            statusEl.innerText = jadwal.status === 'LIVE' ? 'LIVE MATCH' : 'FULL TIME';
+            statusEl.className = jadwal.status === 'LIVE' ? 'text-[9px] font-black bg-red-500/20 border border-red-500 text-red-500 px-3 py-1 rounded uppercase tracking-widest live-pulse' : 'text-[9px] font-black bg-white/10 text-white px-3 py-1 rounded uppercase tracking-widest';
+
+            const container = document.getElementById('md-events-container');
+            // FIX TIMELINE: Ambil event live log, JIKA TIDAK ADA ambil live_events hasil encode PME
+            let eventsJSON = (log && log.detail_event) ? log.detail_event : jadwal.live_events;
+
+            if(eventsJSON) {
+                try {
+                    let events = typeof eventsJSON === 'string' ? JSON.parse(eventsJSON) : eventsJSON;
+                    if(events.length === 0) {
+                        container.innerHTML = '<div class="text-center py-10"><i data-lucide="clock" class="w-8 h-8 text-white/10 mx-auto mb-2"></i><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Belum ada kejadian</p></div>';
+                    } else {
+                        events.sort((a, b) => parseInt(a.time) - parseInt(b.time));
+                        container.innerHTML = events.map(ev => {
+                            let dotCol = 'bg-gray-600 border-gray-500'; let textCol = 'text-white';
+                            const typeLower = ev.type.toLowerCase();
+                            if(typeLower.includes('gol') || typeLower.includes('scored') || typeLower.includes('penalti didapat')) { dotCol = 'bg-green-500 border-green-400'; textCol = 'text-green-400'; }
+                            else if(typeLower.includes('kebobolan') || typeLower.includes('conceded') || typeLower.includes('merah') || typeLower.includes('gagal')) { dotCol = 'bg-red-500 border-red-400'; textCol = 'text-red-400'; }
+                            else if(typeLower.includes('kuning')) { dotCol = 'bg-yellow-400 border-yellow-300'; textCol = 'text-yellow-400'; }
+                            else if(typeLower.includes('assist') || typeLower.includes('sub')) { dotCol = 'bg-brand-neon border-blue-400'; textCol = 'text-brand-neon'; }
+
+                            return `
+                            <div class="flex items-start gap-4 group stagger-item">
+                                <div class="w-10 md:w-12 pt-1 shrink-0 text-right"><span class="text-[10px] md:text-xs font-black text-gray-400">${ev.time}</span></div>
+                                <div class="relative flex flex-col items-center"><div class="w-3.5 h-3.5 rounded-full ${dotCol} border-2 relative z-10 shadow-[0_0_10px_currentColor] mt-1 transition-transform group-hover:scale-125 duration-300"></div></div>
+                                <div class="bg-brand-panel border border-white/5 p-3.5 rounded-2xl flex-1 shadow-md group-hover:border-white/10 group-hover:bg-white/5 transition-all">
+                                    <div class="flex items-center gap-2 mb-1.5"><i data-lucide="${ev.icon || 'activity'}" class="w-4 h-4 ${textCol}"></i><p class="text-[10px] font-black uppercase tracking-widest ${textCol}">${ev.type}</p></div>
+                                    <p class="text-xs font-bold text-gray-200 capitalize leading-tight">${ev.detail}</p>
+                                </div>
+                            </div>`;
+                        }).join('');
+                        
+                        if(jadwal.status === 'FT' || jadwal.status === 'Selesai') {
+                             container.innerHTML += `<div class="flex items-start gap-4 opacity-50 mt-4 stagger-item"><div class="w-10 md:w-12 text-right"><span class="text-[10px] font-black text-gray-500">FT</span></div><div class="relative flex flex-col items-center"><div class="w-3.5 h-3.5 rounded-full bg-transparent border-2 border-gray-500 mt-0.5"></div></div><div class="flex-1"><p class="text-[10px] font-bold text-gray-500 uppercase mt-0.5 tracking-widest">Peluit Akhir Dibunyikan</p></div></div>`;
+                        }
+                    }
+                } catch(e) { container.innerHTML = '<p class="text-center text-[10px] text-red-500 font-bold">Gagal memproses data rekaman pertandingan.</p>'; }
+            } else { container.innerHTML = '<div class="text-center py-10"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Pertandingan belum dimulai</p></div>'; }
+
+            // RENDER LINEUP PUBLIC (Hybrid Auto JSON / Manual)
+            const lineupContainer = document.getElementById('md-lineup-container');
+            let lData = null; let formasi = '4-3-3'; let isJsonValid = false;
+            
+            if(log && log.lineup) {
+                try { lData = JSON.parse(log.lineup); formasi = log.formasi; isJsonValid = true; lineupContainer.innerHTML = renderMiniPitch(lData, formasi, jadwal.cabang); } catch(e) {}
+            } else if (jadwal.lineup_manual && jadwal.lineup_manual !== '-') {
+                try {
+                    const pLineup = JSON.parse(jadwal.lineup_manual);
+                    if(pLineup.pitch && pLineup.formasi) {
+                        isJsonValid = true;
+                        lineupContainer.innerHTML = renderMiniPitch(pLineup.pitch, pLineup.formasi, jadwal.cabang) + 
+                        `<div class="mt-6 bg-brand-panel p-5 rounded-2xl border border-white/5 shadow-lg"><h4 class="text-[10px] font-black text-brand-gold uppercase tracking-widest mb-3 border-b border-white/5 pb-2 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i> Pemain Cadangan</h4><div class="flex flex-wrap gap-2">${pLineup.bench.map(p => `<div class="bg-black border border-white/10 px-3 py-1.5 rounded-lg flex items-center gap-2"><div class="w-4 h-4 rounded-full bg-white/10 overflow-hidden"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div><span class="text-[9px] font-bold text-gray-300 uppercase">${val(p.nama).split(' ')[0]}</span></div>`).join('')}</div></div>`;
+                    }
+                } catch(e) {}
+            }
+            if(!isJsonValid) {
+                lineupContainer.innerHTML = (jadwal.lineup_manual && jadwal.lineup_manual !== '-') ? `<div class="bg-white/5 border border-white/10 p-5 rounded-2xl text-[10px] text-gray-300 leading-relaxed whitespace-pre-wrap shadow-inner">${jadwal.lineup_manual}</div>` : '<div class="text-center py-10"><i data-lucide="users" class="w-8 h-8 text-white/5 mx-auto mb-2"></i><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Belum ada data Line Up</p></div>';
+            }
+
+            // RENDER STATS (HYBRID JSON VISUALIZER / TEXT)
+            const statsContainer = document.getElementById('md-stats-container');
+            let statData = null;
+            
+            // Baca data dari Match Log atau dari ketikan manual Spreadsheet
+            let statRaw = (log && log.statistik) ? log.statistik : (jadwal.statistik_manual !== '-' ? jadwal.statistik_manual : null);
+            
+            if (statRaw) {
+                try { 
+                    statData = JSON.parse(statRaw); // Coba ubah teks jadi JSON 
+                } catch(e) { 
+                    statData = null; // Jika gagal, berarti ini teks biasa dari ketikan lama
+                }
+            }
+
+            if (statData && typeof statData === 'object') {
+                // JIKA FORMAT JSON (DARI POST-MATCH EDITOR) -> RENDER GRAFIK FOTMOB
+                statsContainer.innerHTML = `
+                    <div class="bg-brand-panel border border-white/5 p-5 md:p-6 rounded-3xl shadow-xl mt-2 animate-fade-in relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/5 blur-3xl rounded-full pointer-events-none"></div>
+                        <h4 class="text-[10px] font-black text-brand-gold uppercase tracking-widest mb-6 border-b border-white/10 pb-3 text-center">Match Stats</h4>
+                        
+                        ${buildStatBarHTML('Penguasaan Bola', statData.pos_h, statData.pos_a, true)}
+                        ${buildStatBarHTML('Total Tembakan', statData.shot_h, statData.shot_a)}
+                        ${buildStatBarHTML('Tepat Sasaran', statData.sot_h, statData.sot_a)}
+                        ${buildStatBarHTML('Total Umpan', statData.pass_h, statData.pass_a)}
+                        ${buildStatBarHTML('Umpan Akurat', statData.acc_h, statData.acc_a, true)}
+                        ${buildStatBarHTML('Tendangan Sudut', statData.corn_h, statData.corn_a)}
+                        ${buildStatBarHTML('Offside', statData.off_h, statData.off_a)}
+                        ${buildStatBarHTML('Pelanggaran', statData.foul_h, statData.foul_a)}
+                    </div>
+                `;
+            } else if (statRaw && statRaw !== '-') {
+                // JIKA TEKS BIASA -> TAMPILKAN SEBAGAI CATATAN (BACKWARD COMPATIBILITY)
+                statsContainer.innerHTML = `<div class="bg-brand-panel border border-white/5 p-5 rounded-2xl text-[10px] text-gray-300 leading-relaxed whitespace-pre-wrap mt-2 shadow-lg"><h4 class="text-brand-neon font-black mb-2 uppercase tracking-widest">Catatan Statistik</h4>${statRaw}</div>`;
+            } else {
+                // JIKA KOSONG
+                statsContainer.innerHTML = '<div class="text-center py-12"><i data-lucide="bar-chart-2" class="w-10 h-10 text-white/5 mx-auto mb-3"></i><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Statistik belum tersedia</p></div>';
+            }
+            
+            switchMatchTab('timeline'); // Memaksa tab timeline terbuka otomatis
+            document.getElementById('matchDetailModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+        
+        function closeMatchDetail() { document.getElementById('matchDetailModal').classList.add('hidden'); }
+
+        // --- LINEUP BUILDER ENGINE ---
+        function initLineupBuilder() {
+            lineupData = {}; activeLineupSlot = null; document.getElementById('lineupSearch').value = '';
+            const select = document.getElementById('formation-select'); const forms = FORMATIONS[activeSport];
+            select.innerHTML = Object.keys(forms).map(k => `<option value="${k}">${k}</option>`).join('');
+            currentFormationKey = Object.keys(forms)[0]; renderLineupPitchSetup(); renderLineupPool();
+        }
+        function changeFormation(key) { currentFormationKey = key; lineupData = {}; activeLineupSlot = null; document.getElementById('lineupSearch').value = ''; renderLineupPitchSetup(); renderLineupPool(); }
+        
+        function renderLineupPitchSetup() {
+            const container = document.getElementById('lineup-slots-container');
+            const pitch = document.getElementById('lineup-pitch');
+            pitch.className = `pitch-container ${activeSport === 'futsal' ? 'pitch-futsal' : 'pitch-football'}`;
+            const slots = FORMATIONS[activeSport][currentFormationKey];
+            container.innerHTML = slots.map((s, i) => {
+                const p = lineupData[i];
+                if (p) return `<div onclick="selectLineupSlot(${i})" class="lineup-slot filled ${activeLineupSlot === i ? 'active' : ''}" style="bottom:${s.b}; left:${s.l}; background-image:url('${val(p.link_foto)}')"><span class="lineup-slot-label">${val(p.nama).split(' ')[0]}</span></div>`;
+                return `<div onclick="selectLineupSlot(${i})" class="lineup-slot ${activeLineupSlot === i ? 'active' : ''}" style="bottom:${s.b}; left:${s.l};"><i data-lucide="plus" class="w-4 h-4 text-white/50"></i><span class="lineup-slot-label bg-brand-blue border-brand-blue text-white">${s.role}</span></div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function renderLineupPool() {
+            const query = document.getElementById('lineupSearch') ? document.getElementById('lineupSearch').value.toLowerCase() : '';
+            const pool = document.getElementById('lineup-pool'); const inst = document.getElementById('lineup-instruction');
+            
+            if (activeLineupSlot === null) {
+                pool.style.opacity = '0.3'; pool.style.pointerEvents = 'none';
+                inst.innerText = '1. Ketuk slot formasi di lapangan'; inst.className = 'text-[9px] font-bold text-gray-500 uppercase tracking-widest mt-1';
+            } else {
+                pool.style.opacity = '1'; pool.style.pointerEvents = 'auto';
+                const role = FORMATIONS[activeSport][currentFormationKey][activeLineupSlot].role;
+                inst.innerHTML = `2. Pilih pemain untuk <span class="text-brand-neon">${role}</span>`; inst.className = 'text-[9px] font-black text-white uppercase tracking-widest mt-1';
+            }
+            
+            const players = rawData[activeSport]?.pemain || []; 
+            const assignedIds = Object.values(lineupData).map(p => p.nomor + p.nama);
+            
+            const filteredPlayers = players.filter(p => (val(p.nama) + val(p.posisi)).toLowerCase().includes(query));
+
+            pool.innerHTML = filteredPlayers.map((p) => {
+                const i = players.indexOf(p);
+                const isAssigned = assignedIds.includes(p.nomor + p.nama);
+                return `
+                <div onclick="${isAssigned ? '' : `assignPlayerToSlot(${i})`}" class="pool-card flex flex-col items-center gap-2 transition-all ${isAssigned ? 'opacity-20 grayscale cursor-not-allowed' : 'cursor-pointer hover:scale-105'}">
+                    <div class="w-14 h-14 rounded-full overflow-hidden border-2 ${isAssigned ? 'border-gray-800' : 'border-white/10'} bg-black">
+                        <img src="${val(p.link_foto)}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[8px] font-black ${isAssigned ? 'text-gray-600' : 'text-white'} uppercase line-clamp-1 w-16 leading-tight">${val(p.nama)}</p>
+                        <p class="text-[7px] ${isAssigned ? 'text-gray-700' : 'text-brand-neon'} font-bold mt-0.5">${val(p.posisi)}</p>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function selectLineupSlot(idx) { activeLineupSlot = idx; renderLineupPitchSetup(); renderLineupPool(); }
+        function assignPlayerToSlot(playerIdx) { if (activeLineupSlot === null) return; const p = rawData[activeSport].pemain[playerIdx]; lineupData[activeLineupSlot] = p; activeLineupSlot = null; document.getElementById('lineupSearch').value = ''; renderLineupPitchSetup(); renderLineupPool(); }
+        function resetLineup() { lineupData = {}; activeLineupSlot = null; document.getElementById('lineupSearch').value = ''; renderLineupPitchSetup(); renderLineupPool(); }
+
+        // --- MEDIA HUB LOGIC ---
+        function runMediaFilter() {
+            const query = document.getElementById('mediaSearch').value.toLowerCase();
+            if(!rawData.galeri) return;
+            const filtered = rawData.galeri.filter(item => { return val(item.kegiatan).toLowerCase().includes(query) || val(item.tanggal).toLowerCase().includes(query); });
+            renderGallery(filtered);
+        }
+        function renderGallery(list) {
+            const grid = document.getElementById('galleryGrid');
+            if (!list || list.length === 0) { grid.innerHTML = `<div class="col-span-full py-16 text-center text-[10px] font-black text-gray-500 uppercase tracking-widest border border-dashed border-white/10 rounded-2xl">Kosong</div>`; return; }
+            grid.innerHTML = list.map((item, i) => `
+                <a href="${item.link_drive}" target="_blank" class="glass-panel rounded-2xl p-3 flex flex-col gap-3 relative overflow-hidden group stagger-item border border-white/5" style="animation-delay: ${i*0.02}s">
+                    <div class="relative w-full aspect-video rounded-xl bg-brand-dark overflow-hidden">${item.preview_image ? `<img src="${item.preview_image}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-transform duration-700">` : '<div class="absolute inset-0 flex items-center justify-center"><i data-lucide="folder" class="w-10 h-10 text-white/10"></i></div>'}<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div><div class="absolute bottom-3 left-3 text-white"><h4 class="text-xs font-black uppercase tracking-tight line-clamp-1">${val(item.kegiatan)}</h4><p class="text-[9px] font-bold text-gray-300 uppercase mt-0.5">${val(item.tanggal)}</p></div></div>
+                </a>`).join('');
+            lucide.createIcons();
+        }
+
+        // --- SISTEM ABSENSI PELATIH ---
+        let currentAttendanceData = {}; 
+
+        function openAttendancePanel() {
+            document.getElementById('coach-match-selector').classList.add('hidden');
+            document.getElementById('coach-active-match-panel').classList.add('hidden');
+            
+            document.getElementById('coach-attendance-panel').classList.remove('hidden');
+            document.getElementById('coach-attendance-panel').classList.add('flex');
+            
+            document.getElementById('match-status-text').innerText = 'Sistem Absensi Aktif';
+            document.getElementById('match-status-text').classList.replace('text-red-500', 'text-brand-neon');
+
+            document.getElementById('attendanceSearch').value = '';
+            renderAttendanceList();
+        }
+
+        function renderAttendanceList() {
+            const listContainer = document.getElementById('attendance-list');
+            const query = document.getElementById('attendanceSearch') ? document.getElementById('attendanceSearch').value.toLowerCase() : '';
+            const players = rawData[activeSport]?.pemain || [];
+            
+            if(Object.keys(currentAttendanceData).length === 0) {
+                players.forEach(p => { currentAttendanceData[p.nama] = 'H'; });
+            }
+
+            const filteredPlayers = players.filter(p => val(p.nama).toLowerCase().includes(query));
+
+            if (filteredPlayers.length === 0) {
+                listContainer.innerHTML = `<div class="text-center py-8"><p class="text-[10px] font-bold text-gray-500 uppercase">Pemain tidak ditemukan</p></div>`;
+                return;
+            }
+
+            listContainer.innerHTML = filteredPlayers.map((p, idx) => {
+                const s = currentAttendanceData[p.nama];
+                const cH = s === 'H' ? 'bg-brand-neon text-white' : 'text-gray-500 hover:bg-white/5';
+                const cI = s === 'I' ? 'bg-yellow-500 text-black' : 'text-gray-500 hover:bg-white/5';
+                const cS = s === 'S' ? 'bg-brand-gold text-black' : 'text-gray-500 hover:bg-white/5';
+                const cA = s === 'A' ? 'bg-red-500 text-white' : 'text-gray-500 hover:bg-white/5';
+
+                return `
+                <div class="flex items-center justify-between bg-black p-3 rounded-xl border border-white/5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full overflow-hidden border border-white/10"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div>
+                        <div>
+                            <p class="text-[10px] font-black text-white uppercase line-clamp-1 leading-none">${val(p.nama)}</p>
+                            <p class="text-[8px] text-gray-500 uppercase mt-0.5">${val(p.posisi)}</p>
+                        </div>
+                    </div>
+                    <div class="flex bg-brand-panel rounded-lg border border-white/10 overflow-hidden">
+                        <button onclick="setAbsenStatus('${p.nama}', 'H', this)" class="w-8 h-8 text-[10px] font-black transition-all ${cH}">H</button>
+                        <button onclick="setAbsenStatus('${p.nama}', 'I', this)" class="w-8 h-8 text-[10px] font-black transition-all border-l border-white/5 ${cI}">I</button>
+                        <button onclick="setAbsenStatus('${p.nama}', 'S', this)" class="w-8 h-8 text-[10px] font-black transition-all border-l border-white/5 ${cS}">S</button>
+                        <button onclick="setAbsenStatus('${p.nama}', 'A', this)" class="w-8 h-8 text-[10px] font-black transition-all border-l border-white/5 ${cA}">A</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function setAbsenStatus(namaPemain, status, btnElement) {
+            currentAttendanceData[namaPemain] = status;
+            const parent = btnElement.parentElement;
+            const buttons = parent.querySelectorAll('button');
+            buttons.forEach(b => {
+                b.className = b.className.replace('bg-brand-neon text-white', 'text-gray-500 hover:bg-white/5').replace('bg-yellow-500 text-black', 'text-gray-500 hover:bg-white/5').replace('bg-brand-gold text-black', 'text-gray-500 hover:bg-white/5').replace('bg-red-500 text-white', 'text-gray-500 hover:bg-white/5');
+            });
+            let activeColorClass = '';
+            if(status === 'H') activeColorClass = 'bg-brand-neon text-white';
+            if(status === 'I') activeColorClass = 'bg-yellow-500 text-black';
+            if(status === 'S') activeColorClass = 'bg-brand-gold text-black';
+            if(status === 'A') activeColorClass = 'bg-red-500 text-white';
+            btnElement.className = btnElement.className.replace('text-gray-500 hover:bg-white/5', activeColorClass);
+        }
+
+        async function submitAttendance() {
+            if(!confirm("Kirim data absensi ke server?")) return;
+            const btn = document.querySelector('button[onclick="submitAttendance()"]');
+            const originalText = btn.innerHTML; btn.innerHTML = "Menyimpan..."; btn.disabled = true;
+
+            const tipeSesi = document.getElementById('tipe-sesi-absen').value;
+            const arrayAbsen = Object.keys(currentAttendanceData).map(nama => { return { nama: nama, status: currentAttendanceData[nama] }; });
+
+            const payload = { id_sesi: 'ABS' + Date.now(), tanggal: new Date().toLocaleDateString('id-ID'), cabang: activeSport, tipe_sesi: tipeSesi, data_absen: arrayAbsen };
+
+            try {
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'save_attendance', payload: payload }) });
+                alert("Absensi berhasil disimpan ke Spreadsheet!");
+                document.getElementById('coach-attendance-panel').classList.add('hidden');
+                document.getElementById('coach-match-selector').classList.remove('hidden');
+                document.getElementById('match-status-text').innerText = 'Pilih Pertandingan';
+            } catch(e) { alert("Gagal menyimpan absensi. Cek koneksi."); }
+            finally { btn.innerHTML = originalText; btn.disabled = false; }
+        }
+
+        function tutupDossier() { const p = document.getElementById('fullProfilePage'); p.classList.remove('page-slide-in'); setTimeout(() => { p.classList.add('hidden'); document.body.style.overflow = ''; }, 500); }
+        function closeModal() { document.getElementById('playerModal').classList.add('hidden'); document.body.style.overflow = ''; }
+
+        // 1. MESIN AUTO-KALKULASI GOL & ASSIST
+        function calculateAutoStats() {
+            // Reset state
+            ['mnafc', 'futsal'].forEach(sport => {
+                if(rawData[sport] && rawData[sport].pemain) {
+                    rawData[sport].pemain.forEach(p => { 
+                        p.gol_total = parseInt(val(p.gol, 0)) || 0; 
+                        p.assist_total = 0; 
+                    });
+                }
+            });
+
+            // Kalkulasi dari Tab Jadwal (Input Manual Mandiri)
+            if(rawData.jadwal) {
+                rawData.jadwal.forEach(j => {
+                    const cabang = val(j.cabang, 'mnafc').toLowerCase();
+                    const golMan = val(j.pencetak_gol, '').toLowerCase();
+                    const assistMan = val(j.pencetak_assist, '').toLowerCase();
+                    
+                    if(rawData[cabang] && rawData[cabang].pemain) {
+                        rawData[cabang].pemain.forEach(p => {
+                            const nama = p.nama.toLowerCase();
+                            // Deteksi jika nama pemain diketik di kolom Pencetak Gol/Assist
+                            if(golMan.includes(nama)) p.gol_total++;
+                            if(assistMan.includes(nama)) p.assist_total++;
+                        });
+                    }
+                });
+            }
+
+            // Kalkulasi dari Match Log (Input Otomatis Coach Area)
+            if(rawData.match_log) {
+                rawData.match_log.forEach(log => {
+                    const cabang = val(log.cabang, 'mnafc').toLowerCase();
+                    if(log.detail_event) {
+                        try {
+                            const events = JSON.parse(log.detail_event);
+                            events.forEach(ev => {
+                                const type = ev.type.toLowerCase(); const desc = ev.detail.toLowerCase();
+                                if(rawData[cabang] && rawData[cabang].pemain) {
+                                    rawData[cabang].pemain.forEach(p => {
+                                        const nama = p.nama.toLowerCase();
+                                        if(desc.includes(nama)) {
+                                            if(type.includes('gol') || type.includes('scored')) p.gol_total++;
+                                            if(type.includes('assist')) p.assist_total++;
+                                        }
+                                    });
+                                }
+                            });
+                        } catch(e) {}
+                    }
+                });
+            }
+        }
+
+        // 2. FUNGSI PINDAH TAB DETAIL MATCH
+        function switchMatchTab(tab) {
+            document.getElementById('md-view-timeline').classList.toggle('hidden', tab !== 'timeline');
+            document.getElementById('md-view-lineup').classList.toggle('hidden', tab !== 'lineup');
+            document.getElementById('md-view-stats').classList.toggle('hidden', tab !== 'stats');
+            
+            const aCls = 'flex-1 py-3.5 text-[10px] font-black uppercase tracking-widest text-brand-neon border-b-2 border-brand-neon transition-colors';
+            const iCls = 'flex-1 py-3.5 text-[10px] font-bold uppercase tracking-widest text-gray-600 border-b-2 border-transparent transition-colors';
+            
+            document.getElementById('tab-md-timeline').className = tab === 'timeline' ? aCls : iCls;
+            document.getElementById('tab-md-lineup').className = tab === 'lineup' ? aCls : iCls;
+            document.getElementById('tab-md-stats').className = tab === 'stats' ? aCls : iCls;
+        }
+
+        // 3. FUNGSI RENDER LAPANGAN VIRTUAL MINI
+        // 3. FUNGSI RENDER LAPANGAN VIRTUAL MINI
+        function renderMiniPitch(lineupObj, formasi, cabangRaw) {
+            // FIX: Failsafe default ke 'mnafc' jika kolom cabang kosong
+            const cabang = val(cabangRaw, 'mnafc').toLowerCase() === 'futsal' ? 'futsal' : 'mnafc';
+            
+            const formsDef = FORMATIONS[cabang][formasi] || FORMATIONS[cabang][Object.keys(FORMATIONS[cabang])[0]];
+            const bgClass = cabang === 'futsal' ? 'pitch-futsal' : 'pitch-football';
+            let slotsHTML = formsDef.map((s, i) => {
+                const p = lineupObj[i];
+                if(p) return `<div class="absolute w-8 h-8 rounded-full border border-white bg-cover bg-center shadow-lg" style="bottom:${s.b}; left:${s.l}; transform: translate(-50%, 50%); background-image:url('${val(p.link_foto)}')"><span class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-black/80 px-1 py-0.5 rounded text-[6px] font-black text-white uppercase whitespace-nowrap">${val(p.nama).split(' ')[0]}</span></div>`;
+                return `<div class="absolute w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center" style="bottom:${s.b}; left:${s.l}; transform: translate(-50%, 50%);"><span class="text-[6px] font-black text-white/50">${s.role}</span></div>`;
+            }).join('');
+            
+            return `
+            <div class="pitch-wrapper mx-auto mt-4" style="max-width: 280px;">
+                <div class="pitch-container ${bgClass}">
+                    <div class="pitch-half pitch-line"></div><div class="pitch-circle pitch-line"></div>
+                    <div class="pitch-line" style="top:0; left:20%; width:60%; height:18%; border-top:0;"></div>
+                    <div class="pitch-line" style="bottom:0; left:20%; width:60%; height:18%; border-bottom:0;"></div>
+                    ${slotsHTML}
+                </div>
+            </div>`;
+        }
+
+        // --- POST-MATCH EDITOR LOGIC PRO ---
+        let editMatchId = null;
+        let pmeLineup = {}; let pmeBench = []; let pmeEvents = [];
+        let pmeActiveSlot = null; // Bisa berupa index pitch (angka), 'bench', atau 'event'
+
+        function openPostMatchEditor(matchId) {
+            const jadwal = rawData.jadwal.find(j => String(j.id_match) === String(matchId));
+            if(!jadwal) return; editMatchId = matchId;
+            
+            // FIX: Sinkronisasi Cabang Olahraga Otomatis
+            const cab = val(jadwal.cabang, 'mnafc').toLowerCase();
+            if(cab === 'futsal' || cab === 'mnafc') activeSport = cab;
+            
+            document.getElementById('coach-match-selector').classList.add('hidden');
+            document.getElementById('coach-post-match-panel').classList.remove('hidden'); document.getElementById('coach-post-match-panel').classList.add('flex');
+            document.getElementById('pme-match-title').innerText = `VS ${jadwal.lawan} (${jadwal.tanggal})`;
+            
+            const select = document.getElementById('pme-formation-select'); const forms = FORMATIONS[activeSport];
+            select.innerHTML = Object.keys(forms).map(k => `<option value="${k}">${k}</option>`).join('');
+            select.value = Object.keys(forms)[0]; // Setel Default agar lapangan tidak kosong!
+            
+            // Dekode Data Lineup JSON
+            pmeLineup = {}; pmeBench = []; pmeEvents = [];
+            try {
+                const parsedLineup = JSON.parse(jadwal.lineup_manual || '{}');
+                if(parsedLineup.formasi) select.value = parsedLineup.formasi;
+                if(parsedLineup.pitch) pmeLineup = parsedLineup.pitch;
+                if(parsedLineup.bench) pmeBench = parsedLineup.bench;
+            } catch(e) {}
+            
+            // Dekode Data Event JSON
+            try { pmeEvents = JSON.parse(jadwal.live_events || '[]'); } catch(e) {}
+            
+            // Dekode Statistik JSON
+            let statData = {}; try { statData = JSON.parse(jadwal.statistik_manual || '{}'); } catch(e) {}
+            ['pos','shot','sot','pass','acc','corn','off','foul'].forEach(key => {
+                document.getElementById(`pme-${key}-h`).value = statData[`${key}_h`] || ''; document.getElementById(`pme-${key}-a`).value = statData[`${key}_a`] || '';
+            });
+
+            switchPmeTab('skuad'); pmeActiveSlot = null; renderPmePitch(); renderPmeBench(); renderPmePool(); renderPmeEvents();
+            lucide.createIcons();
+        }
+
+        function closePostMatchEditor() {
+            document.getElementById('coach-post-match-panel').classList.add('hidden'); document.getElementById('coach-post-match-panel').classList.remove('flex');
+            document.getElementById('coach-match-selector').classList.remove('hidden');
+        }
+
+        function switchPmeTab(tab) {
+            document.getElementById('pme-view-skuad').classList.toggle('hidden', tab !== 'skuad');
+            document.getElementById('pme-view-event').classList.toggle('hidden', tab !== 'event');
+            document.getElementById('pme-view-stats').classList.toggle('hidden', tab !== 'stats');
+            
+            // FIX: Sembunyikan Bursa Pemain saat masuk ke tab statistik
+            document.getElementById('pme-pool-section').classList.toggle('hidden', tab === 'stats');
+            
+            const aCls = 'flex-1 py-2 text-[9px] font-black uppercase rounded-lg bg-brand-neon text-white transition-all';
+            const iCls = 'flex-1 py-2 text-[9px] font-bold uppercase rounded-lg text-gray-500 hover:text-white transition-all';
+            document.getElementById('pme-tab-skuad').className = tab === 'skuad' ? aCls : iCls;
+            document.getElementById('pme-tab-event').className = tab === 'event' ? aCls : iCls;
+            document.getElementById('pme-tab-stats').className = tab === 'stats' ? aCls : iCls;
+            
+            pmeActiveSlot = null; renderPmePool();
+        }
+
+        function changePmeFormation(key) { pmeLineup = {}; pmeBench = []; renderPmePitch(); renderPmeBench(); renderPmePool(); }
+
+        function renderPmePitch() {
+            const container = document.getElementById('pme-pitch');
+            container.className = `pitch-container ${activeSport === 'futsal' ? 'pitch-futsal' : 'pitch-football'}`;
+            const formKey = document.getElementById('pme-formation-select').value;
+            const slots = FORMATIONS[activeSport][formKey];
+            
+            container.innerHTML = `<div class="pitch-half pitch-line"></div><div class="pitch-circle pitch-line"></div><div class="pitch-line" style="top:0; left:20%; width:60%; height:18%; border-top:0;"></div><div class="pitch-line" style="bottom:0; left:20%; width:60%; height:18%; border-bottom:0;"></div>` + slots.map((s, i) => {
+                const p = pmeLineup[i];
+                if (p) return `<div onclick="pmeActiveSlot=${i}; renderPmePitch(); renderPmePool();" class="lineup-slot filled ${pmeActiveSlot === i ? 'active' : ''}" style="bottom:${s.b}; left:${s.l}; background-image:url('${val(p.link_foto)}')"><span class="lineup-slot-label bg-brand-neon border-brand-neon text-white">${val(p.nama).split(' ')[0]}</span></div>`;
+                return `<div onclick="pmeActiveSlot=${i}; renderPmePitch(); renderPmePool();" class="lineup-slot ${pmeActiveSlot === i ? 'active' : ''}" style="bottom:${s.b}; left:${s.l};"><i data-lucide="plus" class="w-4 h-4 text-white/50"></i><span class="lineup-slot-label bg-brand-blue border-brand-blue text-white">${s.role}</span></div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function renderPmeBench() {
+            const container = document.getElementById('pme-bench-container');
+            if(pmeBench.length === 0) { container.innerHTML = '<p class="text-[8px] text-gray-500 uppercase font-bold w-full text-center py-2">Belum ada cadangan dipilih</p>'; return; }
+            container.innerHTML = pmeBench.map((p, i) => `
+                <div class="flex items-center gap-2 bg-white/5 border border-white/10 pl-1 pr-3 py-1 rounded-lg">
+                    <div class="w-6 h-6 rounded bg-black overflow-hidden shrink-0"><img src="${val(p.link_foto)}" class="w-full h-full object-cover"></div>
+                    <div><p class="text-[8px] font-black text-white uppercase">${val(p.nama).split(' ')[0]}</p><p class="text-[6px] font-bold text-brand-gold uppercase">${val(p.posisi)}</p></div>
+                    <button onclick="pmeBench.splice(${i}, 1); renderPmeBench(); renderPmePool();" class="ml-2 text-red-500 hover:text-red-400"><i data-lucide="x-circle" class="w-3 h-3"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderPmePool() {
+            const poolSec = document.getElementById('pme-pool-section');
+            const inst = document.getElementById('pme-pool-instruction');
+            const query = document.getElementById('pmeSearch') ? document.getElementById('pmeSearch').value.toLowerCase() : '';
+            
+            if (pmeActiveSlot === null) {
+                poolSec.style.opacity = '0.3'; poolSec.style.pointerEvents = 'none'; inst.innerText = 'Pilih slot/tombol di atas terlebih dahulu'; inst.className = 'text-[8px] font-bold text-gray-500 uppercase mt-0.5';
+            } else {
+                poolSec.style.opacity = '1'; poolSec.style.pointerEvents = 'auto';
+                let actionText = pmeActiveSlot === 'event' ? 'Pilih Pemain untuk Kejadian' : (pmeActiveSlot === 'bench' ? 'Pilih Pemain CADANGAN' : 'Pilih Pemain STARTER (XI)');
+                inst.innerText = actionText; inst.className = 'text-[9px] font-black text-brand-neon uppercase tracking-widest mt-0.5';
+            }
+            
+            const players = rawData[activeSport]?.pemain || []; 
+            // FIX: Filter (p => p) mencegah crash mematikan jika ada slot lapangan yang kosong
+            const assignedIds = Object.values(pmeLineup).filter(p => p).map(p => p.nomor + p.nama).concat(pmeBench.filter(p => p).map(p => p.nomor + p.nama));
+            const filteredPlayers = players.filter(p => (val(p.nama) + val(p.posisi)).toLowerCase().includes(query));
+
+            document.getElementById('pme-pool-container').innerHTML = filteredPlayers.map((p) => {
+                const i = players.indexOf(p);
+                const isAssigned = assignedIds.includes(p.nomor + p.nama);
+                const isEventMode = pmeActiveSlot === 'event';
+                const canClick = isEventMode || !isAssigned; // Di mode event, semua bisa diklik
+                
+                return `
+                <div onclick="${canClick ? `assignPmePlayer(${i})` : ''}" class="flex flex-col items-center gap-2 transition-all ${!canClick ? 'opacity-20 grayscale cursor-not-allowed' : 'cursor-pointer hover:scale-105'}">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 ${!canClick ? 'border-gray-800' : 'border-white/10'} bg-black">
+                        <img src="${val(p.link_foto)}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[8px] font-black ${!canClick ? 'text-gray-600' : 'text-white'} uppercase line-clamp-1 w-16 leading-tight">${val(p.nama).split(' ')[0]}</p>
+                        <p class="text-[7px] ${!canClick ? 'text-gray-700' : 'text-brand-neon'} font-bold mt-0.5">${val(p.posisi)}</p>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function assignPmePlayer(idx) {
+            const p = rawData[activeSport].pemain[idx];
+            if (pmeActiveSlot === 'event') {
+                // FIX: Menyamakan ID dengan tombol di HTML (pme-btn-select-player)
+                document.getElementById('pme-btn-select-player').innerText = p.nama;
+                document.getElementById('pme-btn-select-player').className = 'w-full bg-brand-neon/20 border border-brand-neon text-brand-neon font-black text-[10px] p-2.5 rounded-lg truncate text-left';
+                document.getElementById('pme-event-player-idx').value = idx;
+            } else if (pmeActiveSlot === 'bench') {
+                pmeBench.push(p); renderPmeBench();
+            } else if (pmeActiveSlot !== null) {
+                pmeLineup[pmeActiveSlot] = p; renderPmePitch();
+            }
+            pmeActiveSlot = null; document.getElementById('pmeSearch').value = ''; renderPmePool();
+        }
+
+        function addPmeEvent() {
+            const idx = document.getElementById('pme-event-player-idx').value;
+            if(!idx) return alert("Pilih pemain terlebih dahulu dari Bursa Pemain di bawah!");
+            const p = rawData[activeSport].pemain[idx];
+            const type = document.getElementById('pme-input-type').value;
+            const time = document.getElementById('pme-input-time').value || "0'";
+            
+            let bgStr = ''; let textStr = ''; let iconCol = ''; let iconName = 'activity';
+            if(type === 'Gol') { bgStr = 'bg-green-500/10 border-green-500/30'; textStr = 'text-green-400'; iconCol = 'text-green-500'; iconName = 'goal'; }
+            else if(type === 'Kartu Merah') { bgStr = 'bg-red-500/10 border-red-500/30'; textStr = 'text-red-400'; iconCol = 'text-red-500'; iconName = 'alert-triangle'; }
+            else if(type === 'Kartu Kuning') { bgStr = 'bg-yellow-500/10 border-yellow-500/30'; textStr = 'text-yellow-400'; iconCol = 'text-yellow-500'; iconName = 'alert-circle'; }
+            else if(type === 'Assist') { bgStr = 'bg-brand-neon/10 border-brand-neon/30'; textStr = 'text-brand-neon'; iconCol = 'text-brand-neon'; iconName = 'footprints'; }
+
+            pmeEvents.push({ time: time, type: type, detail: p.nama, icon: iconName, col: iconCol, bg: bgStr });
+            
+            // Reset form setelah sukses menambah
+            document.getElementById('pme-input-time').value = '';
+            document.getElementById('pme-btn-select-player').innerText = 'Klik Pilih Pemain...';
+            document.getElementById('pme-btn-select-player').className = 'w-full bg-white/5 border border-white/10 text-brand-gold font-bold text-[10px] p-2.5 rounded-lg truncate text-left hover:bg-white/10 transition-colors';
+            document.getElementById('pme-event-player-idx').value = '';
+            renderPmeEvents();
+        }
+
+        function renderPmeEvents() {
+            const container = document.getElementById('pme-events-list');
+            if(pmeEvents.length === 0) { container.innerHTML = '<p class="text-[9px] font-bold text-gray-500 uppercase text-center mt-4">Belum ada kejadian</p>'; return; }
+            
+            container.innerHTML = pmeEvents.map((ev, i) => `
+                <div class="flex items-center gap-3 p-2.5 rounded-xl border ${ev.bg} bg-black/50">
+                    <div class="w-6 h-6 rounded bg-black flex items-center justify-center shrink-0"><i data-lucide="${ev.icon}" class="w-3 h-3 ${ev.col}"></i></div>
+                    <div class="flex-1 min-w-0"><p class="text-[9px] font-black uppercase ${ev.textStr || ev.col}">${ev.type} <span class="text-gray-400">(${ev.time})</span></p><p class="text-[8px] text-white uppercase truncate">${ev.detail}</p></div>
+                    <button onclick="pmeEvents.splice(${i}, 1); renderPmeEvents();" class="text-red-500 hover:text-red-400 p-1"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        async function savePmeData() {
+            if(!confirm("Encode JSON dan kirim ke server?")) return;
+            const btn = document.querySelector('button[onclick="savePmeData()"]');
+            const originalText = btn.innerHTML; btn.innerHTML = "Menyimpan ke Database..."; btn.disabled = true;
+
+            const statObj = {};
+            ['pos', 'shot', 'sot', 'pass', 'acc', 'corn', 'off', 'foul'].forEach(key => {
+                statObj[`${key}_h`] = parseInt(document.getElementById(`pme-${key}-h`).value) || 0; statObj[`${key}_a`] = parseInt(document.getElementById(`pme-${key}-a`).value) || 0;
+            });
+
+            // Otomatis Ekstrak Pencetak Gol/Assist dari Array Event untuk Kartu Jadwal Publik!
+            const golArr = pmeEvents.filter(e => e.type === 'Gol').map(e => e.detail.split(' ')[0]);
+            const assistArr = pmeEvents.filter(e => e.type === 'Assist').map(e => e.detail.split(' ')[0]);
+            const kkArr = pmeEvents.filter(e => e.type === 'Kartu Kuning').map(e => e.detail.split(' ')[0]);
+            const kmArr = pmeEvents.filter(e => e.type === 'Kartu Merah').map(e => e.detail.split(' ')[0]);
+
+            const payload = { 
+                id_match: editMatchId, 
+                statistik_manual: JSON.stringify(statObj), 
+                lineup_manual: JSON.stringify({ formasi: document.getElementById('pme-formation-select').value, pitch: pmeLineup, bench: pmeBench }),
+                live_events: JSON.stringify(pmeEvents), // Ini akan dibaca otomatis oleh Tab Timeline Publik!
+                pencetak_gol: golArr.join(', '),
+                pencetak_assist: assistArr.join(', '),
+                kartu_kuning: kkArr.join(', '),
+                kartu_merah: kmArr.join(', ')
+            };
+
+            try {
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'save_post_match_stats', payload: payload }) });
+                alert("SUKSES! Data Laga berhasil diperbarui."); closePostMatchEditor();
+            } catch(e) { alert("Gagal menyimpan. Cek koneksi."); } finally { btn.innerHTML = originalText; btn.disabled = false; }
+        }
+        
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
