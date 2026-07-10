@@ -2122,83 +2122,63 @@
             let htmlKlasemen = ''; let groupKeys = Object.keys(groups).sort();
             groupKeys.forEach((g, index) => {
                 let timList = groups[g];
-                
-                // 1. MESIN PEMBUAT PODIUM 3D (TOP 3)
-                let podiumHtml = '';
-                if (timList.length >= 3) {
-                    const buildPodiumCard = (timObj, rank) => {
-                        if(!timObj) return '';
-                        let klub = getProp(timObj, 'klub'); let logo = getProp(timObj, 'logo') || getAvatar(klub, true);
-                        let pts = getProp(timObj, 'poin') || 0;
-                        
-                        let isGold = rank === 1; let isSilver = rank === 2;
-                        
-                        // Styling Kasta Dinamis (Gold, Silver, Bronze)
-                        let height = isGold ? 'h-24 md:h-32' : (isSilver ? 'h-20 md:h-24' : 'h-16 md:h-20');
-                        let bgGlow = isGold ? 'bg-gradient-to-t from-yellow-500/40 to-yellow-300/5 border-yellow-400/50 shadow-[0_-5px_20px_rgba(250,204,21,0.2)]' : 
-                                    (isSilver ? 'bg-gradient-to-t from-gray-400/40 to-gray-300/5 border-gray-300/50' : 'bg-gradient-to-t from-orange-600/40 to-orange-400/5 border-orange-500/50');
-                        let rankColor = isGold ? 'text-yellow-400' : (isSilver ? 'text-gray-300' : 'text-orange-500');
-                        let crown = isGold ? '<div class="absolute -top-7 text-3xl drop-shadow-md animate-bounce z-30">👑</div>' : '';
-                        let order = isGold ? 'order-2 z-20' : (isSilver ? 'order-1 z-10' : 'order-3 z-10');
-                        let size = isGold ? 'scale-110 md:scale-125' : 'scale-100';
-
-                        return `
-                        <div class="flex flex-col items-center justify-end w-1/3 px-1 cursor-pointer group ${order}" onclick="bukaHalamanTim('${safeStr(klub)}')">
-                            <div class="relative flex flex-col items-center transform transition-transform duration-500 group-hover:-translate-y-3 ${size}">
-                                ${crown}
-                                <div class="relative w-12 h-12 md:w-14 md:h-14 mb-2 rounded-full bg-white p-1 border-2 ${isGold ? 'border-yellow-400' : 'border-transparent'} group-hover:border-brand-green shadow-xl z-10">
-                                    <img src="${logo}" class="w-full h-full object-contain">
-                                </div>
-                                <div class="text-[9px] md:text-[10px] font-bold text-brand-black dark:text-white uppercase truncate w-full text-center max-w-[80px] drop-shadow-sm">${klub}</div>
-                                <div class="text-[9px] text-gray-500 uppercase tracking-[0.2em] font-black mt-1 bg-white/50 dark:bg-black/50 px-2 py-0.5 rounded backdrop-blur-sm shadow-inner">${pts} PTS</div>
-                            </div>
-                            <div class="w-full mt-4 rounded-t-xl border-t-2 border-x border-b-0 flex flex-col items-center justify-end pb-2 relative overflow-hidden ${height} ${bgGlow} transition-colors">
-                                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 mix-blend-overlay"></div>
-                                <span class="font-heading font-black text-3xl md:text-4xl ${rankColor} drop-shadow-lg opacity-90 relative z-10">${rank}</span>
-                            </div>
-                        </div>`;
-                    };
-
-                    podiumHtml = `
-                    <div class="flex items-end justify-center w-full px-2 md:px-8 pt-12 pb-6 border-b border-gray-100 dark:border-brand-dark-border bg-gray-50/50 dark:bg-black/30 relative overflow-hidden">
-                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-yellow-500/10 blur-[50px] pointer-events-none"></div>
-                        ${buildPodiumCard(timList[1], 2)}
-                        ${buildPodiumCard(timList[0], 1)}
-                        ${buildPodiumCard(timList[2], 3)}
-                    </div>`;
-                }
-
-                // 2. MESIN DAFTAR TABEL REGULER (Peringkat 4 ke Bawah)
                 let tableRows = '';
-                let startIdx = timList.length >= 3 ? 3 : 0; // Jika tim kurang dari 3, masukkan semua ke tabel
                 
-                for(let i = startIdx; i < timList.length; i++) {
+                // MESIN DAFTAR TABEL REGULER (ZONA HIJAU UNTUK TOP 2)
+                for(let i = 0; i < timList.length; i++) {
                     let tim = timList[i];
-                    let klub = getProp(tim, 'klub'); if(!klub) continue; let logo = getProp(tim, 'logo') || getAvatar(klub, true);
-                    tableRows += `<tr class="hover:bg-gray-50 dark:hover:bg-brand-dark-surface/50 transition cursor-pointer group border-b border-gray-50 dark:border-brand-dark-border" onclick="bukaHalamanTim('${safeStr(klub)}')">
-                        <td class="px-4 py-3 font-bold uppercase text-brand-black dark:text-white transition-colors border-r border-gray-100 dark:border-brand-dark-border">
-                            <div class="flex items-center gap-3">
-                                <span class="text-gray-400 dark:text-brand-dark-muted w-4 text-right text-[11px]">${i + 1}</span>
+                    let klub = getProp(tim, 'klub'); if(!klub) continue; 
+                    let logo = getProp(tim, 'logo') || getAvatar(klub, true);
+                    
+                    let rank = i + 1;
+                    let rankHtml = '';
+                    let rowBg = 'hover:bg-gray-50 dark:hover:bg-brand-dark-surface/50';
+                    let borderLeft = '';
+
+                    // FOTMOB STYLE: Kualifikasi Semi Final (Rank 1 & 2)
+                    if (rank === 1 || rank === 2) {
+                        rankHtml = `<span class="flex items-center justify-center w-5 h-5 rounded-md bg-brand-green text-white text-[10px] font-black shadow-sm">${rank}</span>`;
+                        rowBg = 'bg-brand-green/5 dark:bg-brand-green/10 hover:bg-brand-green/10 dark:hover:bg-brand-green/20';
+                        borderLeft = 'border-l-4 border-l-brand-green';
+                    } else {
+                        rankHtml = `<span class="flex items-center justify-center w-5 h-5 text-gray-400 dark:text-brand-dark-muted text-[11px] font-bold">${rank}</span>`;
+                        borderLeft = 'border-l-4 border-l-transparent';
+                    }
+
+                    tableRows += `<tr class="${rowBg} transition cursor-pointer group border-b border-gray-50 dark:border-brand-dark-border" onclick="bukaHalamanTim('${safeStr(klub)}')">
+                        <td class="px-3 py-3 font-bold uppercase text-brand-black dark:text-white transition-colors border-r border-gray-100 dark:border-brand-dark-border ${borderLeft}">
+                            <div class="flex items-center gap-2.5">
+                                ${rankHtml}
                                 <img src="${logo}" class="w-6 h-6 rounded-[22%] object-cover bg-white flex-shrink-0 shadow-sm border border-gray-100 dark:border-gray-800">
                                 <span class="truncate group-hover:text-brand-green">${klub}</span>
                             </div>
                         </td>
-                        <td class="px-2 py-3 text-center font-semibold text-gray-500 dark:text-brand-dark-muted">${getProp(tim, 'main') || 0}</td><td class="px-2 py-3 text-center text-gray-500 dark:text-brand-dark-muted">${getProp(tim, 'menang') || 0}</td><td class="px-2 py-3 text-center text-gray-500 dark:text-brand-dark-muted">${getProp(tim, 'seri') || 0}</td><td class="px-2 py-3 text-center text-gray-500 dark:text-brand-dark-muted">${getProp(tim, 'kalah') || 0}</td><td class="px-2 py-3 text-center text-gray-400 dark:text-gray-600 col-detail hidden">${getProp(tim, 'gm') || 0}</td><td class="px-2 py-3 text-center text-gray-400 dark:text-gray-600 col-detail hidden">${getProp(tim, 'gk') || 0}</td><td class="px-2 py-3 text-center font-bold col-detail hidden ${parseInt(getProp(tim, 'sg'))<0 ? 'text-brand-red':'text-gray-400 dark:text-gray-600'}">${parseInt(getProp(tim, 'sg'))>0 ? '+'+getProp(tim, 'sg') : (getProp(tim, 'sg')||0)}</td><td class="px-4 py-3 text-center font-bold text-brand-black dark:text-white text-sm bg-brand-green/5 dark:bg-brand-green/10">${getProp(tim, 'poin') || 0}</td>
+                        <td class="px-2 py-3 text-center font-semibold text-gray-500 dark:text-brand-dark-muted">${getProp(tim, 'main') || 0}</td>
+                        <td class="px-2 py-3 text-center text-gray-500 dark:text-brand-dark-muted">${getProp(tim, 'menang') || 0}</td>
+                        <td class="px-2 py-3 text-center text-gray-500 dark:text-brand-dark-muted">${getProp(tim, 'seri') || 0}</td>
+                        <td class="px-2 py-3 text-center text-gray-500 dark:text-brand-dark-muted">${getProp(tim, 'kalah') || 0}</td>
+                        <td class="px-2 py-3 text-center text-gray-400 dark:text-gray-600 col-detail hidden">${getProp(tim, 'gm') || 0}</td>
+                        <td class="px-2 py-3 text-center text-gray-400 dark:text-gray-600 col-detail hidden">${getProp(tim, 'gk') || 0}</td>
+                        <td class="px-2 py-3 text-center font-bold col-detail hidden ${parseInt(getProp(tim, 'sg'))<0 ? 'text-brand-red':'text-gray-400 dark:text-gray-600'}">${parseInt(getProp(tim, 'sg'))>0 ? '+'+getProp(tim, 'sg') : (getProp(tim, 'sg')||0)}</td>
+                        <td class="px-4 py-3 text-center font-black text-brand-black dark:text-white text-sm ${(rank === 1 || rank === 2) ? 'bg-brand-green/10' : 'bg-brand-green/5 dark:bg-brand-green/10'}">${getProp(tim, 'poin') || 0}</td>
                     </tr>`;
                 }
                 
                 let groupTitle = g === 'GLOBAL' ? `KLASEMEN LIGA ${ligaAktif}` : `GRUP ${g}`;
                 let badgeColors = ['bg-brand-green', 'bg-brand-red', 'bg-blue-500', 'bg-yellow-500']; let badgeColor = badgeColors[index % badgeColors.length];
                 let colSpan = groupKeys.length === 1 ? 'lg:col-span-2' : '';
+                
+                // LEGENDA ZONA KLASIFIKASI
+                let legendHtml = `
+                <div class="bg-gray-50 dark:bg-[#111] p-3 md:px-5 text-[9px] font-bold uppercase tracking-widest flex flex-wrap gap-4 border-t border-gray-100 dark:border-gray-800">
+                    <div class="flex items-center gap-1.5 text-gray-600 dark:text-gray-400"><div class="w-2 h-2 rounded-[2px] bg-brand-green"></div> Lolos Semi Final</div>
+                </div>`;
 
-                // 3. RAKIT SEMUA (Header + Podium + Tabel)
                 htmlKlasemen += `
                 <div class="bg-white dark:bg-brand-dark-surface rounded-3xl shadow-soft border border-gray-100 dark:border-brand-dark-border overflow-hidden flex flex-col ${colSpan} transition-colors">
                     <div class="bg-brand-black dark:bg-[#0a0a0a] text-white py-3 px-5 text-[11px] font-bold tracking-widest uppercase flex items-center gap-2 border-b border-gray-800 shrink-0">
                         <div class="w-2 h-2 ${badgeColor} rounded-full shadow-glow animate-pulse"></div> ${groupTitle}
                     </div>
-                    
-                    ${podiumHtml}
                     
                     <div class="overflow-x-auto hide-scroll flex-1 relative">
                         <table class="w-full text-sm text-left whitespace-nowrap">
@@ -2212,7 +2192,7 @@
                                     <th class="px-2 py-3 text-center text-gray-300 dark:text-gray-600 col-detail hidden">GM</th>
                                     <th class="px-2 py-3 text-center text-gray-300 dark:text-gray-600 col-detail hidden">GK</th>
                                     <th class="px-2 py-3 text-center text-gray-300 dark:text-gray-600 col-detail hidden">SG</th>
-                                    <th class="px-4 py-3 text-center font-bold text-brand-black dark:text-white transition-colors">PTS</th>
+                                    <th class="px-4 py-3 text-center font-black text-brand-black dark:text-white transition-colors">PTS</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50 dark:divide-brand-dark-border text-[11px] transition-colors">
@@ -2220,6 +2200,7 @@
                             </tbody>
                         </table>
                     </div>
+                    ${legendHtml}
                 </div>`;
             });
 
