@@ -3923,40 +3923,45 @@
         // ==========================================
         // MESIN GAMIFIKASI: MATCH PREDICTOR (VOTING)
         // ==========================================
+        // ==========================================
+        // MESIN GAMIFIKASI: MATCH PREDICTOR (REAL-TIME SERVER VOTE)
+        // ==========================================
         function renderMatchPredictor(idMatch, tk, tn, lKiri, lKanan, status) {
             let container = document.getElementById('mm-predictor-container');
             if (!container) return;
 
             let isStarted = status.toUpperCase().includes('LIVE') || status.toUpperCase().includes('HT') || status.toUpperCase().includes('FT');
             
-            // Cek apakah HP ini sudah pernah voting untuk match ini
+            // Cek apakah HP ini sudah pernah voting
             let userVote = localStorage.getItem('tsl_vote_' + idMatch);
             
-            // SIMULASI DATA SERVER: Agar persentase tidak 0%, kita buat "Base Votes"
-            // (Di masa depan, angka ini bisa ditarik langsung dari Google Sheets)
-            let hash = 0; for (let i = 0; i < idMatch.length; i++) { hash = idMatch.charCodeAt(i) + ((hash << 5) - hash); }
-            let baseKiri = Math.abs(hash % 150) + 20; 
-            let baseKanan = Math.abs((hash >> 2) % 150) + 20;
-            let baseSeri = Math.abs((hash >> 4) % 50) + 5;
+            // 1. AMBIL DATA VOTING ASLI DARI GOOGLE SHEETS
+            let m = (jadwalCache || []).find(x => String(getProp(x, 'id_match')) === String(idMatch));
+            let realKiri = parseInt(getProp(m, 'vote_kiri')) || 0;
+            let realKanan = parseInt(getProp(m, 'vote_kanan')) || 0;
+            let realSeri = parseInt(getProp(m, 'vote_seri')) || 0;
 
-            // Jika user sudah vote hari ini, tambahkan vote-nya ke simulasi
-            if(userVote === 'KIRI') baseKiri++;
-            if(userVote === 'KANAN') baseKanan++;
-            if(userVote === 'SERI') baseSeri++;
+            // 2. OPTIMISTIC UI: Jika user baru saja vote (tapi data dari Google Sheets belum ter-refresh)
+            let localPending = localStorage.getItem('tsl_vote_pending_' + idMatch);
+            if (localPending === 'KIRI') realKiri++;
+            else if (localPending === 'KANAN') realKanan++;
+            else if (localPending === 'SERI') realSeri++;
 
-            let totalVotes = baseKiri + baseKanan + baseSeri;
-            let pctKiri = Math.round((baseKiri / totalVotes) * 100);
-            let pctKanan = Math.round((baseKanan / totalVotes) * 100);
-            let pctSeri = 100 - pctKiri - pctKanan;
+            // 3. KALKULASI PERSENTASE ASLI
+            let totalVotes = realKiri + realKanan + realSeri;
+            let pctKiri = totalVotes > 0 ? Math.round((realKiri / totalVotes) * 100) : 0;
+            let pctKanan = totalVotes > 0 ? Math.round((realKanan / totalVotes) * 100) : 0;
+            let pctSeri = totalVotes > 0 ? (100 - pctKiri - pctKanan) : 0;
 
             let html = '';
 
             if (isStarted) {
-                // Jika Match sudah main atau selesai, TAMPILKAN HASIL AKHIR (Tanpa Tombol Vote)
+                // TAMPILAN HASIL AKHIR (Tanpa Tombol)
                 html = `
                 <div class="bg-white dark:bg-brand-dark-surface rounded-2xl shadow-soft border border-gray-100 dark:border-brand-dark-border p-5 text-center overflow-hidden relative transition-colors">
                     <div class="absolute -right-4 -top-4 text-6xl opacity-5 grayscale">📊</div>
-                    <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4">Hasil Poling Suporter</h4>
+                    <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1">Hasil Poling Suporter</h4>
+                    <p class="text-[8px] font-bold text-gray-400 mb-4">${totalVotes} Suara Masuk</p>
                     <div class="flex h-3 bg-gray-100 dark:bg-brand-dark-bg rounded-full overflow-hidden border border-gray-200 dark:border-gray-800 shadow-inner mb-3">
                         <div class="h-full bg-brand-green transition-all duration-1000" style="width: ${pctKiri}%"></div>
                         <div class="h-full bg-gray-400 transition-all duration-1000" style="width: ${pctSeri}%"></div>
@@ -3969,7 +3974,7 @@
                     </div>
                 </div>`;
             } else if (!userVote) {
-                // Jika BELUM MAIN dan BELUM VOTE -> Munculkan Tombol
+                // BELUM VOTE -> Munculkan Tombol
                 html = `
                 <div class="bg-gradient-to-br from-brand-black to-gray-900 rounded-2xl shadow-xl border border-gray-800 p-5 md:p-6 text-center relative overflow-hidden group">
                     <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30 mix-blend-overlay"></div>
@@ -3995,12 +4000,17 @@
                     <div class="text-[8px] text-gray-500 mt-4 uppercase tracking-widest relative z-10">*1 Device hanya 1 Hak Suara</div>
                 </div>`;
             } else {
-                // Jika BELUM MAIN TAPI SUDAH VOTE -> Munculkan Animasi Bar Hasil (Dikunci)
+                // SUDAH VOTE -> Bar Hasil Terkunci Asli
+                // Jika belum ada yg vote (0 total), amankan bar agar tidak error
+                let wKiri = pctKiri > 0 ? pctKiri : (totalVotes === 0 ? 33.3 : 0);
+                let wSeri = pctSeri > 0 ? pctSeri : (totalVotes === 0 ? 33.3 : 0);
+                let wKanan = pctKanan > 0 ? pctKanan : (totalVotes === 0 ? 33.3 : 0);
+
                 html = `
                 <div class="bg-gradient-to-br from-brand-black to-gray-900 rounded-2xl shadow-xl border border-gray-800 p-5 md:p-6 text-center relative overflow-hidden">
                     <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30 mix-blend-overlay"></div>
                     <h4 class="text-[10px] font-black text-brand-gold uppercase tracking-[0.2em] mb-1 relative z-10">Vote Terkunci</h4>
-                    <p class="text-[10px] font-bold text-gray-400 mb-5 relative z-10">Terima kasih atas prediksi Anda!</p>
+                    <p class="text-[10px] font-bold text-gray-400 mb-5 relative z-10">Terima kasih! Total ${totalVotes} Suara Masuk.</p>
                     
                     <div class="relative z-10">
                         <div class="flex justify-between items-end mb-2 px-1">
@@ -4009,9 +4019,9 @@
                             <span class="font-heading font-black text-xs text-blue-400">${pctKanan}%<img src="${lKanan}" class="w-4 h-4 inline-block rounded-full bg-white ml-1"></span>
                         </div>
                         <div class="flex h-3 bg-gray-800 rounded-full overflow-hidden shadow-inner border border-gray-700">
-                            <div class="h-full bg-brand-green transition-all duration-1000" style="width: ${pctKiri}%"></div>
-                            <div class="h-full bg-gray-500 transition-all duration-1000" style="width: ${pctSeri}%"></div>
-                            <div class="h-full bg-blue-500 transition-all duration-1000" style="width: ${pctKanan}%"></div>
+                            <div class="h-full bg-brand-green transition-all duration-1000" style="width: ${wKiri}%"></div>
+                            <div class="h-full bg-gray-500 transition-all duration-1000" style="width: ${wSeri}%"></div>
+                            <div class="h-full bg-blue-500 transition-all duration-1000" style="width: ${wKanan}%"></div>
                         </div>
                     </div>
                 </div>`;
@@ -4020,20 +4030,35 @@
             container.innerHTML = html;
         }
 
-        // Fungsi ketika User menekan tombol Vote
-        window.submitVote = function(idMatch, choice) {
-            // 1. Simpan pilihan ke Memori HP
+        // Fungsi Mengirim Vote Asli ke Server
+        window.submitVote = async function(idMatch, choice) {
+            // 1. Kunci UI Langsung di Device Ini
             localStorage.setItem('tsl_vote_' + idMatch, choice);
+            localStorage.setItem('tsl_vote_pending_' + idMatch, choice); 
             
-            // 2. Render Ulang UI (Akan otomatis menyembunyikan tombol dan memunculkan Bar Hasil)
+            // 2. Render ulang agar tombol langsung hilang dan berubah jadi Bar Animasi
             let m = jadwalCache.find(x => String(getProp(x, 'id_match')) === String(idMatch));
             if(m) {
                 let tk = getProp(m, 'tim_kiri'); let tn = getProp(m, 'tim_kanan');
                 let tKiri = allKlasemenCache.find(t => getProp(t, 'klub') === tk); let tKanan = allKlasemenCache.find(t => getProp(t, 'klub') === tn);
                 let lKiri = tKiri && getProp(tKiri, 'logo') ? getProp(tKiri, 'logo') : getAvatar(tk, true);
                 let lKanan = tKanan && getProp(tKanan, 'logo') ? getProp(tKanan, 'logo') : getAvatar(tn, true);
-                
                 renderMatchPredictor(idMatch, tk, tn, lKiri, lKanan, getProp(m, 'status'));
+            }
+
+            // 3. Eksekusi Kirim Data ke Google Sheets di Latar Belakang (Tanpa Loading Screen!)
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'submit_vote',
+                        payload: { id_match: idMatch, choice: choice }
+                    })
+                });
+                // Jika sukses terkirim ke server, hapus flag pending lokal
+                localStorage.removeItem('tsl_vote_pending_' + idMatch);
+            } catch(e) {
+                console.error("Gagal mengirim vote ke server:", e);
             }
         };
         
