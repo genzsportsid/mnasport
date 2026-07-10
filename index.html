@@ -769,6 +769,9 @@
 
         <div id="mtab-fakta" class="mtab-content block page-enter">
                 <div class="px-4 md:px-0">
+                    <!-- ARENA MATCH PREDICTOR -->
+                    <div id="mm-predictor-container" class="mb-6"></div>
+                    
                     <div class="bg-white dark:bg-brand-dark-surface rounded-2xl shadow-soft border border-gray-100 dark:border-brand-dark-border p-5 md:p-8">
                         <h4 class="text-[10px] font-bold text-gray-400 dark:text-brand-dark-muted uppercase tracking-widest mb-8 border-b border-gray-100 dark:border-brand-dark-border pb-4 text-center flex items-center justify-center gap-3">
                             <span class="w-8 h-[1px] bg-gray-200 dark:bg-gray-700"></span> 
@@ -3220,6 +3223,8 @@
             setTimeout(updateLiveTimers, 50);
 
             switchMatchTab('fakta');
+                // PANGGIL MESIN PREDICTOR
+            renderMatchPredictor(idMatch, tk, tn, lKiri, lKanan, status);
 
             // ==========================================
             // MESIN JEJAK PERFORMA & HEAD-TO-HEAD
@@ -3915,6 +3920,123 @@
         // Render inisial lapangan saat web dimuat
         document.addEventListener('DOMContentLoaded', () => { setTimeout(renderDtPitch, 500); });
 
+        // ==========================================
+        // MESIN GAMIFIKASI: MATCH PREDICTOR (VOTING)
+        // ==========================================
+        function renderMatchPredictor(idMatch, tk, tn, lKiri, lKanan, status) {
+            let container = document.getElementById('mm-predictor-container');
+            if (!container) return;
+
+            let isStarted = status.toUpperCase().includes('LIVE') || status.toUpperCase().includes('HT') || status.toUpperCase().includes('FT');
+            
+            // Cek apakah HP ini sudah pernah voting untuk match ini
+            let userVote = localStorage.getItem('tsl_vote_' + idMatch);
+            
+            // SIMULASI DATA SERVER: Agar persentase tidak 0%, kita buat "Base Votes"
+            // (Di masa depan, angka ini bisa ditarik langsung dari Google Sheets)
+            let hash = 0; for (let i = 0; i < idMatch.length; i++) { hash = idMatch.charCodeAt(i) + ((hash << 5) - hash); }
+            let baseKiri = Math.abs(hash % 150) + 20; 
+            let baseKanan = Math.abs((hash >> 2) % 150) + 20;
+            let baseSeri = Math.abs((hash >> 4) % 50) + 5;
+
+            // Jika user sudah vote hari ini, tambahkan vote-nya ke simulasi
+            if(userVote === 'KIRI') baseKiri++;
+            if(userVote === 'KANAN') baseKanan++;
+            if(userVote === 'SERI') baseSeri++;
+
+            let totalVotes = baseKiri + baseKanan + baseSeri;
+            let pctKiri = Math.round((baseKiri / totalVotes) * 100);
+            let pctKanan = Math.round((baseKanan / totalVotes) * 100);
+            let pctSeri = 100 - pctKiri - pctKanan;
+
+            let html = '';
+
+            if (isStarted) {
+                // Jika Match sudah main atau selesai, TAMPILKAN HASIL AKHIR (Tanpa Tombol Vote)
+                html = `
+                <div class="bg-white dark:bg-brand-dark-surface rounded-2xl shadow-soft border border-gray-100 dark:border-brand-dark-border p-5 text-center overflow-hidden relative transition-colors">
+                    <div class="absolute -right-4 -top-4 text-6xl opacity-5 grayscale">📊</div>
+                    <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4">Hasil Poling Suporter</h4>
+                    <div class="flex h-3 bg-gray-100 dark:bg-brand-dark-bg rounded-full overflow-hidden border border-gray-200 dark:border-gray-800 shadow-inner mb-3">
+                        <div class="h-full bg-brand-green transition-all duration-1000" style="width: ${pctKiri}%"></div>
+                        <div class="h-full bg-gray-400 transition-all duration-1000" style="width: ${pctSeri}%"></div>
+                        <div class="h-full bg-blue-500 transition-all duration-1000" style="width: ${pctKanan}%"></div>
+                    </div>
+                    <div class="flex justify-between text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-1">
+                        <div class="text-brand-green w-1/3 text-left truncate pr-2">${pctKiri}% ${tk}</div>
+                        <div class="text-gray-500 w-1/3 text-center">SERI ${pctSeri}%</div>
+                        <div class="text-blue-500 w-1/3 text-right truncate pl-2">${tn} ${pctKanan}%</div>
+                    </div>
+                </div>`;
+            } else if (!userVote) {
+                // Jika BELUM MAIN dan BELUM VOTE -> Munculkan Tombol
+                html = `
+                <div class="bg-gradient-to-br from-brand-black to-gray-900 rounded-2xl shadow-xl border border-gray-800 p-5 md:p-6 text-center relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30 mix-blend-overlay"></div>
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-green/20 rounded-full blur-3xl pointer-events-none group-hover:bg-brand-green/40 transition-colors"></div>
+                    
+                    <h4 class="text-[10px] font-black text-brand-green uppercase tracking-[0.2em] mb-1 relative z-10">Match Predictor</h4>
+                    <p class="text-xs font-bold text-white mb-5 relative z-10 drop-shadow-md">Siapa penguasa lapangan hari ini?</p>
+                    
+                    <div class="flex gap-2 justify-center relative z-10">
+                        <button onclick="submitVote('${idMatch}', 'KIRI')" class="flex-1 flex flex-col items-center justify-center bg-white/10 hover:bg-brand-green/80 border border-white/20 hover:border-brand-green rounded-xl p-3 transition-all duration-300 shadow-sm group/btn">
+                            <img src="${lKiri}" class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white p-1 mb-2 shadow-md group-hover/btn:scale-110 transition-transform">
+                            <span class="text-[8px] md:text-[9px] font-bold text-white uppercase truncate w-full text-center">${tk}</span>
+                        </button>
+                        <button onclick="submitVote('${idMatch}', 'SERI')" class="w-14 md:w-16 flex flex-col items-center justify-center bg-white/10 hover:bg-gray-600 border border-white/20 hover:border-gray-500 rounded-xl p-3 transition-all duration-300 shadow-sm">
+                            <span class="text-xs font-black text-white uppercase mb-1 drop-shadow-md">VS</span>
+                            <span class="text-[8px] font-bold text-gray-400 uppercase">Seri</span>
+                        </button>
+                        <button onclick="submitVote('${idMatch}', 'KANAN')" class="flex-1 flex flex-col items-center justify-center bg-white/10 hover:bg-blue-600 border border-white/20 hover:border-blue-500 rounded-xl p-3 transition-all duration-300 shadow-sm group/btn">
+                            <img src="${lKanan}" class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white p-1 mb-2 shadow-md group-hover/btn:scale-110 transition-transform">
+                            <span class="text-[8px] md:text-[9px] font-bold text-white uppercase truncate w-full text-center">${tn}</span>
+                        </button>
+                    </div>
+                    <div class="text-[8px] text-gray-500 mt-4 uppercase tracking-widest relative z-10">*1 Device hanya 1 Hak Suara</div>
+                </div>`;
+            } else {
+                // Jika BELUM MAIN TAPI SUDAH VOTE -> Munculkan Animasi Bar Hasil (Dikunci)
+                html = `
+                <div class="bg-gradient-to-br from-brand-black to-gray-900 rounded-2xl shadow-xl border border-gray-800 p-5 md:p-6 text-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30 mix-blend-overlay"></div>
+                    <h4 class="text-[10px] font-black text-brand-gold uppercase tracking-[0.2em] mb-1 relative z-10">Vote Terkunci</h4>
+                    <p class="text-[10px] font-bold text-gray-400 mb-5 relative z-10">Terima kasih atas prediksi Anda!</p>
+                    
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-end mb-2 px-1">
+                            <span class="font-heading font-black text-xs text-brand-green"><img src="${lKiri}" class="w-4 h-4 inline-block rounded-full bg-white mr-1">${pctKiri}%</span>
+                            <span class="font-heading font-black text-[10px] text-gray-400">${pctSeri}%</span>
+                            <span class="font-heading font-black text-xs text-blue-400">${pctKanan}%<img src="${lKanan}" class="w-4 h-4 inline-block rounded-full bg-white ml-1"></span>
+                        </div>
+                        <div class="flex h-3 bg-gray-800 rounded-full overflow-hidden shadow-inner border border-gray-700">
+                            <div class="h-full bg-brand-green transition-all duration-1000" style="width: ${pctKiri}%"></div>
+                            <div class="h-full bg-gray-500 transition-all duration-1000" style="width: ${pctSeri}%"></div>
+                            <div class="h-full bg-blue-500 transition-all duration-1000" style="width: ${pctKanan}%"></div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Fungsi ketika User menekan tombol Vote
+        window.submitVote = function(idMatch, choice) {
+            // 1. Simpan pilihan ke Memori HP
+            localStorage.setItem('tsl_vote_' + idMatch, choice);
+            
+            // 2. Render Ulang UI (Akan otomatis menyembunyikan tombol dan memunculkan Bar Hasil)
+            let m = jadwalCache.find(x => String(getProp(x, 'id_match')) === String(idMatch));
+            if(m) {
+                let tk = getProp(m, 'tim_kiri'); let tn = getProp(m, 'tim_kanan');
+                let tKiri = allKlasemenCache.find(t => getProp(t, 'klub') === tk); let tKanan = allKlasemenCache.find(t => getProp(t, 'klub') === tn);
+                let lKiri = tKiri && getProp(tKiri, 'logo') ? getProp(tKiri, 'logo') : getAvatar(tk, true);
+                let lKanan = tKanan && getProp(tKanan, 'logo') ? getProp(tKanan, 'logo') : getAvatar(tn, true);
+                
+                renderMatchPredictor(idMatch, tk, tn, lKiri, lKanan, getProp(m, 'status'));
+            }
+        };
+        
         // ==========================================
         // MESIN STATISTIK TARIK-TAMBANG (TUG-OF-WAR)
         // ==========================================
