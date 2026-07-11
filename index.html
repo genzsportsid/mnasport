@@ -3523,10 +3523,26 @@
                     
                     // Deteksi Ikon & Efek Glow Berdasarkan Jenis Kejadian
                     let ic = ''; let icBg = ''; let icShadow = '';
+                    // Deteksi Ikon & Efek Glow Berdasarkan Jenis Kejadian
+                    let ic = ''; let icBg = ''; let icShadow = '';
                     if(jns === 'GOL') { ic = '⚽'; icBg = 'bg-brand-green/10 border-brand-green/30 text-brand-green'; icShadow = 'shadow-[0_0_15px_rgba(0,154,68,0.3)]'; }
                     else if(jns === 'KUNING') { ic = '<div class="w-2.5 h-3.5 bg-yellow-400 rounded-[1px] shadow-sm border border-yellow-500"></div>'; icBg = 'bg-yellow-400/10 border-yellow-400/30'; icShadow = 'shadow-[0_0_15px_rgba(250,204,21,0.2)]'; }
                     else if(jns === 'MERAH') { ic = '<div class="w-2.5 h-3.5 bg-red-500 rounded-[1px] shadow-sm border border-red-600"></div>'; icBg = 'bg-red-500/10 border-red-500/30'; icShadow = 'shadow-[0_0_15px_rgba(239,68,68,0.3)]'; }
                     else if(jns === 'BUNUH DIRI' || jns === 'OG') { ic = '⚽'; icBg = 'bg-red-500/10 border-red-500/30 text-red-500'; icShadow = 'shadow-[0_0_15px_rgba(239,68,68,0.3)]'; }
+                    
+                    // INJEKSI BARU: Ikon Substitusi FotMob Style
+                    else if(jns === 'SUB IN' || jns === 'SUBIN') { 
+                        ic = '<svg class="w-3.5 h-3.5 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg>'; 
+                        icBg = 'bg-brand-green/10 border-brand-green/30 text-brand-green'; 
+                        icShadow = 'shadow-sm'; 
+                    }
+                    else if(jns === 'SUB OUT' || jns === 'SUBOUT') { 
+                        ic = '<svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path></svg>'; 
+                        icBg = 'bg-red-500/10 border-red-500/30 text-red-500'; 
+                        icShadow = 'shadow-sm'; 
+                    }
+                    
+                    // Jika jenis kejadian tidak dikenali
                     else { ic = '⏱️'; icBg = 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500'; icShadow = 'shadow-sm'; }
                     
                     let pmn = getProp(ev,'pemain'); let mnt = getProp(ev,'menit');
