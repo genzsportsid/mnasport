@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TSL Match Operator</title>
+    <title>TSL Match Operator Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -12,102 +13,236 @@
             }
         }
     </script>
-    <style>body { background-color: #09090b; color: white; }</style>
+    <style>
+        body { background-color: #09090b; color: white; -webkit-tap-highlight-color: transparent; }
+        /* Custom Loader */
+        .loader { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #009A44; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
-<body class="p-4 md:p-6 font-sans antialiased">
+<body class="p-4 md:p-6 font-sans antialiased pb-20">
     
     <div class="max-w-md mx-auto">
-        <div class="text-center mb-6">
-            <h1 class="text-xl font-black uppercase tracking-widest text-brand-green">Match Operator</h1>
-            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">TSL Command Center</p>
-        </div>
-
-        <div class="bg-brand-panel border border-white/10 p-5 rounded-2xl shadow-xl space-y-5">
-            <!-- 1. IDENTITAS LAGA -->
+        <div class="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
             <div>
-                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">ID Match (Lihat di Jadwal)</label>
-                <input type="text" id="op-id-match" placeholder="Contoh: MATCH-01" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white uppercase focus:border-brand-green outline-none transition-colors">
+                <h1 class="text-lg font-black uppercase tracking-widest text-brand-green flex items-center gap-2">
+                    <i data-lucide="radio" class="w-5 h-5 text-red-500 animate-pulse"></i> Match Operator
+                </h1>
+                <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">Zero-Typing System</p>
             </div>
-
-            <!-- 2. PILIH TIM -->
-            <div>
-                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Klub / Tim</label>
-                <input type="text" id="op-tim" placeholder="Nama Klub..." class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white uppercase focus:border-brand-green outline-none transition-colors">
-            </div>
-
-            <!-- 3. PEMAIN & MENIT -->
-            <div class="flex gap-3">
-                <div class="flex-1">
-                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Nama Pemain</label>
-                    <input type="text" id="op-pemain" placeholder="Cth: Bima" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white uppercase focus:border-brand-green outline-none transition-colors">
-                </div>
-                <div class="w-24 shrink-0">
-                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Menit</label>
-                    <input type="number" id="op-menit" placeholder="45" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs font-black text-brand-green text-center focus:border-brand-green outline-none transition-colors">
-                </div>
-            </div>
-
-            <!-- 4. JENIS KEJADIAN -->
-            <div>
-                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Jenis Kejadian</label>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    <button onclick="setEvent('Gol', this)" class="evt-btn bg-black border border-white/10 text-white font-bold text-[10px] py-2.5 rounded-lg uppercase hover:border-brand-green">⚽ Gol</button>
-                    <button onclick="setEvent('Kuning', this)" class="evt-btn bg-black border border-white/10 text-yellow-400 font-bold text-[10px] py-2.5 rounded-lg uppercase hover:border-yellow-400">🟨 Kuning</button>
-                    <button onclick="setEvent('Merah', this)" class="evt-btn bg-black border border-white/10 text-red-500 font-bold text-[10px] py-2.5 rounded-lg uppercase hover:border-red-500">🟥 Merah</button>
-                    
-                    <!-- TOMBOL SUBSTITUSI BARU -->
-                    <button onclick="setEvent('Sub In', this)" class="evt-btn bg-black border border-brand-green/30 text-brand-green font-black text-[10px] py-2.5 rounded-lg uppercase shadow-[0_0_10px_rgba(0,154,68,0.1)]">⬆️ Masuk (In)</button>
-                    <button onclick="setEvent('Sub Out', this)" class="evt-btn bg-black border border-red-500/30 text-red-500 font-black text-[10px] py-2.5 rounded-lg uppercase shadow-[0_0_10px_rgba(239,68,68,0.1)]">⬇️ Keluar (Out)</button>
-                </div>
-                <input type="hidden" id="op-jenis">
-            </div>
-
-            <button onclick="submitEvent()" id="btn-submit" class="w-full bg-brand-green hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(0,154,68,0.3)] transition-colors mt-2">
-                Kirim Data Kejadian
+            <button onclick="fetchData()" class="bg-white/5 p-2 rounded-lg border border-white/10 text-gray-400 hover:text-white transition-colors">
+                <i data-lucide="refresh-cw" id="icon-refresh" class="w-4 h-4"></i>
             </button>
         </div>
-        
-        <div id="log-status" class="mt-4 text-center text-[10px] font-bold uppercase tracking-widest"></div>
+
+        <div id="loading-screen" class="flex flex-col items-center justify-center py-20">
+            <div class="loader mb-4"></div>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Menghubungkan ke Server...</p>
+        </div>
+
+        <div id="main-console" class="hidden space-y-5">
+            
+            <div class="bg-brand-panel border border-white/10 p-4 rounded-2xl shadow-xl">
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2"><i data-lucide="calendar" class="w-3 h-3 inline mr-1 -mt-0.5"></i> 1. Pilih Laga Aktif</label>
+                <select id="select-match" onchange="handleMatchChange()" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white uppercase focus:border-brand-green outline-none appearance-none">
+                    <option value="">-- Pilih Pertandingan --</option>
+                </select>
+            </div>
+
+            <div id="event-area" class="hidden space-y-5 opacity-50 pointer-events-none transition-all duration-300">
+                
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2"><i data-lucide="shield" class="w-3 h-3 inline mr-1 -mt-0.5"></i> 2. Pilih Tim</label>
+                    <div class="flex gap-2">
+                        <button id="btn-tim-kiri" onclick="handleTeamChange('kiri')" class="flex-1 bg-black border border-white/10 text-gray-400 font-bold text-[11px] py-3 rounded-xl uppercase transition-colors truncate px-2"></button>
+                        <button id="btn-tim-kanan" onclick="handleTeamChange('kanan')" class="flex-1 bg-black border border-white/10 text-gray-400 font-bold text-[11px] py-3 rounded-xl uppercase transition-colors truncate px-2"></button>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 bg-brand-panel border border-brand-green/30 p-4 rounded-2xl shadow-[0_0_20px_rgba(0,154,68,0.05)]">
+                    <div class="flex-1">
+                        <label class="block text-[10px] font-bold text-brand-green uppercase tracking-widest mb-2">3. Pilih Pemain</label>
+                        <select id="select-pemain" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white uppercase focus:border-brand-green outline-none appearance-none">
+                            <option value="">-- Pilih Tim Dulu --</option>
+                        </select>
+                    </div>
+                    <div class="w-20 shrink-0">
+                        <label class="block text-[10px] font-bold text-brand-green uppercase tracking-widest mb-2 text-center">Menit</label>
+                        <input type="number" id="input-menit" placeholder="00" class="w-full bg-black border border-white/10 rounded-xl px-2 py-3 text-sm font-black text-white text-center focus:border-brand-green outline-none appearance-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2"><i data-lucide="zap" class="w-3 h-3 inline mr-1 -mt-0.5"></i> 4. Tindakan / Kejadian</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <button onclick="setEvent('Gol', this)" class="evt-btn bg-black border border-white/10 text-white font-bold text-[10px] py-3 rounded-xl uppercase hover:border-brand-green transition-colors flex flex-col items-center gap-1">⚽ <span>Gol</span></button>
+                        <button onclick="setEvent('Kuning', this)" class="evt-btn bg-black border border-white/10 text-yellow-400 font-bold text-[10px] py-3 rounded-xl uppercase hover:border-yellow-400 transition-colors flex flex-col items-center gap-1">🟨 <span>Kuning</span></button>
+                        <button onclick="setEvent('Merah', this)" class="evt-btn bg-black border border-white/10 text-red-500 font-bold text-[10px] py-3 rounded-xl uppercase hover:border-red-500 transition-colors flex flex-col items-center gap-1">🟥 <span>Merah</span></button>
+                        
+                        <button onclick="setEvent('Sub In', this)" class="evt-btn bg-black border border-brand-green/30 text-brand-green font-black text-[10px] py-3 rounded-xl uppercase hover:bg-brand-green/10 transition-colors flex flex-col items-center gap-1">⬆️ <span>Sub In</span></button>
+                        <button onclick="setEvent('Sub Out', this)" class="evt-btn bg-black border border-red-500/30 text-red-500 font-black text-[10px] py-3 rounded-xl uppercase hover:bg-red-500/10 transition-colors flex flex-col items-center gap-1">⬇️ <span>Sub Out</span></button>
+                    </div>
+                    <input type="hidden" id="input-jenis">
+                </div>
+
+                <button onclick="submitEvent()" id="btn-submit" class="w-full bg-brand-green hover:bg-emerald-600 text-white font-black text-sm uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(0,154,68,0.3)] transition-all transform active:scale-95 mt-4 flex justify-center items-center gap-2">
+                    <i data-lucide="send" class="w-4 h-4"></i> Eksekusi Data
+                </button>
+            </div>
+
+            <div id="log-status" class="mt-4 text-center text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-lg bg-black/50 border border-white/5 hidden"></div>
+        </div>
     </div>
 
     <script>
-        // GANTI DENGAN URL APPS SCRIPT ASLI ANDA
-        const API_URL = "https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec";
+        lucide.createIcons();
 
+        // KONFIGURASI API ANDA
+        const API_URL = "https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec";
+        
+        let matchesData = [];
+        let playersData = [];
+        let selectedMatchData = null;
+        let selectedTeamName = "";
+
+        // 1. Tarik Data dari Spreadsheet saat aplikasi dibuka
+        async function fetchData() {
+            document.getElementById('loading-screen').classList.remove('hidden');
+            document.getElementById('main-console').classList.add('hidden');
+            document.getElementById('icon-refresh').classList.add('animate-spin');
+
+            try {
+                // Fetch Jadwal Laga
+                let resJadwal = await fetch(API_URL + "?sheet=Jadwal");
+                matchesData = await resJadwal.json();
+                
+                // Fetch Data Pemain (Asumsi: Anda punya tab bernama "Pemain")
+                let resPemain = await fetch(API_URL + "?sheet=Pemain");
+                playersData = await resPemain.json();
+
+                populateMatchSelect();
+            } catch (error) {
+                alert("Gagal menarik data dari server. Cek koneksi internet.");
+            } finally {
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('main-console').classList.remove('hidden');
+                document.getElementById('icon-refresh').classList.remove('animate-spin');
+            }
+        }
+
+        // 2. Isi Dropdown Pertandingan
+        function populateMatchSelect() {
+            let select = document.getElementById('select-match');
+            select.innerHTML = '<option value="">-- Pilih Pertandingan Aktif --</option>';
+            
+            matchesData.forEach(match => {
+                // Hanya tampilkan laga yang memiliki id_match
+                if(match.id_match) {
+                    select.innerHTML += `<option value="${match.id_match}">${match.tim_kiri} VS ${match.tim_kanan} (${match.id_match})</option>`;
+                }
+            });
+        }
+
+        // 3. Saat Laga Dipilih, Atur Tombol Tim
+        function handleMatchChange() {
+            let matchId = document.getElementById('select-match').value;
+            let eventArea = document.getElementById('event-area');
+            
+            if(!matchId) {
+                eventArea.classList.add('opacity-50', 'pointer-events-none');
+                return;
+            }
+
+            selectedMatchData = matchesData.find(m => String(m.id_match) === String(matchId));
+            
+            // Set teks di tombol tim
+            let btnKiri = document.getElementById('btn-tim-kiri');
+            let btnKanan = document.getElementById('btn-tim-kanan');
+            btnKiri.innerText = selectedMatchData.tim_kiri;
+            btnKanan.innerText = selectedMatchData.tim_kanan;
+            
+            // Reset state
+            btnKiri.className = "flex-1 bg-black border border-white/10 text-gray-400 font-bold text-[11px] py-3 rounded-xl uppercase transition-colors truncate px-2";
+            btnKanan.className = "flex-1 bg-black border border-white/10 text-gray-400 font-bold text-[11px] py-3 rounded-xl uppercase transition-colors truncate px-2";
+            
+            document.getElementById('select-pemain').innerHTML = '<option value="">-- Silakan Pilih Tim --</option>';
+            selectedTeamName = "";
+            
+            // Buka gembok area input
+            eventArea.classList.remove('opacity-50', 'pointer-events-none');
+        }
+
+        // 4. Saat Tombol Tim Ditekan, Filter Dropdown Pemain
+        function handleTeamChange(posisi) {
+            selectedTeamName = posisi === 'kiri' ? selectedMatchData.tim_kiri : selectedMatchData.tim_kanan;
+            
+            // UI Update
+            let btnKiri = document.getElementById('btn-tim-kiri');
+            let btnKanan = document.getElementById('btn-tim-kanan');
+            
+            btnKiri.classList.remove('bg-brand-green/20', 'border-brand-green', 'text-brand-green');
+            btnKanan.classList.remove('bg-brand-green/20', 'border-brand-green', 'text-brand-green');
+            
+            if(posisi === 'kiri') {
+                btnKiri.classList.add('bg-brand-green/20', 'border-brand-green', 'text-brand-green');
+            } else {
+                btnKanan.classList.add('bg-brand-green/20', 'border-brand-green', 'text-brand-green');
+            }
+
+            // Filter Dropdown Pemain berdasarkan nama klub
+            let selectPemain = document.getElementById('select-pemain');
+            selectPemain.innerHTML = '<option value="">-- Pilih Pemain --</option>';
+            
+            let filteredPlayers = playersData.filter(p => String(p.klub).toLowerCase().trim() === String(selectedTeamName).toLowerCase().trim());
+            
+            if(filteredPlayers.length === 0) {
+                selectPemain.innerHTML = '<option value="">(Data Pemain Kosong)</option>';
+            } else {
+                filteredPlayers.forEach(p => {
+                    selectPemain.innerHTML += `<option value="${p.nama_pemain}">${p.nama_pemain} ${p.no_punggung ? '('+p.no_punggung+')' : ''}</option>`;
+                });
+            }
+        }
+
+        // 5. Pemilihan Tombol Kejadian
         function setEvent(jenis, btn) {
-            document.getElementById('op-jenis').value = jenis;
+            document.getElementById('input-jenis').value = jenis;
             document.querySelectorAll('.evt-btn').forEach(b => {
-                b.classList.remove('bg-white/10', 'border-white');
+                b.classList.remove('bg-white/20', 'border-white', 'shadow-inner');
                 b.classList.add('bg-black');
             });
             btn.classList.remove('bg-black');
-            btn.classList.add('bg-white/10', 'border-white');
+            btn.classList.add('bg-white/20', 'border-white', 'shadow-inner');
         }
 
+        // 6. Eksekusi Pengiriman POST Data
         async function submitEvent() {
-            const id_match = document.getElementById('op-id-match').value.trim();
-            const tim = document.getElementById('op-tim').value.trim();
-            const pemain = document.getElementById('op-pemain').value.trim();
-            const menit = document.getElementById('op-menit').value.trim();
-            const jenis = document.getElementById('op-jenis').value;
+            const id_match = document.getElementById('select-match').value;
+            const tim = selectedTeamName;
+            const pemain = document.getElementById('select-pemain').value;
+            const menit = document.getElementById('input-menit').value;
+            const jenis = document.getElementById('input-jenis').value;
 
             if(!id_match || !tim || !pemain || !menit || !jenis) {
-                alert("Mohon isi seluruh data!"); return;
+                alert("GAGAL: Mohon lengkapi semua isian (Pemain, Menit, dan Kejadian)!"); 
+                return;
             }
 
             const btn = document.getElementById('btn-submit');
-            const status = document.getElementById('log-status');
-            btn.innerText = "Mengirim..."; btn.disabled = true;
-            status.innerHTML = `<span class="text-yellow-500">Memproses sinkronisasi ke server...</span>`;
+            const statusLog = document.getElementById('log-status');
+            
+            btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Mengirim...`; 
+            btn.disabled = true;
+            statusLog.classList.remove('hidden');
+            statusLog.innerHTML = `<span class="text-yellow-500">Memproses sinkronisasi ke server...</span>`;
+            lucide.createIcons();
 
             try {
-                // Konsep API: Menembak langsung ke Sheet "Event_Match"
-                // Pastikan Apps Script doPost Anda menangkap action 'submit_event'
                 await fetch(API_URL, {
                     method: 'POST',
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify({
-                        action: 'submit_event', // Tambahkan parameter ini di Apps Script Anda
+                        action: 'submit_event',
                         payload: {
                             id_match: id_match,
                             waktu: new Date().toISOString(),
@@ -119,18 +254,24 @@
                     })
                 });
 
-                status.innerHTML = `<span class="text-brand-green">Sukses! Data dikirim.</span>`;
-                // Reset form pemain dan jenis (ID Match, Tim, Menit biarkan untuk mempermudah input pemain kedua jika itu substitusi)
-                document.getElementById('op-pemain').value = '';
-                document.getElementById('op-jenis').value = '';
-                document.querySelectorAll('.evt-btn').forEach(b => { b.classList.remove('bg-white/10', 'border-white'); b.classList.add('bg-black'); });
+                statusLog.innerHTML = `<span class="text-brand-green">Sukses! [${menit}'] ${pemain} (${jenis}) tercatat.</span>`;
+                
+                // Reset form sebagian (Biarkan tim, fokus untuk mempercepat input pemain lain)
+                document.getElementById('select-pemain').value = '';
+                document.getElementById('input-jenis').value = '';
+                document.querySelectorAll('.evt-btn').forEach(b => { b.classList.remove('bg-white/20', 'border-white'); b.classList.add('bg-black'); });
                 
             } catch(e) {
-                status.innerHTML = `<span class="text-red-500">Gagal mengirim. Cek koneksi.</span>`;
+                statusLog.innerHTML = `<span class="text-red-500">Gagal mengirim. Cek koneksi internet!</span>`;
             } finally {
-                btn.innerText = "Kirim Data Kejadian"; btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> Eksekusi Data`; 
+                btn.disabled = false;
+                lucide.createIcons();
             }
         }
+
+        // Jalankan fetch data saat web pertama kali dimuat
+        window.onload = fetchData;
     </script>
 </body>
 </html>
