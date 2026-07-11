@@ -359,6 +359,12 @@
                 </div>
             </header>
 
+            <div class="px-4 md:px-8 py-6 bg-white dark:bg-brand-dark-bg border-b border-gray-100 dark:border-brand-dark-border transition-colors">
+                <div id="tsl-stories-tray" class="flex gap-4 overflow-x-auto hide-scroll pb-1">
+                    <div class="text-[9px] font-bold text-gray-400 uppercase tracking-widest py-2">Memuat Stories...</div>
+                </div>
+            </div>
+        
             <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-20 -mt-8 lg:-mt-10 page-enter pb-6" style="animation-delay: 0.2s;">
                 <div class="mb-6 bg-white/95 dark:bg-brand-dark-surface/95 backdrop-blur-2xl rounded-[2rem] shadow-xl border border-gray-200/50 dark:border-white/5 overflow-hidden transition-colors duration-500">
                     <div class="flex items-center justify-between px-6 md:px-8 pt-6 pb-4 border-b border-gray-100 dark:border-white/5">
@@ -1728,6 +1734,41 @@
                 updateLiveHeader();
 
             } catch(e) { console.error("Render Error: ", e); }
+        }
+
+        // SUNTIK DI SINI (Contoh di atas renderAllData)
+        function renderStories() {
+            let container = document.getElementById('tsl-stories-tray');
+            let stories = (rawData.Stories || []).filter(s => getProp(s, 'status') === 'active');
+            
+            if(!container) return;
+            if(stories.length === 0) { 
+                container.innerHTML = '<div class="text-[9px] font-bold text-gray-400 uppercase tracking-widest p-2">Tidak ada cerita saat ini</div>'; 
+                return; 
+            }
+            
+            container.innerHTML = stories.map(s => `
+                <div class="flex flex-col items-center gap-1.5 cursor-pointer group" onclick="bukaStory('${safeStr(getProp(s, 'media_url'))}', '${safeStr(getProp(s, 'caption'))}')">
+                    <div class="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-brand-green to-emerald-400 shadow-[0_0_10px_rgba(0,154,68,0.3)]">
+                        <img src="${getProp(s, 'media_url')}" class="w-full h-full rounded-full object-cover border-2 border-white dark:border-brand-dark-bg">
+                    </div>
+                    <span class="text-[8px] font-bold uppercase truncate max-w-[60px]">${getProp(s, 'caption').split(' ')[0]}</span>
+                </div>
+            `).join('');
+        }
+
+        function bukaStory(url, caption) {
+            document.getElementById('story-media').src = url;
+            document.getElementById('story-caption').innerText = caption;
+            document.getElementById('modal-story').classList.remove('hidden');
+            document.getElementById('modal-story').classList.add('flex');
+            document.body.classList.add('modal-open');
+        }
+
+        function tutupStory() {
+            document.getElementById('modal-story').classList.add('hidden');
+            document.getElementById('modal-story').classList.remove('flex');
+            document.body.classList.remove('modal-open');
         }
 
         function renderBerandaClubs(data) {
@@ -4157,5 +4198,10 @@
             });
         }
     </script>
+<div id="modal-story" class="fixed inset-0 z-[250] hidden flex-col items-center justify-center bg-black/95 backdrop-blur-md">
+        <button onclick="tutupStory()" class="absolute top-4 right-4 text-white text-3xl z-50 p-2">&times;</button>
+        <img id="story-media" class="max-h-[80vh] w-auto object-contain rounded-lg shadow-2xl">
+        <p id="story-caption" class="text-white font-bold mt-6 text-center px-6 text-sm uppercase tracking-widest"></p>
+    </div>
 </body>
 </html>
