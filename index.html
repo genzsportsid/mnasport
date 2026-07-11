@@ -1737,87 +1737,137 @@
             } catch(e) { console.error("Render Error: ", e); }
         }
 
-        // SUNTIK DI SINI (Contoh di atas renderAllData)
+        // ==========================================
+        // INSTAGRAM STORY ENGINE (REAL-TIME NAV)
+        // ==========================================
+        window.tslStoriesData = [];
+        window.currentStoryIndex = 0;
+        window.storyTimeout = null;
+        let touchStartX = 0;
+
+        // 1. Render Ikon Bulatan di Beranda
         function renderStories() {
             let container = document.getElementById('tsl-stories-tray');
             let stories = (rawData.Stories || []).filter(s => getProp(s, 'status') === 'active');
             
             if(!container) return;
             if(stories.length === 0) { 
-                container.innerHTML = '<div class="text-[9px] font-bold text-gray-400 uppercase tracking-widest py-2">Tidak ada cerita saat ini</div>'; 
+                container.innerHTML = '<div class="text-[9px] font-bold text-gray-400 uppercase tracking-widest py-2 px-2">Tidak ada cerita saat ini</div>'; 
                 return; 
             }
             
-            container.innerHTML = stories.map(s => {
+            // Simpan data ke memori Global agar mesin tahu urutan Next/Prev
+            window.tslStoriesData = stories.map(s => {
                 let rawUrl = safeStr(getProp(s, 'media_url'));
                 let thumbUrl = rawUrl;
-                let cap = safeStr(getProp(s, 'caption'));
-                
-                // DETEKSI CERDAS: Apakah ini Video?
                 let isVideo = rawUrl.toLowerCase().match(/\.(mp4|webm|ogg)$/) || rawUrl.toLowerCase().includes('video');
-                
                 if (isVideo) {
-                    if (rawUrl.includes('cloudinary.com')) {
-                        // KEAJAIBAN CLOUDINARY: Ubah akhiran mp4 jadi jpg untuk mengambil frame pertama sebagai foto!
-                        thumbUrl = rawUrl.replace(/\.(mp4|webm|ogg)$/i, '.jpg');
-                    } else {
-                        // Fallback jika menggunakan hosting selain Cloudinary
-                        thumbUrl = 'https://ui-avatars.com/api/?name=VID&background=009A44&color=fff';
-                    }
+                    thumbUrl = rawUrl.includes('cloudinary.com') ? rawUrl.replace(/\.(mp4|webm|ogg)$/i, '.jpg') : 'https://ui-avatars.com/api/?name=VID&background=009A44&color=fff';
                 }
+                return { url: rawUrl, caption: safeStr(getProp(s, 'caption')), isVideo: isVideo, thumb: thumbUrl };
+            });
 
-                return `
-                <div class="flex flex-col items-center gap-1.5 cursor-pointer group" onclick="bukaStory('${rawUrl}', '${cap}')">
-                    <div class="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-brand-green to-emerald-400 shadow-[0_0_10px_rgba(0,154,68,0.3)]">
-                        <img src="${thumbUrl}" class="w-full h-full rounded-full object-cover border-2 border-white dark:border-brand-dark-bg bg-gray-900">
+            container.innerHTML = window.tslStoriesData.map((s, index) => `
+                <div class="flex flex-col items-center gap-1.5 cursor-pointer group shrink-0 px-1" onclick="bukaStory(${index})">
+                    <div class="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-brand-green to-emerald-400 shadow-[0_0_10px_rgba(0,154,68,0.3)] group-hover:scale-105 transition-transform">
+                        <img src="${s.thumb}" class="w-full h-full rounded-full object-cover border-2 border-white dark:border-brand-dark-bg bg-gray-900">
                     </div>
-                    <span class="text-[8px] font-bold text-gray-300 uppercase truncate max-w-[60px] drop-shadow-md">${getProp(s, 'caption').split(' ')[0]}</span>
+                    <span class="text-[8px] font-bold text-gray-400 uppercase truncate max-w-[60px] drop-shadow-md group-hover:text-brand-green transition-colors">${s.caption.split(' ')[0]}</span>
                 </div>
-                `;
-            }).join('');
+            `).join('');
         }
 
-        function bukaStory(url, caption) {
+        // 2. Buka Layar Penuh
+        window.bukaStory = function(index) {
+            // Jika geser ke kiri (Prev) di story pertama -> Abaikan
+            if (index < 0) return; 
+            // Jika geser ke kanan (Next) di story terakhir -> Tutup Layar!
+            if (index >= window.tslStoriesData.length) { tutupStory(); return; }
+
+            window.currentStoryIndex = index;
+            let s = window.tslStoriesData[index];
+            
             let imgEl = document.getElementById('story-image');
             let vidEl = document.getElementById('story-video');
+            let capEl = document.getElementById('story-caption');
+            let progContainer = document.getElementById('story-progress-container');
+
+            // Hentikan aktivitas layar sebelumnya
+            if(window.storyTimeout) clearTimeout(window.storyTimeout);
+            vidEl.pause(); vidEl.src = ''; imgEl.src = '';
             
-            // Deteksi cerdas: Apakah link ini video? (berakhiran .mp4, .webm, atau mengandung kata video)
-            let isVideo = url.toLowerCase().match(/\.(mp4|webm|ogg)$/) || url.toLowerCase().includes('video');
-            
-            if (isVideo) {
-                // Matikan foto, nyalakan video
+            // Gambar Progress Bar (Garis putih di atas layar)
+            let progressHtml = '';
+            for(let i = 0; i < window.tslStoriesData.length; i++) {
+                let bgClass = i < index ? 'bg-white' : 'bg-white/30';
+                let inner = i === index ? `<div class="h-full bg-white progress-bar-fill" style="width: 0%;"></div>` : '';
+                progressHtml += `<div class="flex-1 h-[3px] md:h-1 rounded-full overflow-hidden ${bgClass} shadow-sm">${inner}</div>`;
+            }
+            if(progContainer) progContainer.innerHTML = progressHtml;
+
+            // Load Media
+            if (s.isVideo) {
                 imgEl.classList.add('hidden');
-                imgEl.src = '';
                 vidEl.classList.remove('hidden');
-                vidEl.src = url;
-                vidEl.play(); // Putar otomatis
+                vidEl.src = s.url;
+                vidEl.play().catch(e => console.log('Autoplay dicegah browser:', e));
+                
+                // Animasi Progress Bar mengikuti durasi asli video
+                vidEl.ontimeupdate = () => {
+                    let fill = document.querySelector('.progress-bar-fill');
+                    if(fill && vidEl.duration) { fill.style.width = ((vidEl.currentTime / vidEl.duration) * 100) + '%'; }
+                };
+                // Jika video habis -> Auto Next
+                vidEl.onended = () => nextStory();
             } else {
-                // Matikan video, nyalakan foto
                 vidEl.classList.add('hidden');
-                vidEl.pause();
-                vidEl.src = '';
                 imgEl.classList.remove('hidden');
-                imgEl.src = url;
+                imgEl.src = s.url;
+                
+                // Animasi Progress Bar Foto (5 Detik statis)
+                let fill = document.querySelector('.progress-bar-fill');
+                if(fill) {
+                    fill.style.transition = 'width 5s linear';
+                    setTimeout(() => { fill.style.width = '100%'; }, 50); // Jeda kecil agar CSS terpancing
+                }
+                // Jika 5 detik habis -> Auto Next
+                window.storyTimeout = setTimeout(() => nextStory(), 5000);
             }
 
-            document.getElementById('story-caption').innerText = caption;
+            if(capEl) {
+                capEl.innerText = s.caption;
+                capEl.classList.remove('hidden');
+                if(!s.caption) capEl.classList.add('hidden'); // Sembunyikan bubble hitam jika tidak ada teks
+            }
+
             document.getElementById('modal-story').classList.remove('hidden');
             document.getElementById('modal-story').classList.add('flex');
             document.body.classList.add('modal-open');
-        }
+        };
 
-        function tutupStory() {
+        // 3. Tombol Navigasi (Next / Prev)
+        window.nextStory = function() { bukaStory(window.currentStoryIndex + 1); };
+        window.prevStory = function() { bukaStory(window.currentStoryIndex - 1); };
+        
+        // 4. Tutup Layar Penuh
+        window.tutupStory = function() {
             document.getElementById('modal-story').classList.add('hidden');
             document.getElementById('modal-story').classList.remove('flex');
             document.body.classList.remove('modal-open');
-            
-            // SANGAT PENTING: Hancurkan sumber video saat ditutup agar suara tidak bocor di background
+            if(window.storyTimeout) clearTimeout(window.storyTimeout);
             let vidEl = document.getElementById('story-video');
-            if (vidEl) {
-                vidEl.pause();
-                vidEl.src = '';
-            }
-        }
+            if(vidEl) { vidEl.pause(); vidEl.src = ''; }
+        };
+
+        // 5. Sensor Usapan Jari (Swipe) Khusus HP
+        window.handleStoryTouchStart = function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        };
+        window.handleStoryTouchEnd = function(e) {
+            let touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 50) nextStory(); // Jari usap ke kiri -> Next
+            if (touchEndX > touchStartX + 50) prevStory(); // Jari usap ke kanan -> Prev
+        };
         function renderBerandaClubs(data) {
             let htmlTopBar = '';
             data.forEach(tim => {
@@ -4245,14 +4295,36 @@
             });
         }
     </script>
-<div id="modal-story" class="fixed inset-0 z-[250] hidden flex-col items-center justify-center bg-black/95 backdrop-blur-md">
-        <button onclick="tutupStory()" class="absolute top-4 right-4 text-white text-3xl z-50 p-2">&times;</button>
+<!-- LAYAR STORY VIEWER (INSTAGRAM ENGINE) -->
+    <div id="modal-story" class="fixed inset-0 z-[250] hidden flex-col bg-black/95 backdrop-blur-xl" ontouchstart="handleStoryTouchStart(event)" ontouchend="handleStoryTouchEnd(event)">
         
-        <img id="story-image" class="max-h-[80vh] w-auto object-contain rounded-lg shadow-2xl hidden">
+        <!-- Progress Bar Indicator -->
+        <div id="story-progress-container" class="absolute top-safe md:top-4 pt-4 left-2 right-2 flex gap-1 z-[260] px-2"></div>
         
-        <video id="story-video" class="max-h-[80vh] w-auto object-contain rounded-lg shadow-2xl hidden" controls autoplay playsinline preload="metadata"></video>
-        
-        <p id="story-caption" class="text-white font-bold mt-6 text-center px-6 text-sm uppercase tracking-widest"></p>
+        <!-- Header Controls -->
+        <div class="absolute top-safe md:top-4 pt-8 left-4 right-4 flex justify-between items-center z-[260] px-2">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full bg-brand-green p-0.5 shadow-sm"><img src="./logo-tsl.png" class="w-full h-full object-contain rounded-full bg-white"></div>
+                <span class="text-white text-xs font-bold uppercase tracking-widest drop-shadow-md">TSL 2026</span>
+            </div>
+            <button onclick="tutupStory()" class="text-white text-4xl leading-none drop-shadow-md focus:outline-none hover:text-brand-red transition-colors">&times;</button>
+        </div>
+
+        <!-- Sensor Ketukan (Kiri 30% untuk Prev, Kanan 70% untuk Next) -->
+        <div class="absolute inset-0 z-[255] flex">
+            <div class="w-1/3 h-full cursor-pointer" onclick="prevStory()"></div>
+            <div class="w-2/3 h-full cursor-pointer" onclick="nextStory()"></div>
+        </div>
+
+        <!-- Media Player (Tanpa Video Controls agar murni seperti IG) -->
+        <div class="relative w-full h-full flex flex-col items-center justify-center pointer-events-none z-[250]">
+            <img id="story-image" class="max-h-[85vh] w-full object-contain shadow-2xl hidden">
+            <video id="story-video" class="max-h-[85vh] w-full object-contain shadow-2xl hidden" playsinline preload="metadata"></video>
+            
+            <div class="absolute bottom-12 w-full px-6 flex justify-center text-center">
+                <p id="story-caption" class="text-white font-bold text-[10px] md:text-xs uppercase tracking-widest drop-shadow-md bg-black/40 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-white/10"></p>
+            </div>
+        </div>
     </div>
 </body>
 </html>
