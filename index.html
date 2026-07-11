@@ -4296,33 +4296,30 @@
         }
     </script>
 <!-- LAYAR STORY VIEWER (INSTAGRAM ENGINE) -->
-    <div id="modal-story" class="fixed inset-0 z-[250] hidden flex-col bg-black/95 backdrop-blur-xl" ontouchstart="handleStoryTouchStart(event)" ontouchend="handleStoryTouchEnd(event)">
+    <div id="modal-story" class="fixed inset-0 z-[250] hidden flex-col bg-black/95 backdrop-blur-xl" style="height: 100dvh; height: -webkit-fill-available;" ontouchstart="handleStoryTouchStart(event)" ontouchend="handleStoryTouchEnd(event)">
         
-        <!-- Progress Bar Indicator -->
-        <div id="story-progress-container" class="absolute top-safe md:top-4 pt-4 left-2 right-2 flex gap-1 z-[260] px-2"></div>
+        <div id="story-progress-container" class="absolute left-0 right-0 flex gap-1 z-[260] px-3" style="top: max(10px, env(safe-area-inset-top));"></div>
         
-        <!-- Header Controls -->
-        <div class="absolute top-safe md:top-4 pt-8 left-4 right-4 flex justify-between items-center z-[260] px-2">
-            <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-full bg-brand-green p-0.5 shadow-sm"><img src="./logo-tsl.png" class="w-full h-full object-contain rounded-full bg-white"></div>
-                <span class="text-white text-xs font-bold uppercase tracking-widest drop-shadow-md">TSL 2026</span>
+        <div class="absolute left-0 right-0 flex justify-between items-center z-[260] px-4" style="top: max(25px, calc(env(safe-area-inset-top) + 15px));">
+            <div class="flex items-center gap-2.5 pointer-events-none">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-brand-green p-0.5 shadow-sm"><img src="./logo-tsl.png" class="w-full h-full object-contain rounded-full bg-white"></div>
+                <span class="text-white text-xs md:text-sm font-bold uppercase tracking-widest drop-shadow-md">TSL 2026</span>
             </div>
-            <button onclick="tutupStory()" class="text-white text-4xl leading-none drop-shadow-md focus:outline-none hover:text-brand-red transition-colors">&times;</button>
+            <button onclick="tutupStory()" class="text-white text-4xl leading-none drop-shadow-md focus:outline-none hover:text-brand-red transition-colors p-2 z-[270]">&times;</button>
         </div>
 
-        <!-- Sensor Ketukan (Kiri 30% untuk Prev, Kanan 70% untuk Next) -->
         <div class="absolute inset-0 z-[255] flex">
             <div class="w-1/3 h-full cursor-pointer" onclick="prevStory()"></div>
             <div class="w-2/3 h-full cursor-pointer" onclick="nextStory()"></div>
         </div>
 
-        <!-- Media Player (Tanpa Video Controls agar murni seperti IG) -->
-        <div class="relative w-full h-full flex flex-col items-center justify-center pointer-events-none z-[250]">
-            <img id="story-image" class="max-h-[85vh] w-full object-contain shadow-2xl hidden">
-            <video id="story-video" class="max-h-[85vh] w-full object-contain shadow-2xl hidden" playsinline preload="metadata"></video>
+        <div class="relative w-full h-full flex flex-col items-center justify-center pointer-events-none z-[250]" style="padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);">
             
-            <div class="absolute bottom-12 w-full px-6 flex justify-center text-center">
-                <p id="story-caption" class="text-white font-bold text-[10px] md:text-xs uppercase tracking-widest drop-shadow-md bg-black/40 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-white/10"></p>
+            <img id="story-image" class="h-auto max-h-[75dvh] w-full object-contain shadow-2xl hidden drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+            <video id="story-video" class="h-auto max-h-[75dvh] w-full object-contain shadow-2xl hidden drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" playsinline preload="metadata"></video>
+            
+            <div class="absolute bottom-6 md:bottom-12 w-full px-6 flex justify-center text-center" style="margin-bottom: env(safe-area-inset-bottom);">
+                <p id="story-caption" class="text-white font-bold text-[10px] md:text-xs uppercase tracking-widest drop-shadow-md bg-black/50 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-white/10 hidden"></p>
             </div>
         </div>
     </div>
