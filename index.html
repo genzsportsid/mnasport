@@ -1416,7 +1416,7 @@
 
         // BATCH DATA FETCHING
         async function tarikDataGaib() {
-            const sheets = ['Jadwal', 'Klasemen', 'Pemain', 'Event_Match', 'Stat_Match', 'TopSkor', 'Lineup', 'Sponsor'];
+            const sheets = ['Jadwal', 'Klasemen', 'Pemain', 'Event_Match', 'Stat_Match', 'TopSkor', 'Lineup', 'Sponsor', 'Stories'];
             sheets.forEach(s => { try { let c = localStorage.getItem('tyl_cache_' + s); if (c) rawData[s] = JSON.parse(c); } catch(e){} });
             
             if(rawData.Klasemen && rawData.Klasemen.length > 0 && currentTeamSelected === '' && document.getElementById('view-match').classList.contains('hidden')) renderAllData(); 
@@ -1729,6 +1729,8 @@
                 initFotmobCalendar(); 
                 switchLigaUI(ligaAktif);
                 renderSponsors();
+                // PANGGIL MESIN STORY
+                if (typeof renderStories === 'function') renderStories();
 
                 // PANGGIL BANNER MELAYANG DI SINI
                 updateLiveHeader();
