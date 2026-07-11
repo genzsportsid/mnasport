@@ -3697,14 +3697,29 @@
                     let numBg = isAway ? 'bg-red-500 text-white' : 'bg-blue-600 text-white';
                     
                     let pEvents = matchEvents.filter(ev => String(getProp(ev, 'pemain')).toLowerCase().trim() === nmLower && String(getProp(ev, 'tim')).toLowerCase().trim() === tLower);
-                    let goals = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'GOL').length;
-                    let yellows = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'KUNING').length;
-                    let reds = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'MERAH').length;
-                    
-                    let eventIcons = '';
-                    if (goals > 0) { eventIcons += `<div class="bg-white rounded-full p-0.5 shadow-md border border-gray-200 flex items-center justify-center"><span class="text-[7px] md:text-[10px] leading-none">⚽</span>${goals>1?`<span class="text-[6px] font-bold text-black ml-0.5">${goals}</span>`:''}</div>`; }
-                    if (reds > 0) { eventIcons += `<div class="w-1.5 h-2.5 md:w-2 md:h-3 bg-red-500 border border-red-700 rounded-[1px] shadow-sm transform -rotate-6"></div>`; } 
-                    else if (yellows > 0) { eventIcons += `<div class="w-1.5 h-2.5 md:w-2 md:h-3 bg-yellow-400 border border-yellow-600 rounded-[1px] shadow-sm transform -rotate-6 relative">${yellows>1?'<div class="absolute w-1.5 h-2.5 md:w-2 md:h-3 bg-red-500 border border-red-700 rounded-[1px] -right-1 -top-0.5"></div>':''}</div>`; }
+                    // DETEKSI GOL & KARTU
+                        let goals = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'GOL').length;
+                        let yellows = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'KUNING').length;
+                        let reds = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'MERAH').length;
+                        
+                        // DETEKSI SUBSTITUSI (Tambahan Baru)
+                        let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
+                        let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
+
+                        let eventIcons = '';
+                        
+                        // CETAK IKON GOL & KARTU
+                        if (goals > 0) { eventIcons += `<div class="bg-white rounded-full p-0.5 shadow-md border border-gray-200 flex items-center justify-center"><span class="text-[7px] md:text-[10px] leading-none">⚽</span>${goals>1?`<span class="text-[6px] font-bold text-black ml-0.5">${goals}</span>`:''}</div>`; }
+                        if (reds > 0) { eventIcons += `<div class="w-1.5 h-2.5 md:w-2 md:h-3 bg-red-500 border border-red-700 rounded-[1px] shadow-sm transform -rotate-6"></div>`; } 
+                        else if (yellows > 0) { eventIcons += `<div class="w-1.5 h-2.5 md:w-2 md:h-3 bg-yellow-400 border border-yellow-600 rounded-[1px] shadow-sm transform -rotate-6 relative">${yellows>1?'<div class="absolute w-1.5 h-2.5 md:w-2 md:h-3 bg-red-500 border border-red-700 rounded-[1px] -right-1 -top-0.5"></div>':''}</div>`; }
+
+                        // CETAK IKON SUBSTITUSI (Tambahan Baru)
+                        if (subOut) { 
+                            eventIcons += `<div class="bg-white/90 backdrop-blur-sm rounded px-1 py-0.5 shadow-md border border-gray-200 flex items-center justify-center gap-0.5"><svg class="w-2.5 h-2.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path></svg><span class="text-[6px] font-black text-brand-black">${getProp(subOut, 'menit')}'</span></div>`; 
+                        }
+                        if (subIn) { 
+                            eventIcons += `<div class="bg-white/90 backdrop-blur-sm rounded px-1 py-0.5 shadow-md border border-gray-200 flex items-center justify-center gap-0.5"><svg class="w-2.5 h-2.5 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg><span class="text-[6px] font-black text-brand-black">${getProp(subIn, 'menit')}'</span></div>`; 
+                        }
                     let eventBadge = eventIcons !== '' ? `<div class="absolute -top-1.5 -left-2 md:-top-2 md:-left-2 flex items-center gap-0.5 z-20">${eventIcons}</div>` : '';
 
                     // UI Animasi Drop-In (EA FC Style)
@@ -3750,14 +3765,29 @@
                     let ringColor = isAway ? 'ring-red-500/50 dark:ring-red-400/50' : 'ring-blue-500/50 dark:ring-blue-400/50';
 
                     let pEvents = matchEvents.filter(ev => String(getProp(ev, 'pemain')).toLowerCase().trim() === nmLower && String(getProp(ev, 'tim')).toLowerCase().trim() === tLower);
-                    let goals = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'GOL').length;
-                    let yellows = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'KUNING').length;
-                    let reds = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'MERAH').length;
-                    
-                    let eventIcons = '';
-                    if (goals > 0) { eventIcons += `<div class="bg-white rounded-full p-0.5 shadow-sm border border-gray-200 flex items-center justify-center"><span class="text-[8px] leading-none">⚽</span>${goals>1?`<span class="text-[7px] font-bold text-black ml-0.5">${goals}</span>`:''}</div>`; }
-                    if (reds > 0) { eventIcons += `<div class="w-2 h-3 bg-red-500 border border-red-700 rounded-[1px] shadow-sm transform -rotate-6"></div>`; } 
-                    else if (yellows > 0) { eventIcons += `<div class="w-2 h-3 bg-yellow-400 border border-yellow-600 rounded-[1px] shadow-sm transform -rotate-6 relative">${yellows>1?'<div class="absolute w-2 h-3 bg-red-500 border border-red-700 rounded-[1px] -right-1 -top-0.5"></div>':''}</div>`; }
+                    // DETEKSI GOL & KARTU
+                        let goals = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'GOL').length;
+                        let yellows = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'KUNING').length;
+                        let reds = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'MERAH').length;
+                        
+                        // DETEKSI SUBSTITUSI (Tambahan Baru)
+                        let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
+                        let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
+
+                        let eventIcons = '';
+                        
+                        // CETAK IKON GOL & KARTU
+                        if (goals > 0) { eventIcons += `<div class="bg-white rounded-full p-0.5 shadow-md border border-gray-200 flex items-center justify-center"><span class="text-[7px] md:text-[10px] leading-none">⚽</span>${goals>1?`<span class="text-[6px] font-bold text-black ml-0.5">${goals}</span>`:''}</div>`; }
+                        if (reds > 0) { eventIcons += `<div class="w-1.5 h-2.5 md:w-2 md:h-3 bg-red-500 border border-red-700 rounded-[1px] shadow-sm transform -rotate-6"></div>`; } 
+                        else if (yellows > 0) { eventIcons += `<div class="w-1.5 h-2.5 md:w-2 md:h-3 bg-yellow-400 border border-yellow-600 rounded-[1px] shadow-sm transform -rotate-6 relative">${yellows>1?'<div class="absolute w-1.5 h-2.5 md:w-2 md:h-3 bg-red-500 border border-red-700 rounded-[1px] -right-1 -top-0.5"></div>':''}</div>`; }
+
+                        // CETAK IKON SUBSTITUSI (Tambahan Baru)
+                        if (subOut) { 
+                            eventIcons += `<div class="bg-white/90 backdrop-blur-sm rounded px-1 py-0.5 shadow-md border border-gray-200 flex items-center justify-center gap-0.5"><svg class="w-2.5 h-2.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path></svg><span class="text-[6px] font-black text-brand-black">${getProp(subOut, 'menit')}'</span></div>`; 
+                        }
+                        if (subIn) { 
+                            eventIcons += `<div class="bg-white/90 backdrop-blur-sm rounded px-1 py-0.5 shadow-md border border-gray-200 flex items-center justify-center gap-0.5"><svg class="w-2.5 h-2.5 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg><span class="text-[6px] font-black text-brand-black">${getProp(subIn, 'menit')}'</span></div>`; 
+                        }
                     
                     let animDelay = idx * 60;
                     let animClass = isAway ? 'slide-right-anim' : 'slide-left-anim';
