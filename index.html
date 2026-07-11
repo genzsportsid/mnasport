@@ -1744,18 +1744,37 @@
             
             if(!container) return;
             if(stories.length === 0) { 
-                container.innerHTML = '<div class="text-[9px] font-bold text-gray-400 uppercase tracking-widest p-2">Tidak ada cerita saat ini</div>'; 
+                container.innerHTML = '<div class="text-[9px] font-bold text-gray-400 uppercase tracking-widest py-2">Tidak ada cerita saat ini</div>'; 
                 return; 
             }
             
-            container.innerHTML = stories.map(s => `
-                <div class="flex flex-col items-center gap-1.5 cursor-pointer group" onclick="bukaStory('${safeStr(getProp(s, 'media_url'))}', '${safeStr(getProp(s, 'caption'))}')">
+            container.innerHTML = stories.map(s => {
+                let rawUrl = safeStr(getProp(s, 'media_url'));
+                let thumbUrl = rawUrl;
+                let cap = safeStr(getProp(s, 'caption'));
+                
+                // DETEKSI CERDAS: Apakah ini Video?
+                let isVideo = rawUrl.toLowerCase().match(/\.(mp4|webm|ogg)$/) || rawUrl.toLowerCase().includes('video');
+                
+                if (isVideo) {
+                    if (rawUrl.includes('cloudinary.com')) {
+                        // KEAJAIBAN CLOUDINARY: Ubah akhiran mp4 jadi jpg untuk mengambil frame pertama sebagai foto!
+                        thumbUrl = rawUrl.replace(/\.(mp4|webm|ogg)$/i, '.jpg');
+                    } else {
+                        // Fallback jika menggunakan hosting selain Cloudinary
+                        thumbUrl = 'https://ui-avatars.com/api/?name=VID&background=009A44&color=fff';
+                    }
+                }
+
+                return `
+                <div class="flex flex-col items-center gap-1.5 cursor-pointer group" onclick="bukaStory('${rawUrl}', '${cap}')">
                     <div class="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-brand-green to-emerald-400 shadow-[0_0_10px_rgba(0,154,68,0.3)]">
-                        <img src="${getProp(s, 'media_url')}" class="w-full h-full rounded-full object-cover border-2 border-white dark:border-brand-dark-bg">
+                        <img src="${thumbUrl}" class="w-full h-full rounded-full object-cover border-2 border-white dark:border-brand-dark-bg bg-gray-900">
                     </div>
-                    <span class="text-[8px] font-bold uppercase truncate max-w-[60px]">${getProp(s, 'caption').split(' ')[0]}</span>
+                    <span class="text-[8px] font-bold text-gray-300 uppercase truncate max-w-[60px] drop-shadow-md">${getProp(s, 'caption').split(' ')[0]}</span>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function bukaStory(url, caption) {
