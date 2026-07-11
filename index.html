@@ -1758,7 +1758,28 @@
         }
 
         function bukaStory(url, caption) {
-            document.getElementById('story-media').src = url;
+            let imgEl = document.getElementById('story-image');
+            let vidEl = document.getElementById('story-video');
+            
+            // Deteksi cerdas: Apakah link ini video? (berakhiran .mp4, .webm, atau mengandung kata video)
+            let isVideo = url.toLowerCase().match(/\.(mp4|webm|ogg)$/) || url.toLowerCase().includes('video');
+            
+            if (isVideo) {
+                // Matikan foto, nyalakan video
+                imgEl.classList.add('hidden');
+                imgEl.src = '';
+                vidEl.classList.remove('hidden');
+                vidEl.src = url;
+                vidEl.play(); // Putar otomatis
+            } else {
+                // Matikan video, nyalakan foto
+                vidEl.classList.add('hidden');
+                vidEl.pause();
+                vidEl.src = '';
+                imgEl.classList.remove('hidden');
+                imgEl.src = url;
+            }
+
             document.getElementById('story-caption').innerText = caption;
             document.getElementById('modal-story').classList.remove('hidden');
             document.getElementById('modal-story').classList.add('flex');
@@ -1769,8 +1790,14 @@
             document.getElementById('modal-story').classList.add('hidden');
             document.getElementById('modal-story').classList.remove('flex');
             document.body.classList.remove('modal-open');
+            
+            // SANGAT PENTING: Hancurkan sumber video saat ditutup agar suara tidak bocor di background
+            let vidEl = document.getElementById('story-video');
+            if (vidEl) {
+                vidEl.pause();
+                vidEl.src = '';
+            }
         }
-
         function renderBerandaClubs(data) {
             let htmlTopBar = '';
             data.forEach(tim => {
@@ -4200,7 +4227,11 @@
     </script>
 <div id="modal-story" class="fixed inset-0 z-[250] hidden flex-col items-center justify-center bg-black/95 backdrop-blur-md">
         <button onclick="tutupStory()" class="absolute top-4 right-4 text-white text-3xl z-50 p-2">&times;</button>
-        <img id="story-media" class="max-h-[80vh] w-auto object-contain rounded-lg shadow-2xl">
+        
+        <img id="story-image" class="max-h-[80vh] w-auto object-contain rounded-lg shadow-2xl hidden">
+        
+        <video id="story-video" class="max-h-[80vh] w-auto object-contain rounded-lg shadow-2xl hidden" controls autoplay playsinline preload="metadata"></video>
+        
         <p id="story-caption" class="text-white font-bold mt-6 text-center px-6 text-sm uppercase tracking-widest"></p>
     </div>
 </body>
