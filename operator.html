@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TSL Match Operator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { 'brand-green': '#009A44', 'brand-dark': '#09090b', 'brand-panel': '#18181b' } }
+            }
+        }
+    </script>
+    <style>body { background-color: #09090b; color: white; }</style>
+</head>
+<body class="p-4 md:p-6 font-sans antialiased">
+    
+    <div class="max-w-md mx-auto">
+        <div class="text-center mb-6">
+            <h1 class="text-xl font-black uppercase tracking-widest text-brand-green">Match Operator</h1>
+            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">TSL Command Center</p>
+        </div>
+
+        <div class="bg-brand-panel border border-white/10 p-5 rounded-2xl shadow-xl space-y-5">
+            <!-- 1. IDENTITAS LAGA -->
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">ID Match (Lihat di Jadwal)</label>
+                <input type="text" id="op-id-match" placeholder="Contoh: MATCH-01" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white uppercase focus:border-brand-green outline-none transition-colors">
+            </div>
+
+            <!-- 2. PILIH TIM -->
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Klub / Tim</label>
+                <input type="text" id="op-tim" placeholder="Nama Klub..." class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white uppercase focus:border-brand-green outline-none transition-colors">
+            </div>
+
+            <!-- 3. PEMAIN & MENIT -->
+            <div class="flex gap-3">
+                <div class="flex-1">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Nama Pemain</label>
+                    <input type="text" id="op-pemain" placeholder="Cth: Bima" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white uppercase focus:border-brand-green outline-none transition-colors">
+                </div>
+                <div class="w-24 shrink-0">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Menit</label>
+                    <input type="number" id="op-menit" placeholder="45" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs font-black text-brand-green text-center focus:border-brand-green outline-none transition-colors">
+                </div>
+            </div>
+
+            <!-- 4. JENIS KEJADIAN -->
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Jenis Kejadian</label>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <button onclick="setEvent('Gol', this)" class="evt-btn bg-black border border-white/10 text-white font-bold text-[10px] py-2.5 rounded-lg uppercase hover:border-brand-green">⚽ Gol</button>
+                    <button onclick="setEvent('Kuning', this)" class="evt-btn bg-black border border-white/10 text-yellow-400 font-bold text-[10px] py-2.5 rounded-lg uppercase hover:border-yellow-400">🟨 Kuning</button>
+                    <button onclick="setEvent('Merah', this)" class="evt-btn bg-black border border-white/10 text-red-500 font-bold text-[10px] py-2.5 rounded-lg uppercase hover:border-red-500">🟥 Merah</button>
+                    
+                    <!-- TOMBOL SUBSTITUSI BARU -->
+                    <button onclick="setEvent('Sub In', this)" class="evt-btn bg-black border border-brand-green/30 text-brand-green font-black text-[10px] py-2.5 rounded-lg uppercase shadow-[0_0_10px_rgba(0,154,68,0.1)]">⬆️ Masuk (In)</button>
+                    <button onclick="setEvent('Sub Out', this)" class="evt-btn bg-black border border-red-500/30 text-red-500 font-black text-[10px] py-2.5 rounded-lg uppercase shadow-[0_0_10px_rgba(239,68,68,0.1)]">⬇️ Keluar (Out)</button>
+                </div>
+                <input type="hidden" id="op-jenis">
+            </div>
+
+            <button onclick="submitEvent()" id="btn-submit" class="w-full bg-brand-green hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(0,154,68,0.3)] transition-colors mt-2">
+                Kirim Data Kejadian
+            </button>
+        </div>
+        
+        <div id="log-status" class="mt-4 text-center text-[10px] font-bold uppercase tracking-widest"></div>
+    </div>
+
+    <script>
+        // GANTI DENGAN URL APPS SCRIPT ASLI ANDA
+        const API_URL = "https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec";
+
+        function setEvent(jenis, btn) {
+            document.getElementById('op-jenis').value = jenis;
+            document.querySelectorAll('.evt-btn').forEach(b => {
+                b.classList.remove('bg-white/10', 'border-white');
+                b.classList.add('bg-black');
+            });
+            btn.classList.remove('bg-black');
+            btn.classList.add('bg-white/10', 'border-white');
+        }
+
+        async function submitEvent() {
+            const id_match = document.getElementById('op-id-match').value.trim();
+            const tim = document.getElementById('op-tim').value.trim();
+            const pemain = document.getElementById('op-pemain').value.trim();
+            const menit = document.getElementById('op-menit').value.trim();
+            const jenis = document.getElementById('op-jenis').value;
+
+            if(!id_match || !tim || !pemain || !menit || !jenis) {
+                alert("Mohon isi seluruh data!"); return;
+            }
+
+            const btn = document.getElementById('btn-submit');
+            const status = document.getElementById('log-status');
+            btn.innerText = "Mengirim..."; btn.disabled = true;
+            status.innerHTML = `<span class="text-yellow-500">Memproses sinkronisasi ke server...</span>`;
+
+            try {
+                // Konsep API: Menembak langsung ke Sheet "Event_Match"
+                // Pastikan Apps Script doPost Anda menangkap action 'submit_event'
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        action: 'submit_event', // Tambahkan parameter ini di Apps Script Anda
+                        payload: {
+                            id_match: id_match,
+                            waktu: new Date().toISOString(),
+                            menit: menit,
+                            tim: tim,
+                            pemain: pemain,
+                            jenis: jenis
+                        }
+                    })
+                });
+
+                status.innerHTML = `<span class="text-brand-green">Sukses! Data dikirim.</span>`;
+                // Reset form pemain dan jenis (ID Match, Tim, Menit biarkan untuk mempermudah input pemain kedua jika itu substitusi)
+                document.getElementById('op-pemain').value = '';
+                document.getElementById('op-jenis').value = '';
+                document.querySelectorAll('.evt-btn').forEach(b => { b.classList.remove('bg-white/10', 'border-white'); b.classList.add('bg-black'); });
+                
+            } catch(e) {
+                status.innerHTML = `<span class="text-red-500">Gagal mengirim. Cek koneksi.</span>`;
+            } finally {
+                btn.innerText = "Kirim Data Kejadian"; btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
