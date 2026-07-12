@@ -3626,7 +3626,7 @@
         }
 
         // ==========================================
-        // MESIN RENDER LINEUP & BENCH (FIX: ABSOLUTE PRECISION & CLICKABLE INJURY)
+        // MESIN RENDER LINEUP & BENCH (FOTMOB STYLE: ABSOLUTE COORDINATE MAPPING)
         // ==========================================
         function renderPitchAndBench(tk, tn, dataKiri, dataKanan, lKiri, lKanan, matchEvents = []) {
             let container = document.getElementById('mm-pitch-players');
@@ -3666,59 +3666,85 @@
             document.getElementById('mm-pitch-info-home').innerHTML = `<div class="flex items-center gap-2"><img src="${lKiri}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"> <span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tk}</span></div><div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fHomeRaw}</span></div>`;
             document.getElementById('mm-pitch-info-away').innerHTML = `<div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fAwayRaw}</span></div><div class="flex items-center gap-2"><span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tn}</span> <img src="${lKanan}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"></div>`;
 
-            // FIX: Pertahankan urutan absolut dari koma tanpa membuang slot kosong, matikan Auto-Sort!
+            // DATABASE KORDINAT (Menjiplak persis dari TSL Operator)
+            const FORMATIONS_MAPPING = {
+                '4-3-3': [{b:'10%', l:'50%'}, {b:'25%', l:'15%'}, {b:'25%', l:'35%'}, {b:'25%', l:'65%'}, {b:'25%', l:'85%'}, {b:'45%', l:'50%'}, {b:'55%', l:'30%'}, {b:'55%', l:'70%'}, {b:'80%', l:'20%'}, {b:'80%', l:'80%'}, {b:'85%', l:'50%'}],
+                '4-4-2': [{b:'10%', l:'50%'}, {b:'25%', l:'15%'}, {b:'25%', l:'35%'}, {b:'25%', l:'65%'}, {b:'25%', l:'85%'}, {b:'50%', l:'15%'}, {b:'45%', l:'35%'}, {b:'45%', l:'65%'}, {b:'50%', l:'85%'}, {b:'80%', l:'35%'}, {b:'80%', l:'65%'}],
+                '4-2-3-1': [{b:'10%', l:'50%'}, {b:'25%', l:'15%'}, {b:'25%', l:'35%'}, {b:'25%', l:'65%'}, {b:'25%', l:'85%'}, {b:'45%', l:'35%'}, {b:'45%', l:'65%'}, {b:'65%', l:'20%'}, {b:'65%', l:'50%'}, {b:'65%', l:'80%'}, {b:'85%', l:'50%'}],
+                '3-5-2': [{b:'10%', l:'50%'}, {b:'25%', l:'25%'}, {b:'25%', l:'50%'}, {b:'25%', l:'75%'}, {b:'45%', l:'35%'}, {b:'45%', l:'65%'}, {b:'60%', l:'15%'}, {b:'60%', l:'85%'}, {b:'65%', l:'50%'}, {b:'85%', l:'35%'}, {b:'85%', l:'65%'}]
+            };
+
             let homeNames = pHomeRaw ? pHomeRaw.split(',').map(s=>s.trim()) : new Array(11).fill('');
             let awayNames = pAwayRaw ? pAwayRaw.split(',').map(s=>s.trim()) : new Array(11).fill('');
 
-            let htmlPitch = '';
+            // Tentukan peta formasi untuk masing-masing tim (Default 4-3-3 jika formasi tidak lazim)
+            let fH = FORMATIONS_MAPPING[fHomeRaw] || FORMATIONS_MAPPING['4-3-3'];
+            let fA = FORMATIONS_MAPPING[fAwayRaw] || FORMATIONS_MAPPING['4-3-3'];
 
-            const createRow = (names, teamName, isAway=false, rowIdx=0) => {
-                let h = `<div class="flex flex-row justify-around items-center w-full relative z-10 px-0 py-3 md:py-5">`;
-                names.forEach((nm, idx) => {
-                    if(!nm) { h += `<div class="w-[18%] max-w-[85px] md:max-w-[110px]"></div>`; return; } // Render slot kosong jika tidak ada pemain
-                    let nmLower = nm.toLowerCase().trim(); let tLower = teamName.toLowerCase().trim();
-                    let pData = (rawData.Pemain||[]).find(x => String(getProp(x,'nama')).toLowerCase().trim() === nmLower && String(getProp(x,'tim')).toLowerCase().trim() === tLower);
-                    let f = (pData && getProp(pData,'foto')) ? getProp(pData,'foto') : getAvatar(nm);
-                    let num = (pData && getProp(pData,'nomor') != null) ? getProp(pData,'nomor') : '-'; 
-                    let short = getShortName(nm);
-                    let ringColor = isAway ? 'ring-red-500/50 dark:ring-red-400/50 shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'ring-blue-500/50 dark:ring-blue-400/50 shadow-[0_0_15px_rgba(37,99,235,0.4)]';
-                    let numBg = isAway ? 'bg-red-500 text-white' : 'bg-blue-600 text-white';
-                    
-                    let pEvents = matchEvents.filter(ev => String(getProp(ev, 'pemain')).toLowerCase().trim() === nmLower && String(getProp(ev, 'tim')).toLowerCase().trim() === tLower);
-                    let goals = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'GOL').length;
-                    let yellows = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'KUNING').length;
-                    let reds = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'MERAH').length;
-                    let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
-                    let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
+            // Pabrik Pembuat Node Pemain TSL
+            const createPlayerNode = (nm, teamName, isAway, slotDef, idx) => {
+                if(!nm) return ''; // Lewati slot yang kosong
 
-                    let eventIcons = '';
-                    if (goals > 0) { eventIcons += `<div class="bg-white rounded-full p-0.5 shadow-md border border-gray-200 flex items-center justify-center"><span class="text-[7px] md:text-[10px] leading-none">⚽</span>${goals>1?`<span class="text-[6px] font-bold text-black ml-0.5">${goals}</span>`:''}</div>`; }
-                    if (reds > 0) { eventIcons += `<div class="w-1.5 h-2.5 md:w-2 md:h-3 bg-red-500 border border-red-700 rounded-[1px] shadow-sm transform -rotate-6"></div>`; } 
-                    else if (yellows > 0) { eventIcons += `<div class="w-1.5 h-2.5 md:w-2 md:h-3 bg-yellow-400 border border-yellow-600 rounded-[1px] shadow-sm transform -rotate-6 relative">${yellows>1?'<div class="absolute w-1.5 h-2.5 md:w-2 md:h-3 bg-red-500 border border-red-700 rounded-[1px] -right-1 -top-0.5"></div>':''}</div>`; }
-                    if (subOut) { eventIcons += `<div class="bg-white/90 backdrop-blur-sm rounded px-1 py-0.5 shadow-md border border-gray-200 flex items-center justify-center gap-0.5"><svg class="w-2.5 h-2.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path></svg><span class="text-[6px] font-black text-brand-black">${getProp(subOut, 'menit')}'</span></div>`; }
-                    if (subIn) { eventIcons += `<div class="bg-white/90 backdrop-blur-sm rounded px-1 py-0.5 shadow-md border border-gray-200 flex items-center justify-center gap-0.5"><svg class="w-2.5 h-2.5 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg><span class="text-[6px] font-black text-brand-black">${getProp(subIn, 'menit')}'</span></div>`; }
-                    
-                    let eventBadge = eventIcons !== '' ? `<div class="absolute -top-1.5 -left-2 md:-top-2 md:-left-2 flex items-center gap-0.5 z-20">${eventIcons}</div>` : '';
-                    let animDelay = (rowIdx * 100) + (idx * 50);
+                let nmLower = nm.toLowerCase().trim(); let tLower = teamName.toLowerCase().trim();
+                let pData = (rawData.Pemain||[]).find(x => String(getProp(x,'nama')).toLowerCase().trim() === nmLower && String(getProp(x,'tim')).toLowerCase().trim() === tLower);
+                let f = (pData && getProp(pData,'foto')) ? getProp(pData,'foto') : getAvatar(nm);
+                let num = (pData && getProp(pData,'nomor') != null) ? getProp(pData,'nomor') : '-'; 
+                let short = getShortName(nm);
+                
+                let ringColor = isAway ? 'ring-red-500/50 dark:ring-red-400/50 shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'ring-blue-500/50 dark:ring-blue-400/50 shadow-[0_0_15px_rgba(37,99,235,0.4)]';
+                let numBg = isAway ? 'bg-red-500 text-white' : 'bg-blue-600 text-white';
 
-                    h += `<div class="flex flex-col items-center cursor-pointer hover:scale-110 transition-transform w-[18%] max-w-[85px] md:max-w-[110px] pitch-player-anim" style="animation-delay: ${animDelay}ms;" onclick="bukaModalPemain('${safeStr(pData ? getProp(pData,'nama') : nm)}', '${safeStr(teamName)}')">
-                            <div class="relative w-12 h-12 md:w-16 md:h-16 rounded-full ring-2 md:ring-[3px] ${ringColor} bg-white/50 dark:bg-black/50 backdrop-blur-sm p-0.5 flex items-center justify-center">
-                                ${eventBadge}
-                                <img src="${f}" class="w-full h-full rounded-full object-cover bg-white">
-                                <div class="absolute -bottom-1.5 -right-1.5 md:-bottom-2 md:-right-2 ${numBg} text-[9px] md:text-[11px] font-bold w-5 h-5 md:w-7 md:h-7 rounded-full flex items-center justify-center shadow-md border border-white/20">${num}</div>
-                            </div>
-                            <div class="export-safe-text bg-white/90 dark:bg-black/70 backdrop-blur-md text-brand-black dark:text-white border border-gray-200 dark:border-white/10 text-[8px] sm:text-[10px] font-bold px-1.5 py-1 rounded mt-2 md:mt-3 w-full min-w-[60px] text-center shadow-sm uppercase transition-colors line-clamp-2 leading-tight break-words">${short}</div>
-                          </div>`;
-                });
-                h += `</div>`; return h;
+                // Parsing Ikon Kejadian (Gol/Sub/Merah)
+                let pEvents = matchEvents.filter(ev => String(getProp(ev, 'pemain')).toLowerCase().trim() === nmLower && String(getProp(ev, 'tim')).toLowerCase().trim() === tLower);
+                let goals = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'GOL').length;
+                let yellows = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'KUNING').length;
+                let reds = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'MERAH').length;
+                let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
+                let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
+
+                let eventIcons = '';
+                if (goals > 0) { eventIcons += `<div class="bg-white rounded-full p-0.5 shadow-md border border-gray-200 flex items-center justify-center"><span class="text-[7px] md:text-[10px] leading-none">⚽</span>${goals>1?`<span class="text-[6px] font-bold text-black ml-0.5">${goals}</span>`:''}</div>`; }
+                if (reds > 0) { eventIcons += `<div class="w-1.5 h-2.5 md:w-2 md:h-3 bg-red-500 border border-red-700 rounded-[1px] shadow-sm transform -rotate-6"></div>`; } 
+                else if (yellows > 0) { eventIcons += `<div class="w-1.5 h-2.5 md:w-2 md:h-3 bg-yellow-400 border border-yellow-600 rounded-[1px] shadow-sm transform -rotate-6 relative">${yellows>1?'<div class="absolute w-1.5 h-2.5 md:w-2 md:h-3 bg-red-500 border border-red-700 rounded-[1px] -right-1 -top-0.5"></div>':''}</div>`; }
+                if (subOut) { eventIcons += `<div class="bg-white/90 backdrop-blur-sm rounded px-1 py-0.5 shadow-md border border-gray-200 flex items-center justify-center gap-0.5"><svg class="w-2.5 h-2.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path></svg><span class="text-[6px] font-black text-brand-black">${getProp(subOut, 'menit')}'</span></div>`; }
+                if (subIn) { eventIcons += `<div class="bg-white/90 backdrop-blur-sm rounded px-1 py-0.5 shadow-md border border-gray-200 flex items-center justify-center gap-0.5"><svg class="w-2.5 h-2.5 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg><span class="text-[6px] font-black text-brand-black">${getProp(subIn, 'menit')}'</span></div>`; }
+                
+                let eventBadge = eventIcons !== '' ? `<div class="absolute -top-1.5 -left-2 md:-top-2 md:-left-2 flex items-center gap-0.5 z-20">${eventIcons}</div>` : '';
+                
+                // KALKULASI KORDINAT ABSOLUT (X, Y)
+                let posStyle = '';
+                if(isAway) {
+                    // Tim Tamu (Away): Berada di setengah lapangan Bawah, Kiper di Bawah.
+                    posStyle = `bottom: ${slotDef.b}; left: ${slotDef.l}; transform: translate(-50%, 50%);`;
+                } else {
+                    // Tim Tuan Rumah (Home): Berada di setengah lapangan Atas, Kiper di Atas.
+                    // (Sumbu Kiri/Kanan dibalik agar prespektif lapangan presisi dari kacamata kiper)
+                    let leftInverted = 100 - parseFloat(slotDef.l);
+                    posStyle = `top: ${slotDef.b}; left: ${leftInverted}%; transform: translate(-50%, -50%);`;
+                }
+
+                let animDelay = idx * 50;
+
+                return `
+                <div class="absolute flex flex-col items-center cursor-pointer hover:scale-110 transition-transform w-[22%] max-w-[85px] md:max-w-[110px] pitch-player-anim" style="${posStyle} animation-delay: ${animDelay}ms; z-index: 10;" onclick="bukaModalPemain('${safeStr(pData ? getProp(pData,'nama') : nm)}', '${safeStr(teamName)}')">
+                    <div class="relative w-10 h-10 md:w-14 md:h-14 rounded-full ring-2 md:ring-[3px] ${ringColor} bg-white/50 dark:bg-black/50 backdrop-blur-sm p-0.5 flex items-center justify-center">
+                        ${eventBadge}
+                        <img src="${f}" class="w-full h-full rounded-full object-cover bg-white">
+                        <div class="absolute -bottom-1.5 -right-1.5 md:-bottom-2 md:-right-2 ${numBg} text-[8px] md:text-[10px] font-bold w-4 h-4 md:w-6 md:h-6 rounded-full flex items-center justify-center shadow-md border border-white/20">${num}</div>
+                    </div>
+                    <div class="export-safe-text bg-white/90 dark:bg-black/70 backdrop-blur-md text-brand-black dark:text-white border border-gray-200 dark:border-white/10 text-[7px] sm:text-[9px] font-bold px-1.5 py-1 rounded mt-1.5 md:mt-2 w-full min-w-[50px] text-center shadow-sm uppercase transition-colors line-clamp-2 leading-tight break-words">${short}</div>
+                </div>`;
             };
 
-            let fH = fHomeRaw.split('-'); let hGK = homeNames.slice(0,1); let hDEF = homeNames.slice(1, 1+parseInt(fH[0]||4)); let hMID = homeNames.slice(1+parseInt(fH[0]||4), 1+parseInt(fH[0]||4)+parseInt(fH[1]||3)); let hFWD = homeNames.slice(1+parseInt(fH[0]||4)+parseInt(fH[1]||3));
-            htmlPitch += `<div class="w-full flex flex-col justify-around h-1/2 pt-2 pb-10 md:pb-14 relative z-10">${createRow(hGK, tk, false, 0)}${createRow(hDEF, tk, false, 1)}${createRow(hMID, tk, false, 2)}${createRow(hFWD, tk, false, 3)}</div>`;
-
-            let fA = fAwayRaw.split('-'); let aFWD = awayNames.slice(1+parseInt(fA[0]||4)+parseInt(fA[1]||3)); let aMID = awayNames.slice(1+parseInt(fA[0]||4), 1+parseInt(fA[0]||4)+parseInt(fA[1]||3)); let aDEF = awayNames.slice(1, 1+parseInt(fA[0]||4)); let aGK = awayNames.slice(0,1);
-            htmlPitch += `<div class="w-full flex flex-col justify-around h-1/2 pt-10 md:pt-14 pb-2 relative z-10">${createRow(aFWD, tn, true, 4)}${createRow(aMID, tn, true, 5)}${createRow(aDEF, tn, true, 6)}${createRow(aGK, tn, true, 7)}</div>`;
-            container.innerHTML = htmlPitch;
+            // INJEKSI ABSOLUT KEDALAM LAPANGAN
+            container.innerHTML = `
+                <div class="absolute top-0 left-0 w-full h-1/2 z-10">
+                    ${homeNames.map((nm, i) => createPlayerNode(nm, tk, false, fH[i] || fH[fH.length-1], i)).join('')}
+                </div>
+                <div class="absolute bottom-0 left-0 w-full h-1/2 z-10">
+                    ${awayNames.map((nm, i) => createPlayerNode(nm, tn, true, fA[i] || fA[fA.length-1], i)).join('')}
+                </div>
+            `;
 
             // ===============================================
             // FOTMOB STYLE: EXPLICIT BENCH & ABSENCES ENGINE
@@ -3727,7 +3753,6 @@
                 if(!commaString || commaString.trim() === '') return [];
                 let names = String(commaString).split(',').map(s=>s.trim().toLowerCase());
                 let allPlayers = (rawData.Pemain||[]).filter(x => String(getProp(x,'tim')).toLowerCase() === String(teamName).toLowerCase());
-                // FIX: Sensor Super Kuat mengamankan semua ejaan nama
                 return allPlayers.filter(x => names.includes(String(getProp(x,'nama')).toLowerCase().trim()));
             };
 
@@ -3750,8 +3775,8 @@
                     let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
 
                     let eventIcons = '';
-                    if (subOut) { eventIcons += `<div class="bg-white/90 backdrop-blur-sm rounded px-1 py-0.5 shadow-md border border-gray-200 flex items-center justify-center gap-0.5"><svg class="w-2.5 h-2.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path></svg><span class="text-[6px] font-black text-brand-black">${getProp(subOut, 'menit')}'</span></div>`; }
-                    if (subIn) { eventIcons += `<div class="bg-white/90 backdrop-blur-sm rounded px-1 py-0.5 shadow-md border border-gray-200 flex items-center justify-center gap-0.5"><svg class="w-2.5 h-2.5 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg><span class="text-[6px] font-black text-brand-black">${getProp(subIn, 'menit')}'</span></div>`; }
+                    if (subOut) { eventIcons += `<div class="bg-white/90 backdrop-blur-sm rounded px-1 py-0.5 shadow-md border border-gray-200 flex items-center justify-center gap-0.5"><svg class="w-2.5 h-2.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path></svg></div>`; }
+                    if (subIn) { eventIcons += `<div class="bg-white/90 backdrop-blur-sm rounded px-1 py-0.5 shadow-md border border-gray-200 flex items-center justify-center gap-0.5"><svg class="w-2.5 h-2.5 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg></div>`; }
                     
                     let animDelay = idx * 60; let animClass = isAway ? 'slide-right-anim' : 'slide-left-anim';
 
@@ -3778,14 +3803,11 @@
                     }
                 });
                 
-                // 2. RENDER ABSEN (CEDERA & SKORSING BISA DI KLIK)
                 const renderAbsence = (aArr, iconHtml, label) => {
                     if(aArr.length === 0) return;
                     h += `<div class="bg-gray-100 dark:bg-gray-800 border-y border-gray-200 dark:border-gray-700 px-2 py-1.5 text-[8px] font-bold text-gray-500 uppercase tracking-widest text-center shadow-inner flex items-center justify-center gap-1.5">${iconHtml} ${label}</div>`;
-                    
                     aArr.forEach(p => {
                         let nm = getProp(p,'nama'); let num = getProp(p,'nomor')||'-'; let f = getProp(p,'foto') ? getProp(p,'foto') : getAvatar(nm);
-                        // FIX: Tombol klik ditambahkan dan efek not-allowed dihapus
                         h += `<div onclick="bukaModalPemain('${safeStr(nm)}', '${safeStr(teamName)}')" class="flex items-center px-1.5 md:px-4 py-2 opacity-60 grayscale cursor-pointer hover:bg-gray-50 dark:hover:bg-brand-dark-bg transition-colors w-full ${!isAway ? '' : 'flex-row-reverse'}">
                                 <div class="w-4 md:w-6 text-center font-bold text-gray-400 text-[9px] md:text-xs shrink-0">${num}</div>
                                 <div class="relative w-7 h-7 md:w-10 md:h-10 rounded-full ring-2 ring-gray-400 p-0.5 shrink-0 mx-1.5 md:mx-2"><img src="${f}" class="w-full h-full rounded-full object-cover bg-white"></div>
