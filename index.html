@@ -3626,12 +3626,12 @@
         }
 
         // ==========================================
-        // MESIN RENDER LINEUP (FOTMOB ABSOLUTE CANVAS & MAX-FACE ENGINE)
+        // MESIN RENDER LINEUP (FOTMOB ICONS & ABSOLUTE CANVAS ENGINE)
         // ==========================================
         function renderPitchAndBench(tk, tn, dataKiri, dataKanan, lKiri, lKanan, matchEvents = []) {
             let container = document.getElementById('mm-pitch-players');
             
-            // Failsafe: Paksa container menggunakan mode absolut agar perhitungan X,Y tidak diganggu CSS Flexbox lama
+            // Failsafe: Paksa container absolut agar perhitungan X,Y sempurna
             container.className = "absolute inset-0 w-full h-full z-10";
 
             let infoHome = document.getElementById('mm-pitch-info-home'); 
@@ -3670,9 +3670,7 @@
             document.getElementById('mm-pitch-info-home').innerHTML = `<div class="flex items-center gap-2"><img src="${lKiri}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"> <span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tk}</span></div><div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fHomeRaw}</span></div>`;
             document.getElementById('mm-pitch-info-away').innerHTML = `<div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fAwayRaw}</span></div><div class="flex items-center gap-2"><span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tn}</span> <img src="${lKanan}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"></div>`;
 
-            // DATABASE KORDINAT SETENGAH LAPANGAN (Y = 0 s/d 100)
-            // Di mana 0 adalah Garis Gawang, dan 100 adalah Garis Tengah.
-            // Striker mentok di 84, menjamin tidak ada yang melewati batas suci garis tengah!
+            // KORDINAT SETENGAH LAPANGAN ABSOLUT (Striker mentok di 84)
             const FORMATIONS_MAPPING = {
                 '4-3-3': [{x:50, y:8}, {x:12, y:28}, {x:36, y:25}, {x:64, y:25}, {x:88, y:28}, {x:25, y:52}, {x:50, y:52}, {x:75, y:52}, {x:20, y:78}, {x:50, y:82}, {x:80, y:78}],
                 '4-2-3-1': [{x:50, y:8}, {x:12, y:28}, {x:36, y:25}, {x:64, y:25}, {x:88, y:28}, {x:35, y:46}, {x:65, y:46}, {x:18, y:65}, {x:50, y:65}, {x:82, y:65}, {x:50, y:84}],
@@ -3703,34 +3701,35 @@
                 let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
                 let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
 
-                // DYNAMIC BADGE INSET (Merapat, Menabrak Sebagian Wajah)
+                // DYNAMIC BADGE INSET (Desain Baru FotMob - Premium Icons)
                 let leftBadges = '';
-                if (goals > 0) { leftBadges += `<div class="flex items-center gap-0.5"><div class="w-4 h-4 bg-white rounded-full flex items-center justify-center border-[1.5px] border-gray-600 shadow-md text-[9px] leading-none text-black z-10">⚽</div>${goals>1?`<span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">x${goals}</span>`:''}</div>`; }
-                if (reds > 0) { leftBadges += `<div class="w-3 h-4 bg-brand-red border border-white rounded-[2px] shadow-md transform -rotate-6 mt-0.5 z-10"></div>`; } 
-                else if (yellows > 0) { leftBadges += `<div class="w-3 h-4 bg-yellow-400 border border-white rounded-[2px] shadow-md transform -rotate-6 mt-0.5 z-10"></div>`; }
+                if (goals > 0) { 
+                    leftBadges += `<div class="flex items-center flex-row-reverse gap-0.5"><div class="w-4 h-4 bg-gradient-to-br from-gray-100 to-gray-300 rounded-full flex items-center justify-center border border-gray-500 shadow-[0_2px_5px_rgba(0,0,0,0.8)] z-10"><svg class="w-2.5 h-2.5 text-gray-900" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 1022 12 10 10 0 0012 2Zm0 2a8 8 0 015.65 2.12l-2.6 2.37a3.86 3.86 0 00-6.1 0L6.35 6.12A8 8 0 0112 4ZM5.23 8.35l3.22 1.62a3.88 3.88 0 000 4.06L5.23 15.65A8 8 0 015.23 8.35Zm2.12 9.3l2.6-2.37a3.86 3.86 0 006.1 0l2.6 2.37A8 8 0 017.35 17.65Zm11.42-2l-3.22-1.62a3.88 3.88 0 000-4.06l3.22-1.62A8 8 0 0118.77 15.65Z"/></svg></div>${goals>1?`<span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">x${goals}</span>`:''}</div>`; 
+                }
+                if (reds > 0) { leftBadges += `<div class="w-2.5 h-3.5 bg-[#ef4444] border-[1.5px] border-white rounded-[2px] shadow-[0_2px_4px_rgba(0,0,0,0.8)] transform rotate-6 mt-0.5 z-10"></div>`; } 
+                else if (yellows > 0) { leftBadges += `<div class="w-2.5 h-3.5 bg-[#eab308] border-[1.5px] border-white rounded-[2px] shadow-[0_2px_4px_rgba(0,0,0,0.8)] transform rotate-6 mt-0.5 z-10"></div>`; }
 
                 let rightBadges = '';
-                if (subOut) { rightBadges += `<div class="flex items-center gap-0.5"><span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${getProp(subOut, 'menit')}'</span><div class="w-4.5 h-4.5 bg-brand-red rounded-full flex items-center justify-center border-[1.5px] border-brand-panel shadow-md z-10"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 12H5M12 19l-7-7 7-7"/></svg></div></div>`; }
-                if (subIn) { rightBadges += `<div class="flex items-center gap-0.5"><span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${getProp(subIn, 'menit')}'</span><div class="w-4.5 h-4.5 bg-brand-green rounded-full flex items-center justify-center border-[1.5px] border-brand-panel shadow-md z-10"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>`; }
+                // Panah Merah Keluar (Sub Out)
+                if (subOut) { rightBadges += `<div class="flex items-center gap-0.5"><span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${getProp(subOut, 'menit')}'</span><div class="w-4 h-4 bg-[#2a2a2a] rounded-full flex items-center justify-center border border-gray-500 shadow-[0_2px_5px_rgba(0,0,0,0.8)] z-10"><svg class="w-2.5 h-2.5 text-[#ef4444]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></div></div>`; }
+                // Panah Hijau Masuk (Sub In)
+                if (subIn) { rightBadges += `<div class="flex items-center gap-0.5"><span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${getProp(subIn, 'menit')}'</span><div class="w-4 h-4 bg-[#2a2a2a] rounded-full flex items-center justify-center border border-gray-500 shadow-[0_2px_5px_rgba(0,0,0,0.8)] z-10"><svg class="w-2.5 h-2.5 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></div></div>`; }
                 
-                // RUMUS MATEMATIKA ANTI-TABRAKAN
-                // Home menyerang ke Bawah. Away menyerang ke Atas. 
-                // Lapangan dikunci dalam hitungan Absolut (0 - 100%)
                 let posX = isAway ? (100 - slotDef.x) : slotDef.x; 
                 let absY = isAway ? (100 - (slotDef.y / 2)) : (slotDef.y / 2);
                 let posStyle = `top: ${absY}%; left: ${posX}%;`;
                 let animDelay = idx * 50;
 
-                // FOTMOB BIG FACE DESIGN (Ukuran Wajah Di-Boost Maksimal: w-[56px])
+                // FOTMOB BIG FACE DESIGN (Ukuran Wajah Maksimal: w-[56px] - w-20)
                 return `
                 <div class="absolute" style="${posStyle} transform: translate(-50%, -50%); z-index: 10;" onclick="bukaModalPemain('${safeStr(pData ? getProp(pData,'nama') : nm)}', '${safeStr(teamName)}')">
                     <div class="flex flex-col items-center w-[68px] sm:w-[80px] md:w-[100px] pitch-player-anim cursor-pointer group hover:scale-110 transition-transform" style="animation-delay: ${animDelay}ms;">
                         
                         <div class="relative w-[56px] h-[56px] sm:w-16 sm:h-16 md:w-20 md:h-20 mb-1">
-                            ${leftBadges !== '' ? `<div class="absolute -top-1.5 -left-1.5 flex flex-col gap-1 z-20 items-start">${leftBadges}</div>` : ''}
-                            ${rightBadges !== '' ? `<div class="absolute -top-1.5 -right-1.5 flex flex-col gap-1 z-20 items-end">${rightBadges}</div>` : ''}
+                            ${leftBadges !== '' ? `<div class="absolute -top-1 -left-1 flex flex-col gap-1 z-20 items-start">${leftBadges}</div>` : ''}
+                            ${rightBadges !== '' ? `<div class="absolute -top-1 -right-1 flex flex-col gap-1 z-20 items-end">${rightBadges}</div>` : ''}
                             
-                            <div class="w-full h-full rounded-full border-[2px] border-white/60 shadow-[0_5px_15px_rgba(0,0,0,0.8)] overflow-hidden bg-brand-panel">
+                            <div class="w-full h-full rounded-full border-2 border-white/60 shadow-[0_5px_15px_rgba(0,0,0,0.8)] overflow-hidden bg-brand-panel">
                                 <img src="${f}" class="w-full h-full object-cover">
                             </div>
                         </div>
@@ -3745,7 +3744,6 @@
                 </div>`;
             };
 
-            // INJEKSI ABSOLUT KEDALAM SATU KANVAS BERSAMA (Full 100% Pitch)
             container.innerHTML = `
                 ${homeNames.map((nm, i) => createPlayerNode(nm, tk, false, fH[i] || fH[fH.length-1], i)).join('')}
                 ${awayNames.map((nm, i) => createPlayerNode(nm, tn, true, fA[i] || fA[fA.length-1], i)).join('')}
@@ -3773,15 +3771,15 @@
                     let nm = getProp(p,'nama'); let nmLower = nm ? nm.toLowerCase().trim() : '';
                     let num = getProp(p,'nomor')||'-'; let f = getProp(p,'foto') ? getProp(p,'foto') : getAvatar(nm);
                     let pos = getProp(p,'posisi')||'POS';
-                    let ringColor = isAway ? 'ring-red-500/50 dark:ring-red-400/50' : 'ring-blue-500/50 dark:ring-blue-400/50';
+                    let ringColor = isAway ? 'ring-[#ef4444]/50' : 'ring-[#3b82f6]/50';
 
                     let pEvents = matchEvents.filter(ev => String(getProp(ev, 'pemain')).toLowerCase().trim() === nmLower && String(getProp(ev, 'tim')).toLowerCase().trim() === tLower);
                     let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
                     let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
 
                     let eventIcons = '';
-                    if (subOut) { eventIcons += `<div class="bg-white/90 backdrop-blur-sm rounded px-1 py-0.5 shadow-md border border-gray-200 flex items-center justify-center gap-0.5"><svg class="w-2.5 h-2.5 text-brand-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 12H5M12 19l-7-7 7-7"/></svg></div>`; }
-                    if (subIn) { eventIcons += `<div class="bg-white/90 backdrop-blur-sm rounded px-1 py-0.5 shadow-md border border-gray-200 flex items-center justify-center gap-0.5"><svg class="w-2.5 h-2.5 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 12h14M12 5l7 7-7 7"/></svg></div>`; }
+                    if (subOut) { eventIcons += `<div class="bg-[#2a2a2a] rounded-full px-1.5 py-0.5 shadow-md border border-gray-600 flex items-center justify-center gap-1"><svg class="w-2.5 h-2.5 text-[#ef4444]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg><span class="text-[7px] font-black text-white">${getProp(subOut, 'menit')}'</span></div>`; }
+                    if (subIn) { eventIcons += `<div class="bg-[#2a2a2a] rounded-full px-1.5 py-0.5 shadow-md border border-gray-600 flex items-center justify-center gap-1"><svg class="w-2.5 h-2.5 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg><span class="text-[7px] font-black text-white">${getProp(subIn, 'menit')}'</span></div>`; }
                     
                     let animDelay = idx * 60; let animClass = isAway ? 'slide-right-anim' : 'slide-left-anim';
 
