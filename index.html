@@ -3626,10 +3626,14 @@
         }
 
         // ==========================================
-        // MESIN RENDER LINEUP (FOTMOB STRICT BOUNDARY & ANTI-COLLISION ENGINE)
+        // MESIN RENDER LINEUP (FOTMOB ABSOLUTE CANVAS & MAX-FACE ENGINE)
         // ==========================================
         function renderPitchAndBench(tk, tn, dataKiri, dataKanan, lKiri, lKanan, matchEvents = []) {
             let container = document.getElementById('mm-pitch-players');
+            
+            // Failsafe: Paksa container menggunakan mode absolut agar perhitungan X,Y tidak diganggu CSS Flexbox lama
+            container.className = "absolute inset-0 w-full h-full z-10";
+
             let infoHome = document.getElementById('mm-pitch-info-home'); 
             let infoAway = document.getElementById('mm-pitch-info-away');
             let bKiri = document.getElementById('mm-bench-kiri'); 
@@ -3666,17 +3670,15 @@
             document.getElementById('mm-pitch-info-home').innerHTML = `<div class="flex items-center gap-2"><img src="${lKiri}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"> <span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tk}</span></div><div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fHomeRaw}</span></div>`;
             document.getElementById('mm-pitch-info-away').innerHTML = `<div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fAwayRaw}</span></div><div class="flex items-center gap-2"><span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tn}</span> <img src="${lKanan}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"></div>`;
 
-            // KALIBRASI ZONA AMAN (DMZ) - Jarak Maksimal ke Tengah (Y) adalah 74%. 
-            // Posisi X juga direnggangkan agar 4 Bek tidak saling tabrak bahu.
+            // DATABASE KORDINAT SETENGAH LAPANGAN (Y = 0 s/d 100)
+            // Di mana 0 adalah Garis Gawang, dan 100 adalah Garis Tengah.
+            // Striker mentok di 84, menjamin tidak ada yang melewati batas suci garis tengah!
             const FORMATIONS_MAPPING = {
-                // Formasi 4 Baris (Longgar & Lega)
-                '4-3-3': [{x:50, y:12}, {x:15, y:30}, {x:38, y:32}, {x:62, y:32}, {x:85, y:30}, {x:50, y:50}, {x:25, y:52}, {x:75, y:52}, {x:20, y:72}, {x:80, y:72}, {x:50, y:74}],
-                '4-4-2': [{x:50, y:12}, {x:15, y:30}, {x:38, y:32}, {x:62, y:32}, {x:85, y:30}, {x:15, y:54}, {x:38, y:52}, {x:62, y:52}, {x:85, y:54}, {x:35, y:74}, {x:65, y:74}],
-                '3-5-2': [{x:50, y:12}, {x:25, y:32}, {x:50, y:30}, {x:75, y:32}, {x:12, y:54}, {x:32, y:52}, {x:50, y:56}, {x:68, y:52}, {x:88, y:54}, {x:35, y:74}, {x:65, y:74}],
-                
-                // Formasi 5 Baris (Dikondensasi agar 5 lapis muat tanpa melewati Y: 74%)
-                '4-2-3-1': [{x:50, y:10}, {x:15, y:26}, {x:38, y:28}, {x:62, y:28}, {x:85, y:26}, {x:35, y:42}, {x:65, y:42}, {x:18, y:58}, {x:50, y:60}, {x:82, y:58}, {x:50, y:74}],
-                '4-3-2-1': [{x:50, y:10}, {x:15, y:26}, {x:38, y:28}, {x:62, y:28}, {x:85, y:26}, {x:22, y:42}, {x:50, y:44}, {x:78, y:42}, {x:35, y:58}, {x:65, y:58}, {x:50, y:74}]
+                '4-3-3': [{x:50, y:8}, {x:12, y:28}, {x:36, y:25}, {x:64, y:25}, {x:88, y:28}, {x:25, y:52}, {x:50, y:52}, {x:75, y:52}, {x:20, y:78}, {x:50, y:82}, {x:80, y:78}],
+                '4-2-3-1': [{x:50, y:8}, {x:12, y:28}, {x:36, y:25}, {x:64, y:25}, {x:88, y:28}, {x:35, y:46}, {x:65, y:46}, {x:18, y:65}, {x:50, y:65}, {x:82, y:65}, {x:50, y:84}],
+                '4-4-2': [{x:50, y:8}, {x:12, y:28}, {x:36, y:25}, {x:64, y:25}, {x:88, y:28}, {x:15, y:55}, {x:38, y:55}, {x:62, y:55}, {x:85, y:55}, {x:35, y:80}, {x:65, y:80}],
+                '3-5-2': [{x:50, y:8}, {x:25, y:25}, {x:50, y:25}, {x:75, y:25}, {x:12, y:50}, {x:35, y:48}, {x:50, y:55}, {x:65, y:48}, {x:88, y:50}, {x:35, y:80}, {x:65, y:80}],
+                '4-3-2-1': [{x:50, y:8}, {x:12, y:25}, {x:36, y:22}, {x:64, y:22}, {x:88, y:25}, {x:22, y:42}, {x:50, y:44}, {x:78, y:42}, {x:35, y:62}, {x:65, y:62}, {x:50, y:84}]
             };
 
             let homeNames = pHomeRaw ? pHomeRaw.split(',').map(s=>s.trim()) : new Array(11).fill('');
@@ -3701,39 +3703,41 @@
                 let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
                 let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
 
-                // BADGE INSET (Digeser lebih keluar dari wajah agar informasi tak tertutup penuh)
+                // DYNAMIC BADGE INSET (Merapat, Menabrak Sebagian Wajah)
                 let leftBadges = '';
-                if (goals > 0) { leftBadges += `<div class="flex items-center flex-row-reverse gap-0.5"><div class="w-4 h-4 bg-white rounded-full flex items-center justify-center border-[1.5px] border-gray-600 shadow-md text-[9px] leading-none text-black z-10">⚽</div>${goals>1?`<span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">x${goals}</span>`:''}</div>`; }
-                if (reds > 0) { leftBadges += `<div class="w-3 h-4 bg-brand-red border border-white rounded-[2px] shadow-md transform rotate-6 mt-0.5 z-10"></div>`; } 
-                else if (yellows > 0) { leftBadges += `<div class="w-3 h-4 bg-yellow-400 border border-white rounded-[2px] shadow-md transform rotate-6 mt-0.5 z-10"></div>`; }
+                if (goals > 0) { leftBadges += `<div class="flex items-center gap-0.5"><div class="w-4 h-4 bg-white rounded-full flex items-center justify-center border-[1.5px] border-gray-600 shadow-md text-[9px] leading-none text-black z-10">⚽</div>${goals>1?`<span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">x${goals}</span>`:''}</div>`; }
+                if (reds > 0) { leftBadges += `<div class="w-3 h-4 bg-brand-red border border-white rounded-[2px] shadow-md transform -rotate-6 mt-0.5 z-10"></div>`; } 
+                else if (yellows > 0) { leftBadges += `<div class="w-3 h-4 bg-yellow-400 border border-white rounded-[2px] shadow-md transform -rotate-6 mt-0.5 z-10"></div>`; }
 
                 let rightBadges = '';
-                if (subOut) { rightBadges += `<div class="flex items-center gap-0.5"><span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${getProp(subOut, 'menit')}'</span><div class="w-4 h-4 bg-brand-red rounded-full flex items-center justify-center border-[1.5px] border-brand-panel shadow-md z-10"><svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 12H5M12 19l-7-7 7-7"/></svg></div></div>`; }
-                if (subIn) { rightBadges += `<div class="flex items-center gap-0.5"><span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${getProp(subIn, 'menit')}'</span><div class="w-4 h-4 bg-brand-green rounded-full flex items-center justify-center border-[1.5px] border-brand-panel shadow-md z-10"><svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>`; }
+                if (subOut) { rightBadges += `<div class="flex items-center gap-0.5"><span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${getProp(subOut, 'menit')}'</span><div class="w-4.5 h-4.5 bg-brand-red rounded-full flex items-center justify-center border-[1.5px] border-brand-panel shadow-md z-10"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 12H5M12 19l-7-7 7-7"/></svg></div></div>`; }
+                if (subIn) { rightBadges += `<div class="flex items-center gap-0.5"><span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${getProp(subIn, 'menit')}'</span><div class="w-4.5 h-4.5 bg-brand-green rounded-full flex items-center justify-center border-[1.5px] border-brand-panel shadow-md z-10"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 12h14M12 5l7 7-7 7"/></svg></div></div>`; }
                 
-                // KALKULASI KORDINAT STRICT BOUNDARY
+                // RUMUS MATEMATIKA ANTI-TABRAKAN
+                // Home menyerang ke Bawah. Away menyerang ke Atas. 
+                // Lapangan dikunci dalam hitungan Absolut (0 - 100%)
                 let posX = isAway ? (100 - slotDef.x) : slotDef.x; 
-                let posY = slotDef.y;
-                let posStyle = isAway ? `bottom: ${posY}%; left: ${posX}%;` : `top: ${posY}%; left: ${posX}%;`;
+                let absY = isAway ? (100 - (slotDef.y / 2)) : (slotDef.y / 2);
+                let posStyle = `top: ${absY}%; left: ${posX}%;`;
                 let animDelay = idx * 50;
 
-                // FIX HORIZONTAL COLLISION: Lebar kontainer dibatasi ke w-[64px] di HP
+                // FOTMOB BIG FACE DESIGN (Ukuran Wajah Di-Boost Maksimal: w-[56px])
                 return `
                 <div class="absolute" style="${posStyle} transform: translate(-50%, -50%); z-index: 10;" onclick="bukaModalPemain('${safeStr(pData ? getProp(pData,'nama') : nm)}', '${safeStr(teamName)}')">
-                    <div class="flex flex-col items-center w-[64px] sm:w-[85px] md:w-[100px] pitch-player-anim cursor-pointer group hover:scale-110 transition-transform" style="animation-delay: ${animDelay}ms;">
+                    <div class="flex flex-col items-center w-[68px] sm:w-[80px] md:w-[100px] pitch-player-anim cursor-pointer group hover:scale-110 transition-transform" style="animation-delay: ${animDelay}ms;">
                         
-                        <div class="relative w-11 h-11 sm:w-14 sm:h-14 md:w-16 md:h-16 mb-1">
-                            ${leftBadges !== '' ? `<div class="absolute -top-1.5 -right-1 flex flex-col gap-1 z-20 items-end">${leftBadges}</div>` : ''}
-                            ${rightBadges !== '' ? `<div class="absolute -top-1.5 -left-1 flex flex-col gap-1 z-20 items-start">${rightBadges}</div>` : ''}
+                        <div class="relative w-[56px] h-[56px] sm:w-16 sm:h-16 md:w-20 md:h-20 mb-1">
+                            ${leftBadges !== '' ? `<div class="absolute -top-1.5 -left-1.5 flex flex-col gap-1 z-20 items-start">${leftBadges}</div>` : ''}
+                            ${rightBadges !== '' ? `<div class="absolute -top-1.5 -right-1.5 flex flex-col gap-1 z-20 items-end">${rightBadges}</div>` : ''}
                             
-                            <div class="w-full h-full rounded-full border-[1.5px] border-white/50 shadow-[0_5px_15px_rgba(0,0,0,0.8)] overflow-hidden bg-brand-panel">
+                            <div class="w-full h-full rounded-full border-[2px] border-white/60 shadow-[0_5px_15px_rgba(0,0,0,0.8)] overflow-hidden bg-brand-panel">
                                 <img src="${f}" class="w-full h-full object-cover">
                             </div>
                         </div>
                         
                         <div class="text-center w-full relative z-20">
-                            <span class="text-[9px] md:text-[11px] font-bold text-white tracking-tight truncate block w-full drop-shadow-[0_2px_4px_rgba(0,0,0,1)] whitespace-nowrap">
-                                <span class="text-gray-300 font-medium mr-0.5">${num}</span>${short}
+                            <span class="text-[9px] sm:text-[10px] md:text-[12px] font-black text-white tracking-tight truncate block w-full drop-shadow-[0_2px_4px_rgba(0,0,0,1)] whitespace-nowrap">
+                                <span class="text-gray-300 font-bold mr-0.5">${num}</span>${short}
                             </span>
                         </div>
 
@@ -3741,14 +3745,10 @@
                 </div>`;
             };
 
-            // PEMISAHAN WADAH SECARA FISIK (Home & Away tidak akan pernah bercampur)
+            // INJEKSI ABSOLUT KEDALAM SATU KANVAS BERSAMA (Full 100% Pitch)
             container.innerHTML = `
-                <div class="relative w-full h-1/2 z-10 border-b-[1.5px] border-white/10">
-                    ${homeNames.map((nm, i) => createPlayerNode(nm, tk, false, fH[i] || fH[fH.length-1], i)).join('')}
-                </div>
-                <div class="relative w-full h-1/2 z-10 border-t-[1.5px] border-white/10">
-                    ${awayNames.map((nm, i) => createPlayerNode(nm, tn, true, fA[i] || fA[fA.length-1], i)).join('')}
-                </div>
+                ${homeNames.map((nm, i) => createPlayerNode(nm, tk, false, fH[i] || fH[fH.length-1], i)).join('')}
+                ${awayNames.map((nm, i) => createPlayerNode(nm, tn, true, fA[i] || fA[fA.length-1], i)).join('')}
             `;
 
             // ===============================================
