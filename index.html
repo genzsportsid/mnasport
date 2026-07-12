@@ -3626,7 +3626,7 @@
         }
 
         // ==========================================
-        // MESIN RENDER LINEUP & BENCH (EXPLICIT ROSTER & INJURY SYSTEM)
+        // MESIN RENDER LINEUP & BENCH (FIX: ABSOLUTE PRECISION & CLICKABLE INJURY)
         // ==========================================
         function renderPitchAndBench(tk, tn, dataKiri, dataKanan, lKiri, lKanan, matchEvents = []) {
             let container = document.getElementById('mm-pitch-players');
@@ -3641,8 +3641,8 @@
             const autoFetchCoach = (teamName, dLineup) => {
                 let coachNm = getProp(dLineup, 'pelatih'); let coachFt = getProp(dLineup, 'foto_pelatih');
                 if (!coachNm || coachNm.trim() === '' || coachNm.trim() === '-') {
-                    let coachDb = (rawData.Pemain||[]).find(x => String(getProp(x,'tim')).toLowerCase().trim() === teamName.toLowerCase().trim() && ['PELATIH','COACH','HEADCOACH','MANAGER'].includes(String(getProp(x,'posisi')).toUpperCase().replace(/\s+/g,'')));
-                    if (coachDb) { coachNm = getProp(coachDb, 'nama'); coachFt = getProp(coachDb, 'foto'); }
+                    let coachDb = (rawData.Pelatih||[]).find(x => String(getProp(x,'tim')).toLowerCase().trim() === teamName.toLowerCase().trim());
+                    if (coachDb) { coachNm = getProp(coachDb, 'nama_pelatih') || getProp(coachDb, 'nama'); coachFt = getProp(coachDb, 'foto'); }
                 }
                 let finalName = coachNm && coachNm.trim() !== '' ? coachNm : '-';
                 return { nama: finalName, foto: coachFt && coachFt.trim() !== '' ? coachFt : getAvatar(finalName) };
@@ -3666,27 +3666,17 @@
             document.getElementById('mm-pitch-info-home').innerHTML = `<div class="flex items-center gap-2"><img src="${lKiri}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"> <span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tk}</span></div><div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fHomeRaw}</span></div>`;
             document.getElementById('mm-pitch-info-away').innerHTML = `<div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fAwayRaw}</span></div><div class="flex items-center gap-2"><span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tn}</span> <img src="${lKanan}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"></div>`;
 
-            let homeNames = pHomeRaw ? pHomeRaw.split(',').map(s=>s.trim()) : []; let awayNames = pAwayRaw ? pAwayRaw.split(',').map(s=>s.trim()) : [];
+            // FIX: Pertahankan urutan absolut dari koma tanpa membuang slot kosong, matikan Auto-Sort!
+            let homeNames = pHomeRaw ? pHomeRaw.split(',').map(s=>s.trim()) : new Array(11).fill('');
+            let awayNames = pAwayRaw ? pAwayRaw.split(',').map(s=>s.trim()) : new Array(11).fill('');
+
             let htmlPitch = '';
-
-            const sortLineupByPosition = (names, teamName, isTopTeam) => {
-                const posWeights = { 'GK': [1,2], 'KIPER': [1,2], 'LB': [2,1], 'LWB': [2,1], 'CB': [2,2], 'DEF': [2,2], 'BEK': [2,2], 'RB': [2,3], 'RWB': [2,3], 'LM': [3,1], 'CM': [3,2], 'CDM': [3,2], 'CAM': [3,2], 'MID': [3,2], 'TENGAH': [3,2], 'RM': [3,3], 'LW': [4,1], 'LF': [4,1], 'ST': [4,2], 'CF': [4,2], 'SS': [4,2], 'FWD': [4,2], 'DEPAN': [4,2], 'RW': [4,3], 'RF': [4,3] };
-                return names.sort((a, b) => {
-                    let pA = (rawData.Pemain||[]).find(x => String(getProp(x,'nama')).toLowerCase().trim() === a.toLowerCase().trim() && String(getProp(x,'tim')).toLowerCase().trim() === teamName.toLowerCase().trim());
-                    let pB = (rawData.Pemain||[]).find(x => String(getProp(x,'nama')).toLowerCase().trim() === b.toLowerCase().trim() && String(getProp(x,'tim')).toLowerCase().trim() === teamName.toLowerCase().trim());
-                    let posA = pA ? String(getProp(pA,'posisi')).toUpperCase().replace(/\s+/g, '') : ''; let posB = pB ? String(getProp(pB,'posisi')).toUpperCase().replace(/\s+/g, '') : '';
-                    let wA = posWeights[posA] || [5, 2]; let wB = posWeights[posB] || [5, 2];
-                    if (wA[0] !== wB[0]) return wA[0] - wB[0];
-                    if (isTopTeam) return wB[1] - wA[1]; else return wA[1] - wB[1];
-                });
-            };
-
-            homeNames = sortLineupByPosition(homeNames, tk, true); awayNames = sortLineupByPosition(awayNames, tn, false); 
 
             const createRow = (names, teamName, isAway=false, rowIdx=0) => {
                 let h = `<div class="flex flex-row justify-around items-center w-full relative z-10 px-0 py-3 md:py-5">`;
                 names.forEach((nm, idx) => {
-                    let nmLower = nm ? nm.toLowerCase().trim() : ''; let tLower = teamName ? teamName.toLowerCase().trim() : '';
+                    if(!nm) { h += `<div class="w-[18%] max-w-[85px] md:max-w-[110px]"></div>`; return; } // Render slot kosong jika tidak ada pemain
+                    let nmLower = nm.toLowerCase().trim(); let tLower = teamName.toLowerCase().trim();
                     let pData = (rawData.Pemain||[]).find(x => String(getProp(x,'nama')).toLowerCase().trim() === nmLower && String(getProp(x,'tim')).toLowerCase().trim() === tLower);
                     let f = (pData && getProp(pData,'foto')) ? getProp(pData,'foto') : getAvatar(nm);
                     let num = (pData && getProp(pData,'nomor') != null) ? getProp(pData,'nomor') : '-'; 
@@ -3737,24 +3727,18 @@
                 if(!commaString || commaString.trim() === '') return [];
                 let names = String(commaString).split(',').map(s=>s.trim().toLowerCase());
                 let allPlayers = (rawData.Pemain||[]).filter(x => String(getProp(x,'tim')).toLowerCase() === String(teamName).toLowerCase());
-                return allPlayers.filter(x => names.includes(String(getProp(x,'nama')).toLowerCase()));
+                // FIX: Sensor Super Kuat mengamankan semua ejaan nama
+                return allPlayers.filter(x => names.includes(String(getProp(x,'nama')).toLowerCase().trim()));
             };
 
-            // Baca langsung dari Google Sheets (bukan hasil hitungan tebakan!)
-            let benchKiri = parseNamesToList(tk, getProp(dataKiri, 'bench')); 
-            let benchKanan = parseNamesToList(tn, getProp(dataKanan, 'bench'));
-            
-            let cederaKiri = parseNamesToList(tk, getProp(dataKiri, 'cedera'));
-            let cederaKanan = parseNamesToList(tn, getProp(dataKanan, 'cedera'));
-            
-            let skorsKiri = parseNamesToList(tk, getProp(dataKiri, 'skorsing'));
-            let skorsKanan = parseNamesToList(tn, getProp(dataKanan, 'skorsing'));
+            let benchKiri = parseNamesToList(tk, getProp(dataKiri, 'bench')); let benchKanan = parseNamesToList(tn, getProp(dataKanan, 'bench'));
+            let cederaKiri = parseNamesToList(tk, getProp(dataKiri, 'cedera')); let cederaKanan = parseNamesToList(tn, getProp(dataKanan, 'cedera'));
+            let skorsKiri = parseNamesToList(tk, getProp(dataKiri, 'skorsing')); let skorsKanan = parseNamesToList(tn, getProp(dataKanan, 'skorsing'));
 
             const renderBench = (bArr, cArr, sArr, isAway, teamName) => {
                 if(bArr.length===0 && cArr.length===0 && sArr.length===0) return '<div class="text-[9px] text-gray-400 italic text-center py-4 w-full">Data kosong</div>';
                 let h=''; let tLower = teamName ? teamName.toLowerCase().trim() : '';
                 
-                // 1. RENDER CADANGAN
                 bArr.forEach((p, idx) => {
                     let nm = getProp(p,'nama'); let nmLower = nm ? nm.toLowerCase().trim() : '';
                     let num = getProp(p,'nomor')||'-'; let f = getProp(p,'foto') ? getProp(p,'foto') : getAvatar(nm);
@@ -3794,39 +3778,30 @@
                     }
                 });
                 
-                // 2. RENDER ABSEN (CEDERA & SKORSING) DI BAWAH BENCH
+                // 2. RENDER ABSEN (CEDERA & SKORSING BISA DI KLIK)
                 const renderAbsence = (aArr, iconHtml, label) => {
                     if(aArr.length === 0) return;
                     h += `<div class="bg-gray-100 dark:bg-gray-800 border-y border-gray-200 dark:border-gray-700 px-2 py-1.5 text-[8px] font-bold text-gray-500 uppercase tracking-widest text-center shadow-inner flex items-center justify-center gap-1.5">${iconHtml} ${label}</div>`;
                     
                     aArr.forEach(p => {
                         let nm = getProp(p,'nama'); let num = getProp(p,'nomor')||'-'; let f = getProp(p,'foto') ? getProp(p,'foto') : getAvatar(nm);
-                        if (!isAway) {
-                            h += `<div class="flex items-center px-1.5 md:px-4 py-2 opacity-60 grayscale cursor-not-allowed w-full">
-                                    <div class="w-4 md:w-6 text-center font-bold text-gray-400 text-[9px] md:text-xs shrink-0">${num}</div>
-                                    <div class="relative w-7 h-7 md:w-10 md:h-10 rounded-full ring-2 ring-gray-400 p-0.5 shrink-0 mx-1.5 md:mx-2"><img src="${f}" class="w-full h-full rounded-full object-cover bg-white"></div>
-                                    <div class="flex-1 flex flex-col justify-center overflow-hidden text-left"><span class="font-bold text-[8px] md:text-[11px] uppercase text-gray-600 truncate">${nm}</span><span class="text-[7px] md:text-[9px] font-bold text-gray-400 mt-[1px] tracking-widest truncate line-through">Absen</span></div>
-                                  </div>`;
-                        } else {
-                            h += `<div class="flex items-center px-1.5 md:px-4 py-2 opacity-60 grayscale cursor-not-allowed w-full flex-row-reverse">
-                                    <div class="w-4 md:w-6 text-center font-bold text-gray-400 text-[9px] md:text-xs shrink-0">${num}</div>
-                                    <div class="relative w-7 h-7 md:w-10 md:h-10 rounded-full ring-2 ring-gray-400 p-0.5 shrink-0 mx-1.5 md:mx-2"><img src="${f}" class="w-full h-full rounded-full object-cover bg-white"></div>
-                                    <div class="flex-1 flex flex-col justify-center items-end overflow-hidden text-right"><span class="font-bold text-[8px] md:text-[11px] uppercase text-gray-600 truncate">${nm}</span><span class="text-[7px] md:text-[9px] font-bold text-gray-400 mt-[1px] tracking-widest truncate w-full line-through">Absen</span></div>
-                                  </div>`;
-                        }
+                        // FIX: Tombol klik ditambahkan dan efek not-allowed dihapus
+                        h += `<div onclick="bukaModalPemain('${safeStr(nm)}', '${safeStr(teamName)}')" class="flex items-center px-1.5 md:px-4 py-2 opacity-60 grayscale cursor-pointer hover:bg-gray-50 dark:hover:bg-brand-dark-bg transition-colors w-full ${!isAway ? '' : 'flex-row-reverse'}">
+                                <div class="w-4 md:w-6 text-center font-bold text-gray-400 text-[9px] md:text-xs shrink-0">${num}</div>
+                                <div class="relative w-7 h-7 md:w-10 md:h-10 rounded-full ring-2 ring-gray-400 p-0.5 shrink-0 mx-1.5 md:mx-2"><img src="${f}" class="w-full h-full rounded-full object-cover bg-white"></div>
+                                <div class="flex-1 flex flex-col justify-center overflow-hidden ${!isAway ? 'text-left' : 'items-end text-right'}"><span class="font-bold text-[8px] md:text-[11px] uppercase text-gray-600 truncate">${nm}</span><span class="text-[7px] md:text-[9px] font-bold text-gray-400 mt-[1px] tracking-widest truncate w-full line-through">Absen</span></div>
+                              </div>`;
                     });
                 };
                 
-                renderAbsence(cArr, '🚑', 'Cedera');
-                renderAbsence(sArr, '🟥', 'Skorsing / Akumulasi');
-
+                renderAbsence(cArr, '🚑', 'Cedera'); renderAbsence(sArr, '🟥', 'Skorsing / Akumulasi');
                 return h;
             };
             
             bKiri.innerHTML = renderBench(benchKiri, cederaKiri, skorsKiri, false, tk); 
             bKanan.innerHTML = renderBench(benchKanan, cederaKanan, skorsKanan, true, tn);
         }
-
+            
         // PULL TO REFRESH
         let ptrStartY = 0; let ptrCurrentY = 0; let ptrPulling = false; 
         const ptrThreshold = 70; 
