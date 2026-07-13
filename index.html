@@ -3705,23 +3705,25 @@
                 let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
                 let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
 
-                // 1. KIRI ATAS: SUB IN / SUB OUT
+                // 1. KIRI ATAS: SUB IN / SUB OUT (Panah tebal dengan menit di atasnya)
                 let topLeftBadges = '';
-                if (subOut) { topLeftBadges += `<div class="flex items-center flex-row-reverse gap-0.5"><div class="w-4.5 h-4.5 bg-[#ef4444] rounded-full flex items-center justify-center border-[1.5px] border-brand-panel shadow-md z-10"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></div><span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${getProp(subOut, 'menit')}'</span></div>`; }
-                if (subIn) { topLeftBadges += `<div class="flex items-center flex-row-reverse gap-0.5"><div class="w-4.5 h-4.5 bg-[#4ade80] rounded-full flex items-center justify-center border-[1.5px] border-brand-panel shadow-md z-10"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></div><span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${getProp(subIn, 'menit')}'</span></div>`; }
+                if (subOut) { topLeftBadges += `<div class="flex flex-col items-center"><span class="text-[11px] font-black text-white drop-shadow-[0_2px_2px_rgba(0,0,0,1)] leading-none mb-[2px]">${getProp(subOut, 'menit')}'</span><div class="w-[22px] h-[22px] bg-[#ef4444] rounded-full flex items-center justify-center border-2 border-white shadow-[0_2px_5px_rgba(0,0,0,0.9)] z-10"><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></div></div>`; }
+                if (subIn) { topLeftBadges += `<div class="flex flex-col items-center"><span class="text-[11px] font-black text-white drop-shadow-[0_2px_2px_rgba(0,0,0,1)] leading-none mb-[2px]">${getProp(subIn, 'menit')}'</span><div class="w-[22px] h-[22px] bg-[#4ade80] rounded-full flex items-center justify-center border-2 border-white shadow-[0_2px_5px_rgba(0,0,0,0.9)] z-10"><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></div></div>`; }
 
                 // 2. KIRI TENGAH: KARTU KUNING / MERAH
                 let midLeftBadges = '';
-                if (reds > 0) { midLeftBadges += `<div class="w-2.5 h-3.5 bg-[#ef4444] border-[1.5px] border-white rounded-[2px] shadow-[0_2px_4px_rgba(0,0,0,0.8)] transform -rotate-6 z-10"></div>`; } 
-                else if (yellows > 0) { midLeftBadges += `<div class="w-2.5 h-3.5 bg-[#eab308] border-[1.5px] border-white rounded-[2px] shadow-[0_2px_4px_rgba(0,0,0,0.8)] transform -rotate-6 z-10"></div>`; }
+                if (reds > 0) { midLeftBadges += `<div class="w-3.5 h-5 bg-[#ef4444] border-2 border-white rounded-[2px] shadow-[0_2px_4px_rgba(0,0,0,0.8)] transform -rotate-6 z-10"></div>`; } 
+                else if (yellows > 0) { midLeftBadges += `<div class="w-3.5 h-5 bg-[#eab308] border-2 border-white rounded-[2px] shadow-[0_2px_4px_rgba(0,0,0,0.8)] transform -rotate-6 z-10"></div>`; }
 
-                // 3. KIRI BAWAH: GOL (Deret Bola Numpuk)
+                // 3. KIRI BAWAH: GOL (Bola hitam tebal background putih solid, menumpuk jika > 1)
                 let bottomLeftBadges = '';
                 if (goals > 0) { 
                     let ballsHtml = '';
                     for(let i = 0; i < goals; i++) {
-                        let margin = i > 0 ? '-ml-1.5' : ''; 
-                        ballsHtml += `<div class="relative w-[15px] h-[15px] bg-white rounded-full flex items-center justify-center border-[1.5px] border-black shadow-[0_2px_4px_rgba(0,0,0,0.9)] ${margin}" style="z-index: ${10 + i}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-[9px] h-[9px] text-black"><path fill="currentColor" d="M256 0a256 256 0 1 0 0 512A256 256 0 1 0 256 0zM358.4 114.8l-40.4 55.4L256 124.9l-62.1 45.4-40.4-55.4C181.7 93.1 217.7 80 256 80s74.3 13.1 102.4 34.8zM122.9 146.4l34.5 47.3L135.1 262 67.2 249.4c-1.3-43.2 17.5-82.6 55.7-103zm-27.1 144.3L166.4 306l21.6 71.3-64.8 47.1C91.9 389.6 70.8 343 95.8 290.7zm160.2 141.3v-84.6l-67.4-49.2h134.7l-67.4 49.2v84.6c-48.4 0-92.4-19.6-124.3-51.3l62.1-45.2 62.1 45.2c-31.9 31.7-75.9 51.3-124.3 51.3zm133.1-42.9l-64.8-47.1 21.6-71.3 70.6-15.3c25 52.3 3.9 98.9-27.4 133.7zm28.6-175.7l-67.9 12.6-22.3-68.3 34.5-47.3c38.2 20.4 57 59.8 55.7 103zM256 160.8l56.8 41.5-21.7 66.8h-70.2l-21.7-66.8L256 160.8z"/></svg></div>`;
+                        let margin = i > 0 ? '-ml-2.5' : ''; // Membuat tumpukan overlap
+                        ballsHtml += `<div class="relative w-[22px] h-[22px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_5px_rgba(0,0,0,0.9)] ${margin}" style="z-index: ${10 + i}">
+                            <svg viewBox="0 0 512 512" class="w-[15px] h-[15px] text-[#111]"><path fill="currentColor" d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM362.4 122.9l-45.7 67.1-70.1 14.1-39.7-58.4 51.5-62.1c32.7-5.9 66.8-5.9 99.4 0l4.6 19.3zm-119.5 73l70.1-14.1 48 83-36.2 62.6-81.9 0-36.2-62.6 36.2-68.9zm-49.8 171.7l39.7 58.4-51.5 62.1c-32.7 5.9-66.8 5.9-99.4 0l-4.6-19.3 45.7-67.1 70.1-14.1zm119.5 0l70.1 14.1 45.7 67.1c-29.2 12.5-61.1 19.4-94.4 19.4c-15.5 0-30.7-1.4-45.4-4l-15.7-38.2 39.7-58.4zm105-139.7l-48 83 36.2 62.6 15.7-38.2c12.5-29.2 19.4-61.1 19.4-94.4c0-4.6-.1-9.1-.4-13.6l-22.9 0zm-333.6 83l48-83-36.2-62.6L79.1 229.6C66.6 258.8 59.7 290.7 59.7 324c0 4.6 .1 9.1 .4 13.6l22.9 0zm88.5-83l-70.1-14.1-45.7-67.1c29.2-12.5 61.1-19.4 94.4-19.4c15.5 0 30.7 1.4 45.4 4l15.7 38.2-39.7 58.4z"/></svg>
+                        </div>`;
                     }
                     bottomLeftBadges += `<div class="flex items-center flex-row-reverse">${ballsHtml}</div>`;
                 }
@@ -3729,16 +3731,20 @@
                 // 4. KANAN TENGAH: GAGAL PENALTI (Lingkaran Merah Silang)
                 let midRightBadges = '';
                 if (missedPens > 0) {
-                    midRightBadges += `<div class="w-[15px] h-[15px] bg-brand-red rounded-full flex items-center justify-center border-[1.5px] border-white shadow-[0_2px_4px_rgba(0,0,0,0.8)] z-10"><svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M6 18L18 6M6 6l12 12"/></svg></div>`;
+                    midRightBadges += `<div class="w-[20px] h-[20px] bg-[#ef4444] rounded-full flex items-center justify-center border-2 border-white shadow-[0_2px_4px_rgba(0,0,0,0.8)] z-10"><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M6 18L18 6M6 6l12 12"/></svg></div>`;
                 }
 
-                // 5. KANAN BAWAH: ASSIST (Ikon Sepatu Bola)
+                // 5. KANAN BAWAH: ASSIST (Sepatu hitam tebal background putih, menumpuk jika > 1)
                 let bottomRightBadges = '';
                 if (assists > 0) {
                     let shoeHtml = '';
                     for(let i=0; i<assists; i++) {
-                        let margin = i > 0 ? '-ml-1.5' : '';
-                        shoeHtml += `<div class="relative w-[15px] h-[15px] bg-white rounded-full flex items-center justify-center border-[1.5px] border-gray-900 shadow-[0_2px_4px_rgba(0,0,0,0.9)] ${margin}" style="z-index: ${10 + i}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-[9px] h-[9px] text-gray-900"><path d="M21.3 12.44L17.5 7.69A2.5 2.5 0 0 0 15.54 6.8H8.5A1.5 1.5 0 0 0 7 8.3v1H4a1 1 0 0 0 0 2h3v1H5a1 1 0 0 0 0 2h2v1.5A2.5 2.5 0 0 0 9.5 18h9a3.5 3.5 0 0 0 3.19-2.07l1.08-2.52a1.5 1.5 0 0 0-.47-1.58V12.44z"/></svg></div>`;
+                        let margin = i > 0 ? '-ml-2.5' : '';
+                        shoeHtml += `<div class="relative w-[22px] h-[22px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_5px_rgba(0,0,0,0.9)] ${margin}" style="z-index: ${10 + i}">
+                            <svg viewBox="0 0 24 24" fill="currentColor" class="w-[15px] h-[15px] text-[#111] transform scale-x-[-1]">
+                               <path d="M22 13.5l-4-2-2-4-5.5-1.5a3 3 0 0 0-3.5 1.5L2 15a4 4 0 0 0 3 5.5h12l5-3a3 3 0 0 0 1.5-4h-1.5z"/><path d="M6 20.5v2.5h2v-2.5zM11 20.5v2.5h2v-2.5zM16 19.5v2.5h2v-2.5z"/>
+                            </svg>
+                        </div>`;
                     }
                     bottomRightBadges += `<div class="flex items-center flex-row-reverse">${shoeHtml}</div>`;
                 }
