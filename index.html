@@ -3715,14 +3715,13 @@
                 if (reds > 0) { midLeftBadges += `<div class="w-3.5 h-5 bg-[#ef4444] border-2 border-white rounded-[2px] shadow-[0_2px_4px_rgba(0,0,0,0.8)] transform -rotate-6 z-10"></div>`; } 
                 else if (yellows > 0) { midLeftBadges += `<div class="w-3.5 h-5 bg-[#eab308] border-2 border-white rounded-[2px] shadow-[0_2px_4px_rgba(0,0,0,0.8)] transform -rotate-6 z-10"></div>`; }
 
-                // 3. KIRI BAWAH: GOL (Ikon Bola Kustom)
+                // 3. KIRI BAWAH: GOL (Ikon Bola ImgBB Kustom - Ultra Dempet & Elegan)
                 let bottomLeftBadges = '';
                 if (goals > 0) { 
                     let ballsHtml = '';
                     for(let i = 0; i < goals; i++) {
-                        let margin = i > 0 ? '-ml-2.5' : ''; // Membuat tumpukan overlap
+                        let margin = i > 0 ? '-ml-[14px]' : ''; // Diketatkan ke 14px agar tumpukan menyatu sempurna
                         ballsHtml += `<div class="relative w-[22px] h-[22px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_5px_rgba(0,0,0,0.9)] ${margin}" style="z-index: ${10 + i}">
-                            <!-- MASUKKAN LINK GAMBAR BOLA ANDA DI SINI -->
                             <img src="https://i.ibb.co.com/Zzq7NkhD/ICON-BOLA-T.png" class="w-[15px] h-[15px] object-contain">
                         </div>`;
                     }
@@ -3735,14 +3734,13 @@
                     midRightBadges += `<div class="w-[20px] h-[20px] bg-[#ef4444] rounded-full flex items-center justify-center border-2 border-white shadow-[0_2px_4px_rgba(0,0,0,0.8)] z-10"><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M6 18L18 6M6 6l12 12"/></svg></div>`;
                 }
 
-                // 5. KANAN BAWAH: ASSIST (Ikon Sepatu Kustom)
+                // 5. KANAN BAWAH: ASSIST (Ikon Sepatu ImgBB Kustom - Ultra Dempet & Elegan)
                 let bottomRightBadges = '';
                 if (assists > 0) {
                     let shoeHtml = '';
-                    for(let i=0; i<assists; i++) {
-                        let margin = i > 0 ? '-ml-2.5' : '';
+                    for(let i = 0; i < assists; i++) {
+                        let margin = i > 0 ? '-ml-[14px]' : ''; // Diketatkan ke 14px mengikuti skala presisi bola
                         shoeHtml += `<div class="relative w-[22px] h-[22px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_5px_rgba(0,0,0,0.9)] ${margin}" style="z-index: ${10 + i}">
-                            <!-- MASUKKAN LINK GAMBAR SEPATU ANDA DI SINI -->
                             <img src="https://i.ibb.co.com/Y77msYwV/ICON-SEPATU-T.png" class="w-[15px] h-[15px] object-contain">
                         </div>`;
                     }
