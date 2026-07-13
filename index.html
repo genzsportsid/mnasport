@@ -3705,69 +3705,69 @@
                 let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
                 let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
 
-                // 1. KIRI ATAS: SUB IN / SUB OUT (Panah tebal dengan menit di atasnya)
+                // 1. KIRI ATAS: SUB IN / SUB OUT (Micro-scale 16px, border tipis)
                 let topLeftBadges = '';
-                if (subOut) { topLeftBadges += `<div class="flex flex-col items-center"><span class="text-[11px] font-black text-white drop-shadow-[0_2px_2px_rgba(0,0,0,1)] leading-none mb-[2px]">${getProp(subOut, 'menit')}'</span><div class="w-[22px] h-[22px] bg-[#ef4444] rounded-full flex items-center justify-center border-2 border-white shadow-[0_2px_5px_rgba(0,0,0,0.9)] z-10"><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></div></div>`; }
-                if (subIn) { topLeftBadges += `<div class="flex flex-col items-center"><span class="text-[11px] font-black text-white drop-shadow-[0_2px_2px_rgba(0,0,0,1)] leading-none mb-[2px]">${getProp(subIn, 'menit')}'</span><div class="w-[22px] h-[22px] bg-[#4ade80] rounded-full flex items-center justify-center border-2 border-white shadow-[0_2px_5px_rgba(0,0,0,0.9)] z-10"><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></div></div>`; }
+                if (subOut) { topLeftBadges += `<div class="flex flex-col items-center"><span class="text-[9px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,1)] leading-none mb-[1px]">${getProp(subOut, 'menit')}'</span><div class="w-[16px] h-[16px] bg-[#ef4444] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-sm z-20"><svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></div></div>`; }
+                if (subIn) { topLeftBadges += `<div class="flex flex-col items-center"><span class="text-[9px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,1)] leading-none mb-[1px]">${getProp(subIn, 'menit')}'</span><div class="w-[16px] h-[16px] bg-[#4ade80] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-sm z-20"><svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></div></div>`; }
 
-                // 2. KIRI TENGAH: KARTU KUNING / MERAH
+                // 2. KIRI TENGAH: KARTU KUNING / MERAH (Skala proporsional)
                 let midLeftBadges = '';
-                if (reds > 0) { midLeftBadges += `<div class="w-3.5 h-5 bg-[#ef4444] border-2 border-white rounded-[2px] shadow-[0_2px_4px_rgba(0,0,0,0.8)] transform -rotate-6 z-10"></div>`; } 
-                else if (yellows > 0) { midLeftBadges += `<div class="w-3.5 h-5 bg-[#eab308] border-2 border-white rounded-[2px] shadow-[0_2px_4px_rgba(0,0,0,0.8)] transform -rotate-6 z-10"></div>`; }
+                if (reds > 0) { midLeftBadges += `<div class="w-2.5 h-3.5 bg-[#ef4444] border-[1.5px] border-white rounded-[1px] shadow-sm transform -rotate-6 z-10"></div>`; } 
+                else if (yellows > 0) { midLeftBadges += `<div class="w-2.5 h-3.5 bg-[#eab308] border-[1.5px] border-white rounded-[1px] shadow-sm transform -rotate-6 z-10"></div>`; }
 
-                // 3. KIRI BAWAH: GOL (Ikon Bola ImgBB Kustom - Ultra Dempet & Elegan)
+                // 3. KIRI BAWAH: GOL (Tumpukan ketat -ml-[8px] agar rapat)
                 let bottomLeftBadges = '';
                 if (goals > 0) { 
                     let ballsHtml = '';
                     for(let i = 0; i < goals; i++) {
-                        let margin = i > 0 ? '-ml-[14px]' : ''; // Diketatkan ke 14px agar tumpukan menyatu sempurna
-                        ballsHtml += `<div class="relative w-[22px] h-[22px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_5px_rgba(0,0,0,0.9)] ${margin}" style="z-index: ${10 + i}">
-                            <img src="https://i.ibb.co.com/Zzq7NkhD/ICON-BOLA-T.png" class="w-[15px] h-[15px] object-contain">
+                        let margin = i > 0 ? '-ml-[8px]' : ''; 
+                        ballsHtml += `<div class="relative w-[16px] h-[16px] bg-white rounded-full flex items-center justify-center border-[1.5px] border-black shadow-sm ${margin}" style="z-index: ${10 + i}">
+                            <img src="https://i.ibb.co.com/Zzq7NkhD/ICON-BOLA-T.png" class="w-[10px] h-[10px] object-contain">
                         </div>`;
                     }
                     bottomLeftBadges += `<div class="flex items-center flex-row-reverse">${ballsHtml}</div>`;
                 }
 
-                // 4. KANAN TENGAH: GAGAL PENALTI (Lingkaran Merah Silang)
+                // 4. KANAN TENGAH: GAGAL PENALTI
                 let midRightBadges = '';
                 if (missedPens > 0) {
-                    midRightBadges += `<div class="w-[20px] h-[20px] bg-[#ef4444] rounded-full flex items-center justify-center border-2 border-white shadow-[0_2px_4px_rgba(0,0,0,0.8)] z-10"><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M6 18L18 6M6 6l12 12"/></svg></div>`;
+                    midRightBadges += `<div class="w-[14px] h-[14px] bg-[#ef4444] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-sm z-10"><svg class="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M6 18L18 6M6 6l12 12"/></svg></div>`;
                 }
 
-                // 5. KANAN BAWAH: ASSIST (Ikon Sepatu ImgBB Kustom - Ultra Dempet & Elegan)
+                // 5. KANAN BAWAH: ASSIST (Tumpukan ketat -ml-[8px])
                 let bottomRightBadges = '';
                 if (assists > 0) {
                     let shoeHtml = '';
                     for(let i = 0; i < assists; i++) {
-                        let margin = i > 0 ? '-ml-[14px]' : ''; // Diketatkan ke 14px mengikuti skala presisi bola
-                        shoeHtml += `<div class="relative w-[22px] h-[22px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_5px_rgba(0,0,0,0.9)] ${margin}" style="z-index: ${10 + i}">
-                            <img src="https://i.ibb.co.com/Y77msYwV/ICON-SEPATU-T.png" class="w-[15px] h-[15px] object-contain">
+                        let margin = i > 0 ? '-ml-[8px]' : ''; 
+                        shoeHtml += `<div class="relative w-[16px] h-[16px] bg-white rounded-full flex items-center justify-center border-[1.5px] border-gray-900 shadow-sm ${margin}" style="z-index: ${10 + i}">
+                            <img src="https://i.ibb.co.com/Y77msYwV/ICON-SEPATU-T.png" class="w-[10px] h-[10px] object-contain">
                         </div>`;
                     }
                     bottomRightBadges += `<div class="flex items-center flex-row-reverse">${shoeHtml}</div>`;
                 }
-                
-                // KALKULASI KORDINAT STRICT BOUNDARY (TIDAK ADA YANG DIUBAH)
+
                 let posX = isAway ? (100 - slotDef.x) : slotDef.x; 
                 let absY = isAway ? (100 - (slotDef.y / 2)) : (slotDef.y / 2);
-                let posStyle = `top: ${absY}%; left: ${posX}%;`;
+                let posStyle = `top: ${absY}\%; left:${posX}%;`;
                 let animDelay = idx * 50;
 
-                // FOTMOB BIG FACE DESIGN DENGAN 5 ZONA TITIK IKON
+                // WRAPPER FOTO PEMAIN DENGAN OFFSET PERIMETER BARU
                 return `
                 <div class="absolute" style="${posStyle} transform: translate(-50%, -50%); z-index: 10;" onclick="bukaModalPemain('${safeStr(pData ? getProp(pData,'nama') : nm)}', '${safeStr(teamName)}')">
                     <div class="flex flex-col items-center w-[68px] sm:w-[80px] md:w-[100px] pitch-player-anim cursor-pointer group hover:scale-110 transition-transform" style="animation-delay: ${animDelay}ms;">
                         
                         <div class="relative w-[56px] h-[56px] sm:w-16 sm:h-16 md:w-20 md:h-20 mb-1">
-                            <!-- ZONA IKON MENGELILINGI FOTO -->
-                            ${topLeftBadges !== '' ? `<div class="absolute -top-1 -left-1.5 flex flex-col gap-1 z-20 items-start">${topLeftBadges}</div>` : ''}
-                            ${bottomLeftBadges !== '' ? `<div class="absolute -bottom-1 -left-1.5 flex flex-col gap-1 z-30 items-start">${bottomLeftBadges}</div>` : ''}
-                            ${midLeftBadges !== '' ? `<div class="absolute top-1/2 -left-2.5 transform -translate-y-1/2 flex flex-col gap-1 z-20 items-start">${midLeftBadges}</div>` : ''}
+                            ${topLeftBadges !== '' ? `<div class="absolute -top-2 -left-1 flex flex-col gap-0.5 z-30 items-start">${topLeftBadges}</div>` : ''}
+                            ${bottomLeftBadges !== '' ? `<div class="absolute -bottom-0.5 -left-2 flex flex-col gap-0.5 z-30 items-start">${bottomLeftBadges}</div>` : ''}
                             
-                            ${midRightBadges !== '' ? `<div class="absolute top-1/2 -right-2.5 transform -translate-y-1/2 flex flex-col gap-1 z-20 items-end">${midRightBadges}</div>` : ''}
-                            ${bottomRightBadges !== '' ? `<div class="absolute -bottom-1 -right-1.5 flex flex-col gap-1 z-30 items-end">${bottomRightBadges}</div>` : ''}
+                            <!-- Kartu digeser ke top-[25%] dan lebih keluar (-left-3) agar tidak bentrok dengan Sub/Gol -->
+                            ${midLeftBadges !== '' ? `<div class="absolute top-[25%] -left-3 transform -translate-y-1/2 flex flex-col gap-0.5 z-20 items-start">${midLeftBadges}</div>` : ''}
                             
-                            <div class="w-full h-full rounded-full border-[2px] border-white/60 shadow-[0_5px_15px_rgba(0,0,0,0.8)] overflow-hidden bg-brand-panel">
+                            ${midRightBadges !== '' ? `<div class="absolute top-[25%] -right-3 transform -translate-y-1/2 flex flex-col gap-0.5 z-20 items-end">${midRightBadges}</div>` : ''}
+                            ${bottomRightBadges !== '' ? `<div class="absolute -bottom-0.5 -right-2 flex flex-col gap-0.5 z-30 items-end">${bottomRightBadges}</div>` : ''}
+                            
+                            <div class="w-full h-full rounded-full border-2 border-white/60 shadow-md overflow-hidden bg-brand-panel">
                                 <img src="${f}" class="w-full h-full object-cover">
                             </div>
                         </div>
