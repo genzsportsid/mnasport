@@ -3626,11 +3626,12 @@
         }
 
         // ==========================================
-        // MESIN RENDER LINEUP (5-POINT BADGE MAPPING ENGINE)
+        // MESIN RENDER LINEUP (FOTMOB ICONS & ABSOLUTE CANVAS ENGINE)
         // ==========================================
         function renderPitchAndBench(tk, tn, dataKiri, dataKanan, lKiri, lKanan, matchEvents = []) {
             let container = document.getElementById('mm-pitch-players');
             
+            // Failsafe: Paksa container absolut agar perhitungan X,Y sempurna
             container.className = "absolute inset-0 w-full h-full z-10";
 
             let infoHome = document.getElementById('mm-pitch-info-home'); 
@@ -3669,6 +3670,7 @@
             document.getElementById('mm-pitch-info-home').innerHTML = `<div class="flex items-center gap-2"><img src="${lKiri}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"> <span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tk}</span></div><div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fHomeRaw}</span></div>`;
             document.getElementById('mm-pitch-info-away').innerHTML = `<div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fAwayRaw}</span></div><div class="flex items-center gap-2"><span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tn}</span> <img src="${lKanan}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"></div>`;
 
+            // KORDINAT SETENGAH LAPANGAN ABSOLUT (Striker mentok di 84)
             const FORMATIONS_MAPPING = {
                 '4-3-3': [{x:50, y:8}, {x:12, y:28}, {x:36, y:25}, {x:64, y:25}, {x:88, y:28}, {x:25, y:52}, {x:50, y:52}, {x:75, y:52}, {x:20, y:78}, {x:50, y:82}, {x:80, y:78}],
                 '4-2-3-1': [{x:50, y:8}, {x:12, y:28}, {x:36, y:25}, {x:64, y:25}, {x:88, y:28}, {x:35, y:46}, {x:65, y:46}, {x:18, y:65}, {x:50, y:65}, {x:82, y:65}, {x:50, y:84}],
@@ -3692,77 +3694,47 @@
                 let num = (pData && getProp(pData,'nomor') != null) ? getProp(pData,'nomor') : '-'; 
                 let short = getShortName(nm);
                 
-                // MENDETEKSI KEJADIAN SPESIFIK
                 let pEvents = matchEvents.filter(ev => String(getProp(ev, 'pemain')).toLowerCase().trim() === nmLower && String(getProp(ev, 'tim')).toLowerCase().trim() === tLower);
                 let goals = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'GOL').length;
-                let assists = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'ASSIST').length;
                 let yellows = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'KUNING').length;
                 let reds = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'MERAH').length;
                 let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
                 let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
-                let missedPens = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'GAGALPENALTI' || String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'MISSEDPENALTY').length;
 
-                // 1. KIRI ATAS (Sub In / Sub Out)
-                let topLeftBadges = '';
-                if (subOut) { topLeftBadges += `<div class="flex items-center gap-0.5"><div class="w-[14px] h-[14px] bg-[#2a2a2a] rounded-full flex items-center justify-center border border-gray-500 shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10"><svg class="w-2.5 h-2.5 text-[#ef4444]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></div><span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${getProp(subOut, 'menit')}'</span></div>`; }
-                if (subIn) { topLeftBadges += `<div class="flex items-center gap-0.5"><div class="w-[14px] h-[14px] bg-[#2a2a2a] rounded-full flex items-center justify-center border border-gray-500 shadow-[0_2px_4px_rgba(0,0,0,0.9)] z-10"><svg class="w-2.5 h-2.5 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></div><span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${getProp(subIn, 'menit')}'</span></div>`; }
-                
-                // 2. KIRI TENGAH (Kartu Kuning / Merah)
-                let midLeftBadges = '';
-                if (reds > 0) { midLeftBadges += `<div class="w-2.5 h-3.5 bg-[#ef4444] border-[1.5px] border-white rounded-[2px] shadow-[0_2px_4px_rgba(0,0,0,0.8)] transform -rotate-6 z-10"></div>`; } 
-                else if (yellows > 0) { midLeftBadges += `<div class="w-2.5 h-3.5 bg-[#eab308] border-[1.5px] border-white rounded-[2px] shadow-[0_2px_4px_rgba(0,0,0,0.8)] transform -rotate-6 z-10"></div>`; }
-
-                // 3. KIRI BAWAH (Gol Bola Putih Garis Hitam)
-                let bottomLeftBadges = '';
+                // DYNAMIC BADGE INSET (Desain Baru FotMob - Premium Icons)
+                let leftBadges = '';
                 if (goals > 0) { 
                     let ballsHtml = '';
                     for(let i = 0; i < goals; i++) {
-                        let margin = i > 0 ? '-ml-1.5' : '';
+                        let margin = i > 0 ? '-ml-1.5' : ''; // Bikin numpuk elegan kalau gol > 1
                         ballsHtml += `<div class="relative w-[15px] h-[15px] bg-white rounded-full flex items-center justify-center border-[1.5px] border-black shadow-[0_2px_4px_rgba(0,0,0,0.9)] ${margin}" style="z-index: ${10 + i}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-[9px] h-[9px] text-black"><path fill="currentColor" d="M256 0a256 256 0 1 0 0 512A256 256 0 1 0 256 0zM358.4 114.8l-40.4 55.4L256 124.9l-62.1 45.4-40.4-55.4C181.7 93.1 217.7 80 256 80s74.3 13.1 102.4 34.8zM122.9 146.4l34.5 47.3L135.1 262 67.2 249.4c-1.3-43.2 17.5-82.6 55.7-103zm-27.1 144.3L166.4 306l21.6 71.3-64.8 47.1C91.9 389.6 70.8 343 95.8 290.7zm160.2 141.3v-84.6l-67.4-49.2h134.7l-67.4 49.2v84.6c-48.4 0-92.4-19.6-124.3-51.3l62.1-45.2 62.1 45.2c-31.9 31.7-75.9 51.3-124.3 51.3zm133.1-42.9l-64.8-47.1 21.6-71.3 70.6-15.3c25 52.3 3.9 98.9-27.4 133.7zm28.6-175.7l-67.9 12.6-22.3-68.3 34.5-47.3c38.2 20.4 57 59.8 55.7 103zM256 160.8l56.8 41.5-21.7 66.8h-70.2l-21.7-66.8L256 160.8z"/></svg></div>`;
                     }
-                    bottomLeftBadges += `<div class="flex items-center">${ballsHtml}</div>`;
+                    leftBadges += `<div class="flex items-center">${ballsHtml}</div>`;
                 }
+                if (reds > 0) { leftBadges += `<div class="w-2.5 h-3.5 bg-[#ef4444] border-[1.5px] border-white rounded-[2px] shadow-[0_2px_4px_rgba(0,0,0,0.8)] transform rotate-6 mt-0.5 z-10"></div>`; } 
+                else if (yellows > 0) { leftBadges += `<div class="w-2.5 h-3.5 bg-[#eab308] border-[1.5px] border-white rounded-[2px] shadow-[0_2px_4px_rgba(0,0,0,0.8)] transform rotate-6 mt-0.5 z-10"></div>`; }
 
-                // 4. KANAN BAWAH (Assist Sepatu)
-                let bottomRightBadges = '';
-                if (assists > 0) {
-                    let assistHtml = '';
-                    for(let i = 0; i < assists; i++) {
-                        let margin = i > 0 ? '-ml-1.5' : '';
-                        assistHtml += `<div class="relative w-[15px] h-[15px] bg-[#2a2a2a] rounded-full flex items-center justify-center border-[1.5px] border-gray-500 shadow-[0_2px_4px_rgba(0,0,0,0.9)] ${margin}" style="z-index: ${10 + i}"><span class="text-[8px] leading-none mb-[1px]">👟</span></div>`;
-                    }
-                    bottomRightBadges += `<div class="flex items-center flex-row-reverse">${assistHtml}</div>`;
-                }
-
-                // 5. KANAN TENGAH (Gagal Penalti)
-                let midRightBadges = '';
-                if (missedPens > 0) {
-                    let penHtml = '';
-                    for(let i = 0; i < missedPens; i++) {
-                        let margin = i > 0 ? '-ml-1.5' : '';
-                        penHtml += `<div class="relative w-[14px] h-[14px] bg-[#ef4444] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md ${margin}" style="z-index: ${10 + i}"><svg class="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M6 18L18 6M6 6l12 12"/></svg></div>`;
-                    }
-                    midRightBadges += `<div class="flex items-center flex-row-reverse">${penHtml}</div>`;
-                }
+                let rightBadges = '';
+                // Panah Merah Keluar (Sub Out)
+                if (subOut) { rightBadges += `<div class="flex items-center gap-0.5"><span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${getProp(subOut, 'menit')}'</span><div class="w-4 h-4 bg-[#2a2a2a] rounded-full flex items-center justify-center border border-gray-500 shadow-[0_2px_5px_rgba(0,0,0,0.8)] z-10"><svg class="w-2.5 h-2.5 text-[#ef4444]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></div></div>`; }
+                // Panah Hijau Masuk (Sub In)
+                if (subIn) { rightBadges += `<div class="flex items-center gap-0.5"><span class="text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">${getProp(subIn, 'menit')}'</span><div class="w-4 h-4 bg-[#2a2a2a] rounded-full flex items-center justify-center border border-gray-500 shadow-[0_2px_5px_rgba(0,0,0,0.8)] z-10"><svg class="w-2.5 h-2.5 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></div></div>`; }
                 
                 let posX = isAway ? (100 - slotDef.x) : slotDef.x; 
-                let posY = slotDef.y;
-                let posStyle = isAway ? `bottom: ${posY}%; left: ${posX}%;` : `top: ${posY}%; left: ${posX}%;`;
+                let absY = isAway ? (100 - (slotDef.y / 2)) : (slotDef.y / 2);
+                let posStyle = `top: ${absY}%; left: ${posX}%;`;
                 let animDelay = idx * 50;
 
+                // FOTMOB BIG FACE DESIGN (Ukuran Wajah Maksimal: w-[56px] - w-20)
                 return `
                 <div class="absolute" style="${posStyle} transform: translate(-50%, -50%); z-index: 10;" onclick="bukaModalPemain('${safeStr(pData ? getProp(pData,'nama') : nm)}', '${safeStr(teamName)}')">
                     <div class="flex flex-col items-center w-[68px] sm:w-[80px] md:w-[100px] pitch-player-anim cursor-pointer group hover:scale-110 transition-transform" style="animation-delay: ${animDelay}ms;">
                         
                         <div class="relative w-[56px] h-[56px] sm:w-16 sm:h-16 md:w-20 md:h-20 mb-1">
-                            ${topLeftBadges !== '' ? `<div class="absolute -top-1 -left-2 flex flex-col gap-1 z-20 items-start">${topLeftBadges}</div>` : ''}
-                            ${midLeftBadges !== '' ? `<div class="absolute top-1/2 -translate-y-1/2 -left-1.5 flex flex-col gap-1 z-20 items-start">${midLeftBadges}</div>` : ''}
-                            ${bottomLeftBadges !== '' ? `<div class="absolute -bottom-1 -left-2 flex flex-col gap-1 z-20 items-start">${bottomLeftBadges}</div>` : ''}
+                            ${leftBadges !== '' ? `<div class="absolute -top-1 -left-1 flex flex-col gap-1 z-20 items-start">${leftBadges}</div>` : ''}
+                            ${rightBadges !== '' ? `<div class="absolute -top-1 -right-1 flex flex-col gap-1 z-20 items-end">${rightBadges}</div>` : ''}
                             
-                            ${bottomRightBadges !== '' ? `<div class="absolute -bottom-1 -right-2 flex flex-col gap-1 z-20 items-end">${bottomRightBadges}</div>` : ''}
-                            ${midRightBadges !== '' ? `<div class="absolute top-1/2 -translate-y-1/2 -right-1.5 flex flex-col gap-1 z-20 items-end">${midRightBadges}</div>` : ''}
-                            
-                            <div class="w-full h-full rounded-full border-[2px] border-white/60 shadow-[0_5px_15px_rgba(0,0,0,0.8)] overflow-hidden bg-brand-panel">
+                            <div class="w-full h-full rounded-full border-2 border-white/60 shadow-[0_5px_15px_rgba(0,0,0,0.8)] overflow-hidden bg-brand-panel">
                                 <img src="${f}" class="w-full h-full object-cover">
                             </div>
                         </div>
@@ -3807,47 +3779,12 @@
                     let ringColor = isAway ? 'ring-[#ef4444]/50' : 'ring-[#3b82f6]/50';
 
                     let pEvents = matchEvents.filter(ev => String(getProp(ev, 'pemain')).toLowerCase().trim() === nmLower && String(getProp(ev, 'tim')).toLowerCase().trim() === tLower);
-                    let goals = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'GOL').length;
-                    let assists = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'ASSIST').length;
-                    let yellows = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'KUNING').length;
-                    let reds = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'MERAH').length;
                     let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
                     let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
-                    let missedPens = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'GAGALPENALTI' || String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'MISSEDPENALTY').length;
 
                     let eventIcons = '';
                     if (subOut) { eventIcons += `<div class="bg-[#2a2a2a] rounded-full px-1.5 py-0.5 shadow-md border border-gray-600 flex items-center justify-center gap-1"><svg class="w-2.5 h-2.5 text-[#ef4444]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg><span class="text-[7px] font-black text-white">${getProp(subOut, 'menit')}'</span></div>`; }
                     if (subIn) { eventIcons += `<div class="bg-[#2a2a2a] rounded-full px-1.5 py-0.5 shadow-md border border-gray-600 flex items-center justify-center gap-1"><svg class="w-2.5 h-2.5 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg><span class="text-[7px] font-black text-white">${getProp(subIn, 'menit')}'</span></div>`; }
-                    
-                    if (goals > 0) { 
-                        let ballsHtml = '';
-                        for(let i=0; i<goals; i++) {
-                            let margin = i > 0 ? '-ml-1.5' : '';
-                            ballsHtml += `<div class="relative w-[12px] h-[12px] bg-white rounded-full flex items-center justify-center border border-black shadow-sm ${margin}" style="z-index: ${10 + i}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-[7px] h-[7px] text-black"><path fill="currentColor" d="M256 0a256 256 0 1 0 0 512A256 256 0 1 0 256 0zM358.4 114.8l-40.4 55.4L256 124.9l-62.1 45.4-40.4-55.4C181.7 93.1 217.7 80 256 80s74.3 13.1 102.4 34.8zM122.9 146.4l34.5 47.3L135.1 262 67.2 249.4c-1.3-43.2 17.5-82.6 55.7-103zm-27.1 144.3L166.4 306l21.6 71.3-64.8 47.1C91.9 389.6 70.8 343 95.8 290.7zm160.2 141.3v-84.6l-67.4-49.2h134.7l-67.4 49.2v84.6c-48.4 0-92.4-19.6-124.3-51.3l62.1-45.2 62.1 45.2c-31.9 31.7-75.9 51.3-124.3 51.3zm133.1-42.9l-64.8-47.1 21.6-71.3 70.6-15.3c25 52.3 3.9 98.9-27.4 133.7zm28.6-175.7l-67.9 12.6-22.3-68.3 34.5-47.3c38.2 20.4 57 59.8 55.7 103zM256 160.8l56.8 41.5-21.7 66.8h-70.2l-21.7-66.8L256 160.8z"/></svg></div>`;
-                        }
-                        eventIcons += `<div class="flex items-center ml-1">${ballsHtml}</div>`;
-                    }
-                    
-                    if (assists > 0) {
-                        let assistHtml = '';
-                        for(let i=0; i<assists; i++) {
-                            let margin = i > 0 ? '-ml-1.5' : '';
-                            assistHtml += `<div class="relative w-[12px] h-[12px] bg-[#2a2a2a] rounded-full flex items-center justify-center border border-gray-500 shadow-sm ${margin}" style="z-index: ${10 + i}"><span class="text-[6px] leading-none mb-[1px]">👟</span></div>`;
-                        }
-                        eventIcons += `<div class="flex items-center ml-1">${assistHtml}</div>`;
-                    }
-
-                    if (missedPens > 0) {
-                        let penHtml = '';
-                        for(let i=0; i<missedPens; i++) {
-                            let margin = i > 0 ? '-ml-1.5' : '';
-                            penHtml += `<div class="relative w-[12px] h-[12px] bg-[#ef4444] rounded-full flex items-center justify-center border border-white shadow-sm ${margin}" style="z-index: ${10 + i}"><svg class="w-1.5 h-1.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M6 18L18 6M6 6l12 12"/></svg></div>`;
-                        }
-                        eventIcons += `<div class="flex items-center ml-1">${penHtml}</div>`;
-                    }
-
-                    if (reds > 0) { eventIcons += `<div class="w-2 h-3 bg-[#ef4444] border-[1.5px] border-white rounded-[2px] shadow-sm transform -rotate-6 ml-1"></div>`; } 
-                    else if (yellows > 0) { eventIcons += `<div class="w-2 h-3 bg-[#eab308] border-[1.5px] border-white rounded-[2px] shadow-sm transform -rotate-6 ml-1"></div>`; }
                     
                     let animDelay = idx * 60; let animClass = isAway ? 'slide-right-anim' : 'slide-left-anim';
 
