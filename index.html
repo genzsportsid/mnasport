@@ -3741,10 +3741,10 @@
                     bottomRightBadges = `<div class="absolute -bottom-1.5 -right-2.5 flex items-center flex-row-reverse z-30">${ballsHtml}</div>`;
                 }
 
-                // 5. KANAN TENGAH: GAGAL PENALTI (Ukuran -10% sesuai request)
+                // 5. KANAN TENGAH: GAGAL PENALTI (Ukuran disamakan dengan kontainer Kartu: 20px)
                 let midRightBadges = '';
                 if (missedPens > 0) {
-                    midRightBadges = `<div class="w-[16px] h-[16px] bg-[#ef4444] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md"><svg class="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M6 18L18 6M6 6l12 12"/></svg></div>`;
+                    midRightBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><img src="https://i.ibb.co.com/pjWQBCHQ/ICON-MISS-PENALTY-T.png" class="w-[12px] h-[12px] object-contain"></div>`;
                 }
 
                 let posX = isAway ? (100 - slotDef.x) : slotDef.x; 
