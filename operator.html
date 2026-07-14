@@ -35,13 +35,19 @@
         <div id="mode-live" class="hidden space-y-5 opacity-50 pointer-events-none transition-opacity">
             <div class="bg-brand-panel border border-brand-green/30 p-5 rounded-2xl shadow-[0_0_20px_rgba(0,154,68,0.05)]">
                 <div class="grid grid-cols-3 gap-2 mb-4">
-                    <button onclick="setEventMode('Gol', this)" class="evt-btn bg-white/20 border border-white text-white font-bold text-[9px] py-3 rounded-xl uppercase flex flex-col items-center">⚽ <span>Gol</span></button>
-                    <button onclick="setEventMode('Assist', this)" class="evt-btn bg-black border border-white/10 text-gray-300 font-bold text-[9px] py-3 rounded-xl uppercase flex flex-col items-center">👟 <span>Assist</span></button>
-                    <button onclick="setEventMode('Gagal Penalti', this)" class="evt-btn bg-black border border-white/10 text-red-400 font-bold text-[9px] py-3 rounded-xl uppercase flex flex-col items-center">❌ <span>Penalti Gagal</span></button>
-                    
-                    <button onclick="setEventMode('Kuning', this)" class="evt-btn bg-black border border-white/10 text-yellow-400 font-bold text-[9px] py-3 rounded-xl uppercase flex flex-col items-center">🟨 <span>Kuning</span></button>
-                    <button onclick="setEventMode('Merah', this)" class="evt-btn bg-black border border-white/10 text-red-500 font-bold text-[9px] py-3 rounded-xl uppercase flex flex-col items-center">🟥 <span>Merah</span></button>
-                    <button onclick="setEventMode('Substitusi', this)" class="evt-btn bg-black border border-white/10 text-brand-green font-black text-[9px] py-3 rounded-xl uppercase flex flex-col items-center">🔄 <span>Ganti</span></button>
+                    <button onclick="setEventMode('Gol', this)" class="evt-btn bg-white/20 border border-white text-white font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">⚽</span> <span>Gol</span></button>
+                    <button onclick="setEventMode('Assist', this)" class="evt-btn bg-black border border-white/10 text-gray-300 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">👟</span> <span>Assist</span></button>
+                    <button onclick="setEventMode('Gol Bunuh Diri', this)" class="evt-btn bg-black border border-white/10 text-red-300 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🤦‍♂️</span> <span class="text-[8px]">Own Goal</span></button>
+
+                    <button onclick="setEventMode('Kuning', this)" class="evt-btn bg-black border border-white/10 text-yellow-400 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🟨</span> <span>Kuning</span></button>
+                    <button onclick="setEventMode('Kuning Kedua', this)" class="evt-btn bg-black border border-white/10 text-orange-400 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1 text-center"><span class="text-sm">🟨🟥</span> <span class="text-[8px]">2nd Kuning</span></button>
+                    <button onclick="setEventMode('Merah', this)" class="evt-btn bg-black border border-white/10 text-red-500 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🟥</span> <span>Merah</span></button>
+
+                    <button onclick="setEventMode('Gagal Penalti', this)" class="evt-btn bg-black border border-white/10 text-red-400 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">❌</span> <span class="text-[8px]">Miss Pen</span></button>
+                    <button onclick="setEventMode('Penyelamatan Penalti', this)" class="evt-btn bg-black border border-white/10 text-blue-300 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1 text-center"><span class="text-sm">🧤</span> <span class="text-[8px]">Save Pen</span></button>
+                    <button onclick="setEventMode('Cedera', this)" class="evt-btn bg-black border border-white/10 text-white font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🚑</span> <span>Cedera</span></button>
+
+                    <button onclick="setEventMode('Substitusi', this)" class="evt-btn col-span-3 bg-black border border-white/10 text-brand-green font-black text-[10px] py-3 rounded-xl uppercase flex flex-row items-center justify-center gap-2"><span class="text-sm">🔄</span> <span>Ganti Pemain (Substitusi)</span></button>
                 </div>
                 <div class="flex gap-3 mb-4">
                     <div id="ui-normal" class="flex-1"><select id="select-pemain" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs font-bold uppercase outline-none"><option value="">-- Pilih Pemain --</option></select></div>
