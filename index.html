@@ -3705,54 +3705,46 @@
                 let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
                 let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
 
-                // 1. KIRI ATAS (LAYER BAWAH): KARTU KUNING/MERAH (Mengintip dari belakang Sub)
-                let midLeftBadges = '';
-                if (reds > 0) { midLeftBadges = `<div class="absolute top-[2px] -left-3.5 w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200 z-10"><div class="w-2.5 h-3.5 bg-[#ef4444] rounded-[2px]"></div></div>`; } 
-                else if (yellows > 0) { midLeftBadges = `<div class="absolute top-[2px] -left-3.5 w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200 z-10"><div class="w-2.5 h-3.5 bg-[#eab308] rounded-[2px]"></div></div>`; }
-
-                // 2. KIRI ATAS (LAYER ATAS): SUB IN / SUB OUT (Menit melayang)
+                // 1. KIRI ATAS: SUB IN / SUB OUT (Z-Index 30)
                 let topLeftBadges = '';
-                if (subOut) { topLeftBadges = `<div class="absolute -top-3 -left-1 flex flex-col items-center z-20"><span class="text-[10px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,1)] leading-none mb-[1px]">${getProp(subOut, 'menit')}'</span><div class="w-[18px] h-[18px] bg-[#ef4444] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></div></div>`; }
-                if (subIn) { topLeftBadges = `<div class="absolute -top-3 -left-1 flex flex-col items-center z-20"><span class="text-[10px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,1)] leading-none mb-[1px]">${getProp(subIn, 'menit')}'</span><div class="w-[18px] h-[18px] bg-[#4ade80] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></div></div>`; }
+                if (subOut) { topLeftBadges = `<div class="flex flex-col items-center"><span class="text-[10px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,1)] leading-none mb-[1px]">${getProp(subOut, 'menit')}'</span><div class="w-[18px] h-[18px] bg-[#ef4444] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></div></div>`; }
+                if (subIn) { topLeftBadges = `<div class="flex flex-col items-center"><span class="text-[10px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,1)] leading-none mb-[1px]">${getProp(subIn, 'menit')}'</span><div class="w-[18px] h-[18px] bg-[#4ade80] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></div></div>`; }
 
-                // 3. TENGAH BAWAH: GOL & ASSIST (FOTMOB CENTER-SPLIT LOGIC)
+                // 2. KIRI TENGAH: KARTU KUNING / MERAH (Z-Index 40 Tertinggi, Posisi Mutlak Top-1/2 agar presisi dan tidak tertutup Sub)
+                let midLeftBadges = '';
+                if (reds > 0) { midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><div class="w-2.5 h-3.5 bg-[#ef4444] rounded-[2px]"></div></div>`; } 
+                else if (yellows > 0) { midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><div class="w-2.5 h-3.5 bg-[#eab308] rounded-[2px]"></div></div>`; }
+
+                // 3. KIRI BAWAH: ASSIST (Ukuran -10%, Z-Index Progresif Naik agar Tumpukan Berada di Atas)
                 let bottomLeftBadges = '';
                 if (assists > 0) {
                     let shoeHtml = '';
                     for(let i = 0; i < assists; i++) {
-                        let margin = i > 0 ? '-mr-[10px]' : ''; // Tumpuk rapi masuk ke bawah sepatu sebelumnya
-                        shoeHtml += `<div class="relative w-[22px] h-[22px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200 ${margin}" style="z-index: ${20 - i}">
-                            <img src="https://i.ibb.co.com/Y77msYwV/ICON-SEPATU-T.png" class="w-[15px] h-[15px] object-contain">
+                        let margin = i > 0 ? '-ml-[8px]' : ''; 
+                        shoeHtml += `<div class="relative w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200 ${margin}" style="z-index: ${30 + i}">
+                            <img src="https://i.ibb.co.com/Y77msYwV/ICON-SEPATU-T.png" class="w-[12px] h-[12px] object-contain">
                         </div>`;
                     }
-                    bottomLeftBadges = `<div class="flex items-center flex-row-reverse">${shoeHtml}</div>`;
+                    bottomLeftBadges = `<div class="absolute -bottom-1.5 -left-2.5 flex items-center flex-row z-30">${shoeHtml}</div>`;
                 }
 
+                // 4. KANAN BAWAH: GOL (Ukuran -10%, Z-Index Progresif Naik agar Tumpukan Berada di Atas)
                 let bottomRightBadges = '';
                 if (goals > 0) { 
                     let ballsHtml = '';
                     for(let i = 0; i < goals; i++) {
-                        let margin = i > 0 ? '-ml-[10px]' : ''; // Tumpuk rapi masuk ke bawah bola sebelumnya
-                        ballsHtml += `<div class="relative w-[22px] h-[22px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200 ${margin}" style="z-index: ${20 - i}">
-                            <img src="https://i.ibb.co.com/Zzq7NkhD/ICON-BOLA-T.png" class="w-[15px] h-[15px] object-contain">
+                        let margin = i > 0 ? '-mr-[8px]' : ''; 
+                        ballsHtml += `<div class="relative w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200 ${margin}" style="z-index: ${30 + i}">
+                            <img src="https://i.ibb.co.com/Zzq7NkhD/ICON-BOLA-T.png" class="w-[12px] h-[12px] object-contain">
                         </div>`;
                     }
-                    bottomRightBadges = `<div class="flex items-center">${ballsHtml}</div>`;
+                    bottomRightBadges = `<div class="absolute -bottom-1.5 -right-2.5 flex items-center flex-row-reverse z-30">${ballsHtml}</div>`;
                 }
 
-                // Penggabung Eksekusi Dagu (Keduanya mekar dari pusat bawah dagu pemain)
-                let bottomCluster = '';
-                if (assists > 0 || goals > 0) {
-                    bottomCluster = `<div class="absolute -bottom-2.5 left-1/2 transform -translate-x-1/2 flex items-center justify-center gap-[2px] w-max z-30">
-                        ${bottomLeftBadges}
-                        ${bottomRightBadges}
-                    </div>`;
-                }
-
-                // 4. KANAN TENGAH: GAGAL PENALTI
+                // 5. KANAN TENGAH: GAGAL PENALTI (Ukuran -10% sesuai request)
                 let midRightBadges = '';
                 if (missedPens > 0) {
-                    midRightBadges = `<div class="absolute top-[25%] -right-3 transform -translate-y-1/2 w-[18px] h-[18px] bg-[#ef4444] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md z-10"><svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M6 18L18 6M6 6l12 12"/></svg></div>`;
+                    midRightBadges = `<div class="w-[16px] h-[16px] bg-[#ef4444] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md"><svg class="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M6 18L18 6M6 6l12 12"/></svg></div>`;
                 }
 
                 let posX = isAway ? (100 - slotDef.x) : slotDef.x; 
@@ -3760,16 +3752,21 @@
                 let posStyle = `top: ${absY}%; left: ${posX}%;`;
                 let animDelay = idx * 50;
 
-                // FOTMOB ELITE WRAPPER
+                // FOTMOB ELITE WRAPPER (Penempatan 5 Sudut Terisolasi Mutlak)
                 return `
                 <div class="absolute" style="${posStyle} transform: translate(-50%, -50%); z-index: 10;" onclick="bukaModalPemain('${safeStr(pData ? getProp(pData,'nama') : nm)}', '${safeStr(teamName)}')">
                     <div class="flex flex-col items-center w-[68px] sm:w-[80px] md:w-[100px] pitch-player-anim cursor-pointer group hover:scale-110 transition-transform" style="animation-delay: ${animDelay}ms;">
                         
                         <div class="relative w-[56px] h-[56px] sm:w-16 sm:h-16 md:w-20 md:h-20 mb-1">
-                            ${midLeftBadges}
-                            ${topLeftBadges}
-                            ${bottomCluster}
-                            ${midRightBadges}
+                            ${topLeftBadges !== '' ? `<div class="absolute -top-3 -left-1 flex flex-col items-center z-30">${topLeftBadges}</div>` : ''}
+                            
+                            ${midLeftBadges !== '' ? `<div class="absolute top-1/2 -left-3.5 transform -translate-y-1/2 z-40">${midLeftBadges}</div>` : ''}
+                            
+                            ${midRightBadges !== '' ? `<div class="absolute top-1/2 -right-2.5 transform -translate-y-1/2 z-40">${midRightBadges}</div>` : ''}
+                            
+                            ${bottomLeftBadges}
+                            
+                            ${bottomRightBadges}
                             
                             <div class="w-full h-full rounded-full border-[1.5px] border-white/80 shadow-md overflow-hidden bg-brand-panel">
                                 <img src="${f}" class="w-full h-full object-cover">
