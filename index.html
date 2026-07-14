@@ -3520,35 +3520,70 @@
                 sortedEvents.forEach((ev, idx) => {
                     let isK = getProp(ev,'tim') === tk; 
                     let jns = String(getProp(ev,'jenis')).toUpperCase(); 
-                    
                     // Deteksi Ikon & Efek Glow Berdasarkan Jenis Kejadian
                     let ic = ''; let icBg = ''; let icShadow = '';
-                    if(jns === 'GOL') { ic = '⚽'; icBg = 'bg-brand-green/10 border-brand-green/30 text-brand-green'; icShadow = 'shadow-[0_0_15px_rgba(0,154,68,0.3)]'; }
-                    else if(jns === 'KUNING') { ic = '<div class="w-2.5 h-3.5 bg-yellow-400 rounded-[1px] shadow-sm border border-yellow-500"></div>'; icBg = 'bg-yellow-400/10 border-yellow-400/30'; icShadow = 'shadow-[0_0_15px_rgba(250,204,21,0.2)]'; }
-                    else if(jns === 'MERAH') { ic = '<div class="w-2.5 h-3.5 bg-red-500 rounded-[1px] shadow-sm border border-red-600"></div>'; icBg = 'bg-red-500/10 border-red-500/30'; icShadow = 'shadow-[0_0_15px_rgba(239,68,68,0.3)]'; }
-                    else if(jns === 'BUNUH DIRI' || jns === 'OG') { ic = '⚽'; icBg = 'bg-red-500/10 border-red-500/30 text-red-500'; icShadow = 'shadow-[0_0_15px_rgba(239,68,68,0.3)]'; }
+                    let jnsRaw = jns.replace(/\s+/g, ''); // Hapus spasi untuk pencocokan yang aman
                     
-                    // INJEKSI BARU: Ikon Substitusi FotMob Style
-                    else if(jns === 'SUB IN' || jns === 'SUBIN') { 
-                        ic = '<svg class="w-3.5 h-3.5 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg>'; 
-                        icBg = 'bg-brand-green/10 border-brand-green/30 text-brand-green'; 
-                        icShadow = 'shadow-sm'; 
+                    if(jnsRaw === 'GOL') { 
+                        ic = '<img src="https://i.ibb.co.com/Zzq7NkhD/ICON-BOLA-T.png" class="w-4 h-4 object-contain">'; 
+                        icBg = 'bg-white border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
                     }
-                    else if(jns === 'SUB OUT' || jns === 'SUBOUT') { 
-                        ic = '<svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path></svg>'; 
-                        icBg = 'bg-red-500/10 border-red-500/30 text-red-500'; 
-                        icShadow = 'shadow-sm'; 
+                    else if(jnsRaw === 'ASSIST') { 
+                        ic = '<img src="https://i.ibb.co.com/Y77msYwV/ICON-SEPATU-T.png" class="w-4 h-4 object-contain">'; 
+                        icBg = 'bg-white border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
                     }
-                    
-                    // Jika jenis kejadian tidak dikenali
-                    else { ic = '⏱️'; icBg = 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500'; icShadow = 'shadow-sm'; }
+                    else if(jnsRaw === 'KUNING') { 
+                        ic = '<div class="w-2.5 h-3.5 bg-yellow-400 rounded-[2px] shadow-sm border border-yellow-500"></div>'; 
+                        icBg = 'bg-white border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                    }
+                    else if(jnsRaw === 'MERAH') { 
+                        ic = '<div class="w-2.5 h-3.5 bg-red-500 rounded-[2px] shadow-sm border border-red-600"></div>'; 
+                        icBg = 'bg-white border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                    }
+                    else if(jnsRaw === 'KUNINGKEDUA' || jnsRaw === 'SECONDYELLOW') { 
+                        ic = '<img src="https://i.ibb.co.com/bRrT8P4Q/ICON-KARTU-KUNING-KEDUA.png" class="w-4 h-4 object-contain">'; 
+                        icBg = 'bg-white border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                    }
+                    else if(jnsRaw === 'GOLBUNUHDIRI' || jnsRaw === 'OWNGOAL' || jnsRaw === 'OG') { 
+                        ic = '<img src="https://i.ibb.co.com/27SPqBw3/ICON-BOLA-OG-T.png" class="w-4 h-4 object-contain">'; 
+                        icBg = 'bg-brand-red border-red-600'; icShadow = 'shadow-sm'; 
+                    }
+                    else if(jnsRaw === 'GAGALPENALTI' || jnsRaw === 'MISSPENALTY') { 
+                        ic = '<img src="https://i.ibb.co.com/pjWQBCHQ/ICON-MISS-PENALTY-T.png" class="w-4 h-4 object-contain">'; 
+                        icBg = 'bg-white border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                    }
+                    else if(jnsRaw === 'PENYELAMATANPENALTI' || jnsRaw === 'SAVEPENALTY' || jnsRaw === 'PENALTYSAVE') { 
+                        ic = '<img src="https://i.ibb.co.com/j9fbKb9L/ICON-PENYELAMATAN-KIPER-PENALTI.png" class="w-4 h-4 object-contain flex-shrink-0">'; 
+                        icBg = 'bg-[#0369a1] border-blue-700'; icShadow = 'shadow-sm'; 
+                    }
+                    else if(jnsRaw === 'CEDERA' || jnsRaw === 'INJURY') { 
+                        ic = '<img src="https://i.ibb.co.com/CsY05ZxJ/ICON-CEDERA.png" class="w-4 h-4 object-contain">'; 
+                        icBg = 'bg-white border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                    }
+                    else if(jnsRaw === 'SUBIN') { 
+                        ic = '<svg class="w-4 h-4 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg>'; 
+                        icBg = 'bg-white border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                    }
+                    else if(jnsRaw === 'SUBOUT') { 
+                        ic = '<svg class="w-4 h-4 text-brand-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path></svg>'; 
+                        icBg = 'bg-white border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                    }
+                    else if(jnsRaw === 'SUBSTITUSI') { 
+                        ic = '<svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>'; 
+                        icBg = 'bg-white border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                    }
+                    else { 
+                        ic = '<span class="text-[10px]">⏱️</span>'; 
+                        icBg = 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500'; icShadow = 'shadow-sm'; 
+                    }
                     
                     let pmn = getProp(ev,'pemain'); let mnt = getProp(ev,'menit');
                     
-                    // Rekap Nama Pencetak Gol di Header Atas
-                    if(jns === 'GOL' || jns === 'BUNUH DIRI' || jns === 'OG') { 
-                        if(isK) gsKiri += `<div>${pmn} <span class="text-gray-400 font-bold ml-1">${mnt}'</span></div>`; 
-                        else gsKanan += `<div><span class="text-gray-400 font-bold mr-1">${mnt}'</span> ${pmn}</div>`; 
+                    // Rekap Nama Pencetak Gol di Header Atas (Termasuk OG)
+                    if(jnsRaw === 'GOL' || jnsRaw === 'GOLBUNUHDIRI' || jnsRaw === 'OG' || jnsRaw === 'OWNGOAL') { 
+                        let ogText = (jnsRaw === 'GOLBUNUHDIRI' || jnsRaw === 'OG' || jnsRaw === 'OWNGOAL') ? ' <span class="text-[8px] text-brand-red">(OG)</span>' : '';
+                        if(isK) gsKiri += `<div>${pmn}${ogText} <span class="text-gray-400 font-bold ml-1">${mnt}'</span></div>`; 
+                        else gsKanan += `<div><span class="text-gray-400 font-bold mr-1">${mnt}'</span> ${pmn}${ogText}</div>`; 
                     }
                     
                     // Efek Animasi Staggered (Bergiliran dari bawah ke atas)
