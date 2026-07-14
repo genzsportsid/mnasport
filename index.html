@@ -3520,68 +3520,80 @@
                 sortedEvents.forEach((ev, idx) => {
                     let isK = getProp(ev,'tim') === tk; 
                     let jns = String(getProp(ev,'jenis')).toUpperCase(); 
-                    // Deteksi Ikon & Efek Glow Berdasarkan Jenis Kejadian
+                    // Deteksi Ikon & Efek Glow Berdasarkan Jenis Kejadian (NEON GLOW EDITION)
                     let ic = ''; let icBg = ''; let icShadow = '';
-                    let jnsRaw = jns.replace(/\s+/g, ''); // Hapus spasi untuk pencocokan yang aman
+                    let jnsRaw = jns.replace(/\s+/g, ''); // Hapus spasi agar aman
                     
                     if(jnsRaw === 'GOL') { 
-                        ic = '<img src="https://i.ibb.co.com/Zzq7NkhD/ICON-BOLA-T.png" class="w-4 h-4 object-contain dark:invert">'; 
-                        icBg = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                        ic = '<span class="text-[11px]">⚽</span>'; 
+                        icBg = 'bg-green-500/10 border-green-500/40 text-green-400'; 
+                        icShadow = 'shadow-[0_0_12px_rgba(74,222,128,0.4)]'; 
                     }
                     else if(jnsRaw === 'ASSIST') { 
-                        ic = '<img src="https://i.ibb.co.com/Y77msYwV/ICON-SEPATU-T.png" class="w-4 h-4 object-contain dark:invert">'; 
-                        icBg = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                        ic = '<span class="text-[11px]">👟</span>'; 
+                        icBg = 'bg-cyan-500/10 border-cyan-500/40 text-cyan-400'; 
+                        icShadow = 'shadow-[0_0_12px_rgba(34,211,238,0.4)]'; 
                     }
                     else if(jnsRaw === 'KUNING') { 
-                        ic = '<div class="w-2.5 h-3.5 bg-yellow-400 rounded-[2px] shadow-sm border border-yellow-500"></div>'; 
-                        icBg = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                        ic = '<div class="w-2.5 h-3.5 bg-yellow-400 rounded-[2px] shadow-sm"></div>'; 
+                        icBg = 'bg-yellow-500/10 border-yellow-500/40'; 
+                        icShadow = 'shadow-[0_0_12px_rgba(250,204,21,0.4)]'; 
                     }
                     else if(jnsRaw === 'MERAH') { 
-                        ic = '<div class="w-2.5 h-3.5 bg-red-500 rounded-[2px] shadow-sm border border-red-600"></div>'; 
-                        icBg = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                        ic = '<div class="w-2.5 h-3.5 bg-red-500 rounded-[2px] shadow-sm"></div>'; 
+                        icBg = 'bg-red-500/10 border-red-500/40'; 
+                        icShadow = 'shadow-[0_0_12px_rgba(239,68,68,0.4)]'; 
                     }
                     else if(jnsRaw === 'KUNINGKEDUA' || jnsRaw === 'SECONDYELLOW') { 
-                        ic = '<img src="https://i.ibb.co.com/bRrT8P4Q/ICON-KARTU-KUNING-KEDUA.png" class="w-4 h-4 object-contain dark:invert">'; 
-                        icBg = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                        ic = '<div class="flex"><div class="w-2.5 h-3.5 bg-yellow-400 rounded-[2px] shadow-sm transform -rotate-6 z-10"></div><div class="w-2.5 h-3.5 bg-red-500 rounded-[2px] shadow-sm -ml-1"></div></div>'; 
+                        icBg = 'bg-orange-500/10 border-orange-500/40'; 
+                        icShadow = 'shadow-[0_0_12px_rgba(249,115,22,0.4)]'; 
                     }
                     else if(jnsRaw === 'GOLBUNUHDIRI' || jnsRaw === 'OWNGOAL' || jnsRaw === 'OG') { 
-                        ic = '<img src="https://i.ibb.co.com/27SPqBw3/ICON-BOLA-OG-T.png" class="w-4 h-4 object-contain">'; 
-                        icBg = 'bg-brand-red border-red-600'; icShadow = 'shadow-sm'; 
+                        ic = '<span class="text-[11px]">⚽</span>'; 
+                        icBg = 'bg-rose-500/10 border-rose-500/40 text-rose-400'; 
+                        icShadow = 'shadow-[0_0_12px_rgba(244,63,94,0.4)]'; 
                     }
                     else if(jnsRaw === 'GAGALPENALTI' || jnsRaw === 'MISSPENALTY') { 
-                        ic = '<img src="https://i.ibb.co.com/pjWQBCHQ/ICON-MISS-PENALTY-T.png" class="w-4 h-4 object-contain dark:invert">'; 
-                        icBg = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                        ic = '<span class="text-[11px]">❌</span>'; 
+                        icBg = 'bg-red-600/10 border-red-600/40 text-red-500'; 
+                        icShadow = 'shadow-[0_0_12px_rgba(220,38,38,0.4)]'; 
                     }
                     else if(jnsRaw === 'PENYELAMATANPENALTI' || jnsRaw === 'SAVEPENALTY' || jnsRaw === 'PENALTYSAVE') { 
-                        ic = '<img src="https://i.ibb.co.com/j9fbKb9L/ICON-PENYELAMATAN-KIPER-PENALTI.png" class="w-4 h-4 object-contain flex-shrink-0">'; 
-                        icBg = 'bg-[#0369a1] border-blue-700'; icShadow = 'shadow-sm'; 
+                        ic = '<span class="text-[11px]">🧤</span>'; 
+                        icBg = 'bg-indigo-500/10 border-indigo-500/40 text-indigo-400'; 
+                        icShadow = 'shadow-[0_0_12px_rgba(99,102,241,0.4)]'; 
                     }
                     else if(jnsRaw === 'CEDERA' || jnsRaw === 'INJURY') { 
-                        ic = '<img src="https://i.ibb.co.com/CsY05ZxJ/ICON-CEDERA.png" class="w-4 h-4 object-contain dark:invert">'; 
-                        icBg = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                        ic = '<span class="text-[11px]">🚑</span>'; 
+                        icBg = 'bg-gray-400/10 border-gray-400/40 text-white'; 
+                        icShadow = 'shadow-[0_0_12px_rgba(156,163,175,0.4)]'; 
                     }
                     else if(jnsRaw === 'SUBIN') { 
-                        ic = '<svg class="w-4 h-4 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg>'; 
-                        icBg = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                        ic = '<svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 15l7-7 7 7"></path></svg>'; 
+                        icBg = 'bg-emerald-500/10 border-emerald-500/40'; 
+                        icShadow = 'shadow-[0_0_12px_rgba(52,211,153,0.4)]'; 
                     }
                     else if(jnsRaw === 'SUBOUT') { 
-                        ic = '<svg class="w-4 h-4 text-brand-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path></svg>'; 
-                        icBg = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                        ic = '<svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path></svg>'; 
+                        icBg = 'bg-rose-500/10 border-rose-500/40'; 
+                        icShadow = 'shadow-[0_0_12px_rgba(251,113,133,0.4)]'; 
                     }
                     else if(jnsRaw === 'SUBSTITUSI') { 
-                        ic = '<svg class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>'; 
-                        icBg = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'; icShadow = 'shadow-sm'; 
+                        ic = '<svg class="w-3.5 h-3.5 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>'; 
+                        icBg = 'bg-brand-green/10 border-brand-green/30'; 
+                        icShadow = 'shadow-[0_0_12px_rgba(0,154,68,0.4)]'; 
                     }
                     else { 
                         ic = '<span class="text-[10px]">⏱️</span>'; 
-                        icBg = 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500'; icShadow = 'shadow-sm'; 
+                        icBg = 'bg-white/5 border-white/10 text-gray-400'; icShadow = 'shadow-sm'; 
                     }
                     
                     let pmn = getProp(ev,'pemain'); let mnt = getProp(ev,'menit');
                     
-                    // Rekap Nama Pencetak Gol di Header Atas (Termasuk OG)
+                    // Rekap Nama Pencetak Gol di Header Atas (OG Ditandai Merah)
                     if(jnsRaw === 'GOL' || jnsRaw === 'GOLBUNUHDIRI' || jnsRaw === 'OG' || jnsRaw === 'OWNGOAL') { 
-                        let ogText = (jnsRaw === 'GOLBUNUHDIRI' || jnsRaw === 'OG' || jnsRaw === 'OWNGOAL') ? ' <span class="text-[8px] text-brand-red">(OG)</span>' : '';
+                        let ogText = (jnsRaw === 'GOLBUNUHDIRI' || jnsRaw === 'OG' || jnsRaw === 'OWNGOAL') ? ' <span class="text-[8px] text-rose-500 font-black">(OG)</span>' : '';
                         if(isK) gsKiri += `<div>${pmn}${ogText} <span class="text-gray-400 font-bold ml-1">${mnt}'</span></div>`; 
                         else gsKanan += `<div><span class="text-gray-400 font-bold mr-1">${mnt}'</span> ${pmn}${ogText}</div>`; 
                     }
