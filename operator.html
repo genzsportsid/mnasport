@@ -34,8 +34,11 @@
 
         <div id="mode-live" class="hidden space-y-5 opacity-50 pointer-events-none transition-opacity">
             <div class="bg-brand-panel border border-brand-green/30 p-5 rounded-2xl shadow-[0_0_20px_rgba(0,154,68,0.05)]">
-                <div class="grid grid-cols-4 gap-2 mb-4">
+                <div class="grid grid-cols-3 gap-2 mb-4">
                     <button onclick="setEventMode('Gol', this)" class="evt-btn bg-white/20 border border-white text-white font-bold text-[9px] py-3 rounded-xl uppercase flex flex-col items-center">⚽ <span>Gol</span></button>
+                    <button onclick="setEventMode('Assist', this)" class="evt-btn bg-black border border-white/10 text-gray-300 font-bold text-[9px] py-3 rounded-xl uppercase flex flex-col items-center">👟 <span>Assist</span></button>
+                    <button onclick="setEventMode('Gagal Penalti', this)" class="evt-btn bg-black border border-white/10 text-red-400 font-bold text-[9px] py-3 rounded-xl uppercase flex flex-col items-center">❌ <span>Penalti Gagal</span></button>
+                    
                     <button onclick="setEventMode('Kuning', this)" class="evt-btn bg-black border border-white/10 text-yellow-400 font-bold text-[9px] py-3 rounded-xl uppercase flex flex-col items-center">🟨 <span>Kuning</span></button>
                     <button onclick="setEventMode('Merah', this)" class="evt-btn bg-black border border-white/10 text-red-500 font-bold text-[9px] py-3 rounded-xl uppercase flex flex-col items-center">🟥 <span>Merah</span></button>
                     <button onclick="setEventMode('Substitusi', this)" class="evt-btn bg-black border border-white/10 text-brand-green font-black text-[9px] py-3 rounded-xl uppercase flex flex-col items-center">🔄 <span>Ganti</span></button>
