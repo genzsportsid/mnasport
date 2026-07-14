@@ -3696,26 +3696,39 @@
                 
                 let pEvents = matchEvents.filter(ev => String(getProp(ev, 'pemain')).toLowerCase().trim() === nmLower && String(getProp(ev, 'tim')).toLowerCase().trim() === tLower);
                 
-                // DETEKSI SEMUA JENIS KEJADIAN
+                // DETEKSI SEMUA JENIS KEJADIAN (Termasuk 4 Variabel Baru)
                 let goals = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'GOL').length;
                 let yellows = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'KUNING').length;
                 let reds = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'MERAH').length;
                 let assists = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'ASSIST').length;
                 let missedPens = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'GAGALPENALTI' || j === 'MISSPENALTY'; }).length;
+                
+                // Variabel Baru
+                let ownGoals = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'GOLBUNUHDIRI' || j === 'OWNGOAL' || j === 'OG'; }).length;
+                let penaltySaves = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'PENYELAMATANPENALTI' || j === 'SAVEPENALTY' || j === 'PENALTYSAVE'; }).length;
+                let injuries = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'CEDERA' || j === 'INJURY'; }).length;
+                let secondYellows = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'KUNINGKEDUA' || j === 'SECONDYELLOW'; }).length;
+
                 let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
                 let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
 
-                // 1. KIRI ATAS: SUB IN / SUB OUT (Z-Index 30)
+                // 1. KIRI ATAS: SUB IN / SUB OUT 
                 let topLeftBadges = '';
                 if (subOut) { topLeftBadges = `<div class="flex flex-col items-center"><span class="text-[10px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,1)] leading-none mb-[1px]">${getProp(subOut, 'menit')}'</span><div class="w-[18px] h-[18px] bg-[#ef4444] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></div></div>`; }
                 if (subIn) { topLeftBadges = `<div class="flex flex-col items-center"><span class="text-[10px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,1)] leading-none mb-[1px]">${getProp(subIn, 'menit')}'</span><div class="w-[18px] h-[18px] bg-[#4ade80] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></div></div>`; }
 
-                // 2. KIRI TENGAH: KARTU KUNING / MERAH (Z-Index 40 Tertinggi, Posisi Mutlak Top-1/2 agar presisi dan tidak tertutup Sub)
+                // 2. KIRI TENGAH: KARTU MERAH / KUNING KEDUA / KUNING (Sistem Prioritas)
                 let midLeftBadges = '';
-                if (reds > 0) { midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><div class="w-2.5 h-3.5 bg-[#ef4444] rounded-[2px]"></div></div>`; } 
-                else if (yellows > 0) { midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><div class="w-2.5 h-3.5 bg-[#eab308] rounded-[2px]"></div></div>`; }
+                if (reds > 0) { 
+                    midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><div class="w-2.5 h-3.5 bg-[#ef4444] rounded-[2px]"></div></div>`; 
+                } else if (secondYellows > 0) { 
+                    // Link ikon ini masih menggunakan ikon cedera sesuai yang diberikan. Ganti link di sini nanti jika diperlukan.
+                    midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><img src="https://i.ibb.co.com/bRrT8P4Q/ICON-KARTU-KUNING-KEDUA.png" class="w-[12px] h-[12px] object-contain"></div>`; 
+                } else if (yellows > 0) { 
+                    midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><div class="w-2.5 h-3.5 bg-[#eab308] rounded-[2px]"></div></div>`; 
+                }
 
-                // 3. KIRI BAWAH: ASSIST (Ukuran -10%, Z-Index Progresif Naik agar Tumpukan Berada di Atas)
+                // 3. KIRI BAWAH: ASSIST 
                 let bottomLeftBadges = '';
                 if (assists > 0) {
                     let shoeHtml = '';
@@ -3728,20 +3741,29 @@
                     bottomLeftBadges = `<div class="absolute -bottom-1.5 -left-2.5 flex items-center flex-row z-30">${shoeHtml}</div>`;
                 }
 
-                // 4. KANAN BAWAH: GOL (Ukuran -10%, Z-Index Progresif Naik agar Tumpukan Berada di Atas)
+                // 4. KANAN BAWAH: KLASTER GOL, OG, & PENYELAMATAN (Ditumpuk cerdas menjadi satu deretan)
                 let bottomRightBadges = '';
-                if (goals > 0) { 
-                    let ballsHtml = '';
-                    for(let i = 0; i < goals; i++) {
-                        let margin = i > 0 ? '-mr-[8px]' : ''; 
-                        ballsHtml += `<div class="relative w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200 ${margin}" style="z-index: ${30 + i}">
-                            <img src="https://i.ibb.co.com/Zzq7NkhD/ICON-BOLA-T.png" class="w-[12px] h-[12px] object-contain">
-                        </div>`;
-                    }
-                    bottomRightBadges = `<div class="absolute -bottom-1.5 -right-2.5 flex items-center flex-row-reverse z-30">${ballsHtml}</div>`;
+                let brCount = 0;
+                let brHtml = '';
+
+                // Mesin Pembangun Tumpukan Kanan Bawah
+                const addBrBadge = (imgSrc) => {
+                    let margin = brCount > 0 ? '-mr-[8px]' : ''; 
+                    brHtml += `<div class="relative w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200 ${margin}" style="z-index: ${30 + brCount}">
+                        <img src="${imgSrc}" class="w-[12px] h-[12px] object-contain">
+                    </div>`;
+                    brCount++;
+                };
+
+                for(let i=0; i<goals; i++) addBrBadge('https://i.ibb.co.com/Zzq7NkhD/ICON-BOLA-T.png');
+                for(let i=0; i<ownGoals; i++) addBrBadge('https://i.ibb.co.com/27SPqBw3/ICON-BOLA-OG-T.png');
+                for(let i=0; i<penaltySaves; i++) addBrBadge('https://i.ibb.co.com/j9fbKb9L/ICON-PENYELAMATAN-KIPER-PENALTI.png');
+
+                if (brCount > 0) {
+                    bottomRightBadges = `<div class="absolute -bottom-1.5 -right-2.5 flex items-center flex-row-reverse z-30">${brHtml}</div>`;
                 }
 
-                // 5. KANAN TENGAH: GAGAL PENALTI (Ukuran disamakan dengan kontainer Kartu: 20px)
+                // 5. KANAN TENGAH: GAGAL PENALTI 
                 let midRightBadges = '';
                 if (missedPens > 0) {
                     midRightBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><img src="https://i.ibb.co.com/pjWQBCHQ/ICON-MISS-PENALTY-T.png" class="w-[12px] h-[12px] object-contain"></div>`;
@@ -3752,20 +3774,16 @@
                 let posStyle = `top: ${absY}%; left: ${posX}%;`;
                 let animDelay = idx * 50;
 
-                // FOTMOB ELITE WRAPPER (Penempatan 5 Sudut Terisolasi Mutlak)
+                // FOTMOB ELITE WRAPPER 
                 return `
                 <div class="absolute" style="${posStyle} transform: translate(-50%, -50%); z-index: 10;" onclick="bukaModalPemain('${safeStr(pData ? getProp(pData,'nama') : nm)}', '${safeStr(teamName)}')">
                     <div class="flex flex-col items-center w-[68px] sm:w-[80px] md:w-[100px] pitch-player-anim cursor-pointer group hover:scale-110 transition-transform" style="animation-delay: ${animDelay}ms;">
                         
                         <div class="relative w-[56px] h-[56px] sm:w-16 sm:h-16 md:w-20 md:h-20 mb-1">
                             ${topLeftBadges !== '' ? `<div class="absolute -top-3 -left-1 flex flex-col items-center z-30">${topLeftBadges}</div>` : ''}
-                            
                             ${midLeftBadges !== '' ? `<div class="absolute top-1/2 -left-3.5 transform -translate-y-1/2 z-40">${midLeftBadges}</div>` : ''}
-                            
                             ${midRightBadges !== '' ? `<div class="absolute top-1/2 -right-2.5 transform -translate-y-1/2 z-40">${midRightBadges}</div>` : ''}
-                            
                             ${bottomLeftBadges}
-                            
                             ${bottomRightBadges}
                             
                             <div class="w-full h-full rounded-full border-[1.5px] border-white/80 shadow-md overflow-hidden bg-brand-panel">
@@ -3773,8 +3791,10 @@
                             </div>
                         </div>
                         
-                        <div class="text-center w-full relative z-20">
-                            <span class="text-[9px] sm:text-[10px] md:text-[12px] font-black text-white tracking-tight truncate block w-full drop-shadow-[0_2px_4px_rgba(0,0,0,1)] whitespace-nowrap">
+                        <!-- WADAH NAMA (Menampung Ikon Cedera dengan Rapi dan Responsif) -->
+                        <div class="flex items-center justify-center gap-[3px] w-full relative z-20 px-1">
+                            ${injuries > 0 ? `<img src="https://i.ibb.co.com/CsY05ZxJ/ICON-CEDERA.png" class="w-2.5 sm:w-3 h-2.5 sm:h-3 shrink-0 object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">` : ''}
+                            <span class="text-[9px] sm:text-[10px] md:text-[12px] font-black text-white tracking-tight truncate drop-shadow-[0_2px_4px_rgba(0,0,0,1)] whitespace-nowrap">
                                 <span class="text-gray-300 font-bold mr-0.5">${num}</span>${short}
                             </span>
                         </div>
