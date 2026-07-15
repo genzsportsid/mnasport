@@ -3870,65 +3870,122 @@
             let skorsKiri = parseNamesToList(tk, getProp(dataKiri, 'skorsing')); let skorsKanan = parseNamesToList(tn, getProp(dataKanan, 'skorsing'));
 
             const renderBench = (bArr, cArr, sArr, isAway, teamName) => {
-                if(bArr.length===0 && cArr.length===0 && sArr.length===0) return '<div class="text-[9px] text-gray-400 italic text-center py-4 w-full">Data kosong</div>';
-                let h=''; let tLower = teamName ? teamName.toLowerCase().trim() : '';
+                if(bArr.length===0 && cArr.length===0 && sArr.length===0) return '<div class="text-[9px] text-gray-400 italic text-center py-8 w-full">Data kosong</div>';
                 
-                bArr.forEach((p, idx) => {
+                // Kontainer Vertikal dengan Gap (Jarak) Presisi FotMob
+                let h = '<div class="flex flex-col items-center w-full gap-5">'; 
+                let tLower = teamName ? teamName.toLowerCase().trim() : '';
+                
+                // Pabrik Mini-Face (Duplikasi Identik dengan Lineup Lapangan)
+                const buildMiniFace = (p, isAbsence) => {
                     let nm = getProp(p,'nama'); let nmLower = nm ? nm.toLowerCase().trim() : '';
                     let num = getProp(p,'nomor')||'-'; let f = getProp(p,'foto') ? getProp(p,'foto') : getAvatar(nm);
                     let pos = getProp(p,'posisi')||'POS';
-                    let ringColor = isAway ? 'ring-[#ef4444]/50' : 'ring-[#3b82f6]/50';
-
+                    let short = getShortName(nm);
+                    
                     let pEvents = matchEvents.filter(ev => String(getProp(ev, 'pemain')).toLowerCase().trim() === nmLower && String(getProp(ev, 'tim')).toLowerCase().trim() === tLower);
+                    
+                    let goals = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'GOL').length;
+                    let yellows = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'KUNING').length;
+                    let reds = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'MERAH').length;
+                    let assists = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'ASSIST').length;
+                    let missedPens = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'GAGALPENALTI' || j === 'MISSPENALTY'; }).length;
+                    let ownGoals = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'GOLBUNUHDIRI' || j === 'OWNGOAL' || j === 'OG'; }).length;
+                    let penaltySaves = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'PENYELAMATANPENALTI' || j === 'SAVEPENALTY' || j === 'PENALTYSAVE'; }).length;
+                    let injuries = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'CEDERA' || j === 'INJURY'; }).length;
+                    let secondYellows = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'KUNINGKEDUA' || j === 'SECONDYELLOW'; }).length;
+
                     let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
                     let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
 
-                    let eventIcons = '';
-                    if (subOut) { eventIcons += `<div class="bg-[#2a2a2a] rounded-full px-1.5 py-0.5 shadow-md border border-gray-600 flex items-center justify-center gap-1"><svg class="w-2.5 h-2.5 text-[#ef4444]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg><span class="text-[7px] font-black text-white">${getProp(subOut, 'menit')}'</span></div>`; }
-                    if (subIn) { eventIcons += `<div class="bg-[#2a2a2a] rounded-full px-1.5 py-0.5 shadow-md border border-gray-600 flex items-center justify-center gap-1"><svg class="w-2.5 h-2.5 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg><span class="text-[7px] font-black text-white">${getProp(subIn, 'menit')}'</span></div>`; }
-                    
-                    let animDelay = idx * 60; let animClass = isAway ? 'slide-right-anim' : 'slide-left-anim';
+                    // Override Trigger untuk Cedera & Skorsing (Memicu Ikon & Meredupkan Wajah)
+                    if(isAbsence === 'cedera') injuries = 1;
+                    if(isAbsence === 'skorsing') reds = 1;
 
-                    if (!isAway) {
-                        let eventBadge = eventIcons !== '' ? `<div class="flex items-center gap-1 ml-1.5">${eventIcons}</div>` : '';
-                        h += `<div class="flex items-center px-1.5 md:px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-brand-dark-bg cursor-pointer transition-colors group w-full ${animClass}" style="animation-delay: ${animDelay}ms;" onclick="bukaModalPemain('${safeStr(nm)}', '${safeStr(teamName)}')">
-                                <div class="w-4 md:w-6 text-center font-bold text-gray-400 dark:text-gray-500 text-[9px] md:text-xs shrink-0">${num}</div>
-                                <div class="relative w-7 h-7 md:w-10 md:h-10 rounded-full ring-2 ${ringColor} p-0.5 shrink-0 mx-1.5 md:mx-2"><img src="${f}" class="w-full h-full rounded-full object-cover bg-white"></div>
-                                <div class="flex-1 flex flex-col justify-center overflow-hidden text-left">
-                                    <div class="flex items-center"><span class="font-bold text-[8px] md:text-[11px] uppercase text-brand-black dark:text-white group-hover:text-brand-green truncate transition-colors">${nm}</span>${eventBadge}</div>
-                                    <span class="text-[7px] md:text-[9px] font-bold text-gray-400 mt-[1px] tracking-widest truncate">${pos}</span>
-                                </div>
-                              </div>`;
-                    } else {
-                        let eventBadge = eventIcons !== '' ? `<div class="flex items-center gap-1.5">${eventIcons}</div>` : '';
-                        h += `<div class="flex items-center px-1.5 md:px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-brand-dark-bg cursor-pointer transition-colors group w-full flex-row-reverse ${animClass}" style="animation-delay: ${animDelay}ms;" onclick="bukaModalPemain('${safeStr(nm)}', '${safeStr(teamName)}')">
-                                <div class="w-4 md:w-6 text-center font-bold text-gray-400 dark:text-gray-500 text-[9px] md:text-xs shrink-0">${num}</div>
-                                <div class="relative w-7 h-7 md:w-10 md:h-10 rounded-full ring-2 ${ringColor} p-0.5 shrink-0 mx-1.5 md:mx-2"><img src="${f}" class="w-full h-full rounded-full object-cover bg-white"></div>
-                                <div class="flex-1 flex flex-col justify-center items-end overflow-hidden text-right">
-                                    <div class="flex items-center justify-end gap-1.5 w-full">${eventBadge}<span class="font-bold text-[8px] md:text-[11px] uppercase text-brand-black dark:text-white group-hover:text-brand-red truncate transition-colors">${nm}</span></div>
-                                    <span class="text-[7px] md:text-[9px] font-bold text-gray-400 mt-[1px] tracking-widest truncate w-full">${pos}</span>
-                                </div>
-                              </div>`;
+                    // 1. KIRI ATAS: SUB IN / SUB OUT (Teks menit responsif Tema Gelap/Terang)
+                    let topLeftBadges = '';
+                    if (subOut) { topLeftBadges = `<div class="flex flex-col items-center"><span class="text-[10px] font-black text-brand-black dark:text-white drop-shadow-sm leading-none mb-[1px]">${getProp(subOut, 'menit')}'</span><div class="w-[18px] h-[18px] bg-[#ef4444] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md z-30"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></div></div>`; }
+                    if (subIn) { topLeftBadges = `<div class="flex flex-col items-center"><span class="text-[10px] font-black text-brand-black dark:text-white drop-shadow-sm leading-none mb-[1px]">${getProp(subIn, 'menit')}'</span><div class="w-[18px] h-[18px] bg-[#4ade80] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md z-30"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></div></div>`; }
+
+                    // 2. KIRI TENGAH: KARTU MERAH / KUNING KEDUA / KUNING
+                    let midLeftBadges = '';
+                    if (reds > 0) { midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><div class="w-2.5 h-3.5 bg-[#ef4444] rounded-[2px]"></div></div>`; } 
+                    else if (secondYellows > 0) { midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><img src="https://i.ibb.co.com/bRrT8P4Q/ICON-KARTU-KUNING-KEDUA.png" class="w-[12px] h-[12px] object-contain"></div>`; } 
+                    else if (yellows > 0) { midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><div class="w-2.5 h-3.5 bg-[#eab308] rounded-[2px]"></div></div>`; }
+
+                    // 3. KIRI BAWAH: ASSIST 
+                    let bottomLeftBadges = '';
+                    if (assists > 0) {
+                        let shoeHtml = '';
+                        for(let i = 0; i < assists; i++) {
+                            let margin = i > 0 ? '-ml-[8px]' : ''; 
+                            shoeHtml += `<div class="relative w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200 ${margin}" style="z-index: ${30 + i}"><img src="https://i.ibb.co.com/Y77msYwV/ICON-SEPATU-T.png" class="w-[12px] h-[12px] object-contain"></div>`;
+                        }
+                        bottomLeftBadges = `<div class="absolute -bottom-1.5 -left-2.5 flex items-center flex-row z-30">${shoeHtml}</div>`;
                     }
-                });
-                
-                const renderAbsence = (aArr, iconHtml, label) => {
-                    if(aArr.length === 0) return;
-                    h += `<div class="bg-gray-100 dark:bg-gray-800 border-y border-gray-200 dark:border-gray-700 px-2 py-1.5 text-[8px] font-bold text-gray-500 uppercase tracking-widest text-center shadow-inner flex items-center justify-center gap-1.5">${iconHtml} ${label}</div>`;
-                    aArr.forEach(p => {
-                        let nm = getProp(p,'nama'); let num = getProp(p,'nomor')||'-'; let f = getProp(p,'foto') ? getProp(p,'foto') : getAvatar(nm);
-                        h += `<div onclick="bukaModalPemain('${safeStr(nm)}', '${safeStr(teamName)}')" class="flex items-center px-1.5 md:px-4 py-2 opacity-60 grayscale cursor-pointer hover:bg-gray-50 dark:hover:bg-brand-dark-bg transition-colors w-full ${!isAway ? '' : 'flex-row-reverse'}">
-                                <div class="w-4 md:w-6 text-center font-bold text-gray-400 text-[9px] md:text-xs shrink-0">${num}</div>
-                                <div class="relative w-7 h-7 md:w-10 md:h-10 rounded-full ring-2 ring-gray-400 p-0.5 shrink-0 mx-1.5 md:mx-2"><img src="${f}" class="w-full h-full rounded-full object-cover bg-white"></div>
-                                <div class="flex-1 flex flex-col justify-center overflow-hidden ${!isAway ? 'text-left' : 'items-end text-right'}"><span class="font-bold text-[8px] md:text-[11px] uppercase text-gray-600 truncate">${nm}</span><span class="text-[7px] md:text-[9px] font-bold text-gray-400 mt-[1px] tracking-widest truncate w-full line-through">Absen</span></div>
-                              </div>`;
-                    });
+
+                    // 4. KANAN BAWAH: GOL, OG, PENYELAMATAN KIPER
+                    let bottomRightBadges = '';
+                    let brCount = 0; let brHtml = '';
+                    const addBrBadge = (imgSrc) => {
+                        let margin = brCount > 0 ? '-mr-[8px]' : ''; 
+                        brHtml += `<div class="relative w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200 ${margin}" style="z-index: ${30 + brCount}"><img src="${imgSrc}" class="w-[12px] h-[12px] object-contain"></div>`;
+                        brCount++;
+                    };
+                    for(let i=0; i<goals; i++) addBrBadge('https://i.ibb.co.com/Zzq7NkhD/ICON-BOLA-T.png');
+                    for(let i=0; i<ownGoals; i++) addBrBadge('https://i.ibb.co.com/27SPqBw3/ICON-BOLA-OG-T.png');
+                    for(let i=0; i<penaltySaves; i++) addBrBadge('https://i.ibb.co.com/j9fbKb9L/ICON-PENYELAMATAN-KIPER-PENALTI.png');
+
+                    if (brCount > 0) { bottomRightBadges = `<div class="absolute -bottom-1.5 -right-2.5 flex items-center flex-row-reverse z-30">${brHtml}</div>`; }
+
+                    // 5. KANAN TENGAH: GAGAL PENALTI 
+                    let midRightBadges = '';
+                    if (missedPens > 0) { midRightBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><img src="https://i.ibb.co.com/pjWQBCHQ/ICON-MISS-PENALTY-T.png" class="w-[12px] h-[12px] object-contain"></div>`; }
+
+                    let opacityClass = isAbsence ? "opacity-50 grayscale" : "";
+
+                    return `
+                    <div class="flex flex-col items-center group cursor-pointer hover:scale-105 transition-transform w-full ${opacityClass}" onclick="bukaModalPemain('${safeStr(nm)}', '${safeStr(teamName)}')">
+                        <div class="relative w-[56px] h-[56px] sm:w-16 sm:h-16 md:w-20 md:h-20 mb-1">
+                            ${topLeftBadges !== '' ? `<div class="absolute -top-3 -left-1 flex flex-col items-center z-30">${topLeftBadges}</div>` : ''}
+                            ${midLeftBadges !== '' ? `<div class="absolute top-1/2 -left-3.5 transform -translate-y-1/2 z-40">${midLeftBadges}</div>` : ''}
+                            ${midRightBadges !== '' ? `<div class="absolute top-1/2 -right-2.5 transform -translate-y-1/2 z-40">${midRightBadges}</div>` : ''}
+                            ${bottomLeftBadges}
+                            ${bottomRightBadges}
+                            
+                            <div class="w-full h-full rounded-full border-[1.5px] border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden bg-white dark:bg-brand-dark-bg">
+                                <img src="${f}" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-center gap-[3px] w-full relative z-20 px-1 mt-1">
+                            ${injuries > 0 ? `<div class="w-[12px] h-[12px] bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-200 shrink-0"><img src="https://i.ibb.co.com/CsY05ZxJ/ICON-CEDERA.png" class="w-[7px] h-[7px] object-contain"></div>` : ''}
+                            <span class="text-[9px] sm:text-[10px] md:text-[11px] font-bold text-brand-black dark:text-white tracking-tight truncate whitespace-nowrap ${isAbsence ? 'line-through' : ''}">
+                                <span class="text-gray-400 font-medium mr-0.5">${num}</span>${short}
+                            </span>
+                        </div>
+                        <span class="text-[7px] md:text-[8px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">${pos}</span>
+                    </div>`;
                 };
+
+                // Cetak Pemain Cadangan Aktif
+                bArr.forEach(p => h += buildMiniFace(p, false));
                 
-                renderAbsence(cArr, '🚑', 'Cedera'); renderAbsence(sArr, '🟥', 'Skorsing / Akumulasi');
+                // Cetak Pemain Cedera / Skorsing
+                if (cArr.length > 0 || sArr.length > 0) {
+                    h += `<div class="w-[40%] h-[1px] bg-gray-200 dark:bg-gray-800 my-2"></div>`;
+                    cArr.forEach(p => h += buildMiniFace(p, 'cedera'));
+                    sArr.forEach(p => h += buildMiniFace(p, 'skorsing'));
+                }
+
+                h += '</div>';
                 return h;
             };
-            
+
+            // FIX: Hapus class "divide-y" agar tidak ada garis pembatas horizontal antar pemain, memunculkan kesan Vertikal Elegan.
+            bKiri.className = "flex flex-col w-full py-6";
+            bKanan.className = "flex flex-col w-full py-6";
+
             bKiri.innerHTML = renderBench(benchKiri, cederaKiri, skorsKiri, false, tk); 
             bKanan.innerHTML = renderBench(benchKanan, cederaKanan, skorsKanan, true, tn);
         }
