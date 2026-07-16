@@ -3322,8 +3322,23 @@
             let jenjang = getProp(p, 'Jenjang') || (t ? getProp(t, 'Jenjang') : currentJenjang);
             let leagueTopScorers = (rawData.TopSkor || []).filter(ts => String(getProp(ts, 'Jenjang')||getProp(ts, 'Liga')).toUpperCase() === String(jenjang).toUpperCase());
             let highestGol = 0; if(leagueTopScorers.length > 0) { highestGol = parseInt(getProp(leagueTopScorers[0], 'Gol') || getProp(leagueTopScorers[0], 'gol')) || 0; }
-            let playerGol = parseInt(getProp(p, 'gol')) || 0;
-            let isTopScorer = (playerGol > 0 && playerGol >= highestGol);
+            // MESIN REAL-TIME STATS (Membaca langsung dari Event_Match agar Gol Penalti terbaca otomatis)
+            let rtGol = 0, rtKuning = 0, rtMerah = 0;
+            (rawData.Event_Match || []).forEach(ev => {
+                if (String(getProp(ev, 'pemain')).toLowerCase().trim() === String(namaPemain).toLowerCase().trim()) {
+                    let jns = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '');
+                    if (jns === 'GOL' || jns === 'GOLPENALTI') rtGol++;
+                    else if (jns === 'KUNING') rtKuning++;
+                    else if (jns === 'MERAH' || jns === 'KUNINGKEDUA' || jns === 'SECONDYELLOW') rtMerah++;
+                }
+            });
+
+            // Sinkronisasi Anti-Lag: Gunakan angka terbesar antara Spreadsheet vs Hitungan Real-time Web
+            let finalGol = Math.max(parseInt(getProp(p, 'gol')) || 0, rtGol);
+            let finalKuning = Math.max(parseInt(getProp(p, 'kuning')) || 0, rtKuning);
+            let finalMerah = Math.max(parseInt(getProp(p, 'merah')) || 0, rtMerah);
+
+            let isTopScorer = (finalGol > 0 && finalGol >= highestGol);
 
             let badgeTs = document.getElementById('mp-badge-topskor');
             if(isTopScorer) { if(badgeTs) badgeTs.classList.remove('hidden'); } 
@@ -3333,18 +3348,18 @@
             let elNama = document.getElementById('mp-nama'); if(elNama) elNama.innerText = namaPemain;
             let elTimNama = document.getElementById('mp-tim-nama'); if(elTimNama) elTimNama.innerText = nmTim || "Tanpa Klub";
             let elTimLogo = document.getElementById('mp-tim-logo'); if(elTimLogo) elTimLogo.src = logo;
-            
-            // INJEKSI BARU: Menyuntikkan Logo Klub ke Watermark Raksasa di Latar Belakang
             let elTimWatermark = document.getElementById('mp-tim-watermark'); if(elTimWatermark) elTimWatermark.src = logo;
 
             let elPosisi = document.getElementById('mp-posisi'); if(elPosisi) elPosisi.innerText = getProp(p,'posisi') || "POS";
             let elTinggi = document.getElementById('mp-tinggi'); if(elTinggi) elTinggi.innerText = getProp(p,'tinggi') ? getProp(p,'tinggi') + ' cm' : "-";
             let elKaki = document.getElementById('mp-kaki'); if(elKaki) elKaki.innerText = getProp(p,'kaki') || "-";
             let elUmur = document.getElementById('mp-umur'); if(elUmur) { let tglLahir = getProp(p, 'tanggal lahir') || getProp(p, 'tanggallahir') || getProp(p, 'ttl'); elUmur.innerText = hitungUmurPemain(tglLahir); }
-            let elGol = document.getElementById('mp-gol'); if(elGol) elGol.innerText = getProp(p,'gol') || 0;
+            
+            // Injeksi Angka Valid ke Tampilan Kartu
+            let elGol = document.getElementById('mp-gol'); if(elGol) elGol.innerText = finalGol;
             let elNomor = document.getElementById('mp-nomor'); if(elNomor) elNomor.innerText = getProp(p,'nomor') || "-";
-            let elKuning = document.getElementById('mp-kuning'); if(elKuning) elKuning.innerText = getProp(p,'kuning') || 0;
-            let elMerah = document.getElementById('mp-merah'); if(elMerah) elMerah.innerText = getProp(p,'merah') || 0;
+            let elKuning = document.getElementById('mp-kuning'); if(elKuning) elKuning.innerText = finalKuning;
+            let elMerah = document.getElementById('mp-merah'); if(elMerah) elMerah.innerText = finalMerah;
 
             document.getElementById('modal-pemain').classList.remove('hidden'); document.getElementById('modal-pemain').classList.add('flex'); document.body.classList.add('modal-open');
         }
