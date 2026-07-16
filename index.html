@@ -3524,7 +3524,7 @@
                     let ic = ''; let icBg = ''; let icShadow = '';
                     let jnsRaw = jns.replace(/\s+/g, ''); // Hapus spasi agar aman
                     
-                    if(jnsRaw === 'GOL') { 
+                    if(jnsRaw === 'GOL' || jnsRaw === 'GOLPENALTI') { 
                         ic = '<span class="text-[11px]">⚽</span>'; 
                         icBg = 'bg-green-500/10 border-green-500/40 text-green-400'; 
                         icShadow = 'shadow-[0_0_12px_rgba(74,222,128,0.4)]'; 
@@ -3591,11 +3591,17 @@
                     
                     let pmn = getProp(ev,'pemain'); let mnt = getProp(ev,'menit');
                     
-                    // Rekap Nama Pencetak Gol di Header Atas (OG Ditandai Merah)
-                    if(jnsRaw === 'GOL' || jnsRaw === 'GOLBUNUHDIRI' || jnsRaw === 'OG' || jnsRaw === 'OWNGOAL') { 
-                        let ogText = (jnsRaw === 'GOLBUNUHDIRI' || jnsRaw === 'OG' || jnsRaw === 'OWNGOAL') ? ' <span class="text-[8px] text-rose-500 font-black">(OG)</span>' : '';
-                        if(isK) gsKiri += `<div>${pmn}${ogText} <span class="text-gray-400 font-bold ml-1">${mnt}'</span></div>`; 
-                        else gsKanan += `<div><span class="text-gray-400 font-bold mr-1">${mnt}'</span> ${pmn}${ogText}</div>`; 
+                    // Rekap Nama Pencetak Gol di Header Atas (OG & Penalti Ditandai)
+                    if(jnsRaw === 'GOL' || jnsRaw === 'GOLPENALTI' || jnsRaw === 'GOLBUNUHDIRI' || jnsRaw === 'OG' || jnsRaw === 'OWNGOAL') { 
+                        let extraText = '';
+                        if (jnsRaw === 'GOLBUNUHDIRI' || jnsRaw === 'OG' || jnsRaw === 'OWNGOAL') {
+                            extraText = ' <span class="text-[8px] text-rose-500 font-black">(OG)</span>';
+                        } else if (jnsRaw === 'GOLPENALTI') {
+                            extraText = ' <span class="text-[8px] text-brand-gold font-black">(Penalti)</span>';
+                        }
+
+                        if(isK) gsKiri += `<div>${pmn}${extraText} <span class="text-gray-400 font-bold ml-1">${mnt}'</span></div>`; 
+                        else gsKanan += `<div><span class="text-gray-400 font-bold mr-1">${mnt}'</span> ${pmn}${extraText}</div>`; 
                     }
                     
                     // Efek Animasi Staggered (Bergiliran dari bawah ke atas)
@@ -3744,7 +3750,7 @@
                 let pEvents = matchEvents.filter(ev => String(getProp(ev, 'pemain')).toLowerCase().trim() === nmLower && String(getProp(ev, 'tim')).toLowerCase().trim() === tLower);
                 
                 // DETEKSI SEMUA JENIS KEJADIAN (Termasuk 4 Variabel Baru)
-                let goals = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'GOL').length;
+                let goals = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'GOL' || j === 'GOLPENALTI'; }).length;
                 let yellows = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'KUNING').length;
                 let reds = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'MERAH').length;
                 let assists = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'ASSIST').length;
@@ -3886,7 +3892,7 @@
                     
                     let pEvents = matchEvents.filter(ev => String(getProp(ev, 'pemain')).toLowerCase().trim() === nmLower && String(getProp(ev, 'tim')).toLowerCase().trim() === tLower);
                     
-                    let goals = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'GOL').length;
+                    let goals = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'GOL' || j === 'GOLPENALTI'; }).length;
                     let yellows = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'KUNING').length;
                     let reds = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'MERAH').length;
                     let assists = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'ASSIST').length;
