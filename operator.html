@@ -432,13 +432,15 @@
                 } 
                 else if(currentEvtMode === 'Gol') {
                     let isPen = document.getElementById('check-penalti').checked;
-                    let p1Name = isPen ? p1 + ' (Penalti)' : p1;
+                    
+                    // PENDEKATAN BARU: Nama pemain murni, Jenis Kejadian yang diubah
+                    let jenisGol = isPen ? 'Gol Penalti' : 'Gol';
                     
                     // USER REQUEST: ASSIST DULU BARU GOL (Agar Timeline Urut)
                     if(p2) { await sendPost(p2, 'Assist'); }
-                    await sendPost(p1Name, 'Gol'); 
+                    await sendPost(p1, jenisGol); 
                     
-                    showLog(`Sukses! Gol: ${p1Name} ${p2 ? '(Assist: '+p2+')' : ''}`);
+                    showLog(`Sukses! ${jenisGol}: ${p1} ${p2 ? '(Assist: '+p2+')' : ''}`);
                 }
                 else if(currentEvtMode === 'Gagal Penalti') {
                     // USER REQUEST: Miss penalty auto triggers Save Penalty for enemy GK
