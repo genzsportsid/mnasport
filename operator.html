@@ -11,9 +11,11 @@
 </head>
 <body class="pb-24">
     <div class="max-w-md mx-auto p-4 md:p-6">
-        <!-- HEADER -->
         <div class="mb-5 border-b border-white/10 pb-4 flex items-center justify-between">
-            <div><h1 class="text-lg font-black uppercase tracking-widest text-brand-green flex items-center gap-2"><i data-lucide="radio" class="w-5 h-5 text-red-500 animate-pulse"></i> Pro Operator</h1><p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Visual Lineup & Live Data</p></div>
+            <div>
+                <h1 class="text-lg font-black uppercase tracking-widest text-brand-green flex items-center gap-2"><i data-lucide="radio" class="w-5 h-5 text-red-500 animate-pulse"></i> Pro Operator</h1>
+                <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Visual Lineup & Smart Events</p>
+            </div>
             <button onclick="fetchData()" class="bg-white/5 p-2 rounded-lg border border-white/10"><i data-lucide="refresh-cw" id="icon-refresh" class="w-4 h-4 text-gray-400"></i></button>
         </div>
 
@@ -22,43 +24,58 @@
             <button id="tab-lineup" onclick="switchMode('lineup')" class="flex-1 py-2.5 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-white rounded-lg transition-colors">📋 Rakit Lineup</button>
         </div>
 
-        <div id="loading-screen" class="flex flex-col items-center py-10"><div class="loader mb-4"></div><p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Sinkronisasi Server...</p></div>
+        <div id="loading-screen" class="flex flex-col items-center py-10"><div class="loader mb-4"></div><p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Sinkronisasi Database...</p></div>
 
         <div id="global-selectors" class="hidden space-y-4 mb-5">
-            <select id="select-match" onchange="handleMatchChange()" class="w-full bg-brand-panel border border-white/10 rounded-xl px-4 py-3 text-[11px] font-bold uppercase outline-none shadow-sm"><option value="">-- 1. Pilih Pertandingan Aktif --</option></select>
+            <select id="select-match" onchange="handleMatchChange()" class="w-full bg-brand-panel border border-white/10 rounded-xl px-4 py-3 text-[11px] font-bold uppercase outline-none shadow-sm text-brand-gold"><option value="">-- 1. Pilih Pertandingan Aktif --</option></select>
             <div id="team-selectors" class="hidden flex gap-2">
                 <button id="btn-tim-kiri" onclick="handleTeamChange('kiri')" class="flex-1 bg-black border border-white/10 text-gray-400 font-bold text-[11px] py-3 rounded-xl uppercase truncate px-2"></button>
                 <button id="btn-tim-kanan" onclick="handleTeamChange('kanan')" class="flex-1 bg-black border border-white/10 text-gray-400 font-bold text-[11px] py-3 rounded-xl uppercase truncate px-2"></button>
             </div>
         </div>
 
-        <div id="mode-live" class="hidden space-y-5 opacity-50 pointer-events-none transition-opacity">
-            <div class="bg-brand-panel border border-brand-green/30 p-5 rounded-2xl shadow-[0_0_20px_rgba(0,154,68,0.05)]">
-                <div class="grid grid-cols-3 gap-2 mb-4">
-                    <button onclick="setEventMode('Gol', this)" class="evt-btn bg-white/20 border border-white text-white font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">⚽</span> <span>Gol</span></button>
-                    <button onclick="setEventMode('Assist', this)" class="evt-btn bg-black border border-white/10 text-gray-300 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">👟</span> <span>Assist</span></button>
-                    <button onclick="setEventMode('Gol Bunuh Diri', this)" class="evt-btn bg-black border border-white/10 text-red-300 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🤦‍♂️</span> <span class="text-[8px]">Own Goal</span></button>
+        <div id="mode-live" class="hidden space-y-4 opacity-50 pointer-events-none transition-opacity">
+            
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="setEventMode('Gol', this)" class="evt-btn active-btn bg-white/20 border border-white text-white font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">⚽</span> <span>Gol</span></button>
+                <button onclick="setEventMode('Gol Bunuh Diri', this)" class="evt-btn bg-black border border-white/10 text-rose-400 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🤦‍♂️</span> <span class="text-[8px]">Own Goal</span></button>
+                <button onclick="setEventMode('Penyelamatan Penalti', this)" class="evt-btn bg-black border border-white/10 text-cyan-300 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1 text-center"><span class="text-sm">🧤</span> <span class="text-[8px]">Save Pen</span></button>
 
-                    <button onclick="setEventMode('Kuning', this)" class="evt-btn bg-black border border-white/10 text-yellow-400 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🟨</span> <span>Kuning</span></button>
-                    <button onclick="setEventMode('Kuning Kedua', this)" class="evt-btn bg-black border border-white/10 text-orange-400 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1 text-center"><span class="text-sm">🟨🟥</span> <span class="text-[8px]">2nd Kuning</span></button>
-                    <button onclick="setEventMode('Merah', this)" class="evt-btn bg-black border border-white/10 text-red-500 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🟥</span> <span>Merah</span></button>
+                <button onclick="setEventMode('Kuning', this)" class="evt-btn bg-black border border-white/10 text-yellow-400 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🟨</span> <span>Kuning</span></button>
+                <button onclick="setEventMode('Kuning Kedua', this)" class="evt-btn bg-black border border-white/10 text-orange-400 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1 text-center"><span class="text-sm">🟨🟥</span> <span class="text-[8px]">2nd Kuning</span></button>
+                <button onclick="setEventMode('Merah', this)" class="evt-btn bg-black border border-white/10 text-red-500 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🟥</span> <span>Merah</span></button>
 
-                    <button onclick="setEventMode('Gagal Penalti', this)" class="evt-btn bg-black border border-white/10 text-red-400 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">❌</span> <span class="text-[8px]">Miss Pen</span></button>
-                    <button onclick="setEventMode('Penyelamatan Penalti', this)" class="evt-btn bg-black border border-white/10 text-blue-300 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1 text-center"><span class="text-sm">🧤</span> <span class="text-[8px]">Save Pen</span></button>
-                    <button onclick="setEventMode('Cedera', this)" class="evt-btn bg-black border border-white/10 text-white font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🚑</span> <span>Cedera</span></button>
+                <button onclick="setEventMode('Gagal Penalti', this)" class="evt-btn bg-black border border-white/10 text-red-400 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">❌</span> <span class="text-[8px]">Miss Pen</span></button>
+                <button onclick="setEventMode('Cedera', this)" class="evt-btn bg-black border border-white/10 text-gray-300 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🚑</span> <span>Cedera</span></button>
+                <button onclick="setEventMode('Substitusi', this)" class="evt-btn bg-black border border-white/10 text-brand-green font-black text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🔄</span> <span>Ganti</span></button>
+            </div>
 
-                    <button onclick="setEventMode('Substitusi', this)" class="evt-btn col-span-3 bg-black border border-white/10 text-brand-green font-black text-[10px] py-3 rounded-xl uppercase flex flex-row items-center justify-center gap-2"><span class="text-sm">🔄</span> <span>Ganti Pemain (Substitusi)</span></button>
-                </div>
+            <div id="dynamic-form-container" class="bg-brand-panel border border-brand-green/50 p-4 rounded-2xl shadow-lg transition-colors duration-300">
                 <div class="flex gap-3 mb-4">
-                    <div id="ui-normal" class="flex-1"><select id="select-pemain" class="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-xs font-bold uppercase outline-none"><option value="">-- Pilih Pemain --</option></select></div>
-                    <div id="ui-sub" class="flex-1 hidden space-y-2">
-                        <select id="select-pemain-out" class="w-full bg-black border border-red-500/30 text-red-500 rounded-xl px-3 py-2 text-[10px] font-bold uppercase"><option value="">-- Pemain Keluar ⬇️ --</option></select>
-                        <select id="select-pemain-in" class="w-full bg-black border border-brand-green/30 text-brand-green rounded-xl px-3 py-2 text-[10px] font-bold uppercase"><option value="">-- Pengganti Masuk ⬆️ --</option></select>
+                    <div class="w-[70px] shrink-0">
+                        <label class="block text-[9px] text-gray-400 font-bold uppercase mb-1.5 text-center">Menit</label>
+                        <input type="text" id="input-menit" placeholder="45+2" class="w-full bg-black border border-white/20 rounded-xl px-1 py-3 text-sm font-black text-center text-white outline-none focus:border-white focus:bg-white/10 transition-colors">
                     </div>
-                    <div class="w-16 shrink-0"><input type="number" id="input-menit" placeholder="MNT" class="w-full bg-black border border-white/10 rounded-xl px-2 py-3 text-sm font-black text-center outline-none"></div>
+                    
+                    <div class="flex-1">
+                        <label id="label-primary" class="block text-[9px] text-gray-400 font-bold uppercase mb-1.5">Pemain</label>
+                        <select id="select-primary" class="w-full bg-black border border-white/20 rounded-xl px-3 py-3 text-[11px] font-bold text-white uppercase outline-none focus:border-white transition-colors truncate">
+                            <option value="">-- PILIH PEMAIN --</option>
+                        </select>
+                    </div>
                 </div>
+
+                <div id="container-secondary" class="mb-5">
+                    <label id="label-secondary" class="block text-[9px] text-gray-400 font-bold uppercase mb-1.5">Assist (Opsional)</label>
+                    <select id="select-secondary" class="w-full bg-black border border-white/20 rounded-xl px-3 py-3 text-[11px] font-bold text-white uppercase outline-none focus:border-white transition-colors truncate">
+                        <option value="">-- TANPA ASSIST --</option>
+                    </select>
+                </div>
+
                 <input type="hidden" id="input-jenis" value="Gol">
-                <button onclick="submitEvent()" id="btn-submit-live" class="w-full bg-brand-green text-white font-black text-xs uppercase tracking-widest py-3.5 rounded-xl flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(0,154,68,0.3)]"><i data-lucide="send" class="w-4 h-4"></i> Eksekusi Data</button>
+                <button onclick="submitEvent()" id="btn-submit-live" class="w-full bg-white text-black hover:bg-gray-200 font-black text-xs uppercase tracking-widest py-3.5 rounded-xl flex justify-center items-center gap-2 transition-colors">
+                    <i data-lucide="send" class="w-4 h-4"></i> Eksekusi Data
+                </button>
             </div>
         </div>
 
@@ -117,9 +134,8 @@
         <div id="log-status" class="mt-4 text-center text-[10px] font-bold uppercase tracking-widest px-4 py-3 rounded-lg bg-black/50 border border-white/5 hidden"></div>
     </div>
 
-    <!-- LACI PEMILIH PEMAIN -->
     <div id="modal-picker" class="fixed inset-0 z-[100] hidden flex-col justify-end">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closePicker()"></div>
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closePicker()"></div>
         <div class="relative bg-brand-panel border-t border-white/10 rounded-t-[2rem] shadow-2xl modal-up flex flex-col h-[75vh] max-w-md mx-auto w-full pb-safe">
             <div class="p-5 border-b border-white/10 flex justify-between items-center shrink-0">
                 <div><h3 id="picker-title" class="font-black text-lg uppercase text-white tracking-widest">Pilih Pemain</h3><p id="picker-subtitle" class="text-[9px] font-bold text-brand-green uppercase tracking-widest mt-0.5">Posisi: ST</p></div>
@@ -133,10 +149,15 @@
 
     <script>
         lucide.createIcons();
-        const API_URL = "https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec"; //[cite: 1]
+        const API_URL = "https://script.google.com/macros/s/AKfycbzAeXyhA-VIDTJQfmOnPfv0o9NZQXJg9PIk1r1FpSWeqH3TvInjK6QnhONhLieHiqY/exec";
         
-        let matchesData = []; let playersData = []; let coachesData = []; 
+        let matchesData = []; let playersData = []; let coachesData = []; let lineupData = []; let kejadianData = [];
         let selectedMatchId = ''; let selectedTeamName = ''; let currentMode = 'live'; let currentEvtMode = 'Gol';
+
+        // STATE KONDISI LAPANGAN (Context-Aware Logic)
+        let allTeamPlayers = [];
+        let onPitchPlayers = [];
+        let onBenchPlayers = [];
 
         const FORMATIONS = {
             '4-3-3': [{b:'10%', l:'50%', role:'GK'}, {b:'25%', l:'15%', role:'LB'}, {b:'25%', l:'35%', role:'CB'}, {b:'25%', l:'65%', role:'CB'}, {b:'25%', l:'85%', role:'RB'}, {b:'45%', l:'50%', role:'CDM'}, {b:'55%', l:'30%', role:'CM'}, {b:'55%', l:'70%', role:'CM'}, {b:'80%', l:'20%', role:'LW'}, {b:'80%', l:'80%', role:'RW'}, {b:'85%', l:'50%', role:'ST'}],
@@ -151,9 +172,10 @@
         async function fetchData() {
             document.getElementById('loading-screen').classList.remove('hidden'); document.getElementById('global-selectors').classList.add('hidden'); document.getElementById('icon-refresh').classList.add('animate-spin');
             try {
-                matchesData = await (await fetch(API_URL + "?sheet=Jadwal")).json();
-                playersData = await (await fetch(API_URL + "?sheet=Pemain")).json();
-                coachesData = await (await fetch(API_URL + "?sheet=Pelatih")).json(); // Tarik data pelatih
+                // Fetch Semua Data Sekaligus agar UI secepat kilat (Enterprise Level)
+                const fetchSafe = async (s) => { try { return await (await fetch(API_URL+"?sheet="+s)).json(); } catch(e){ return []; } };
+                matchesData = await fetchSafe('Jadwal'); playersData = await fetchSafe('Pemain'); coachesData = await fetchSafe('Pelatih');
+                lineupData = await fetchSafe('Lineup'); kejadianData = await fetchSafe('Kejadian');
                 
                 let select = document.getElementById('select-match'); select.innerHTML = '<option value="">-- 1. Pilih Pertandingan --</option>';
                 matchesData.forEach(m => { let idm = m.id_match || m.ID_Match; if(idm) select.innerHTML += `<option value="${idm}">${m.tim_kiri || m.Tim_Kiri} VS ${m.tim_kanan || m.Tim_Kanan} (${idm})</option>`; });
@@ -188,148 +210,188 @@
             document.getElementById('btn-tim-kiri').className = posisi==='kiri' ? "flex-1 bg-brand-green/20 border border-brand-green text-brand-green font-bold text-[11px] py-3 rounded-xl uppercase truncate px-2" : "flex-1 bg-black border border-white/10 text-gray-400 font-bold text-[11px] py-3 rounded-xl uppercase truncate px-2";
             document.getElementById('btn-tim-kanan').className = posisi==='kanan' ? "flex-1 bg-brand-green/20 border border-brand-green text-brand-green font-bold text-[11px] py-3 rounded-xl uppercase truncate px-2" : "flex-1 bg-black border border-white/10 text-gray-400 font-bold text-[11px] py-3 rounded-xl uppercase truncate px-2";
 
-            // Filter Dropdown Live Events
-            let filteredP = playersData.filter(p => String(p.klub||p.Klub||p.tim||p.Tim||"").toLowerCase().trim() === String(selectedTeamName).toLowerCase().trim());
-            let opt = '<option value="">-- Pilih Pemain --</option>';
-            filteredP.forEach(p => { let nm = p.nama_pemain||p.nama||p.Pemain; opt += `<option value="${nm}">${nm} ${p.no_punggung ? '('+p.no_punggung+')':''}</option>`; });
-            document.getElementById('select-pemain').innerHTML = opt; document.getElementById('select-pemain-out').innerHTML = opt; document.getElementById('select-pemain-in').innerHTML = opt;
-            document.getElementById('mode-live').classList.remove('opacity-50', 'pointer-events-none');
+            // Persiapan Data Mentah
+            allTeamPlayers = playersData.filter(p => String(p.klub||p.Klub||p.tim||p.Tim||"").toLowerCase().trim() === String(selectedTeamName).toLowerCase().trim() && !['PELATIH','COACH','MANAGER'].includes(String(p.posisi||'').toUpperCase().replace(/\s+/g,'')));
             
-            // Filter Dropdown Pelatih
+            // Sinkronisasi Logic Pintar (Siapa di Lapangan, Siapa di Bench)
+            syncMatchStateLocally();
+
+            // Filter Dropdown Pelatih untuk Lineup
             let filteredC = coachesData.filter(c => String(c.tim||c.Tim||c.klub||c.Klub||"").toLowerCase().trim() === String(selectedTeamName).toLowerCase().trim());
             let optC = '<option value="">-- Pilih Pelatih --</option>';
             filteredC.forEach(c => { let nm = c.nama_pelatih||c.nama||c.Nama; optC += `<option value="${nm}">${nm}</option>`; });
             document.getElementById('select-pelatih').innerHTML = optC;
 
+            document.getElementById('mode-live').classList.remove('opacity-50', 'pointer-events-none');
             document.getElementById('mode-lineup').classList.remove('opacity-50', 'pointer-events-none');
             resetLineup();
         }
 
-        function resetLineup() { lineupState = { starters: new Array(11).fill(null), bench: [], cedera: [], skorsing: [] }; renderPitch(); renderExtraRoster(); document.getElementById('select-pelatih').value = ''; }
+        // ==========================================
+        // SMART CONTEXT LOGIC (MEMBEDAH PEMAIN LAPANGAN & BENCH)
+        // ==========================================
+        function syncMatchStateLocally() {
+            let lu = lineupData.find(l => String(l.id_match) === String(selectedMatchId) && String(l.tim).toLowerCase() === String(selectedTeamName).toLowerCase());
+            onPitchPlayers = []; onBenchPlayers = [];
+            
+            if(lu) {
+                if(lu.starting_xi) onPitchPlayers = lu.starting_xi.split(',').map(s=>s.trim()).filter(s=>s);
+                if(lu.bench) onBenchPlayers = lu.bench.split(',').map(s=>s.trim()).filter(s=>s);
+                
+                // Kalkulasi Riwayat Substitusi
+                let kejs = kejadianData.filter(k => String(k.id_match) === String(selectedMatchId) && String(k.tim).toLowerCase() === String(selectedTeamName).toLowerCase());
+                kejs.forEach(k => {
+                    let jns = String(k.jenis).toUpperCase().replace(/\s+/g,'');
+                    let pmn = String(k.pemain).trim();
+                    if(jns === 'SUBOUT') { onPitchPlayers = onPitchPlayers.filter(p => p.toLowerCase() !== pmn.toLowerCase()); onBenchPlayers.push(pmn); }
+                    if(jns === 'SUBIN') { onBenchPlayers = onBenchPlayers.filter(p => p.toLowerCase() !== pmn.toLowerCase()); if(!onPitchPlayers.includes(pmn)) onPitchPlayers.push(pmn); }
+                });
+                showLog('<span class="text-brand-green">Sistem: Filter Lapangan vs Cadangan Aktif!</span>');
+            } else {
+                // Fallback jika pelatih belum setor Lineup
+                onPitchPlayers = allTeamPlayers.map(p => p.nama_pemain||p.nama||p.Pemain);
+                showLog('<span class="text-yellow-500">Peringatan: Lineup belum disubmit. Semua pemain terbuka.</span>');
+            }
+            
+            // Reset Tampilan ke Form Gol
+            setEventMode('Gol', document.querySelector('.evt-btn.active-btn') || document.querySelectorAll('.evt-btn')[0]);
+        }
 
+        // ==========================================
+        // ONE-SHOT FORM GENERATOR (GOL + ASSIST SEKALI KLIK)
+        // ==========================================
+        function setEventMode(jenis, btn) { 
+            currentEvtMode = jenis; document.getElementById('input-jenis').value = jenis; 
+            
+            // Efek UI Tombol
+            document.querySelectorAll('.evt-btn').forEach(b => { b.classList.remove('bg-white/20', 'border-white', 'active-btn'); b.classList.add('bg-black'); }); 
+            btn.classList.replace('bg-black', 'bg-white/20'); btn.classList.add('border-white', 'active-btn'); 
+
+            let lPrimary = document.getElementById('label-primary'); let sPrimary = document.getElementById('select-primary');
+            let lSecondary = document.getElementById('label-secondary'); let sSecondary = document.getElementById('select-secondary');
+            let cSecondary = document.getElementById('container-secondary'); let cForm = document.getElementById('dynamic-form-container');
+
+            // Pabrik Opsi Dropdown
+            let optPitch = '<option value="">-- PILIH PEMAIN --</option>' + onPitchPlayers.map(p => `<option value="${p}">${p}</option>`).join('');
+            let optBench = '<option value="">-- PENGGANTI MASUK --</option>' + onBenchPlayers.map(p => `<option value="${p}">${p}</option>`).join('');
+            let optAll = '<option value="">-- PILIH PEMAIN --</option>' + allTeamPlayers.map(p => `<option value="${p.nama_pemain||p.nama||p.Pemain}">${p.nama_pemain||p.nama||p.Pemain}</option>`).join('');
+            let fallbackOpt = onPitchPlayers.length > 0 ? optPitch : optAll; // Auto Fallback
+
+            cSecondary.classList.add('hidden'); // Sembunyikan Input Kedua secara default
+
+            // Kustomisasi Form Sesuai Kejadian
+            if(jenis === 'Gol') {
+                cForm.className = "bg-brand-panel border border-brand-green/50 p-4 rounded-2xl shadow-[0_0_15px_rgba(0,154,68,0.2)] transition-colors duration-300";
+                lPrimary.innerHTML = '⚽ Pencetak Gol <span class="text-brand-green ml-1">(On Pitch)</span>'; sPrimary.innerHTML = fallbackOpt;
+                lSecondary.innerHTML = '👟 Pencetak Assist <span class="text-gray-500 font-medium ml-1">(Opsional)</span>'; sSecondary.innerHTML = '<option value="">-- TANPA ASSIST --</option>' + fallbackOpt.replace('<option value="">-- PILIH PEMAIN --</option>', '');
+                cSecondary.classList.remove('hidden');
+            } 
+            else if (jenis === 'Substitusi') {
+                cForm.className = "bg-brand-panel border border-white/30 p-4 rounded-2xl shadow-lg transition-colors duration-300";
+                lPrimary.innerHTML = '🔻 Ditarik Keluar <span class="text-red-500 ml-1">(Dari Lapangan)</span>'; sPrimary.innerHTML = fallbackOpt;
+                lSecondary.innerHTML = '✅ Pemain Masuk <span class="text-brand-green ml-1">(Dari Bench)</span>'; sSecondary.innerHTML = onBenchPlayers.length > 0 ? optBench : optAll;
+                cSecondary.classList.remove('hidden');
+            }
+            else if (jenis === 'Kuning' || jenis === 'Kuning Kedua') {
+                cForm.className = "bg-brand-panel border border-yellow-500/50 p-4 rounded-2xl shadow-[0_0_15px_rgba(234,179,8,0.15)] transition-colors duration-300";
+                lPrimary.innerHTML = '🟨 Penerima Kartu <span class="text-gray-500 ml-1">(On Pitch)</span>'; sPrimary.innerHTML = fallbackOpt;
+            }
+            else if (jenis === 'Merah' || jenis === 'Gagal Penalti') {
+                cForm.className = "bg-brand-panel border border-red-500/50 p-4 rounded-2xl shadow-[0_0_15px_rgba(239,68,68,0.15)] transition-colors duration-300";
+                lPrimary.innerHTML = '🟥 Pelaku Kejadian <span class="text-gray-500 ml-1">(On Pitch)</span>'; sPrimary.innerHTML = fallbackOpt;
+            }
+            else if (jenis === 'Gol Bunuh Diri') {
+                cForm.className = "bg-brand-panel border border-rose-500/50 p-4 rounded-2xl shadow-[0_0_15px_rgba(244,63,94,0.15)] transition-colors duration-300";
+                lPrimary.innerHTML = '🤦‍♂️ Pemain (Own Goal) <span class="text-gray-500 ml-1">(On Pitch)</span>'; sPrimary.innerHTML = fallbackOpt;
+            }
+            else if (jenis === 'Penyelamatan Penalti') {
+                cForm.className = "bg-brand-panel border border-cyan-500/50 p-4 rounded-2xl shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-colors duration-300";
+                lPrimary.innerHTML = '🧤 Kiper (Save Pen) <span class="text-gray-500 ml-1">(On Pitch)</span>'; sPrimary.innerHTML = fallbackOpt;
+            }
+            else {
+                cForm.className = "bg-brand-panel border border-gray-500/50 p-4 rounded-2xl shadow-lg transition-colors duration-300";
+                lPrimary.innerHTML = `👤 Pemain Terlibat`; sPrimary.innerHTML = optAll; // Cedera bisa siapa saja
+            }
+        }
+
+        async function submitEvent() {
+            let menit = document.getElementById('input-menit').value.trim();
+            if(!selectedMatchId || !selectedTeamName || !menit) return alert("Isi Menit & Pilih Tim!");
+            
+            let p1 = document.getElementById('select-primary').value; let p2 = document.getElementById('select-secondary').value;
+            if(!p1) return alert("Pilih Pemain Utama!");
+            if(currentEvtMode === 'Substitusi' && !p2) return alert("Pilih Pemain Pengganti (Masuk)!");
+
+            let btn = document.getElementById('btn-submit-live'); btn.disabled = true; btn.innerHTML = "Memproses..."; showLog('<span class="text-yellow-500">Mengirim ke server...</span>');
+
+            const sendPost = async (pNm, jns) => { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'submit_event', payload: { id_match: selectedMatchId, waktu: new Date().toISOString(), menit: menit, tim: selectedTeamName, pemain: pNm, jenis: jns } }) }); };
+            try {
+                if(currentEvtMode === 'Substitusi') {
+                    await sendPost(p1, 'Sub Out'); await sendPost(p2, 'Sub In'); showLog(`Sukses! Substitusi [${p1} ➔ ${p2}]`);
+                    // Update Local State Langsung! (Agar next event presisi)
+                    onPitchPlayers = onPitchPlayers.filter(p => p !== p1); onBenchPlayers = onBenchPlayers.filter(p => p !== p2);
+                    onPitchPlayers.push(p2); onBenchPlayers.push(p1); 
+                } 
+                else if(currentEvtMode === 'Gol') {
+                    await sendPost(p1, 'Gol'); if(p2) await sendPost(p2, 'Assist'); showLog(`Sukses! Gol: ${p1} ${p2 ? '(Assist: '+p2+')' : ''}`);
+                }
+                else { await sendPost(p1, currentEvtMode); showLog(`Sukses! ${currentEvtMode} ➔ ${p1}`); }
+                
+                document.getElementById('input-menit').value = ''; // Kosongkan menit
+                setEventMode(currentEvtMode, document.querySelector('.evt-btn.active-btn')); // Refresh Form
+            } catch(e) { showLog("Gagal mengirim data.", true); } 
+            finally { btn.disabled = false; btn.innerHTML = `<i data-lucide="send" class="w-4 h-4 inline"></i> Eksekusi Data`; lucide.createIcons(); }
+        }
+
+        const showLog = (msg, isErr=false) => { let l = document.getElementById('log-status'); l.classList.remove('hidden'); l.innerHTML = `<span class="${isErr ? 'text-red-500' : 'text-brand-green'}">${msg}</span>`; };
+
+        // ==========================================
+        // RAKIT LINEUP LOGIC (TETAP SAMA SEPERTI SEBELUMNYA)
+        // ==========================================
+        function resetLineup() { lineupState = { starters: new Array(11).fill(null), bench: [], cedera: [], skorsing: [] }; renderPitch(); renderExtraRoster(); document.getElementById('select-pelatih').value = ''; }
         function renderPitch() {
-            const formKey = document.getElementById('select-formasi').value; const slots = FORMATIONS[formKey];
-            let container = document.getElementById('pitch-slots'); let html = '';
+            const formKey = document.getElementById('select-formasi').value; const slots = FORMATIONS[formKey]; let container = document.getElementById('pitch-slots'); let html = '';
             slots.forEach((s, i) => {
                 let p = lineupState.starters[i];
-                if(p) {
-                    let nm = p.nama_pemain||p.nama||p.Pemain; let f = p.foto ? p.foto : `https://ui-avatars.com/api/?name=${nm}&background=fff&color=000&bold=true`;
-                    html += `<div class="builder-slot filled" style="bottom:${s.b}; left:${s.l}; background-image:url('${f}')" onclick="openPicker('starter', ${i})"><span class="slot-label bg-brand-green border-brand-green text-white">${nm.split(' ')[0]}</span></div>`;
-                } else {
-                    html += `<div class="builder-slot empty" style="bottom:${s.b}; left:${s.l};" onclick="openPicker('starter', ${i})"><i data-lucide="plus" class="w-4 h-4 text-white/50 mx-auto mt-2"></i><span class="slot-label">${s.role}</span></div>`;
-                }
-            });
-            container.innerHTML = html; lucide.createIcons();
+                if(p) { let nm = p.nama_pemain||p.nama||p.Pemain; let f = p.foto ? p.foto : `https://ui-avatars.com/api/?name=${nm}&background=fff&color=000&bold=true`; html += `<div class="builder-slot filled" style="bottom:${s.b}; left:${s.l}; background-image:url('${f}')" onclick="openPicker('starter', ${i})"><span class="slot-label bg-brand-green border-brand-green text-white">${nm.split(' ')[0]}</span></div>`; } 
+                else { html += `<div class="builder-slot empty" style="bottom:${s.b}; left:${s.l};" onclick="openPicker('starter', ${i})"><i data-lucide="plus" class="w-4 h-4 text-white/50 mx-auto mt-2"></i><span class="slot-label">${s.role}</span></div>`; }
+            }); container.innerHTML = html; lucide.createIcons();
         }
-
         function renderExtraRoster() {
-            const buildBadge = (arr, type) => {
-                if(arr.length === 0) return '<div class="text-[8px] text-gray-500 italic w-full">Kosong</div>';
-                return arr.map((p, i) => {
-                    let nm = p.nama_pemain||p.nama||p.Pemain;
-                    return `<div class="bg-gray-800 border border-gray-600 px-2 py-1 rounded text-[9px] font-bold text-white uppercase flex items-center gap-2">${nm} <button onclick="removeExtra('${type}', ${i})" class="text-red-400 hover:text-red-300">&times;</button></div>`;
-                }).join('');
-            };
-            document.getElementById('list-bench').innerHTML = buildBadge(lineupState.bench, 'bench');
-            document.getElementById('list-cedera').innerHTML = buildBadge(lineupState.cedera, 'cedera');
-            document.getElementById('list-skorsing').innerHTML = buildBadge(lineupState.skorsing, 'skorsing');
+            const buildBadge = (arr, type) => { if(arr.length === 0) return '<div class="text-[8px] text-gray-500 italic w-full">Kosong</div>'; return arr.map((p, i) => { let nm = p.nama_pemain||p.nama||p.Pemain; return `<div class="bg-gray-800 border border-gray-600 px-2 py-1 rounded text-[9px] font-bold text-white uppercase flex items-center gap-2">${nm} <button onclick="removeExtra('${type}', ${i})" class="text-red-400 hover:text-red-300">&times;</button></div>`; }).join(''); };
+            document.getElementById('list-bench').innerHTML = buildBadge(lineupState.bench, 'bench'); document.getElementById('list-cedera').innerHTML = buildBadge(lineupState.cedera, 'cedera'); document.getElementById('list-skorsing').innerHTML = buildBadge(lineupState.skorsing, 'skorsing');
         }
-
         function removeExtra(type, index) { lineupState[type].splice(index, 1); renderExtraRoster(); }
-
         function openPicker(type, index = null) {
-            if(!selectedTeamName) return alert("Pilih tim terlebih dahulu!");
-            activeContext = { type, index };
-            let title = '', sub = '';
+            if(!selectedTeamName) return alert("Pilih tim terlebih dahulu!"); activeContext = { type, index }; let title = '', sub = '';
             if(type === 'starter') { title = 'Pilih Starter XI'; sub = `Posisi Slot: ${FORMATIONS[document.getElementById('select-formasi').value][index].role}`; document.getElementById('picker-remove-btn').classList.remove('hidden'); }
             else if(type === 'bench') { title = 'Pilih Cadangan'; sub = 'Tambahkan ke bangku cadangan'; document.getElementById('picker-remove-btn').classList.add('hidden'); }
             else if(type === 'cedera') { title = 'Pilih Pemain Cedera'; sub = 'Tandai 🚑'; document.getElementById('picker-remove-btn').classList.add('hidden'); }
             else if(type === 'skorsing') { title = 'Pilih Skorsing'; sub = 'Tandai 🟥'; document.getElementById('picker-remove-btn').classList.add('hidden'); }
-            document.getElementById('picker-title').innerText = title; document.getElementById('picker-subtitle').innerText = sub;
-            document.getElementById('picker-search').value = ''; renderPickerList();
+            document.getElementById('picker-title').innerText = title; document.getElementById('picker-subtitle').innerText = sub; document.getElementById('picker-search').value = ''; renderPickerList();
             document.getElementById('modal-picker').classList.remove('hidden'); document.getElementById('modal-picker').classList.add('flex'); document.body.style.overflow = 'hidden';
         }
-
         function closePicker() { document.getElementById('modal-picker').classList.add('hidden'); document.getElementById('modal-picker').classList.remove('flex'); document.body.style.overflow = ''; }
-
         function renderPickerList() {
             let q = document.getElementById('picker-search').value.toLowerCase().trim();
-            let allPlayers = playersData.filter(p => String(p.klub||p.Klub||p.tim||p.Tim||"").toLowerCase().trim() === String(selectedTeamName).toLowerCase().trim() && !['PELATIH','COACH','MANAGER'].includes(String(p.posisi||'').toUpperCase().replace(/\s+/g,'')));
-            
-            let selectedNames = []; // Anti Kloning Pemain
-            lineupState.starters.forEach(p => { if(p) selectedNames.push(String(p.nama_pemain||p.nama||p.Pemain).toLowerCase()); });
-            lineupState.bench.forEach(p => selectedNames.push(String(p.nama_pemain||p.nama||p.Pemain).toLowerCase()));
-            lineupState.cedera.forEach(p => selectedNames.push(String(p.nama_pemain||p.nama||p.Pemain).toLowerCase()));
-            lineupState.skorsing.forEach(p => selectedNames.push(String(p.nama_pemain||p.nama||p.Pemain).toLowerCase()));
-
-            let available = allPlayers.filter(p => !selectedNames.includes(String(p.nama_pemain||p.nama||p.Pemain).toLowerCase()));
+            let selectedNames = []; lineupState.starters.forEach(p => { if(p) selectedNames.push(String(p.nama_pemain||p.nama||p.Pemain).toLowerCase()); }); lineupState.bench.forEach(p => selectedNames.push(String(p.nama_pemain||p.nama||p.Pemain).toLowerCase())); lineupState.cedera.forEach(p => selectedNames.push(String(p.nama_pemain||p.nama||p.Pemain).toLowerCase())); lineupState.skorsing.forEach(p => selectedNames.push(String(p.nama_pemain||p.nama||p.Pemain).toLowerCase()));
+            let available = allTeamPlayers.filter(p => !selectedNames.includes(String(p.nama_pemain||p.nama||p.Pemain).toLowerCase()));
             if(q) available = available.filter(p => String(p.nama_pemain||p.nama||p.Pemain).toLowerCase().includes(q) || String(p.posisi||'').toLowerCase().includes(q));
-
             let html = '';
             if(available.length === 0) { html = '<div class="text-[10px] text-gray-500 text-center py-6">Pemain habis/tidak ditemukan</div>'; }
-            else {
-                available.forEach((p, idx) => {
-                    let nm = p.nama_pemain||p.nama||p.Pemain; let f = p.foto ? p.foto : `https://ui-avatars.com/api/?name=${nm}&background=000&color=fff`;
-                    html += `
-                    <div onclick="selectPlayerForContext(${playersData.indexOf(p)})" class="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:border-brand-green transition-colors">
-                        <img src="${f}" class="w-10 h-10 rounded-full border border-gray-600 bg-white object-cover">
-                        <div class="flex-1"><h4 class="font-bold text-xs uppercase text-white">${nm}</h4><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">${p.posisi||'POS'}</span></div>
-                        <i data-lucide="plus-circle" class="w-5 h-5 text-gray-500"></i>
-                    </div>`;
-                });
-            }
+            else { available.forEach((p, idx) => { let nm = p.nama_pemain||p.nama||p.Pemain; let f = p.foto ? p.foto : `https://ui-avatars.com/api/?name=${nm}&background=000&color=fff`; html += `<div onclick="selectPlayerForContext(${playersData.indexOf(p)})" class="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:border-brand-green transition-colors"><img src="${f}" class="w-10 h-10 rounded-full border border-gray-600 bg-white object-cover"><div class="flex-1"><h4 class="font-bold text-xs uppercase text-white">${nm}</h4><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">${p.posisi||'POS'}</span></div><i data-lucide="plus-circle" class="w-5 h-5 text-gray-500"></i></div>`; }); }
             document.getElementById('picker-list').innerHTML = html; lucide.createIcons();
         }
-
-        function selectPlayerForContext(globalIndex) {
-            let p = playersData[globalIndex];
-            if(activeContext.type === 'starter') { lineupState.starters[activeContext.index] = p; renderPitch(); }
-            else { lineupState[activeContext.type].push(p); renderExtraRoster(); }
-            closePicker();
-        }
+        function selectPlayerForContext(globalIndex) { let p = playersData[globalIndex]; if(activeContext.type === 'starter') { lineupState.starters[activeContext.index] = p; renderPitch(); } else { lineupState[activeContext.type].push(p); renderExtraRoster(); } closePicker(); }
         function removeSelectedPlayer() { if(activeContext.type === 'starter' && activeContext.index !== null) { lineupState.starters[activeContext.index] = null; renderPitch(); } closePicker(); }
-
-        const showLog = (msg, isErr=false) => { let l = document.getElementById('log-status'); l.classList.remove('hidden'); l.innerHTML = `<span class="${isErr ? 'text-red-500' : 'text-brand-green'}">${msg}</span>`; };
-        function setEventMode(jenis, btn) { currentEvtMode = jenis; document.getElementById('input-jenis').value = jenis; document.querySelectorAll('.evt-btn').forEach(b => { b.classList.remove('bg-white/20', 'border-white'); b.classList.add('bg-black'); }); btn.classList.replace('bg-black', 'bg-white/20'); btn.classList.add('border-white'); if(jenis === 'Substitusi') { document.getElementById('ui-normal').classList.add('hidden'); document.getElementById('ui-sub').classList.remove('hidden'); } else { document.getElementById('ui-normal').classList.remove('hidden'); document.getElementById('ui-sub').classList.add('hidden'); } }
-
-        async function submitEvent() {
-            let menit = document.getElementById('input-menit').value;
-            if(!selectedMatchId || !selectedTeamName || !menit) return alert("Pilih Tim dan isi Menit!");
-            let btn = document.getElementById('btn-submit-live'); btn.disabled = true; btn.innerHTML = "Memproses..."; showLog('<span class="text-yellow-500">Mengirim ke server...</span>');
-            const sendPost = async (pNm, jns) => { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'submit_event', payload: { id_match: selectedMatchId, waktu: new Date().toISOString(), menit: menit, tim: selectedTeamName, pemain: pNm, jenis: jns } }) }); };
-            try {
-                if(currentEvtMode === 'Substitusi') {
-                    let out = document.getElementById('select-pemain-out').value; let inP = document.getElementById('select-pemain-in').value;
-                    if(!out || !inP) throw new Error("Pilih pemain masuk & keluar!");
-                    await sendPost(out, 'Sub Out'); await sendPost(inP, 'Sub In'); showLog(`Sukses! Pergantian [${out} ➔ ${inP}] tercatat.`);
-                } else {
-                    let n = document.getElementById('select-pemain').value; if(!n) throw new Error("Pilih pemain!");
-                    await sendPost(n, currentEvtMode); showLog(`Sukses! ${currentEvtMode} untuk ${n} tercatat.`);
-                }
-            } catch(e) { showLog(e.message, true); } finally { btn.disabled = false; btn.innerHTML = "Eksekusi Data"; }
-        }
-
         async function submitLineup() {
             if(!selectedMatchId || !selectedTeamName) return alert("Pilih Laga & Tim dulu!");
-            
-            // Konversi Array (dengan menahan slot kosong agar posisi tidak meleset)
             const getNamesRaw = (arr) => arr.map(p => p ? (p.nama_pemain||p.nama||p.Pemain) : '').join(',');
-            const getNamesClean = (arr) => arr.filter(x=>x).map(p => p.nama_pemain||p.nama||p.Pemain).join(', '); // Untuk bench/cedera yang tidak terikat slot
-            
-            let startersStr = getNamesRaw(lineupState.starters);
-            let sCount = lineupState.starters.filter(x => x !== null).length;
+            const getNamesClean = (arr) => arr.filter(x=>x).map(p => p.nama_pemain||p.nama||p.Pemain).join(', ');
+            let startersStr = getNamesRaw(lineupState.starters); let sCount = lineupState.starters.filter(x => x !== null).length;
             if(sCount < 11) { if(!confirm(`Papan taktik baru terisi ${sCount}/11 pemain. Yakin simpan?`)) return; }
-
             let btn = document.getElementById('btn-submit-lineup'); btn.disabled = true; btn.innerHTML = "Merekam..."; showLog('<span class="text-yellow-500">Merekam struktur Lineup...</span>');
-
-            try {
-                let payload = {
-                    id_match: selectedMatchId, tim: selectedTeamName, formasi: document.getElementById('select-formasi').value, pelatih: document.getElementById('select-pelatih').value,
-                    starting_xi: startersStr, bench: getNamesClean(lineupState.bench), cedera: getNamesClean(lineupState.cedera), skorsing: getNamesClean(lineupState.skorsing)
-                };
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'submit_lineup', payload: payload }) });
-                showLog(`Sukses! Susunan pemain ${selectedTeamName} resmi dikunci.`);
-            } catch(e) { showLog("Gagal menyimpan lineup.", true); } finally { btn.disabled = false; btn.innerHTML = "Simpan Lineup Resmi"; }
+            try { let payload = { id_match: selectedMatchId, tim: selectedTeamName, formasi: document.getElementById('select-formasi').value, pelatih: document.getElementById('select-pelatih').value, starting_xi: startersStr, bench: getNamesClean(lineupState.bench), cedera: getNamesClean(lineupState.cedera), skorsing: getNamesClean(lineupState.skorsing) }; await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'submit_lineup', payload: payload }) }); showLog(`Sukses! Susunan pemain ${selectedTeamName} resmi dikunci.`); } catch(e) { showLog("Gagal menyimpan lineup.", true); } finally { btn.disabled = false; btn.innerHTML = "Simpan Lineup Resmi"; }
         }
         window.onload = fetchData;
     </script>
