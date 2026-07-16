@@ -11,6 +11,7 @@
 </head>
 <body class="pb-24">
     <div class="max-w-md mx-auto p-4 md:p-6">
+        <!-- HEADER -->
         <div class="mb-5 border-b border-white/10 pb-4 flex items-center justify-between">
             <div>
                 <h1 class="text-lg font-black uppercase tracking-widest text-brand-green flex items-center gap-2"><i data-lucide="radio" class="w-5 h-5 text-red-500 animate-pulse"></i> Pro Operator</h1>
@@ -34,8 +35,12 @@
             </div>
         </div>
 
+        <!-- ========================================== -->
+        <!-- MODE 1: LIVE EVENTS (SMART CONTEXT ENGINE) -->
+        <!-- ========================================== -->
         <div id="mode-live" class="hidden space-y-4 opacity-50 pointer-events-none transition-opacity">
             
+            <!-- PANEL TOMBOL CEPAT -->
             <div class="grid grid-cols-3 gap-2">
                 <button onclick="setEventMode('Gol', this)" class="evt-btn active-btn bg-white/20 border border-white text-white font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">⚽</span> <span>Gol</span></button>
                 <button onclick="setEventMode('Gol Bunuh Diri', this)" class="evt-btn bg-black border border-white/10 text-rose-400 font-bold text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🤦‍♂️</span> <span class="text-[8px]">Own Goal</span></button>
@@ -50,13 +55,16 @@
                 <button onclick="setEventMode('Substitusi', this)" class="evt-btn bg-black border border-white/10 text-brand-green font-black text-[9px] py-2.5 rounded-xl uppercase flex flex-col items-center justify-center gap-1"><span class="text-sm">🔄</span> <span>Ganti</span></button>
             </div>
 
+            <!-- FORM DINAMIS (Warna Bingkai Berubah Otomatis) -->
             <div id="dynamic-form-container" class="bg-brand-panel border border-brand-green/50 p-4 rounded-2xl shadow-lg transition-colors duration-300">
                 <div class="flex gap-3 mb-4">
+                    <!-- Input Menit String (Support 45+2) -->
                     <div class="w-[70px] shrink-0">
                         <label class="block text-[9px] text-gray-400 font-bold uppercase mb-1.5 text-center">Menit</label>
                         <input type="text" id="input-menit" placeholder="45+2" class="w-full bg-black border border-white/20 rounded-xl px-1 py-3 text-sm font-black text-center text-white outline-none focus:border-white focus:bg-white/10 transition-colors">
                     </div>
                     
+                    <!-- Select Utama (Pencetak Gol / Kartu / Sub Out) -->
                     <div class="flex-1">
                         <label id="label-primary" class="block text-[9px] text-gray-400 font-bold uppercase mb-1.5">Pemain</label>
                         <select id="select-primary" class="w-full bg-black border border-white/20 rounded-xl px-3 py-3 text-[11px] font-bold text-white uppercase outline-none focus:border-white transition-colors truncate">
@@ -65,6 +73,16 @@
                     </div>
                 </div>
 
+                <!-- Checkbox Khusus Jenis Gol (Hanya Muncul Saat Gol) -->
+                <div id="container-penalty-check" class="mb-4 hidden flex items-center gap-2.5 bg-black/50 border border-brand-green/30 p-3 rounded-xl cursor-pointer" onclick="togglePenaltiCheck()">
+                    <div class="w-4 h-4 rounded border border-gray-400 flex items-center justify-center bg-black transition-colors" id="box-penalti">
+                        <svg class="w-3 h-3 text-white hidden" id="icon-check-penalti" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <label class="text-[10px] font-bold text-white uppercase tracking-widest cursor-pointer pointer-events-none">Cetak via Tendangan Penalti</label>
+                    <input type="checkbox" id="check-penalti" class="hidden">
+                </div>
+
+                <!-- Select Kedua (Hanya muncul untuk Gol/Assist dan Substitusi) -->
                 <div id="container-secondary" class="mb-5">
                     <label id="label-secondary" class="block text-[9px] text-gray-400 font-bold uppercase mb-1.5">Assist (Opsional)</label>
                     <select id="select-secondary" class="w-full bg-black border border-white/20 rounded-xl px-3 py-3 text-[11px] font-bold text-white uppercase outline-none focus:border-white transition-colors truncate">
@@ -79,6 +97,9 @@
             </div>
         </div>
 
+        <!-- ========================================== -->
+        <!-- MODE 2: RAKIT LINEUP -->
+        <!-- ========================================== -->
         <div id="mode-lineup" class="hidden space-y-5 opacity-50 pointer-events-none transition-opacity">
             <div class="bg-brand-panel border border-brand-gold/30 p-5 rounded-2xl shadow-xl">
                 
@@ -134,6 +155,7 @@
         <div id="log-status" class="mt-4 text-center text-[10px] font-bold uppercase tracking-widest px-4 py-3 rounded-lg bg-black/50 border border-white/5 hidden"></div>
     </div>
 
+    <!-- LACI PEMILIH PEMAIN -->
     <div id="modal-picker" class="fixed inset-0 z-[100] hidden flex-col justify-end">
         <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closePicker()"></div>
         <div class="relative bg-brand-panel border-t border-white/10 rounded-t-[2rem] shadow-2xl modal-up flex flex-col h-[75vh] max-w-md mx-auto w-full pb-safe">
@@ -158,6 +180,7 @@
         let allTeamPlayers = [];
         let onPitchPlayers = [];
         let onBenchPlayers = [];
+        window.activeEnemyGK = null; // Menyimpan Kiper Lawan yang sedang main
 
         const FORMATIONS = {
             '4-3-3': [{b:'10%', l:'50%', role:'GK'}, {b:'25%', l:'15%', role:'LB'}, {b:'25%', l:'35%', role:'CB'}, {b:'25%', l:'65%', role:'CB'}, {b:'25%', l:'85%', role:'RB'}, {b:'45%', l:'50%', role:'CDM'}, {b:'55%', l:'30%', role:'CM'}, {b:'55%', l:'70%', role:'CM'}, {b:'80%', l:'20%', role:'LW'}, {b:'80%', l:'80%', role:'RW'}, {b:'85%', l:'50%', role:'ST'}],
@@ -172,7 +195,6 @@
         async function fetchData() {
             document.getElementById('loading-screen').classList.remove('hidden'); document.getElementById('global-selectors').classList.add('hidden'); document.getElementById('icon-refresh').classList.add('animate-spin');
             try {
-                // Fetch Semua Data Sekaligus agar UI secepat kilat (Enterprise Level)
                 const fetchSafe = async (s) => { try { return await (await fetch(API_URL+"?sheet="+s)).json(); } catch(e){ return []; } };
                 matchesData = await fetchSafe('Jadwal'); playersData = await fetchSafe('Pemain'); coachesData = await fetchSafe('Pelatih');
                 lineupData = await fetchSafe('Lineup'); kejadianData = await fetchSafe('Kejadian');
@@ -234,11 +256,11 @@
             let lu = lineupData.find(l => String(l.id_match) === String(selectedMatchId) && String(l.tim).toLowerCase() === String(selectedTeamName).toLowerCase());
             onPitchPlayers = []; onBenchPlayers = [];
             
+            // LOGIKA TIM SENDIRI
             if(lu) {
                 if(lu.starting_xi) onPitchPlayers = lu.starting_xi.split(',').map(s=>s.trim()).filter(s=>s);
                 if(lu.bench) onBenchPlayers = lu.bench.split(',').map(s=>s.trim()).filter(s=>s);
                 
-                // Kalkulasi Riwayat Substitusi
                 let kejs = kejadianData.filter(k => String(k.id_match) === String(selectedMatchId) && String(k.tim).toLowerCase() === String(selectedTeamName).toLowerCase());
                 kejs.forEach(k => {
                     let jns = String(k.jenis).toUpperCase().replace(/\s+/g,'');
@@ -248,13 +270,60 @@
                 });
                 showLog('<span class="text-brand-green">Sistem: Filter Lapangan vs Cadangan Aktif!</span>');
             } else {
-                // Fallback jika pelatih belum setor Lineup
                 onPitchPlayers = allTeamPlayers.map(p => p.nama_pemain||p.nama||p.Pemain);
                 showLog('<span class="text-yellow-500">Peringatan: Lineup belum disubmit. Semua pemain terbuka.</span>');
+            }
+
+            // RADAR PENCARI KIPER LAWAN (Untuk Auto-Save Penalty)
+            let match = matchesData.find(m => String(m.id_match||m.ID_Match) === String(selectedMatchId));
+            let enemyTeamName = (selectedTeamName === (match.tim_kiri||match.Tim_Kiri)) ? (match.tim_kanan||match.Tim_Kanan) : (match.tim_kiri||match.Tim_Kiri);
+            
+            let enemyLu = lineupData.find(l => String(l.id_match) === String(selectedMatchId) && String(l.tim).toLowerCase() === String(enemyTeamName).toLowerCase());
+            let enemyPitch = [];
+            if (enemyLu && enemyLu.starting_xi) {
+                enemyPitch = enemyLu.starting_xi.split(',').map(s=>s.trim()).filter(s=>s);
+                let enemyKejs = kejadianData.filter(k => String(k.id_match) === String(selectedMatchId) && String(k.tim).toLowerCase() === String(enemyTeamName).toLowerCase());
+                enemyKejs.forEach(k => {
+                    let jns = String(k.jenis).toUpperCase().replace(/\s+/g,'');
+                    let pmn = String(k.pemain).trim();
+                    if(jns === 'SUBOUT') { enemyPitch = enemyPitch.filter(p => p.toLowerCase() !== pmn.toLowerCase()); }
+                    if(jns === 'SUBIN') { if(!enemyPitch.includes(pmn)) enemyPitch.push(pmn); }
+                });
+            } else {
+                enemyPitch = playersData.filter(p => String(p.klub||p.Klub||p.tim||p.Tim||"").toLowerCase().trim() === String(enemyTeamName).toLowerCase().trim()).map(p => p.nama_pemain||p.nama||p.Pemain);
+            }
+            
+            window.activeEnemyGK = null;
+            for (let ep of enemyPitch) {
+                let pObj = playersData.find(p => String(p.nama_pemain||p.nama||p.Pemain).toLowerCase() === ep.toLowerCase() && String(p.klub||p.Klub||p.tim||p.Tim||"").toLowerCase() === String(enemyTeamName).toLowerCase());
+                let pos = pObj ? String(pObj.posisi||'').toUpperCase().replace(/\s+/g,'') : '';
+                if (pos === 'GK' || pos === 'KIPER') {
+                    window.activeEnemyGK = ep; break;
+                }
             }
             
             // Reset Tampilan ke Form Gol
             setEventMode('Gol', document.querySelector('.evt-btn.active-btn') || document.querySelectorAll('.evt-btn')[0]);
+        }
+
+        // ==========================================
+        // UI TOGGLE UNTUK CHECKBOX GOL PENALTI
+        // ==========================================
+        function togglePenaltiCheck() {
+            let chk = document.getElementById('check-penalti');
+            let box = document.getElementById('box-penalti');
+            let icon = document.getElementById('icon-check-penalti');
+            chk.checked = !chk.checked;
+            
+            if(chk.checked) {
+                box.classList.replace('bg-black', 'bg-brand-green');
+                box.classList.replace('border-gray-400', 'border-brand-green');
+                icon.classList.remove('hidden');
+            } else {
+                box.classList.replace('bg-brand-green', 'bg-black');
+                box.classList.replace('border-brand-green', 'border-gray-400');
+                icon.classList.add('hidden');
+            }
         }
 
         // ==========================================
@@ -270,6 +339,7 @@
             let lPrimary = document.getElementById('label-primary'); let sPrimary = document.getElementById('select-primary');
             let lSecondary = document.getElementById('label-secondary'); let sSecondary = document.getElementById('select-secondary');
             let cSecondary = document.getElementById('container-secondary'); let cForm = document.getElementById('dynamic-form-container');
+            let cPenalty = document.getElementById('container-penalty-check');
 
             // Pabrik Opsi Dropdown
             let optPitch = '<option value="">-- PILIH PEMAIN --</option>' + onPitchPlayers.map(p => `<option value="${p}">${p}</option>`).join('');
@@ -277,14 +347,24 @@
             let optAll = '<option value="">-- PILIH PEMAIN --</option>' + allTeamPlayers.map(p => `<option value="${p.nama_pemain||p.nama||p.Pemain}">${p.nama_pemain||p.nama||p.Pemain}</option>`).join('');
             let fallbackOpt = onPitchPlayers.length > 0 ? optPitch : optAll; // Auto Fallback
 
-            cSecondary.classList.add('hidden'); // Sembunyikan Input Kedua secara default
+            cSecondary.classList.add('hidden'); 
+            cPenalty.classList.add('hidden'); 
 
             // Kustomisasi Form Sesuai Kejadian
             if(jenis === 'Gol') {
                 cForm.className = "bg-brand-panel border border-brand-green/50 p-4 rounded-2xl shadow-[0_0_15px_rgba(0,154,68,0.2)] transition-colors duration-300";
                 lPrimary.innerHTML = '⚽ Pencetak Gol <span class="text-brand-green ml-1">(On Pitch)</span>'; sPrimary.innerHTML = fallbackOpt;
                 lSecondary.innerHTML = '👟 Pencetak Assist <span class="text-gray-500 font-medium ml-1">(Opsional)</span>'; sSecondary.innerHTML = '<option value="">-- TANPA ASSIST --</option>' + fallbackOpt.replace('<option value="">-- PILIH PEMAIN --</option>', '');
+                
                 cSecondary.classList.remove('hidden');
+                cPenalty.classList.remove('hidden'); // Munculkan Checkbox Penalti
+
+                // Reset Checkbox setiap pindah ke tab Gol
+                document.getElementById('check-penalti').checked = false;
+                document.getElementById('box-penalti').classList.replace('bg-brand-green', 'bg-black');
+                document.getElementById('box-penalti').classList.replace('border-brand-green', 'border-gray-400');
+                document.getElementById('icon-check-penalti').classList.add('hidden');
+
             } 
             else if (jenis === 'Substitusi') {
                 cForm.className = "bg-brand-panel border border-white/30 p-4 rounded-2xl shadow-lg transition-colors duration-300";
@@ -310,7 +390,7 @@
             }
             else {
                 cForm.className = "bg-brand-panel border border-gray-500/50 p-4 rounded-2xl shadow-lg transition-colors duration-300";
-                lPrimary.innerHTML = `👤 Pemain Terlibat`; sPrimary.innerHTML = optAll; // Cedera bisa siapa saja
+                lPrimary.innerHTML = `👤 Pemain Terlibat`; sPrimary.innerHTML = optAll;
             }
         }
 
@@ -324,21 +404,63 @@
 
             let btn = document.getElementById('btn-submit-live'); btn.disabled = true; btn.innerHTML = "Memproses..."; showLog('<span class="text-yellow-500">Mengirim ke server...</span>');
 
-            const sendPost = async (pNm, jns) => { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'submit_event', payload: { id_match: selectedMatchId, waktu: new Date().toISOString(), menit: menit, tim: selectedTeamName, pemain: pNm, jenis: jns } }) }); };
+            const sendPost = async (pNm, jns, overrideTim = null) => { 
+                await fetch(API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ 
+                        action: 'submit_event', 
+                        payload: { 
+                            id_match: selectedMatchId, 
+                            waktu: new Date().toISOString(), 
+                            menit: menit, 
+                            tim: overrideTim || selectedTeamName, 
+                            pemain: pNm, 
+                            jenis: jns 
+                        } 
+                    }) 
+                }); 
+            };
+
             try {
                 if(currentEvtMode === 'Substitusi') {
-                    await sendPost(p1, 'Sub Out'); await sendPost(p2, 'Sub In'); showLog(`Sukses! Substitusi [${p1} ➔ ${p2}]`);
-                    // Update Local State Langsung! (Agar next event presisi)
+                    await sendPost(p1, 'Sub Out'); 
+                    await sendPost(p2, 'Sub In'); 
+                    showLog(`Sukses! Substitusi [${p1} ➔ ${p2}]`);
+                    
                     onPitchPlayers = onPitchPlayers.filter(p => p !== p1); onBenchPlayers = onBenchPlayers.filter(p => p !== p2);
                     onPitchPlayers.push(p2); onBenchPlayers.push(p1); 
                 } 
                 else if(currentEvtMode === 'Gol') {
-                    await sendPost(p1, 'Gol'); if(p2) await sendPost(p2, 'Assist'); showLog(`Sukses! Gol: ${p1} ${p2 ? '(Assist: '+p2+')' : ''}`);
+                    let isPen = document.getElementById('check-penalti').checked;
+                    let p1Name = isPen ? p1 + ' (Penalti)' : p1;
+                    
+                    // USER REQUEST: ASSIST DULU BARU GOL (Agar Timeline Urut)
+                    if(p2) { await sendPost(p2, 'Assist'); }
+                    await sendPost(p1Name, 'Gol'); 
+                    
+                    showLog(`Sukses! Gol: ${p1Name} ${p2 ? '(Assist: '+p2+')' : ''}`);
                 }
-                else { await sendPost(p1, currentEvtMode); showLog(`Sukses! ${currentEvtMode} ➔ ${p1}`); }
+                else if(currentEvtMode === 'Gagal Penalti') {
+                    // USER REQUEST: Miss penalty auto triggers Save Penalty for enemy GK
+                    await sendPost(p1, 'Gagal Penalti');
+                    
+                    let enemyMatch = matchesData.find(m => String(m.id_match||m.ID_Match) === String(selectedMatchId));
+                    let enemyTeam = (selectedTeamName === (enemyMatch.tim_kiri||enemyMatch.Tim_Kiri)) ? (enemyMatch.tim_kanan||enemyMatch.Tim_Kanan) : (enemyMatch.tim_kiri||enemyMatch.Tim_Kiri);
+                    
+                    if (window.activeEnemyGK) {
+                        await sendPost(window.activeEnemyGK, 'Penyelamatan Penalti', enemyTeam);
+                        showLog(`Sukses! Gagal Penalti: ${p1}. Auto-Save: ${window.activeEnemyGK} (${enemyTeam})`);
+                    } else {
+                        showLog(`Sukses! Gagal Penalti: ${p1}. (Kiper Lawan tidak ditemukan di radar)`);
+                    }
+                }
+                else { 
+                    await sendPost(p1, currentEvtMode); 
+                    showLog(`Sukses! ${currentEvtMode} ➔ ${p1}`); 
+                }
                 
-                document.getElementById('input-menit').value = ''; // Kosongkan menit
-                setEventMode(currentEvtMode, document.querySelector('.evt-btn.active-btn')); // Refresh Form
+                document.getElementById('input-menit').value = ''; 
+                setEventMode(currentEvtMode, document.querySelector('.evt-btn.active-btn')); 
             } catch(e) { showLog("Gagal mengirim data.", true); } 
             finally { btn.disabled = false; btn.innerHTML = `<i data-lucide="send" class="w-4 h-4 inline"></i> Eksekusi Data`; lucide.createIcons(); }
         }
