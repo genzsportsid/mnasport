@@ -4474,69 +4474,135 @@
         };
         
         // ==========================================
-        // MESIN STATISTIK TARIK-TAMBANG (TUG-OF-WAR)
+        // MESIN STATISTIK FOTMOB (GLOBAL SCALE UI)
         // ==========================================
         function renderPremiumStats(statData) {
             let container = document.getElementById('premium-stats-container');
             if(!container) return;
 
-            // Cek apakah data kosong
-            if (!statData || !getProp(statData, 'pos_kiri')) {
-                container.innerHTML = '<div class="text-center text-[10px] text-gray-400 dark:text-gray-600 uppercase tracking-widest py-10 font-bold"><svg class="w-10 h-10 mx-auto mb-3 text-gray-300 dark:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>Data statistik belum direkam</div>';
+            // Jika belum ada data dari operator
+            if (!statData || (!getProp(statData, 'Poss_Kiri') && !getProp(statData, 'poss_kiri'))) {
+                container.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-16 text-gray-400 dark:text-gray-600">
+                    <svg class="w-12 h-12 mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-center">Statistik Belum <br/>Tersedia</p>
+                </div>`;
                 return;
             }
 
-            const buildBar = (label, keyPrefix, isPercentage = false) => {
-                let valKiri = parseFloat(getProp(statData, `${keyPrefix}_kiri`)) || 0;
-                let valKanan = parseFloat(getProp(statData, `${keyPrefix}_kanan`)) || 0;
-                let total = valKiri + valKanan;
+            // 1. Ekstraksi Data Mentah dari Spreadsheet
+            let st = statData;
+            let possKiri = parseInt(getProp(st, 'Poss_Kiri')||getProp(st, 'poss_kiri'))||0; 
+            let possNetral = parseInt(getProp(st, 'Poss_Netral')||getProp(st, 'poss_netral'))||0; 
+            let possKanan = parseInt(getProp(st, 'Poss_Kanan')||getProp(st, 'poss_kanan'))||0;
+            
+            let sotKiri = parseInt(getProp(st, 'SOT_Kiri')||getProp(st, 'sot_kiri'))||0; let sotKanan = parseInt(getProp(st, 'SOT_Kanan')||getProp(st, 'sot_kanan'))||0;
+            let missKiri = parseInt(getProp(st, 'Miss_Kiri')||getProp(st, 'miss_kiri'))||0; let missKanan = parseInt(getProp(st, 'Miss_Kanan')||getProp(st, 'miss_kanan'))||0;
+            let saveKiri = parseInt(getProp(st, 'Save_Kiri')||getProp(st, 'save_kiri'))||0; let saveKanan = parseInt(getProp(st, 'Save_Kanan')||getProp(st, 'save_kanan'))||0;
+            
+            let cornerKiri = parseInt(getProp(st, 'Corner_Kiri')||getProp(st, 'corner_kiri'))||0; let cornerKanan = parseInt(getProp(st, 'Corner_Kanan')||getProp(st, 'corner_kanan'))||0;
+            let offKiri = parseInt(getProp(st, 'Offside_Kiri')||getProp(st, 'offside_kiri'))||0; let offKanan = parseInt(getProp(st, 'Offside_Kanan')||getProp(st, 'offside_kanan'))||0;
+            let foulsKiri = parseInt(getProp(st, 'Fouls_Kiri')||getProp(st, 'fouls_kiri'))||0; let foulsKanan = parseInt(getProp(st, 'Fouls_Kanan')||getProp(st, 'fouls_kanan'))||0;
+            
+            let kunKiri = parseInt(getProp(st, 'Kuning_Kiri')||getProp(st, 'kuning_kiri'))||0; let kunKanan = parseInt(getProp(st, 'Kuning_Kanan')||getProp(st, 'kuning_kanan'))||0;
+            let merKiri = parseInt(getProp(st, 'Merah_Kiri')||getProp(st, 'merah_kiri'))||0; let merKanan = parseInt(getProp(st, 'Merah_Kanan')||getProp(st, 'merah_kanan'))||0;
+            
+            let psSuksesKiri = parseInt(getProp(st, 'Pass_Sukses_Kiri')||getProp(st, 'pass_sukses_kiri'))||0; let psGagalKiri = parseInt(getProp(st, 'Pass_Gagal_Kiri')||getProp(st, 'pass_gagal_kiri'))||0;
+            let psSuksesKanan = parseInt(getProp(st, 'Pass_Sukses_Kanan')||getProp(st, 'pass_sukses_kanan'))||0; let psGagalKanan = parseInt(getProp(st, 'Pass_Gagal_Kanan')||getProp(st, 'pass_gagal_kanan'))||0;
 
-                // Hitung lebar bar (%)
-                let pctKiri = total === 0 ? 50 : (valKiri / total) * 100;
-                let pctKanan = total === 0 ? 50 : (valKanan / total) * 100;
+            let passTotKiri = psSuksesKiri + psGagalKiri; let passTotKanan = psSuksesKanan + psGagalKanan;
+            let accKiri = passTotKiri > 0 ? Math.round((psSuksesKiri/passTotKiri)*100) : 0;
+            let accKanan = passTotKanan > 0 ? Math.round((psSuksesKanan/passTotKanan)*100) : 0;
 
-                if(isPercentage) {
-                    pctKiri = valKiri || 50; pctKanan = valKanan || 50;
-                }
-
-                // Warna Dinamis: Pemenang akan menyala (Neon)
-                let colKiri = valKiri > valKanan ? 'bg-brand-green shadow-[0_0_12px_rgba(0,154,68,0.7)] z-10' : (valKiri === valKanan ? 'bg-gray-400 dark:bg-gray-500' : 'bg-gray-200 dark:bg-gray-800');
-                let colKanan = valKanan > valKiri ? 'bg-brand-gold shadow-[0_0_12px_rgba(215,182,125,0.7)] z-10' : (valKiri === valKanan ? 'bg-gray-400 dark:bg-gray-500' : 'bg-gray-200 dark:bg-gray-800');
-
-                // Teks Warna Dinamis
-                let textColKiri = valKiri > valKanan ? 'text-brand-green' : (valKiri === valKanan ? 'text-brand-black dark:text-white' : 'text-gray-400 dark:text-gray-600');
-                let textColKanan = valKanan > valKiri ? 'text-brand-gold' : (valKiri === valKanan ? 'text-brand-black dark:text-white' : 'text-gray-400 dark:text-gray-600');
-
-                let displayKiri = valKiri + (isPercentage ? '%' : '');
-                let displayKanan = valKanan + (isPercentage ? '%' : '');
+            // 2. Mesin Pembuat Comparison Bar ala FotMob
+            const renderBar = (lbl, valKiri, valKanan, isReverseLogic = false, isPct = false) => {
+                let max = Math.max(valKiri, valKanan);
+                let pctKiri = max === 0 ? 0 : (valKiri/max)*100;
+                let pctKanan = max === 0 ? 0 : (valKanan/max)*100;
+                
+                // Smart Contrast (Yang menang angka lebih tebal & terang)
+                let isKiriWin = isReverseLogic ? valKiri < valKanan : valKiri > valKanan;
+                let isKananWin = isReverseLogic ? valKanan < valKiri : valKanan > valKiri;
+                
+                let colorKiri = isKiriWin ? 'text-brand-black dark:text-white font-black' : (valKiri === valKanan ? 'text-brand-black dark:text-white font-bold' : 'text-gray-400 dark:text-gray-600 font-medium');
+                let colorKanan = isKananWin ? 'text-brand-black dark:text-white font-black' : (valKiri === valKanan ? 'text-brand-black dark:text-white font-bold' : 'text-gray-400 dark:text-gray-600 font-medium');
+                
+                let displayKiri = valKiri + (isPct ? '%' : '');
+                let displayKanan = valKanan + (isPct ? '%' : '');
 
                 return `
-                <div class="mb-5 group cursor-default">
+                <div class="mb-5 group">
                     <div class="flex justify-between items-end mb-1.5 px-1">
-                        <span class="font-heading font-black text-sm md:text-base ${textColKiri} transition-transform group-hover:-translate-y-1 group-hover:scale-110 duration-300">${displayKiri}</span>
-                        <span class="text-[9px] md:text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">${label}</span>
-                        <span class="font-heading font-black text-sm md:text-base ${textColKanan} transition-transform group-hover:-translate-y-1 group-hover:scale-110 duration-300">${displayKanan}</span>
+                        <span class="w-12 text-left text-sm md:text-base tabular-nums transition-all ${colorKiri}">${displayKiri}</span>
+                        <span class="flex-1 text-center text-[9px] md:text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest leading-none">${lbl}</span>
+                        <span class="w-12 text-right text-sm md:text-base tabular-nums transition-all ${colorKanan}">${displayKanan}</span>
                     </div>
-                    <div class="flex h-2.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden border border-gray-200 dark:border-white/10 p-[1px]">
-                        <div class="stat-bar-animate h-full rounded-l-full ${colKiri} transition-all duration-1000 ease-out" style="width: 0%;" data-target="${pctKiri}%"></div>
-                        <div class="h-full w-1 shrink-0 bg-transparent"></div>
-                        <div class="stat-bar-animate h-full rounded-r-full ${colKanan} transition-all duration-1000 ease-out" style="width: 0%;" data-target="${pctKanan}%"></div>
+                    <div class="flex h-1.5 md:h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden w-full">
+                        <div class="flex-1 flex justify-end border-r border-white dark:border-brand-dark-surface"><div class="stat-bar-animate h-full bg-brand-green transition-all duration-1000 ease-out rounded-l-full" style="width: 0%;" data-target="${pctKiri}%"></div></div>
+                        <div class="flex-1 flex justify-start border-l border-white dark:border-brand-dark-surface"><div class="stat-bar-animate h-full bg-gray-400 dark:bg-gray-500 transition-all duration-1000 ease-out rounded-r-full" style="width: 0%;" data-target="${pctKanan}%"></div></div>
                     </div>
-                </div>
-                `;
+                </div>`;
             };
 
-            // Rakit statistik sesuai kolom di Google Sheets Anda
-            let html = '';
-            html += buildBar('Penguasaan Bola', 'pos', true);
-            html += buildBar('Tembakan', 'shot', false);
-            html += buildBar('Tepat Sasaran', 'target', false);
-            html += buildBar('Total Umpan', 'pass', false);
-            html += buildBar('Akurasi Umpan', 'acc', true);
+            // 3. Merakit UI Secara Keseluruhan
+            let html = `<div class="space-y-6 pb-2">`;
+            
+            // --- BLOK 1: PENGUASAAN BOLA (POSSESSION RAKSASA) ---
+            html += `
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-3 px-1">
+                    <span class="text-2xl md:text-3xl font-black tabular-nums transition-all ${possKiri > possKanan ? 'text-brand-green drop-shadow-sm' : 'text-brand-black dark:text-white'}">${possKiri}%</span>
+                    <div class="flex flex-col items-center">
+                        <span class="text-[10px] md:text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Penguasaan Bola</span>
+                        <span class="text-[8px] md:text-[9px] font-bold text-gray-500 dark:text-gray-500 bg-gray-100 dark:bg-gray-800/80 px-2 py-0.5 rounded mt-1 border border-gray-200 dark:border-gray-800">Netral ${possNetral}%</span>
+                    </div>
+                    <span class="text-2xl md:text-3xl font-black tabular-nums transition-all ${possKanan > possKiri ? 'text-gray-400 dark:text-gray-300 drop-shadow-sm' : 'text-brand-black dark:text-white'}">${possKanan}%</span>
+                </div>
+                <div class="w-full flex h-2.5 md:h-3 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800">
+                    <div class="bg-brand-green h-full shadow-[0_0_10px_rgba(0,154,68,0.5)] transition-all duration-1000 stat-bar-animate" style="width: 0%;" data-target="${possKiri}%"></div>
+                    <div class="bg-gray-300 dark:bg-gray-600 h-full transition-all duration-1000 stat-bar-animate" style="width: 0%;" data-target="${possNetral}%"></div>
+                    <div class="bg-gray-400 dark:bg-gray-500 h-full transition-all duration-1000 stat-bar-animate" style="width: 0%;" data-target="${possKanan}%"></div>
+                </div>
+            </div>
+            <div class="w-full h-px bg-gray-100 dark:bg-gray-800/50 mb-6"></div>`;
 
+            // --- BLOK 2: TEMBAKAN ---
+            html += `<div>`;
+            html += renderBar('Tepat Sasaran', sotKiri, sotKanan);
+            html += renderBar('Melenceng', missKiri, missKanan);
+            html += renderBar('Penyelamatan Kiper', saveKiri, saveKanan);
+            html += `</div><div class="w-full h-px bg-gray-100 dark:bg-gray-800/50 my-6"></div>`;
+
+            // --- BLOK 3: UMPAN ---
+            html += `<div>`;
+            html += renderBar('Akurasi Umpan', accKiri, accKanan, false, true);
+            html += renderBar('Umpan Sukses', psSuksesKiri, psSuksesKanan);
+            html += `</div><div class="w-full h-px bg-gray-100 dark:bg-gray-800/50 my-6"></div>`;
+
+            // --- BLOK 4: KONDISI & KEDISIPLINAN ---
+            html += `<div>`;
+            html += renderBar('Tendangan Sudut', cornerKiri, cornerKanan);
+            html += renderBar('Offside', offKiri, offKanan, true); // Reverse logic
+            html += renderBar('Pelanggaran', foulsKiri, foulsKanan, true); // Reverse logic
+            
+            // KARTU FOTMOB STYLE (KOTAK MIRING)
+            html += `
+            <div class="flex justify-between items-center mt-8 px-1">
+                <div class="flex gap-3 md:gap-4">
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-4.5 bg-yellow-400 border border-yellow-500 rounded-[2px] shadow-sm transform -rotate-6"></div><span class="text-sm font-bold text-brand-black dark:text-white">${kunKiri}</span></div>
+                    <div class="flex items-center gap-1.5"><div class="w-3.5 h-4.5 bg-red-500 border border-red-600 rounded-[2px] shadow-sm transform -rotate-6"></div><span class="text-sm font-bold text-brand-black dark:text-white">${merKiri}</span></div>
+                </div>
+                <span class="text-[9px] md:text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest bg-gray-50 dark:bg-brand-dark-bg px-4 py-1.5 rounded-full border border-gray-100 dark:border-gray-800">KARTU</span>
+                <div class="flex gap-3 md:gap-4">
+                    <div class="flex items-center gap-1.5"><span class="text-sm font-bold text-brand-black dark:text-white">${kunKanan}</span><div class="w-3.5 h-4.5 bg-yellow-400 border border-yellow-500 rounded-[2px] shadow-sm transform -rotate-6"></div></div>
+                    <div class="flex items-center gap-1.5"><span class="text-sm font-bold text-brand-black dark:text-white">${merKanan}</span><div class="w-3.5 h-4.5 bg-red-500 border border-red-600 rounded-[2px] shadow-sm transform -rotate-6"></div></div>
+                </div>
+            </div>`;
+            
+            html += `</div></div>`;
             container.innerHTML = html;
 
-            // Trigger Animasi (Bar memanjang dari tengah)
+            // Trigger Animasi (Bar memanjang perlahan)
             setTimeout(() => {
                 const bars = container.querySelectorAll('.stat-bar-animate');
                 bars.forEach(bar => {
