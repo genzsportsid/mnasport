@@ -2426,18 +2426,11 @@
 
             let currentLeaguePlayers = (rawData.Pemain || []).filter(p => dKlasemen.some(k => String(getProp(k, 'klub')).toLowerCase().trim() === String(getProp(p, 'tim')).toLowerCase().trim()));
 
-            // B. Perhitungan Clean Sheets / Nirbobol (Tim) Mengikuti Fase Liga
+            // B. Perhitungan Clean Sheets / Nirbobol (Tim)
             let teamCS = {};
             dKlasemen.forEach(k => teamCS[getProp(k, 'klub')] = 0);
             
-            let ftMatches = (jadwalCache || []).filter(m => {
-                let s = String(getProp(m, 'status')).toUpperCase();
-                let j = String(getProp(m, 'Jenjang') || getProp(m, 'Liga')).toUpperCase();
-                let g = String(getProp(m, 'grup')).toUpperCase().trim();
-                let matchFase = faseAktif === 'PRE-SEASON' ? g === 'PRE-SEASON' : g !== 'PRE-SEASON';
-                
-                return s.includes('FT') && j === ligaAktif && matchFase;
-            });
+            let ftMatches = (jadwalCache || []).filter(m => String(getProp(m, 'status')).toUpperCase().includes('FT') && String(getProp(m, 'Jenjang') || getProp(m, 'Liga')).toUpperCase() === ligaAktif);
             
             ftMatches.forEach(m => {
                 let tk = getProp(m, 'tim_kiri'); let tn = getProp(m, 'tim_kanan');
@@ -2452,44 +2445,28 @@
             });
             let csArray = Object.keys(teamCS).map(k => ({ klub: k, cs: teamCS[k] })).filter(x => x.cs > 0).sort((a,b) => b.cs - a.cs);
 
-            // C & D. Perhitungan Kartu Tim dan Bad Boys (Pemain) Langsung Dari Match Events!
+            // C. Perhitungan Kartu / Agresivitas (Tim)
             let teamCards = {};
             dKlasemen.forEach(k => teamCards[getProp(k, 'klub')] = { y: 0, r: 0 });
-            
-            let playerStats = {}; 
-            currentLeaguePlayers.forEach(p => playerStats[getProp(p, 'nama')+getProp(p, 'tim')] = { nama: getProp(p, 'nama'), tim: getProp(p, 'tim'), foto: getProp(p, 'foto'), y: 0, r: 0, score: 0 });
-
-            // Ekstrak list ID Match yang valid sesuai Fase (Utama / Pre-Season)
-            let validMatchIds = (jadwalCache || []).filter(m => {
-                let j = String(getProp(m, 'Jenjang') || getProp(m, 'Liga')).toUpperCase();
-                let g = String(getProp(m, 'grup')).toUpperCase().trim();
-                let matchFase = faseAktif === 'PRE-SEASON' ? g === 'PRE-SEASON' : g !== 'PRE-SEASON';
-                return j === ligaAktif && matchFase;
-            }).map(m => String(getProp(m, 'id_match')));
-
-            // Analisis kartu murni dari timeline pertandingan
-            (rawData.Event_Match || []).forEach(ev => {
-                if(validMatchIds.includes(String(getProp(ev, 'id_match')))) {
-                    let t = getProp(ev, 'tim');
-                    let jns = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '');
-                    let pIdx = getProp(ev, 'pemain') + t;
-                    
-                    let isY = jns === 'KUNING';
-                    let isR = jns === 'MERAH' || jns === 'KUNINGKEDUA' || jns === 'SECONDYELLOW';
-
-                    if(teamCards[t]) {
-                        if(isY) teamCards[t].y += 1;
-                        if(isR) teamCards[t].r += 1;
-                    }
-                    if(playerStats[pIdx]) {
-                        if(isY) { playerStats[pIdx].y += 1; playerStats[pIdx].score += 1; }
-                        if(isR) { playerStats[pIdx].r += 1; playerStats[pIdx].score += 3; } // Merah poin kekasaran 3x lipat
-                    }
+            currentLeaguePlayers.forEach(p => {
+                let t = getProp(p, 'tim');
+                if(teamCards[t]) {
+                    teamCards[t].y += parseInt(getProp(p, 'kuning')) || 0;
+                    teamCards[t].r += parseInt(getProp(p, 'merah')) || 0;
                 }
             });
-            
+            // Rumus Kekasaran: Merah dihitung 3 poin, Kuning 1 poin.
             let cardArray = Object.keys(teamCards).map(k => ({ klub: k, y: teamCards[k].y, r: teamCards[k].r, total: teamCards[k].y + (teamCards[k].r * 3) })).filter(x => x.total > 0).sort((a,b) => b.total - a.total);
-            let badBoys = Object.values(playerStats).filter(x => x.score > 0).sort((a,b) => b.score - a.score);
+
+            // D. Bad Boys / Pemain Paling Kasar (Pemain)
+            let badBoys = [...currentLeaguePlayers]
+                .map(p => ({
+                    nama: getProp(p, 'nama'), tim: getProp(p, 'tim'), foto: getProp(p, 'foto'),
+                    y: parseInt(getProp(p, 'kuning'))||0, r: parseInt(getProp(p, 'merah'))||0,
+                    score: (parseInt(getProp(p, 'kuning'))||0) + ((parseInt(getProp(p, 'merah'))||0)*3)
+                }))
+                .filter(x => x.score > 0)
+                .sort((a,b) => b.score - a.score);
 
 
             // --- 2. PABRIK WIDGET HTML ---
@@ -3307,8 +3284,7 @@
             document.getElementById('ml-nama').innerText = namaPelatih;
             document.getElementById('ml-tinggi').innerText = getProp(pInfo,'tinggi') ? getProp(pInfo,'tinggi') + ' cm' : "-";
             let tglLahir = getProp(pInfo, 'tanggal lahir') || getProp(pInfo, 'tanggallahir') || getProp(pInfo, 'ttl');
-            let parsedPelatih = hitungUmurPemain(tglLahir);
-            document.getElementById('ml-umur').innerText = parsedPelatih.umur !== '-' ? `${parsedPelatih.tglAsli} (${parsedPelatih.umur})` : '-';
+            document.getElementById('ml-umur').innerText = hitungUmurPemain(tglLahir);
             
             document.getElementById('ml-winrate').innerText = winRate + '%';
             document.getElementById('ml-menang').innerText = totalM;
@@ -3346,81 +3322,44 @@
             let jenjang = getProp(p, 'Jenjang') || (t ? getProp(t, 'Jenjang') : currentJenjang);
             let leagueTopScorers = (rawData.TopSkor || []).filter(ts => String(getProp(ts, 'Jenjang')||getProp(ts, 'Liga')).toUpperCase() === String(jenjang).toUpperCase());
             let highestGol = 0; if(leagueTopScorers.length > 0) { highestGol = parseInt(getProp(leagueTopScorers[0], 'Gol') || getProp(leagueTopScorers[0], 'gol')) || 0; }
-            // MESIN REAL-TIME STATS (Memisahkan Pre-Season & Liga)
+            // MESIN REAL-TIME STATS (Membaca langsung dari Event_Match agar Gol Penalti terbaca otomatis)
             let rtGol = 0, rtKuning = 0, rtMerah = 0;
-            let preGol = 0, preKuning = 0, preMerah = 0;
-            let ligaGol = 0, ligaKuning = 0, ligaMerah = 0;
-
             (rawData.Event_Match || []).forEach(ev => {
                 if (String(getProp(ev, 'pemain')).toLowerCase().trim() === String(namaPemain).toLowerCase().trim()) {
-                    let idM = getProp(ev, 'id_match');
-                    let matchData = jadwalCache.find(m => String(getProp(m, 'id_match')) === String(idM));
-                    let isPreSeason = matchData && String(getProp(matchData, 'grup')).toUpperCase().trim() === 'PRE-SEASON';
-                    
                     let jns = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '');
-                    
-                    if (jns === 'GOL' || jns === 'GOLPENALTI') {
-                        rtGol++;
-                        if(isPreSeason) preGol++; else ligaGol++;
-                    }
-                    else if (jns === 'KUNING') {
-                        rtKuning++;
-                        if(isPreSeason) preKuning++; else ligaKuning++;
-                    }
-                    else if (jns === 'MERAH' || jns === 'KUNINGKEDUA' || jns === 'SECONDYELLOW') {
-                        rtMerah++;
-                        if(isPreSeason) preMerah++; else ligaMerah++;
-                    }
+                    if (jns === 'GOL' || jns === 'GOLPENALTI') rtGol++;
+                    else if (jns === 'KUNING') rtKuning++;
+                    else if (jns === 'MERAH' || jns === 'KUNINGKEDUA' || jns === 'SECONDYELLOW') rtMerah++;
                 }
             });
 
-            // Sinkronisasi Gol Tertinggi untuk Badge Top Skor
+            // Sinkronisasi Anti-Lag: Gunakan angka terbesar antara Spreadsheet vs Hitungan Real-time Web
             let finalGol = Math.max(parseInt(getProp(p, 'gol')) || 0, rtGol);
+            let finalKuning = Math.max(parseInt(getProp(p, 'kuning')) || 0, rtKuning);
+            let finalMerah = Math.max(parseInt(getProp(p, 'merah')) || 0, rtMerah);
+
             let isTopScorer = (finalGol > 0 && finalGol >= highestGol);
 
             let badgeTs = document.getElementById('mp-badge-topskor');
             if(isTopScorer) { if(badgeTs) badgeTs.classList.remove('hidden'); } 
             else { if(badgeTs) badgeTs.classList.add('hidden'); }
 
-            // Cetak Identitas Dasar
             let elFoto = document.getElementById('mp-foto'); if(elFoto) elFoto.src = getProp(p, 'foto') ? getProp(p, 'foto') : getAvatar(namaPemain);
             let elNama = document.getElementById('mp-nama'); if(elNama) elNama.innerText = namaPemain;
             let elTimNama = document.getElementById('mp-tim-nama'); if(elTimNama) elTimNama.innerText = nmTim || "Tanpa Klub";
             let elTimLogo = document.getElementById('mp-tim-logo'); if(elTimLogo) elTimLogo.src = logo;
             let elTimWatermark = document.getElementById('mp-tim-watermark'); if(elTimWatermark) elTimWatermark.src = logo;
+
             let elPosisi = document.getElementById('mp-posisi'); if(elPosisi) elPosisi.innerText = getProp(p,'posisi') || "POS";
-            let elNomor = document.getElementById('mp-nomor'); if(elNomor) elNomor.innerText = getProp(p,'nomor') || "-";
-            let elKaki = document.getElementById('mp-kaki'); if(elKaki) elKaki.innerText = getProp(p,'kaki') || "-";
             let elTinggi = document.getElementById('mp-tinggi'); if(elTinggi) elTinggi.innerText = getProp(p,'tinggi') ? getProp(p,'tinggi') + ' cm' : "-";
-
-            // Injeksi Berat Badan & Ekstraksi TTL
-            let elBerat = document.getElementById('mp-berat'); 
-            if(elBerat) elBerat.innerText = getProp(p, 'berat badan') || getProp(p, 'berat') ? (getProp(p, 'berat badan') || getProp(p, 'berat')) + ' kg' : "-";
-
-            let elTempatLahir = document.getElementById('mp-tempatlahir'); 
-            let elTglLahir = document.getElementById('mp-tgl');
-            let elUmur = document.getElementById('mp-umur'); 
-
-            if(elUmur) { 
-                let tglLahir = getProp(p, 'tanggal lahir') || getProp(p, 'tanggallahir') || getProp(p, 'ttl'); 
-                let parsedUmur = hitungUmurPemain(tglLahir);
-                elUmur.innerText = parsedUmur.umur;
-                if(elTempatLahir) elTempatLahir.innerText = parsedUmur.tempat;
-                if(elTglLahir) elTglLahir.innerText = parsedUmur.tglAsli;
-            }
+            let elKaki = document.getElementById('mp-kaki'); if(elKaki) elKaki.innerText = getProp(p,'kaki') || "-";
+            let elUmur = document.getElementById('mp-umur'); if(elUmur) { let tglLahir = getProp(p, 'tanggal lahir') || getProp(p, 'tanggallahir') || getProp(p, 'ttl'); elUmur.innerText = hitungUmurPemain(tglLahir); }
             
-            // Injeksi Angka Statistik (Total & Split)
+            // Injeksi Angka Valid ke Tampilan Kartu
             let elGol = document.getElementById('mp-gol'); if(elGol) elGol.innerText = finalGol;
-            let elGolLiga = document.getElementById('mp-gol-liga'); if(elGolLiga) elGolLiga.innerText = "LIGA: " + ligaGol;
-            let elGolPre = document.getElementById('mp-gol-pre'); if(elGolPre) elGolPre.innerText = "PRE: " + preGol;
-
-            let elKuning = document.getElementById('mp-kuning'); if(elKuning) elKuning.innerText = Math.max(parseInt(getProp(p, 'kuning')) || 0, rtKuning);
-            let elKuningLiga = document.getElementById('mp-kuning-liga'); if(elKuningLiga) elKuningLiga.innerText = "LIGA: " + ligaKuning;
-            let elKuningPre = document.getElementById('mp-kuning-pre'); if(elKuningPre) elKuningPre.innerText = "PRE: " + preKuning;
-
-            let elMerah = document.getElementById('mp-merah'); if(elMerah) elMerah.innerText = Math.max(parseInt(getProp(p, 'merah')) || 0, rtMerah);
-            let elMerahLiga = document.getElementById('mp-merah-liga'); if(elMerahLiga) elMerahLiga.innerText = "LIGA: " + ligaMerah;
-            let elMerahPre = document.getElementById('mp-merah-pre'); if(elMerahPre) elMerahPre.innerText = "PRE: " + preMerah;
+            let elNomor = document.getElementById('mp-nomor'); if(elNomor) elNomor.innerText = getProp(p,'nomor') || "-";
+            let elKuning = document.getElementById('mp-kuning'); if(elKuning) elKuning.innerText = finalKuning;
+            let elMerah = document.getElementById('mp-merah'); if(elMerah) elMerah.innerText = finalMerah;
 
             document.getElementById('modal-pemain').classList.remove('hidden'); document.getElementById('modal-pemain').classList.add('flex'); document.body.classList.add('modal-open');
         }
