@@ -297,7 +297,7 @@
             </div>
         </div>
     </div>
-    <div id="ptr-indicator" class="fixed top-0 left-1/2 -translate-x-1/2 z-[150] flex items-center justify-center bg-white dark:bg-brand-dark-surface shadow-xl border border-gray-200 dark:border-gray-800 rounded-full px-5 py-2.5 transform -translate-y-[150%] transition-transform duration-300 pointer-events-none" style="margin-top: max(env(safe-area-inset-top), 10px);">
+    <div id="ptr-indicator" class="fixed top-0 left-1/2 -translate-x-1/2 z-[150] flex items-center justify-center bg-white dark:bg-brand-dark-surface shadow-xl border border-gray-200 dark:border-gray-800 rounded-full px-5 py-2.5 transform -translate-y-[150px] transition-transform duration-300 pointer-events-none" style="margin-top: max(env(safe-area-inset-top), 10px);">
         <svg class="w-4 h-4 text-brand-green animate-spin mr-2.5" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -4012,33 +4012,67 @@
             bKanan.innerHTML = renderBench(benchKanan, cederaKanan, skorsKanan, true, tn);
         }
             
-        // PULL TO REFRESH
-        let ptrStartY = 0; let ptrCurrentY = 0; let ptrPulling = false; 
+        // ==========================================
+        // PULL TO REFRESH (ANTI-STUCK ENGINE)
+        // ==========================================
+        let ptrStartY = 0; let ptrCurrentY = 0; let ptrPulling = false; let ptrIsFetching = false;
         const ptrThreshold = 70; 
         const ptrEl = document.getElementById('ptr-indicator');
 
         document.addEventListener('touchstart', (e) => {
-            if (window.scrollY <= 5 && ptrEl) { 
-                ptrStartY = e.touches[0].clientY; ptrCurrentY = ptrStartY; ptrPulling = true; ptrEl.style.transition = 'none'; 
+            // Hanya aktifkan jika sedang di puncak scroll DAN tidak sedang fetching
+            if (window.scrollY <= 5 && ptrEl && !ptrIsFetching) { 
+                ptrStartY = e.touches[0].clientY; 
+                ptrCurrentY = ptrStartY; 
+                ptrPulling = true; 
+                ptrEl.style.transition = 'none'; 
             }
         }, {passive: true});
 
         document.addEventListener('touchmove', (e) => {
             if (!ptrPulling || !ptrEl) return;
-            ptrCurrentY = e.touches[0].clientY; let pullDist = ptrCurrentY - ptrStartY;
+            ptrCurrentY = e.touches[0].clientY; 
+            let pullDist = ptrCurrentY - ptrStartY;
+            
             if (pullDist > 0 && window.scrollY <= 5) {
-                let moveY = Math.min(pullDist * 0.4, ptrThreshold + 30); ptrEl.style.transform = `translate(-50%, calc(-150% + ${moveY}px))`;
-            } else { ptrPulling = false; ptrEl.style.transition = 'transform 0.3s ease'; ptrEl.style.transform = `translate(-50%, -150%)`; }
+                // Kalkulasi tarikan dari -150px (Jauh di atas layar)
+                let moveY = Math.min(pullDist * 0.4, ptrThreshold + 30); 
+                ptrEl.style.transform = `translate(-50%, calc(-150px + ${moveY}px))`;
+            } else { 
+                // Batal ditarik (User scroll ke bawah)
+                ptrPulling = false; 
+                ptrEl.style.transition = 'transform 0.3s ease'; 
+                ptrEl.style.transform = `translate(-50%, -150px)`; 
+            }
         }, {passive: true});
 
         document.addEventListener('touchend', () => {
             if (!ptrPulling || !ptrEl) return;
-            ptrPulling = false; ptrEl.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            ptrPulling = false; 
+            
             let pullDist = ptrCurrentY - ptrStartY;
+            
             if (pullDist > ptrThreshold && window.scrollY <= 5) {
-                ptrEl.style.transform = `translate(-50%, 20px)`; tarikDataGaib(); 
-                setTimeout(() => { ptrEl.style.transition = 'transform 0.4s ease-in'; ptrEl.style.transform = `translate(-50%, -150%)`; }, 1500);
-            } else { ptrEl.style.transform = `translate(-50%, -150%)`; }
+                // 1. Eksekusi Refresh
+                ptrIsFetching = true;
+                ptrEl.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                ptrEl.style.transform = `translate(-50%, 20px)`; 
+                
+                tarikDataGaib(); 
+                
+                // 2. Sembunyikan dan Kunci (Anti-Stuck)
+                setTimeout(() => { 
+                    ptrEl.style.transition = 'transform 0.4s ease-in'; 
+                    ptrEl.style.transform = `translate(-50%, -150px)`; 
+                    
+                    // Buka gembok setelah animasi sembunyi selesai (400ms)
+                    setTimeout(() => { ptrIsFetching = false; }, 400);
+                }, 1500);
+            } else { 
+                // Batal refresh karena tarikan kurang panjang
+                ptrEl.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                ptrEl.style.transform = `translate(-50%, -150px)`; 
+            }
         });
 
         // FIX: MESIN TIMER LIVE & COUNTDOWN (UI/UX PREMIUM SOLID RED)
