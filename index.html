@@ -2296,7 +2296,12 @@
         }
             
         function renderKlasemenTopSkor() {
-            let isMatch = (d) => { return String(getProp(d, 'Jenjang') || getProp(d, 'Liga') || 'SMA').trim().toUpperCase() === ligaAktif; };
+            let isMatch = (d) => { 
+                let jenjangMatch = String(getProp(d, 'Jenjang') || getProp(d, 'Liga') || 'SMA').trim().toUpperCase() === ligaAktif; 
+                let grupMatch = String(getProp(d, 'grup') || '').toUpperCase().trim();
+                // FILTER: Hanya loloskan data yang jenjangnya sama DAN BUKAN Pre-Season
+                return jenjangMatch && grupMatch !== 'PRE-SEASON';
+            };
             let dataKlasemen = (rawData.Klasemen || []).filter(isMatch);
             let dataTopSkor = (rawData.TopSkor || []).filter(isMatch);
             renderKlasemen(dataKlasemen); renderTopSkor(dataTopSkor, dataKlasemen);
@@ -2430,7 +2435,13 @@
             let teamCS = {};
             dKlasemen.forEach(k => teamCS[getProp(k, 'klub')] = 0);
             
-            let ftMatches = (jadwalCache || []).filter(m => String(getProp(m, 'status')).toUpperCase().includes('FT') && String(getProp(m, 'Jenjang') || getProp(m, 'Liga')).toUpperCase() === ligaAktif);
+            let ftMatches = (jadwalCache || []).filter(m => {
+                let status = String(getProp(m, 'status')).toUpperCase();
+                let jenjang = String(getProp(m, 'Jenjang') || getProp(m, 'Liga')).toUpperCase();
+                let grup = String(getProp(m, 'grup')).toUpperCase().trim();
+                // Hanya hitung FT, jenjang yang sama, dan BUKAN Pre-Season
+                return status.includes('FT') && jenjang === ligaAktif && grup !== 'PRE-SEASON';
+            });
             
             ftMatches.forEach(m => {
                 let tk = getProp(m, 'tim_kiri'); let tn = getProp(m, 'tim_kanan');
@@ -3322,14 +3333,22 @@
             let jenjang = getProp(p, 'Jenjang') || (t ? getProp(t, 'Jenjang') : currentJenjang);
             let leagueTopScorers = (rawData.TopSkor || []).filter(ts => String(getProp(ts, 'Jenjang')||getProp(ts, 'Liga')).toUpperCase() === String(jenjang).toUpperCase());
             let highestGol = 0; if(leagueTopScorers.length > 0) { highestGol = parseInt(getProp(leagueTopScorers[0], 'Gol') || getProp(leagueTopScorers[0], 'gol')) || 0; }
-            // MESIN REAL-TIME STATS (Membaca langsung dari Event_Match agar Gol Penalti terbaca otomatis)
+            // MESIN REAL-TIME STATS (Membaca langsung dari Event_Match dengan Filter PRE-SEASON)
             let rtGol = 0, rtKuning = 0, rtMerah = 0;
             (rawData.Event_Match || []).forEach(ev => {
                 if (String(getProp(ev, 'pemain')).toLowerCase().trim() === String(namaPemain).toLowerCase().trim()) {
-                    let jns = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '');
-                    if (jns === 'GOL' || jns === 'GOLPENALTI') rtGol++;
-                    else if (jns === 'KUNING') rtKuning++;
-                    else if (jns === 'MERAH' || jns === 'KUNINGKEDUA' || jns === 'SECONDYELLOW') rtMerah++;
+                    // Cari laga ini milik grup apa
+                    let idM = getProp(ev, 'id_match');
+                    let matchData = jadwalCache.find(m => String(getProp(m, 'id_match')) === String(idM));
+                    let isPreSeason = matchData && String(getProp(matchData, 'grup')).toUpperCase().trim() === 'PRE-SEASON';
+                    
+                    // Jika BUKAN Pre-Season, baru dihitung!
+                    if (!isPreSeason) {
+                        let jns = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '');
+                        if (jns === 'GOL' || jns === 'GOLPENALTI') rtGol++;
+                        else if (jns === 'KUNING') rtKuning++;
+                        else if (jns === 'MERAH' || jns === 'KUNINGKEDUA' || jns === 'SECONDYELLOW') rtMerah++;
+                    }
                 }
             });
 
