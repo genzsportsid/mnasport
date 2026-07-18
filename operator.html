@@ -67,9 +67,8 @@
                     <!-- Select Utama (Pencetak Gol / Kartu / Sub Out) -->
                     <div class="flex-1">
                         <label id="label-primary" class="block text-[9px] text-gray-400 font-bold uppercase mb-1.5">Pemain</label>
-                        <select id="select-primary" class="w-full bg-black border border-white/20 rounded-xl px-3 py-3 text-[11px] font-bold text-white uppercase outline-none focus:border-white transition-colors truncate">
-                            <option value="">-- PILIH PEMAIN --</option>
-                        </select>
+                        <input type="text" id="select-primary" list="list-primary" placeholder="PILIH ATAU KETIK NAMA..." class="w-full bg-black border border-white/20 rounded-xl px-3 py-3 text-[11px] font-bold text-white uppercase outline-none focus:border-white transition-colors truncate">
+                        <datalist id="list-primary"></datalist>
                     </div>
                 </div>
 
@@ -85,9 +84,8 @@
                 <!-- Select Kedua (Hanya muncul untuk Gol/Assist dan Substitusi) -->
                 <div id="container-secondary" class="mb-5">
                     <label id="label-secondary" class="block text-[9px] text-gray-400 font-bold uppercase mb-1.5">Assist (Opsional)</label>
-                    <select id="select-secondary" class="w-full bg-black border border-white/20 rounded-xl px-3 py-3 text-[11px] font-bold text-white uppercase outline-none focus:border-white transition-colors truncate">
-                        <option value="">-- TANPA ASSIST --</option>
-                    </select>
+                    <input type="text" id="select-secondary" list="list-secondary" placeholder="TANPA ASSIST / KETIK MANUAL..." class="w-full bg-black border border-white/20 rounded-xl px-3 py-3 text-[11px] font-bold text-white uppercase outline-none focus:border-white transition-colors truncate">
+                    <datalist id="list-secondary"></datalist>
                 </div>
 
                 <input type="hidden" id="input-jenis" value="Gol">
@@ -164,6 +162,11 @@
                 <button onclick="closePicker()" class="w-8 h-8 bg-white/10 rounded-full flex justify-center items-center font-bold text-gray-400 hover:text-white">&times;</button>
             </div>
             <div class="p-3 bg-black/50 border-b border-white/5 shrink-0"><input type="text" id="picker-search" oninput="renderPickerList()" placeholder="Cari nama atau posisi..." class="w-full bg-black border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white uppercase outline-none focus:border-brand-green"></div>
+            <!-- FORM INPUT MANUAL PEMAIN -->
+            <div class="p-3 bg-brand-panel border-b border-white/10 shrink-0 flex gap-2">
+                <input type="text" id="manual-player-input" placeholder="TIDAK ADA DI DAFTAR? KETIK DI SINI..." class="w-full bg-black border border-brand-green/30 rounded-lg px-3 py-2 text-[10px] text-white uppercase outline-none focus:border-brand-green">
+                <button onclick="pilihPemainManual()" class="bg-brand-green text-white font-bold text-[10px] uppercase px-4 rounded-lg hover:bg-green-600 transition-colors">Tambah</button>
+            </div>
             <div id="picker-list" class="flex-1 overflow-y-auto hide-scroll p-3 flex flex-col gap-2"></div>
             <div id="picker-remove-btn" class="hidden p-4 border-t border-white/5 shrink-0"><button onclick="removeSelectedPlayer()" class="w-full bg-red-500/10 border border-red-500/30 text-red-500 font-bold uppercase text-[10px] py-3 rounded-xl tracking-widest"><i data-lucide="trash-2" class="w-3 h-3 inline pb-0.5"></i> Kosongkan Slot Ini</button></div>
         </div>
@@ -334,27 +337,40 @@
             
             // Efek UI Tombol
             document.querySelectorAll('.evt-btn').forEach(b => { b.classList.remove('bg-white/20', 'border-white', 'active-btn'); b.classList.add('bg-black'); }); 
-            btn.classList.replace('bg-black', 'bg-white/20'); btn.classList.add('border-white', 'active-btn'); 
+            if(btn) { btn.classList.replace('bg-black', 'bg-white/20'); btn.classList.add('border-white', 'active-btn'); }
 
-            let lPrimary = document.getElementById('label-primary'); let sPrimary = document.getElementById('select-primary');
-            let lSecondary = document.getElementById('label-secondary'); let sSecondary = document.getElementById('select-secondary');
-            let cSecondary = document.getElementById('container-secondary'); let cForm = document.getElementById('dynamic-form-container');
+            let lPrimary = document.getElementById('label-primary'); 
+            let lSecondary = document.getElementById('label-secondary'); 
+            let cSecondary = document.getElementById('container-secondary'); 
+            let cForm = document.getElementById('dynamic-form-container');
             let cPenalty = document.getElementById('container-penalty-check');
 
-            // Pabrik Opsi Dropdown
-            let optPitch = '<option value="">-- PILIH PEMAIN --</option>' + onPitchPlayers.map(p => `<option value="${p}">${p}</option>`).join('');
-            let optBench = '<option value="">-- PENGGANTI MASUK --</option>' + onBenchPlayers.map(p => `<option value="${p}">${p}</option>`).join('');
-            let optAll = '<option value="">-- PILIH PEMAIN --</option>' + allTeamPlayers.map(p => `<option value="${p.nama_pemain||p.nama||p.Pemain}">${p.nama_pemain||p.nama||p.Pemain}</option>`).join('');
+            // 1. Pabrik Opsi Datalist (Tanpa Placeholder)
+            let optPitch = onPitchPlayers.map(p => `<option value="${p}">`).join('');
+            let optBench = onBenchPlayers.map(p => `<option value="${p}">`).join('');
+            let optAll = allTeamPlayers.map(p => `<option value="${p.nama_pemain||p.nama||p.Pemain}">`).join('');
             let fallbackOpt = onPitchPlayers.length > 0 ? optPitch : optAll; // Auto Fallback
+
+            // Targetkan elemen Datalist yang baru kita buat
+            let listPrimary = document.getElementById('list-primary');
+            let listSecondary = document.getElementById('list-secondary');
 
             cSecondary.classList.add('hidden'); 
             cPenalty.classList.add('hidden'); 
+            
+            // Bersihkan teks di input box setiap kali operator memencet tombol jenis kejadian (Gol, Kartu, dll)
+            document.getElementById('select-primary').value = '';
+            let secondaryInput = document.getElementById('select-secondary');
+            if(secondaryInput) secondaryInput.value = '';
 
-            // Kustomisasi Form Sesuai Kejadian
+            // 2. Kustomisasi Form Sesuai Kejadian
             if(jenis === 'Gol') {
                 cForm.className = "bg-brand-panel border border-brand-green/50 p-4 rounded-2xl shadow-[0_0_15px_rgba(0,154,68,0.2)] transition-colors duration-300";
-                lPrimary.innerHTML = '⚽ Pencetak Gol <span class="text-brand-green ml-1">(On Pitch)</span>'; sPrimary.innerHTML = fallbackOpt;
-                lSecondary.innerHTML = '👟 Pencetak Assist <span class="text-gray-500 font-medium ml-1">(Opsional)</span>'; sSecondary.innerHTML = '<option value="">-- TANPA ASSIST --</option>' + fallbackOpt.replace('<option value="">-- PILIH PEMAIN --</option>', '');
+                lPrimary.innerHTML = '⚽ Pencetak Gol <span class="text-brand-green ml-1">(On Pitch)</span>'; 
+                listPrimary.innerHTML = fallbackOpt; // Lempar data ke datalist
+                
+                lSecondary.innerHTML = '👟 Pencetak Assist <span class="text-gray-500 font-medium ml-1">(Opsional)</span>'; 
+                listSecondary.innerHTML = fallbackOpt; // Lempar data ke datalist
                 
                 cSecondary.classList.remove('hidden');
                 cPenalty.classList.remove('hidden'); // Munculkan Checkbox Penalti
@@ -368,29 +384,38 @@
             } 
             else if (jenis === 'Substitusi') {
                 cForm.className = "bg-brand-panel border border-white/30 p-4 rounded-2xl shadow-lg transition-colors duration-300";
-                lPrimary.innerHTML = '🔻 Ditarik Keluar <span class="text-red-500 ml-1">(Dari Lapangan)</span>'; sPrimary.innerHTML = fallbackOpt;
-                lSecondary.innerHTML = '✅ Pemain Masuk <span class="text-brand-green ml-1">(Dari Bench)</span>'; sSecondary.innerHTML = onBenchPlayers.length > 0 ? optBench : optAll;
+                lPrimary.innerHTML = '🔻 Ditarik Keluar <span class="text-red-500 ml-1">(Dari Lapangan)</span>'; 
+                listPrimary.innerHTML = fallbackOpt;
+                
+                lSecondary.innerHTML = '✅ Pemain Masuk <span class="text-brand-green ml-1">(Dari Bench)</span>'; 
+                listSecondary.innerHTML = onBenchPlayers.length > 0 ? optBench : optAll;
+                
                 cSecondary.classList.remove('hidden');
             }
             else if (jenis === 'Kuning' || jenis === 'Kuning Kedua') {
                 cForm.className = "bg-brand-panel border border-yellow-500/50 p-4 rounded-2xl shadow-[0_0_15px_rgba(234,179,8,0.15)] transition-colors duration-300";
-                lPrimary.innerHTML = '🟨 Penerima Kartu <span class="text-gray-500 ml-1">(On Pitch)</span>'; sPrimary.innerHTML = fallbackOpt;
+                lPrimary.innerHTML = '🟨 Penerima Kartu <span class="text-gray-500 ml-1">(On Pitch)</span>'; 
+                listPrimary.innerHTML = fallbackOpt;
             }
             else if (jenis === 'Merah' || jenis === 'Gagal Penalti') {
                 cForm.className = "bg-brand-panel border border-red-500/50 p-4 rounded-2xl shadow-[0_0_15px_rgba(239,68,68,0.15)] transition-colors duration-300";
-                lPrimary.innerHTML = '🟥 Pelaku Kejadian <span class="text-gray-500 ml-1">(On Pitch)</span>'; sPrimary.innerHTML = fallbackOpt;
+                lPrimary.innerHTML = '🟥 Pelaku Kejadian <span class="text-gray-500 ml-1">(On Pitch)</span>'; 
+                listPrimary.innerHTML = fallbackOpt;
             }
             else if (jenis === 'Gol Bunuh Diri') {
                 cForm.className = "bg-brand-panel border border-rose-500/50 p-4 rounded-2xl shadow-[0_0_15px_rgba(244,63,94,0.15)] transition-colors duration-300";
-                lPrimary.innerHTML = '🤦‍♂️ Pemain (Own Goal) <span class="text-gray-500 ml-1">(On Pitch)</span>'; sPrimary.innerHTML = fallbackOpt;
+                lPrimary.innerHTML = '🤦‍♂️ Pemain (Own Goal) <span class="text-gray-500 ml-1">(On Pitch)</span>'; 
+                listPrimary.innerHTML = fallbackOpt;
             }
             else if (jenis === 'Penyelamatan Penalti') {
                 cForm.className = "bg-brand-panel border border-cyan-500/50 p-4 rounded-2xl shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-colors duration-300";
-                lPrimary.innerHTML = '🧤 Kiper (Save Pen) <span class="text-gray-500 ml-1">(On Pitch)</span>'; sPrimary.innerHTML = fallbackOpt;
+                lPrimary.innerHTML = '🧤 Kiper (Save Pen) <span class="text-gray-500 ml-1">(On Pitch)</span>'; 
+                listPrimary.innerHTML = fallbackOpt;
             }
             else {
                 cForm.className = "bg-brand-panel border border-gray-500/50 p-4 rounded-2xl shadow-lg transition-colors duration-300";
-                lPrimary.innerHTML = `👤 Pemain Terlibat`; sPrimary.innerHTML = optAll;
+                lPrimary.innerHTML = `👤 Pemain Terlibat`; 
+                listPrimary.innerHTML = optAll;
             }
         }
 
@@ -398,9 +423,17 @@
             let menit = document.getElementById('input-menit').value.trim();
             if(!selectedMatchId || !selectedTeamName || !menit) return alert("Isi Menit & Pilih Tim!");
             
-            let p1 = document.getElementById('select-primary').value; let p2 = document.getElementById('select-secondary').value;
-            if(!p1) return alert("Pilih Pemain Utama!");
-            if(currentEvtMode === 'Substitusi' && !p2) return alert("Pilih Pemain Pengganti (Masuk)!");
+            let p1 = document.getElementById('select-primary').value.trim(); 
+            let p2 = document.getElementById('select-secondary').value.trim();
+            
+            if(p1 === '') return alert("Isi nama pemain utama!");
+            if(currentEvtMode === 'Substitusi' && p2 === '') return alert("Isi nama pemain pengganti!");
+            
+            // Opsional: Jika Anda ingin menandai pemain manual agar Admin tahu mereka pemain Trial
+            let isP1Manual = !allTeamPlayers.some(p => (p.nama_pemain||p.nama||p.Pemain).toUpperCase() === p1.toUpperCase());
+            if (isP1Manual) {
+                p1 = p1.toUpperCase() + " (TRIAL)"; // Penanda otomatis jika pemain tidak ditemukan di database
+            }
 
             let btn = document.getElementById('btn-submit-live'); btn.disabled = true; btn.innerHTML = "Memproses..."; showLog('<span class="text-yellow-500">Mengirim ke server...</span>');
 
