@@ -518,23 +518,36 @@
             const formKey = document.getElementById('select-formasi').value; const slots = FORMATIONS[formKey]; let container = document.getElementById('pitch-slots'); let html = '';
             slots.forEach((s, i) => {
                 let p = lineupState.starters[i];
-                if(p) { let nm = p.nama_pemain||p.nama||p.Pemain; let f = p.foto ? p.foto : `https://ui-avatars.com/api/?name=${nm}&background=fff&color=000&bold=true`; html += `<div class="builder-slot filled" style="bottom:${s.b}; left:${s.l}; background-image:url('${f}')" onclick="openPicker('starter', ${i})"><span class="slot-label bg-brand-green border-brand-green text-white">${nm.split(' ')[0]}</span></div>`; } 
+                if(p) { 
+                    let nmRaw = p.nama_pemain||p.nama||p.Pemain; 
+                    // Filter UI Cerdas
+                    let isTrial = nmRaw.toUpperCase().includes('(TRIAL)');
+                    let nmClean = nmRaw.replace(/\(TRIAL\)/i, '').trim();
+                    
+                    let f = p.foto ? p.foto : `https://ui-avatars.com/api/?name=${encodeURIComponent(nmClean)}&background=fff&color=000&bold=true`; 
+                    let badge = isTrial ? `<span class="text-brand-gold ml-0.5 text-[10px] leading-none drop-shadow-md">*</span>` : '';
+                    
+                    html += `<div class="builder-slot filled" style="bottom:${s.b}; left:${s.l}; background-image:url('${f}')" onclick="openPicker('starter', ${i})"><span class="slot-label bg-brand-green border-brand-green text-white flex items-center">${nmClean.split(' ')[0]}${badge}</span></div>`; 
+                } 
                 else { html += `<div class="builder-slot empty" style="bottom:${s.b}; left:${s.l};" onclick="openPicker('starter', ${i})"><i data-lucide="plus" class="w-4 h-4 text-white/50 mx-auto mt-2"></i><span class="slot-label">${s.role}</span></div>`; }
             }); container.innerHTML = html; lucide.createIcons();
         }
         function renderExtraRoster() {
-            const buildBadge = (arr, type) => { if(arr.length === 0) return '<div class="text-[8px] text-gray-500 italic w-full">Kosong</div>'; return arr.map((p, i) => { let nm = p.nama_pemain||p.nama||p.Pemain; return `<div class="bg-gray-800 border border-gray-600 px-2 py-1 rounded text-[9px] font-bold text-white uppercase flex items-center gap-2">${nm} <button onclick="removeExtra('${type}', ${i})" class="text-red-400 hover:text-red-300">&times;</button></div>`; }).join(''); };
-            document.getElementById('list-bench').innerHTML = buildBadge(lineupState.bench, 'bench'); document.getElementById('list-cedera').innerHTML = buildBadge(lineupState.cedera, 'cedera'); document.getElementById('list-skorsing').innerHTML = buildBadge(lineupState.skorsing, 'skorsing');
-        }
-        function removeExtra(type, index) { lineupState[type].splice(index, 1); renderExtraRoster(); }
-        function openPicker(type, index = null) {
-            if(!selectedTeamName) return alert("Pilih tim terlebih dahulu!"); activeContext = { type, index }; let title = '', sub = '';
-            if(type === 'starter') { title = 'Pilih Starter XI'; sub = `Posisi Slot: ${FORMATIONS[document.getElementById('select-formasi').value][index].role}`; document.getElementById('picker-remove-btn').classList.remove('hidden'); }
-            else if(type === 'bench') { title = 'Pilih Cadangan'; sub = 'Tambahkan ke bangku cadangan'; document.getElementById('picker-remove-btn').classList.add('hidden'); }
-            else if(type === 'cedera') { title = 'Pilih Pemain Cedera'; sub = 'Tandai 🚑'; document.getElementById('picker-remove-btn').classList.add('hidden'); }
-            else if(type === 'skorsing') { title = 'Pilih Skorsing'; sub = 'Tandai 🟥'; document.getElementById('picker-remove-btn').classList.add('hidden'); }
-            document.getElementById('picker-title').innerText = title; document.getElementById('picker-subtitle').innerText = sub; document.getElementById('picker-search').value = ''; renderPickerList();
-            document.getElementById('modal-picker').classList.remove('hidden'); document.getElementById('modal-picker').classList.add('flex'); document.body.style.overflow = 'hidden';
+            const buildBadge = (arr, type) => { 
+                if(arr.length === 0) return '<div class="text-[8px] text-gray-500 italic w-full">Kosong</div>'; 
+                return arr.map((p, i) => { 
+                    let nmRaw = p.nama_pemain||p.nama||p.Pemain; 
+                    // Filter UI Cerdas
+                    let isTrial = nmRaw.toUpperCase().includes('(TRIAL)');
+                    let nmClean = nmRaw.replace(/\(TRIAL\)/i, '').trim();
+                    let badge = isTrial ? `<span class="bg-brand-gold text-black px-1 rounded-[2px] ml-1.5 text-[6px]">TRIAL</span>` : '';
+                    
+                    return `<div class="bg-gray-800 border border-gray-600 px-2 py-1 rounded text-[9px] font-bold text-white uppercase flex items-center">${nmClean}${badge} <button onclick="removeExtra('${type}', ${i})" class="text-red-400 hover:text-red-300 ml-2">&times;</button></div>`; 
+                }).join(''); 
+            };
+            document.getElementById('list-bench').innerHTML = buildBadge(lineupState.bench, 'bench'); 
+            document.getElementById('list-cedera').innerHTML = buildBadge(lineupState.cedera, 'cedera'); 
+            document.getElementById('list-skorsing').innerHTML = buildBadge(lineupState.skorsing, 'skorsing');
         }
         function closePicker() { document.getElementById('modal-picker').classList.add('hidden'); document.getElementById('modal-picker').classList.remove('flex'); document.body.style.overflow = ''; }
         function renderPickerList() {
