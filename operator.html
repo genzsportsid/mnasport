@@ -549,6 +549,42 @@
             document.getElementById('list-cedera').innerHTML = buildBadge(lineupState.cedera, 'cedera'); 
             document.getElementById('list-skorsing').innerHTML = buildBadge(lineupState.skorsing, 'skorsing');
         }
+        function openPicker(type, index = null) {
+            if(!selectedTeamName) return alert("Pilih tim terlebih dahulu!"); 
+            activeContext = { type, index }; 
+            let title = '', sub = '';
+            
+            if(type === 'starter') { 
+                title = 'Pilih Starter XI'; 
+                sub = `Posisi Slot: ${FORMATIONS[document.getElementById('select-formasi').value][index].role}`; 
+                document.getElementById('picker-remove-btn').classList.remove('hidden'); 
+            }
+            else if(type === 'bench') { 
+                title = 'Pilih Cadangan'; 
+                sub = 'Tambahkan ke bangku cadangan'; 
+                document.getElementById('picker-remove-btn').classList.add('hidden'); 
+            }
+            else if(type === 'cedera') { 
+                title = 'Pilih Pemain Cedera'; 
+                sub = 'Tandai 🚑'; 
+                document.getElementById('picker-remove-btn').classList.add('hidden'); 
+            }
+            else if(type === 'skorsing') { 
+                title = 'Pilih Skorsing'; 
+                sub = 'Tandai 🟥'; 
+                document.getElementById('picker-remove-btn').classList.add('hidden'); 
+            }
+            
+            document.getElementById('picker-title').innerText = title; 
+            document.getElementById('picker-subtitle').innerText = sub; 
+            document.getElementById('picker-search').value = ''; 
+            
+            renderPickerList();
+            
+            document.getElementById('modal-picker').classList.remove('hidden'); 
+            document.getElementById('modal-picker').classList.add('flex'); 
+            document.body.style.overflow = 'hidden';
+        }
         function closePicker() { document.getElementById('modal-picker').classList.add('hidden'); document.getElementById('modal-picker').classList.remove('flex'); document.body.style.overflow = ''; }
         function renderPickerList() {
             let q = document.getElementById('picker-search').value.toLowerCase().trim();
