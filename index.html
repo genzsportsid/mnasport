@@ -3781,7 +3781,7 @@
             document.getElementById('mm-pitch-info-home').innerHTML = `<div class="flex items-center gap-2"><img src="${lKiri}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"> <span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tk}</span></div><div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fHomeRaw}</span></div>`;
             document.getElementById('mm-pitch-info-away').innerHTML = `<div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fAwayRaw}</span></div><div class="flex items-center gap-2"><span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tn}</span> <img src="${lKanan}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"></div>`;
 
-            // KORDINAT SETENGAH LAPANGAN ABSOLUT (Striker mentok di 84)
+            // KORDINAT SETENGAH LAPANGAN ABSOLUT
             const FORMATIONS_MAPPING = {
                 '4-3-3': [{x:50, y:8}, {x:12, y:28}, {x:36, y:25}, {x:64, y:25}, {x:88, y:28}, {x:25, y:52}, {x:50, y:52}, {x:75, y:52}, {x:20, y:78}, {x:50, y:82}, {x:80, y:78}],
                 '4-2-3-1': [{x:50, y:8}, {x:12, y:28}, {x:36, y:25}, {x:64, y:25}, {x:88, y:28}, {x:35, y:46}, {x:65, y:46}, {x:18, y:65}, {x:50, y:65}, {x:82, y:65}, {x:50, y:84}],
@@ -3812,8 +3812,8 @@
                 let f = (pData && getProp(pData,'foto')) ? getProp(pData,'foto') : getAvatar(nmClean);
                 let num = (pData && getProp(pData,'nomor') != null) ? getProp(pData,'nomor') : '-'; 
                 
-                // Bintang Emas untuk Trial
-                let badge = isTrial ? `<span class="text-brand-gold text-[10px] ml-0.5 leading-none drop-shadow-md">*</span>` : '';
+                // Badge Trial Terang
+                let badge = isTrial ? `<span class="bg-brand-gold text-brand-black px-1.5 py-[1px] rounded-[3px] ml-1.5 text-[6px] font-black shadow-[0_0_5px_rgba(215,182,125,0.8)] border border-brand-gold tracking-widest">TRIAL</span>` : '';
 
                 // Filter canggih: Cuci dulu nama dari Event_Match agar cocok
                 let pEvents = matchEvents.filter(ev => {
@@ -3823,19 +3823,24 @@
 
                 // 1. KIRI ATAS: SUB IN / SUB OUT 
                 let topLeftBadges = '';
-                if (subOut) { topLeftBadges = `<div class="flex flex-col items-center"><span class="text-[10px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,1)] leading-none mb-[1px]">${getProp(subOut, 'menit')}'</span><div class="w-[18px] h-[18px] bg-[#ef4444] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></div></div>`; }
-                if (subIn) { topLeftBadges = `<div class="flex flex-col items-center"><span class="text-[10px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,1)] leading-none mb-[1px]">${getProp(subIn, 'menit')}'</span><div class="w-[18px] h-[18px] bg-[#4ade80] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></div></div>`; }
+                if (pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT')) { let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT'); topLeftBadges = `<div class="flex flex-col items-center"><span class="text-[10px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,1)] leading-none mb-[1px]">${getProp(subOut, 'menit')}'</span><div class="w-[18px] h-[18px] bg-[#ef4444] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></div></div>`; }
+                if (pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN')) { let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN'); topLeftBadges = `<div class="flex flex-col items-center"><span class="text-[10px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,1)] leading-none mb-[1px]">${getProp(subIn, 'menit')}'</span><div class="w-[18px] h-[18px] bg-[#4ade80] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></div></div>`; }
 
-                // 2. KIRI TENGAH: KARTU MERAH / KUNING KEDUA / KUNING (Sistem Prioritas)
+                let reds = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'MERAH').length;
+                let secondYellows = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'KUNINGKEDUA' || j === 'SECONDYELLOW'; }).length;
+                let yellows = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'KUNING').length;
+                let assists = pEvents.filter(ev => String(getProp(ev, 'jenis')).toUpperCase() === 'ASSIST').length;
+                let goals = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'GOL' || j === 'GOLPENALTI'; }).length;
+                let ownGoals = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'GOLBUNUHDIRI' || j === 'OWNGOAL' || j === 'OG'; }).length;
+                let penaltySaves = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'PENYELAMATANPENALTI' || j === 'SAVEPENALTY' || j === 'PENALTYSAVE'; }).length;
+                let missedPens = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'GAGALPENALTI' || j === 'MISSPENALTY'; }).length;
+                let injuries = pEvents.filter(ev => { let j = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, ''); return j === 'CEDERA' || j === 'INJURY'; }).length;
+
+                // 2. KIRI TENGAH: KARTU
                 let midLeftBadges = '';
-                if (reds > 0) { 
-                    midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><div class="w-2.5 h-3.5 bg-[#ef4444] rounded-[2px]"></div></div>`; 
-                } else if (secondYellows > 0) { 
-                    // Link ikon ini masih menggunakan ikon cedera sesuai yang diberikan. Ganti link di sini nanti jika diperlukan.
-                    midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><img src="https://i.ibb.co.com/bRrT8P4Q/ICON-KARTU-KUNING-KEDUA.png" class="w-[12px] h-[12px] object-contain"></div>`; 
-                } else if (yellows > 0) { 
-                    midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><div class="w-2.5 h-3.5 bg-[#eab308] rounded-[2px]"></div></div>`; 
-                }
+                if (reds > 0) { midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><div class="w-2.5 h-3.5 bg-[#ef4444] rounded-[2px]"></div></div>`; } 
+                else if (secondYellows > 0) { midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><img src="https://i.ibb.co.com/bRrT8P4Q/ICON-KARTU-KUNING-KEDUA.png" class="w-[12px] h-[12px] object-contain"></div>`; } 
+                else if (yellows > 0) { midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><div class="w-2.5 h-3.5 bg-[#eab308] rounded-[2px]"></div></div>`; }
 
                 // 3. KIRI BAWAH: ASSIST 
                 let bottomLeftBadges = '';
@@ -3850,12 +3855,9 @@
                     bottomLeftBadges = `<div class="absolute -bottom-1.5 -left-2.5 flex items-center flex-row z-30">${shoeHtml}</div>`;
                 }
 
-                // 4. KANAN BAWAH: KLASTER GOL, OG, & PENYELAMATAN (Ditumpuk cerdas menjadi satu deretan)
+                // 4. KANAN BAWAH: GOL dll
                 let bottomRightBadges = '';
-                let brCount = 0;
-                let brHtml = '';
-
-                // Mesin Pembangun Tumpukan Kanan Bawah
+                let brCount = 0; let brHtml = '';
                 const addBrBadge = (imgSrc) => {
                     let margin = brCount > 0 ? '-mr-[8px]' : ''; 
                     brHtml += `<div class="relative w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200 ${margin}" style="z-index: ${30 + brCount}">
@@ -3883,9 +3885,9 @@
                 let posStyle = `top: ${absY}%; left: ${posX}%;`;
                 let animDelay = idx * 50;
 
-                // FOTMOB ELITE WRAPPER 
+                // FOTMOB ELITE WRAPPER (FIX: Use rawNm instead of nm to avoid crash)
                 return `
-                <div class="absolute" style="${posStyle} transform: translate(-50%, -50%); z-index: 10;" onclick="bukaModalPemain('${safeStr(pData ? getProp(pData,'nama') : nm)}', '${safeStr(teamName)}')">
+                <div class="absolute" style="${posStyle} transform: translate(-50%, -50%); z-index: 10;" onclick="bukaModalPemain('${safeStr(pData ? getProp(pData,'nama') : rawNm)}', '${safeStr(teamName)}')">
                     <div class="flex flex-col items-center w-[68px] sm:w-[80px] md:w-[100px] pitch-player-anim cursor-pointer group hover:scale-110 transition-transform" style="animation-delay: ${animDelay}ms;">
                         
                         <div class="relative w-[56px] h-[56px] sm:w-16 sm:h-16 md:w-20 md:h-20 mb-1">
@@ -3900,12 +3902,12 @@
                             </div>
                         </div>
                         
-                        <!-- WADAH NAMA (Menampung Ikon Cedera dengan Rapi dan Responsif) -->
                         <div class="flex items-center justify-center gap-[3px] w-full relative z-20 px-1 mt-0.5">
                             ${injuries > 0 ? `<div class="w-[14px] h-[14px] sm:w-[16px] sm:h-[16px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.8)] border-[1px] border-gray-200 shrink-0"><img src="https://i.ibb.co.com/CsY05ZxJ/ICON-CEDERA.png" class="w-[8px] h-[8px] sm:w-[10px] sm:h-[10px] object-contain"></div>` : ''}
                             <div class="flex items-center justify-center truncate drop-shadow-[0_2px_4px_rgba(0,0,0,1)] whitespace-nowrap">
                                 <span class="text-[9px] sm:text-[10px] md:text-[12px] font-medium text-gray-300 mr-1">${num}</span>
-                                <span class="text-[9px] sm:text-[10px] md:text-[12px] font-black text-white tracking-tight truncate">${short}${badge}</span>
+                                <span class="text-[9px] sm:text-[10px] md:text-[12px] font-black text-white tracking-tight truncate">${short}</span>
+                                ${badge}
                             </div>
                         </div>
 
@@ -3932,9 +3934,9 @@
                     if (found) {
                         result.push(found);
                     } else if (n.includes('(trial)')) {
-                        // Ciptakan "Ghost Player" agar pemain Trial tetap muncul di Bench
                         let cleanName = n.replace('(trial)', '').trim().toUpperCase();
-                        result.push({ nama: cleanName + " (TRIAL)", tim: teamName, posisi: 'POS', nomor: '-', foto: getAvatar(cleanName) });
+                        let titleCaseName = cleanName.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                        result.push({ nama: titleCaseName + " (TRIAL)", tim: teamName, posisi: 'POS', nomor: '-', foto: getAvatar(cleanName) });
                     }
                 });
                 return result;
@@ -3946,15 +3948,12 @@
             const renderBench = (bArr, cArr, sArr, isAway, teamName) => {
                 if(bArr.length===0 && cArr.length===0 && sArr.length===0) return '<div class="text-[9px] text-gray-400 italic text-center py-8 w-full">Data kosong</div>';
                 
-                // Kontainer Vertikal dengan Gap (Jarak) Presisi FotMob
                 let h = '<div class="flex flex-col items-center w-full gap-5">'; 
                 let tLower = teamName ? teamName.toLowerCase().trim() : '';
                 
-                // Pabrik Mini-Face (Duplikasi Identik dengan Lineup Lapangan)
                 const buildMiniFace = (p, isAbsence) => {
                     let rawNm = getProp(p,'nama');
                     
-                    // Cuci Nama & Deteksi Trial Pakai Fungsi Premium
                     let pDataFormat = formatNamaPremium(rawNm);
                     let nmClean = pDataFormat.clean;
                     let isTrial = pDataFormat.isTrial;
@@ -3965,10 +3964,8 @@
                     let f = getProp(p,'foto') ? getProp(p,'foto') : getAvatar(nmClean);
                     let pos = getProp(p,'posisi')||'POS';
                     
-                    // Badge Kotak Emas untuk Cadangan Trial
-                    let badge = isTrial ? `<span class="bg-brand-gold/20 border border-brand-gold/40 text-brand-gold px-1 py-[1px] rounded-[3px] ml-1.5 text-[6px] font-black shadow-sm">T</span>` : '';
+                    let badge = isTrial ? `<span class="bg-brand-gold text-brand-black px-1.5 py-[1px] rounded-[3px] ml-1 text-[6px] font-black shadow-[0_0_5px_rgba(215,182,125,0.8)] border border-brand-gold">TRIAL</span>` : '';
 
-                    // Filter canggih: Cuci dulu nama dari Event_Match agar cocok
                     let pEvents = matchEvents.filter(ev => {
                         let evNameClean = formatNamaPremium(getProp(ev, 'pemain')).clean.toLowerCase();
                         return evNameClean === nmLower && String(getProp(ev, 'tim')).toLowerCase().trim() === tLower;
@@ -3987,22 +3984,18 @@
                     let subOut = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBOUT');
                     let subIn = pEvents.find(ev => String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '') === 'SUBIN');
                         
-                    // Override Trigger untuk Cedera & Skorsing (Memicu Ikon & Meredupkan Wajah)
                     if(isAbsence === 'cedera') injuries = 1;
                     if(isAbsence === 'skorsing') reds = 1;
 
-                    // 1. KIRI ATAS: SUB IN / SUB OUT (Teks menit responsif Tema Gelap/Terang)
                     let topLeftBadges = '';
                     if (subOut) { topLeftBadges = `<div class="flex flex-col items-center"><span class="text-[10px] font-black text-brand-black dark:text-white drop-shadow-sm leading-none mb-[1px]">${getProp(subOut, 'menit')}'</span><div class="w-[18px] h-[18px] bg-[#ef4444] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md z-30"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></div></div>`; }
                     if (subIn) { topLeftBadges = `<div class="flex flex-col items-center"><span class="text-[10px] font-black text-brand-black dark:text-white drop-shadow-sm leading-none mb-[1px]">${getProp(subIn, 'menit')}'</span><div class="w-[18px] h-[18px] bg-[#4ade80] rounded-full flex items-center justify-center border-[1.5px] border-white shadow-md z-30"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg></div></div>`; }
 
-                    // 2. KIRI TENGAH: KARTU MERAH / KUNING KEDUA / KUNING
                     let midLeftBadges = '';
                     if (reds > 0) { midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><div class="w-2.5 h-3.5 bg-[#ef4444] rounded-[2px]"></div></div>`; } 
                     else if (secondYellows > 0) { midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><img src="https://i.ibb.co.com/bRrT8P4Q/ICON-KARTU-KUNING-KEDUA.png" class="w-[12px] h-[12px] object-contain"></div>`; } 
                     else if (yellows > 0) { midLeftBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><div class="w-2.5 h-3.5 bg-[#eab308] rounded-[2px]"></div></div>`; }
 
-                    // 3. KIRI BAWAH: ASSIST 
                     let bottomLeftBadges = '';
                     if (assists > 0) {
                         let shoeHtml = '';
@@ -4013,7 +4006,6 @@
                         bottomLeftBadges = `<div class="absolute -bottom-1.5 -left-2.5 flex items-center flex-row z-30">${shoeHtml}</div>`;
                     }
 
-                    // 4. KANAN BAWAH: GOL, OG, PENYELAMATAN KIPER
                     let bottomRightBadges = '';
                     let brCount = 0; let brHtml = '';
                     const addBrBadge = (imgSrc) => {
@@ -4027,14 +4019,14 @@
 
                     if (brCount > 0) { bottomRightBadges = `<div class="absolute -bottom-1.5 -right-2.5 flex items-center flex-row-reverse z-30">${brHtml}</div>`; }
 
-                    // 5. KANAN TENGAH: GAGAL PENALTI 
                     let midRightBadges = '';
                     if (missedPens > 0) { midRightBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><img src="https://i.ibb.co.com/pjWQBCHQ/ICON-MISS-PENALTY-T.png" class="w-[12px] h-[12px] object-contain"></div>`; }
 
                     let opacityClass = isAbsence ? "opacity-50 grayscale" : "";
 
+                    // FIX: Gunakan rawNm untuk fungsi onclick agar modal player tidak crash
                     return `
-                    <div class="flex flex-col items-center group cursor-pointer hover:scale-105 transition-transform w-full ${opacityClass}" onclick="bukaModalPemain('${safeStr(nm)}', '${safeStr(teamName)}')">
+                    <div class="flex flex-col items-center group cursor-pointer hover:scale-105 transition-transform w-full ${opacityClass}" onclick="bukaModalPemain('${safeStr(rawNm)}', '${safeStr(teamName)}')">
                         <div class="relative w-[56px] h-[56px] sm:w-16 sm:h-16 md:w-20 md:h-20 mb-1">
                             ${topLeftBadges !== '' ? `<div class="absolute -top-3 -left-1 flex flex-col items-center z-30">${topLeftBadges}</div>` : ''}
                             ${midLeftBadges !== '' ? `<div class="absolute top-1/2 -left-3.5 transform -translate-y-1/2 z-40">${midLeftBadges}</div>` : ''}
@@ -4049,7 +4041,7 @@
                         
                         <div class="flex items-center justify-center gap-[3px] w-full relative z-20 px-1 mt-1">
                             ${injuries > 0 ? `<div class="w-[12px] h-[12px] bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-200 shrink-0"><img src="https://i.ibb.co.com/CsY05ZxJ/ICON-CEDERA.png" class="w-[7px] h-[7px] object-contain"></div>` : ''}
-                            <span class="text-[9px] sm:text-[10px] md:text-[11px] font-bold text-brand-black dark:text-white tracking-tight truncate whitespace-nowrap ${isAbsence ? 'line-through' : ''}">
+                            <span class="flex items-center text-[9px] sm:text-[10px] md:text-[11px] font-bold text-brand-black dark:text-white tracking-tight truncate whitespace-nowrap ${isAbsence ? 'line-through' : ''}">
                                 <span class="text-gray-400 font-medium mr-0.5">${num}</span>${short}${badge}
                             </span>
                         </div>
@@ -4057,10 +4049,7 @@
                     </div>`;
                 };
 
-                // Cetak Pemain Cadangan Aktif
                 bArr.forEach(p => h += buildMiniFace(p, false));
-                
-                // Cetak Pemain Cedera / Skorsing
                 if (cArr.length > 0 || sArr.length > 0) {
                     h += `<div class="w-[40%] h-[1px] bg-gray-200 dark:bg-gray-800 my-2"></div>`;
                     cArr.forEach(p => h += buildMiniFace(p, 'cedera'));
@@ -4071,7 +4060,6 @@
                 return h;
             };
 
-            // FIX: Hapus class "divide-y" agar tidak ada garis pembatas horizontal antar pemain, memunculkan kesan Vertikal Elegan.
             bKiri.className = "flex flex-col w-full py-6";
             bKanan.className = "flex flex-col w-full py-6";
 
