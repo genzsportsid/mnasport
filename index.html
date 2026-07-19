@@ -3777,9 +3777,14 @@
 
                 let nmLower = nm.toLowerCase().trim(); let tLower = teamName.toLowerCase().trim();
                 let pData = (rawData.Pemain||[]).find(x => String(getProp(x,'nama')).toLowerCase().trim() === nmLower && String(getProp(x,'tim')).toLowerCase().trim() === tLower);
-                let f = (pData && getProp(pData,'foto')) ? getProp(pData,'foto') : getAvatar(nm);
+                
+                // DECOUPLE UI (Pemisahan Teks)
+                let isTrial = nmLower.includes('(trial)');
+                let nmClean = nm.replace(/\(TRIAL\)/i, '').trim();
+                
+                let f = (pData && getProp(pData,'foto')) ? getProp(pData,'foto') : getAvatar(nmClean);
                 let num = (pData && getProp(pData,'nomor') != null) ? getProp(pData,'nomor') : '-'; 
-                let short = getShortName(nm);
+                let short = getShortName(nmClean);
                 
                 let pEvents = matchEvents.filter(ev => String(getProp(ev, 'pemain')).toLowerCase().trim() === nmLower && String(getProp(ev, 'tim')).toLowerCase().trim() === tLower);
                 
@@ -3884,6 +3889,7 @@
                             <div class="flex items-center justify-center truncate drop-shadow-[0_2px_4px_rgba(0,0,0,1)] whitespace-nowrap">
                                 <span class="text-[9px] sm:text-[10px] md:text-[12px] font-medium text-gray-300 mr-1">${num}</span>
                                 <span class="text-[9px] sm:text-[10px] md:text-[12px] font-black text-white tracking-tight truncate">${short}</span>
+                                ${isTrial ? `<span class="text-brand-gold text-[10px] ml-0.5 leading-none drop-shadow-md">*</span>` : ''}
                             </div>
                         </div>
 
@@ -3903,9 +3909,20 @@
                 if(!commaString || commaString.trim() === '') return [];
                 let names = String(commaString).split(',').map(s=>s.trim().toLowerCase());
                 let allPlayers = (rawData.Pemain||[]).filter(x => String(getProp(x,'tim')).toLowerCase() === String(teamName).toLowerCase());
-                return allPlayers.filter(x => names.includes(String(getProp(x,'nama')).toLowerCase().trim()));
+                
+                let result = [];
+                names.forEach(n => {
+                    let found = allPlayers.find(x => String(getProp(x,'nama')).toLowerCase().trim() === n);
+                    if (found) {
+                        result.push(found);
+                    } else if (n.includes('(trial)')) {
+                        // Ciptakan "Ghost Player" agar pemain Trial tetap muncul di Bench
+                        let cleanName = n.replace('(trial)', '').trim().toUpperCase();
+                        result.push({ nama: cleanName + " (TRIAL)", tim: teamName, posisi: 'POS', nomor: '-', foto: getAvatar(cleanName) });
+                    }
+                });
+                return result;
             };
-
             let benchKiri = parseNamesToList(tk, getProp(dataKiri, 'bench')); let benchKanan = parseNamesToList(tn, getProp(dataKanan, 'bench'));
             let cederaKiri = parseNamesToList(tk, getProp(dataKiri, 'cedera')); let cederaKanan = parseNamesToList(tn, getProp(dataKanan, 'cedera'));
             let skorsKiri = parseNamesToList(tk, getProp(dataKiri, 'skorsing')); let skorsKanan = parseNamesToList(tn, getProp(dataKanan, 'skorsing'));
@@ -3920,9 +3937,14 @@
                 // Pabrik Mini-Face (Duplikasi Identik dengan Lineup Lapangan)
                 const buildMiniFace = (p, isAbsence) => {
                     let nm = getProp(p,'nama'); let nmLower = nm ? nm.toLowerCase().trim() : '';
-                    let num = getProp(p,'nomor')||'-'; let f = getProp(p,'foto') ? getProp(p,'foto') : getAvatar(nm);
+                    
+                    // DECOUPLE UI
+                    let isTrial = nmLower.includes('(trial)');
+                    let nmClean = nm ? nm.replace(/\(TRIAL\)/i, '').trim() : '';
+                    
+                    let num = getProp(p,'nomor')||'-'; let f = getProp(p,'foto') ? getProp(p,'foto') : getAvatar(nmClean);
                     let pos = getProp(p,'posisi')||'POS';
-                    let short = getShortName(nm);
+                    let short = getShortName(nmClean);
                     
                     let pEvents = matchEvents.filter(ev => String(getProp(ev, 'pemain')).toLowerCase().trim() === nmLower && String(getProp(ev, 'tim')).toLowerCase().trim() === tLower);
                     
@@ -4003,6 +4025,7 @@
                             ${injuries > 0 ? `<div class="w-[12px] h-[12px] bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-200 shrink-0"><img src="https://i.ibb.co.com/CsY05ZxJ/ICON-CEDERA.png" class="w-[7px] h-[7px] object-contain"></div>` : ''}
                             <span class="text-[9px] sm:text-[10px] md:text-[11px] font-bold text-brand-black dark:text-white tracking-tight truncate whitespace-nowrap ${isAbsence ? 'line-through' : ''}">
                                 <span class="text-gray-400 font-medium mr-0.5">${num}</span>${short}
+                                ${isTrial ? `<span class="bg-brand-gold text-black px-1 rounded-[2px] ml-0.5 text-[6px]">T</span>` : ''}
                             </span>
                         </div>
                         <span class="text-[7px] md:text-[8px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">${pos}</span>
