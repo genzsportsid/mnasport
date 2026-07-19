@@ -3864,12 +3864,60 @@
             document.getElementById('mm-pitch-info-away').innerHTML = `<div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fAwayRaw}</span></div><div class="flex items-center gap-2"><span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tn}</span> <img src="${lKanan}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"></div>`;
 
             // KORDINAT SETENGAH LAPANGAN ABSOLUT
+            // Telah disinkronisasi 100% dengan urutan Index input dari operator.html
             const FORMATIONS_MAPPING = {
-                '4-3-3': [{x:50, y:8}, {x:12, y:28}, {x:36, y:25}, {x:64, y:25}, {x:88, y:28}, {x:25, y:52}, {x:50, y:52}, {x:75, y:52}, {x:20, y:78}, {x:50, y:82}, {x:80, y:78}],
-                '4-2-3-1': [{x:50, y:8}, {x:12, y:28}, {x:36, y:25}, {x:64, y:25}, {x:88, y:28}, {x:35, y:46}, {x:65, y:46}, {x:18, y:65}, {x:50, y:65}, {x:82, y:65}, {x:50, y:84}],
-                '4-4-2': [{x:50, y:8}, {x:12, y:28}, {x:36, y:25}, {x:64, y:25}, {x:88, y:28}, {x:15, y:55}, {x:38, y:55}, {x:62, y:55}, {x:85, y:55}, {x:35, y:80}, {x:65, y:80}],
-                '3-5-2': [{x:50, y:8}, {x:25, y:25}, {x:50, y:25}, {x:75, y:25}, {x:12, y:50}, {x:35, y:48}, {x:50, y:55}, {x:65, y:48}, {x:88, y:50}, {x:35, y:80}, {x:65, y:80}],
-                '4-3-2-1': [{x:50, y:8}, {x:12, y:25}, {x:36, y:22}, {x:64, y:22}, {x:88, y:25}, {x:22, y:42}, {x:50, y:44}, {x:78, y:42}, {x:35, y:62}, {x:65, y:62}, {x:50, y:84}]
+                '4-3-3': [
+                    {x:50, y:8},   // 0: GK
+                    {x:12, y:28},  // 1: LB
+                    {x:36, y:25},  // 2: CB
+                    {x:64, y:25},  // 3: CB
+                    {x:88, y:28},  // 4: RB
+                    {x:50, y:42},  // 5: CDM (Ditarik sedikit ke bawah sebagai poros)
+                    {x:25, y:55},  // 6: L-CM
+                    {x:75, y:55},  // 7: R-CM
+                    {x:20, y:78},  // 8: LW
+                    {x:80, y:78},  // 9: RW
+                    {x:50, y:82}   // 10: ST (Paling depan)
+                ],
+                '4-2-3-1': [
+                    {x:50, y:8},   // 0: GK
+                    {x:12, y:28},  // 1: LB
+                    {x:36, y:25},  // 2: CB
+                    {x:64, y:25},  // 3: CB
+                    {x:88, y:28},  // 4: RB
+                    {x:35, y:46},  // 5: L-CDM
+                    {x:65, y:46},  // 6: R-CDM
+                    {x:18, y:65},  // 7: LAM
+                    {x:50, y:65},  // 8: CAM
+                    {x:82, y:65},  // 9: RAM
+                    {x:50, y:84}   // 10: ST
+                ],
+                '4-4-2': [
+                    {x:50, y:8},   // 0: GK
+                    {x:12, y:28},  // 1: LB
+                    {x:36, y:25},  // 2: CB
+                    {x:64, y:25},  // 3: CB
+                    {x:88, y:28},  // 4: RB
+                    {x:15, y:55},  // 5: LM
+                    {x:38, y:55},  // 6: L-CM
+                    {x:62, y:55},  // 7: R-CM
+                    {x:85, y:55},  // 8: RM
+                    {x:35, y:80},  // 9: L-CF
+                    {x:65, y:80}   // 10: R-CF
+                ],
+                '3-5-2': [
+                    {x:50, y:8},   // 0: GK
+                    {x:25, y:25},  // 1: L-CB
+                    {x:50, y:25},  // 2: C-CB
+                    {x:75, y:25},  // 3: R-CB
+                    {x:35, y:45},  // 4: L-CM
+                    {x:65, y:45},  // 5: R-CM
+                    {x:12, y:55},  // 6: LWB
+                    {x:88, y:55},  // 7: RWB
+                    {x:50, y:60},  // 8: CAM
+                    {x:35, y:80},  // 9: L-ST
+                    {x:65, y:80}   // 10: R-ST
+                ]
             };
 
             let homeNames = pHomeRaw ? pHomeRaw.split(',').map(s=>s.trim()) : new Array(11).fill('');
