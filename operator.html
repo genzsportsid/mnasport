@@ -111,7 +111,14 @@
                 <div class="flex justify-between items-center mb-4">
                     <label class="text-[10px] font-bold text-brand-gold uppercase tracking-widest">Papan Taktik</label>
                     <select id="select-formasi" onchange="renderPitch()" class="bg-black border border-brand-gold/30 text-brand-gold rounded-lg px-3 py-1.5 text-[10px] font-black uppercase outline-none">
-                        <option value="4-3-3">4-3-3</option><option value="4-2-3-1">4-2-3-1</option><option value="4-4-2">4-4-2</option><option value="3-5-2">3-5-2</option>
+                        <option value="4-3-3">4-3-3</option>
+                        <option value="4-2-3-1">4-2-3-1</option>
+                        <option value="4-4-2">4-4-2</option>
+                        <option value="4-1-4-1">4-1-4-1</option>
+                        <option value="3-5-2">3-5-2</option>
+                        <option value="3-4-3">3-4-3</option>
+                        <option value="5-3-2">5-3-2</option>
+                    </select>
                     </select>
                 </div>
                 
@@ -192,7 +199,10 @@
             '4-3-3': [{b:'10%', l:'50%', role:'GK'}, {b:'25%', l:'15%', role:'LB'}, {b:'25%', l:'35%', role:'CB'}, {b:'25%', l:'65%', role:'CB'}, {b:'25%', l:'85%', role:'RB'}, {b:'45%', l:'50%', role:'CDM'}, {b:'55%', l:'30%', role:'CM'}, {b:'55%', l:'70%', role:'CM'}, {b:'80%', l:'20%', role:'LW'}, {b:'80%', l:'80%', role:'RW'}, {b:'85%', l:'50%', role:'ST'}],
             '4-4-2': [{b:'10%', l:'50%', role:'GK'}, {b:'25%', l:'15%', role:'LB'}, {b:'25%', l:'35%', role:'CB'}, {b:'25%', l:'65%', role:'CB'}, {b:'25%', l:'85%', role:'RB'}, {b:'50%', l:'15%', role:'LM'}, {b:'45%', l:'35%', role:'CM'}, {b:'45%', l:'65%', role:'CM'}, {b:'50%', l:'85%', role:'RM'}, {b:'80%', l:'35%', role:'CF'}, {b:'80%', l:'65%', role:'CF'}],
             '4-2-3-1': [{b:'10%', l:'50%', role:'GK'}, {b:'25%', l:'15%', role:'LB'}, {b:'25%', l:'35%', role:'CB'}, {b:'25%', l:'65%', role:'CB'}, {b:'25%', l:'85%', role:'RB'}, {b:'45%', l:'35%', role:'CDM'}, {b:'45%', l:'65%', role:'CDM'}, {b:'65%', l:'20%', role:'LAM'}, {b:'65%', l:'50%', role:'CAM'}, {b:'65%', l:'80%', role:'RAM'}, {b:'85%', l:'50%', role:'ST'}],
-            '3-5-2': [{b:'10%', l:'50%', role:'GK'}, {b:'25%', l:'25%', role:'CB'}, {b:'25%', l:'50%', role:'CB'}, {b:'25%', l:'75%', role:'CB'}, {b:'45%', l:'35%', role:'CM'}, {b:'45%', l:'65%', role:'CM'}, {b:'60%', l:'15%', role:'LWB'}, {b:'60%', l:'85%', role:'RWB'}, {b:'65%', l:'50%', role:'CAM'}, {b:'85%', l:'35%', role:'ST'}, {b:'85%', l:'65%', role:'ST'}]
+            '4-1-4-1': [{b:'10%', l:'50%', role:'GK'}, {b:'25%', l:'15%', role:'LB'}, {b:'25%', l:'35%', role:'CB'}, {b:'25%', l:'65%', role:'CB'}, {b:'25%', l:'85%', role:'RB'}, {b:'40%', l:'50%', role:'CDM'}, {b:'60%', l:'15%', role:'LM'}, {b:'55%', l:'35%', role:'CM'}, {b:'55%', l:'65%', role:'CM'}, {b:'60%', l:'85%', role:'RM'}, {b:'85%', l:'50%', role:'ST'}],
+            '3-5-2': [{b:'10%', l:'50%', role:'GK'}, {b:'25%', l:'25%', role:'CB'}, {b:'25%', l:'50%', role:'CB'}, {b:'25%', l:'75%', role:'CB'}, {b:'45%', l:'35%', role:'CM'}, {b:'45%', l:'65%', role:'CM'}, {b:'60%', l:'15%', role:'LWB'}, {b:'60%', l:'85%', role:'RWB'}, {b:'65%', l:'50%', role:'CAM'}, {b:'85%', l:'35%', role:'ST'}, {b:'85%', l:'65%', role:'ST'}],
+            '3-4-3': [{b:'10%', l:'50%', role:'GK'}, {b:'25%', l:'25%', role:'LCB'}, {b:'25%', l:'50%', role:'CB'}, {b:'25%', l:'75%', role:'RCB'}, {b:'50%', l:'15%', role:'LM'}, {b:'45%', l:'35%', role:'CM'}, {b:'45%', l:'65%', role:'CM'}, {b:'50%', l:'85%', role:'RM'}, {b:'80%', l:'20%', role:'LW'}, {b:'80%', l:'80%', role:'RW'}, {b:'85%', l:'50%', role:'ST'}],
+            '5-3-2': [{b:'10%', l:'50%', role:'GK'}, {b:'30%', l:'10%', role:'LWB'}, {b:'25%', l:'30%', role:'LCB'}, {b:'25%', l:'50%', role:'CB'}, {b:'25%', l:'70%', role:'RCB'}, {b:'30%', l:'90%', role:'RWB'}, {b:'50%', l:'25%', role:'LCM'}, {b:'45%', l:'50%', role:'CM'}, {b:'50%', l:'75%', role:'RCM'}, {b:'80%', l:'35%', role:'LST'}, {b:'80%', l:'65%', role:'RST'}]
         };
 
         let activeContext = { type: null, index: null }; 
