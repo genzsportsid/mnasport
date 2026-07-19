@@ -1066,20 +1066,38 @@
             
             <div class="p-6 bg-white dark:bg-transparent relative z-20">
                 <div class="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                    <div class="w-1.5 h-1.5 bg-brand-green rounded-full"></div> Atribut Fisik
+                    <div class="w-1.5 h-1.5 bg-brand-green rounded-full shadow-[0_0_8px_rgba(0,154,68,0.5)]"></div> Profil Pemain
                 </div>
-                <div class="grid grid-cols-3 gap-3 mb-6">
-                    <div class="bg-gray-50 dark:bg-white/5 rounded-2xl p-3 border border-gray-100 dark:border-white/5 flex flex-col items-center justify-center shadow-sm">
-                        <span class="text-[8px] text-gray-400 uppercase tracking-widest font-bold mb-1">Tinggi</span>
-                        <span class="font-heading font-black text-sm text-brand-black dark:text-white export-safe-text" id="mp-tinggi">-</span>
+                
+                <div class="grid grid-cols-3 gap-2 mb-2">
+                    <div class="bg-gray-50/80 dark:bg-[#111] rounded-xl border border-gray-200 dark:border-gray-800 py-3 flex flex-col items-center justify-center shadow-sm">
+                        <span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Tinggi</span>
+                        <div class="font-heading font-black text-sm md:text-base text-brand-black dark:text-white flex items-baseline gap-0.5 export-safe-text">
+                            <span id="mp-tinggi">-</span> <span class="text-[8px] text-gray-500 font-bold hidden" id="mp-tinggi-label">cm</span>
+                        </div>
                     </div>
-                    <div class="bg-gray-50 dark:bg-white/5 rounded-2xl p-3 border border-gray-100 dark:border-white/5 flex flex-col items-center justify-center shadow-sm">
-                        <span class="text-[8px] text-gray-400 uppercase tracking-widest font-bold mb-1">Usia</span>
-                        <span class="font-heading font-black text-[10px] text-brand-black dark:text-white mt-0.5 export-safe-text text-center line-clamp-2 px-1 leading-tight" id="mp-umur">-</span>
+                    <div class="bg-gray-50/80 dark:bg-[#111] rounded-xl border border-gray-200 dark:border-gray-800 py-3 flex flex-col items-center justify-center shadow-sm">
+                        <span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Berat</span>
+                        <div class="font-heading font-black text-sm md:text-base text-brand-black dark:text-white flex items-baseline gap-0.5 export-safe-text">
+                            <span id="mp-berat">-</span> <span class="text-[8px] text-gray-500 font-bold hidden" id="mp-berat-label">kg</span>
+                        </div>
                     </div>
-                    <div class="bg-gray-50 dark:bg-white/5 rounded-2xl p-3 border border-gray-100 dark:border-white/5 flex flex-col items-center justify-center shadow-sm">
-                        <span class="text-[8px] text-gray-400 uppercase tracking-widest font-bold mb-1">Kaki</span>
-                        <span class="font-heading font-black text-sm text-brand-black dark:text-white export-safe-text" id="mp-kaki">-</span>
+                    <div class="bg-gray-50/80 dark:bg-[#111] rounded-xl border border-gray-200 dark:border-gray-800 py-3 flex flex-col items-center justify-center shadow-sm">
+                        <span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Usia</span>
+                        <div class="font-heading font-black text-sm md:text-base text-brand-black dark:text-white flex items-baseline gap-0.5 export-safe-text">
+                            <span id="mp-umur">-</span> <span class="text-[8px] text-gray-500 font-bold hidden" id="mp-umur-label">Thn</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50/80 dark:bg-[#111] rounded-xl border border-gray-200 dark:border-gray-800 p-3.5 mb-6 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl grayscale opacity-60">📍</span>
+                        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Kelahiran</span>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-heading font-bold text-[10px] md:text-xs text-brand-black dark:text-white uppercase export-safe-text" id="mp-kota-lahir">-</div>
+                        <div class="text-[8px] md:text-[9px] font-bold text-gray-500 export-safe-text tracking-widest mt-0.5" id="mp-tgl-lahir">-</div>
                     </div>
                 </div>
                 
@@ -3257,15 +3275,51 @@
             document.getElementById('tp-squad-list').innerHTML = sqHtml;
         }
 
-        // PLAYER MODAL: 2-FA (Nama & Tim)
-        function hitungUmurPemain(tgl) {
-            if(!tgl) return "-";
+        // ==========================================
+        // SMART DATE PARSER (Trenggalek, DD-MM-YYYY)
+        // ==========================================
+        function hitungUmurPemain(tglMentah) {
+            if(!tglMentah) return { umur: '-', kota: '-', tglFormat: '-' };
             try {
-                let d = new Date(tgl); if(isNaN(d.getTime())) return tgl;
-                let diff = Date.now() - d.getTime(); let age = new Date(diff).getUTCFullYear() - 1970;
-                const bln = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
-                return `${age} thn (${d.getDate()} ${bln[d.getMonth()]} ${d.getFullYear()})`;
-            } catch(e) { return tgl; }
+                let str = String(tglMentah).trim();
+                let kota = '-';
+                let tglStr = str;
+
+                // 1. Pisahkan Kota dan Tanggal berdasarkan koma
+                if (str.includes(',')) {
+                    let parts = str.split(',');
+                    kota = parts[0].trim();
+                    tglStr = parts[1].trim(); // "18-06-2011"
+                }
+
+                // 2. Pisahkan Hari, Bulan, Tahun
+                let d, m, y;
+                if (tglStr.includes('-')) {
+                    [d, m, y] = tglStr.split('-');
+                } else if (tglStr.includes('/')) {
+                    [d, m, y] = tglStr.split('/');
+                } else {
+                    // Fallback jika format salah
+                    return { umur: '-', kota: kota, tglFormat: tglStr };
+                }
+
+                // 3. Kalkulasi Umur
+                let birthDate = new Date(y, m - 1, d);
+                let today = new Date(); // Karena Turnamen tahun 2026, Date.now() akan membacanya secara real-time
+                let age = today.getFullYear() - birthDate.getFullYear();
+                let mDiff = today.getMonth() - birthDate.getMonth();
+                if (mDiff < 0 || (mDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+
+                // 4. Ubah ke format bulan keren (18 Jun 2011)
+                const blnIndo = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+                let tglFormat = `${d} ${blnIndo[parseInt(m)-1]} ${y}`;
+
+                return { umur: age, kota: kota, tglFormat: tglFormat };
+            } catch (e) {
+                return { umur: '-', kota: '-', tglFormat: tglMentah };
+            }
         }
 
         function tutupModalPemain() { 
@@ -3387,9 +3441,37 @@
             let elTimWatermark = document.getElementById('mp-tim-watermark'); if(elTimWatermark) elTimWatermark.src = logo;
 
             let elPosisi = document.getElementById('mp-posisi'); if(elPosisi) elPosisi.innerText = getProp(p,'posisi') || "POS";
-            let elTinggi = document.getElementById('mp-tinggi'); if(elTinggi) elTinggi.innerText = getProp(p,'tinggi') ? getProp(p,'tinggi') + ' cm' : "-";
-            let elKaki = document.getElementById('mp-kaki'); if(elKaki) elKaki.innerText = getProp(p,'kaki') || "-";
-            let elUmur = document.getElementById('mp-umur'); if(elUmur) { let tglLahir = getProp(p, 'tanggal lahir') || getProp(p, 'tanggallahir') || getProp(p, 'ttl'); elUmur.innerText = hitungUmurPemain(tglLahir); }
+            // Inject Tinggi Badan
+            let tinggiVal = getProp(p,'tinggi');
+            let elTinggi = document.getElementById('mp-tinggi'); 
+            let elTinggiLbl = document.getElementById('mp-tinggi-label');
+            if(elTinggi) {
+                if(tinggiVal) { elTinggi.innerText = tinggiVal; if(elTinggiLbl) elTinggiLbl.classList.remove('hidden'); } 
+                else { elTinggi.innerText = "-"; if(elTinggiLbl) elTinggiLbl.classList.add('hidden'); }
+            }
+
+            // Inject Berat Badan
+            let beratVal = getProp(p,'berat') || getProp(p,'berat badan') || getProp(p,'beratbadan');
+            let elBerat = document.getElementById('mp-berat'); 
+            let elBeratLbl = document.getElementById('mp-berat-label');
+            if(elBerat) {
+                if(beratVal) { elBerat.innerText = beratVal; if(elBeratLbl) elBeratLbl.classList.remove('hidden'); } 
+                else { elBerat.innerText = "-"; if(elBeratLbl) elBeratLbl.classList.add('hidden'); }
+            }
+            
+            // Inject Usia & Kelahiran
+            let tglLahir = getProp(p, 'tanggal lahir') || getProp(p, 'tanggallahir') || getProp(p, 'ttl');
+            let dataLahir = hitungUmurPemain(tglLahir);
+            
+            let elUmur = document.getElementById('mp-umur');
+            let elUmurLbl = document.getElementById('mp-umur-label');
+            if(elUmur) {
+                elUmur.innerText = dataLahir.umur;
+                if(dataLahir.umur !== '-') { if(elUmurLbl) elUmurLbl.classList.remove('hidden'); } else { if(elUmurLbl) elUmurLbl.classList.add('hidden'); }
+            }
+            
+            let elKota = document.getElementById('mp-kota-lahir'); if(elKota) elKota.innerText = dataLahir.kota;
+            let elTgl = document.getElementById('mp-tgl-lahir'); if(elTgl) elTgl.innerText = dataLahir.tglFormat;
             
             // Injeksi Angka Valid ke Tampilan Kartu
             let elGol = document.getElementById('mp-gol'); if(elGol) elGol.innerText = finalGol;
