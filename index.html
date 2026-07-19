@@ -1048,7 +1048,7 @@
             <div class="relative px-6 -mt-16 pb-5 text-center z-20 border-b border-gray-100 dark:border-white/5">
                 <div class="relative inline-block mx-auto mb-3 group">
                     <div class="w-28 h-28 md:w-32 md:h-32 rounded-[2rem] bg-white dark:bg-[#111] p-1.5 shadow-2xl border border-gray-200 dark:border-gray-800 rotate-3 group-hover:rotate-0 transition-transform duration-300">
-                        <img id="mp-foto" src="" class="w-full h-full object-cover rounded-[1.5rem] bg-gray-400 dark:bg-gray-600 border border-gray-400 dark:border-gray-600 -rotate-3 group-hover:rotate-0 transition-transform duration-300">
+                        <img id="mp-foto" src="" class="w-full h-full object-cover rounded-[1.5rem] bg-gray-100 dark:bg-brand-dark-surface border border-gray-100 dark:border-brand-dark-border -rotate-3 group-hover:rotate-0 transition-transform duration-300">
                     </div>
                     <div id="mp-nomor" class="absolute -bottom-2 -left-2 bg-brand-black dark:bg-white text-white dark:text-brand-black w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-xl font-heading font-black text-sm md:text-base border-2 border-white dark:border-[#0a0a0a] shadow-lg rotate-[-10deg] group-hover:rotate-0 transition-transform duration-300">99</div>
                     <div class="absolute -bottom-2 -right-2 bg-brand-green text-white px-2.5 py-1 flex items-center justify-center rounded-xl border-2 border-white dark:border-[#0a0a0a] shadow-lg rotate-[10deg] group-hover:rotate-0 transition-transform duration-300">
@@ -1261,7 +1261,7 @@
 
         const getProp = (obj, key) => { if (!obj || typeof obj !== 'object') return ""; const foundKey = Object.keys(obj).find(k => String(k).trim().toLowerCase() === String(key).toLowerCase()); return foundKey ? obj[foundKey] : ""; };
         const safeStr = (val) => String(val || "").replace(/'/g, "\\'").replace(/"/g, "&quot;");
-        const getAvatar = (nama, isTim = false) => { if(!nama) nama = "Unknown"; let b = isTim ? '111' : '9CA3AF'; let c = 'fff'; return `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=${b}&color=${c}&bold=true&format=svg`; };
+        const getAvatar = (nama, isTim = false) => { if(!nama) nama = "Unknown"; let b = isTim ? '111' : '18181B'; let c = 'fff'; return `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}&background=${b}&color=${c}&bold=true&format=svg`; };
         // ==========================================
         // SMART UI FORMATTER (FOTMOB STYLE)
         // ==========================================
@@ -2004,7 +2004,7 @@
                         
                         html += `
                         <div class="flex items-center bg-gray-50 dark:bg-brand-dark-bg border border-gray-100 dark:border-gray-800 p-2.5 rounded-2xl cursor-pointer hover:border-brand-gold dark:hover:border-brand-gold hover:shadow-md transition-all group hover:-translate-y-0.5" onclick="bukaModalPemain('${safeStr(nama)}', '${safeStr(tim)}')">
-                            <div class="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-[22%] border border-gray-400 dark:border-gray-600 bg-gray-400 dark:bg-gray-600 overflow-hidden shadow-sm relative group-hover:scale-105 transition-transform">
+                            <div class="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-[22%] border border-gray-100 dark:border-brand-dark-border bg-gray-100 dark:bg-brand-dark-surface overflow-hidden shadow-sm relative group-hover:scale-105 transition-transform">
                                 <img src="${f}" class="w-full h-full object-cover">
                             </div>
                             <div class="flex-1 min-w-0 px-3">
@@ -2549,7 +2549,7 @@
                     return `
                     <div class="w-full rounded-2xl p-3 transition-all duration-300 border ${isGold ? 'border-2' : ''} ${cardClass} flex items-center gap-3 cursor-pointer hover:-translate-y-1 group" onclick="bukaModalPemain('${safeStr(nama)}', '${safeStr(tim)}')">
                         <div class="font-heading font-black ${rankColor} w-6 text-center italic shrink-0 group-hover:scale-110 transition-transform">#${rank}</div>
-                        <div class="w-12 h-12 shrink-0 rounded-xl overflow-hidden border border-gray-400 dark:border-gray-600 bg-gray-400 dark:bg-gray-600">
+                        <div class="w-12 h-12 shrink-0 rounded-xl overflow-hidden border border-gray-100 dark:border-brand-dark-border bg-gray-100 dark:bg-brand-dark-surface">
                             <img src="${foto}" class="w-full h-full object-cover">
                         </div>
                         <div class="flex-1 flex flex-col justify-center min-w-0 pr-2">
@@ -2627,7 +2627,7 @@
                         <div class="flex items-center gap-3 min-w-0 pr-2">
                             <span class="font-heading font-black text-sm text-gray-300 dark:text-gray-600 w-4 text-center italic shrink-0 group-hover:text-brand-red transition-colors">#${idx+1}</span>
                             <div class="relative w-10 h-10 shrink-0">
-                                <img src="${foto}" class="w-full h-full rounded-xl border border-gray-400 dark:border-gray-600 bg-gray-400 dark:bg-gray-600 object-cover shadow-sm group-hover:scale-105 transition-transform">
+                                <img src="${foto}" class="w-full h-full rounded-xl border border-gray-100 dark:border-brand-dark-border bg-gray-100 dark:bg-brand-dark-surface object-cover shadow-sm group-hover:scale-105 transition-transform">
                                 <img src="${logo}" class="absolute -bottom-1.5 -right-1.5 w-5 h-5 rounded-full border border-gray-200 dark:border-gray-600 bg-white object-contain shadow-sm p-0.5">
                             </div>
                             <div class="flex flex-col ml-1 min-w-0">
@@ -2687,7 +2687,7 @@
                     html += '<h3 class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1 mt-4 px-2">Pemain</h3>';
                     pemain.forEach(p => {
                        let nm = getProp(p,'nama'); let tim = getProp(p,'tim'); let foto = getProp(p,'foto') || getAvatar(nm);
-                       html += `<div onclick="bukaModalPemain('${safeStr(nm)}', '${safeStr(tim)}')" class="flex items-center p-3 bg-white dark:bg-brand-dark-surface rounded-xl shadow-sm border border-gray-100 dark:border-brand-dark-border mb-2 cursor-pointer hover:border-brand-green dark:hover:border-brand-green transition-colors"><img src="${foto}" class="w-10 h-10 rounded-full bg-gray-400 dark:bg-gray-600 border border-gray-400 dark:border-gray-600 object-cover shadow-sm mr-4"><div class="flex-1"><h4 class="font-bold text-sm text-brand-black dark:text-white uppercase truncate">${nm}</h4><span class="text-[9px] text-gray-400 dark:text-gray-500 uppercase tracking-widest">${tim||'UNKNOWN TIM'}</span></div></div>`;
+                       html += `<div onclick="bukaModalPemain('${safeStr(nm)}', '${safeStr(tim)}')" class="flex items-center p-3 bg-white dark:bg-brand-dark-surface rounded-xl shadow-sm border border-gray-100 dark:border-brand-dark-border mb-2 cursor-pointer hover:border-brand-green dark:hover:border-brand-green transition-colors"><img src="${foto}" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-brand-dark-surface border border-gray-100 dark:border-brand-dark-border object-cover shadow-sm mr-4"><div class="flex-1"><h4 class="font-bold text-sm text-brand-black dark:text-white uppercase truncate">${nm}</h4><span class="text-[9px] text-gray-400 dark:text-gray-500 uppercase tracking-widest">${tim||'UNKNOWN TIM'}</span></div></div>`;
                     });
                 }
             }
@@ -2991,7 +2991,7 @@
                     if(skorStr.includes('-')) { let p = skorStr.split('-'); sKiri = parseInt(p[0].trim()); sKanan = parseInt(p[1].trim()); }
                     let myScore = isKiri ? sKiri : sKanan; let enScore = isKiri ? sKanan : sKiri;
                     
-                    let formChar = 'S'; let bgClass = 'bg-gray-400 dark:bg-gray-600 border-gray-500'; let textColor = 'text-white';
+                    let formChar = 'S'; let bgClass = 'bg-gray-100 dark:bg-brand-dark-surface border-gray-500'; let textColor = 'text-white';
                     if(myScore > enScore) { formChar = 'M'; bgClass = 'bg-brand-green border-brand-green shadow-[0_0_10px_rgba(0,154,68,0.4)]'; } 
                     else if(myScore < enScore) { formChar = 'K'; bgClass = 'bg-brand-red border-brand-red shadow-[0_0_10px_rgba(239,68,68,0.4)]'; }
                     
@@ -3099,7 +3099,7 @@
                     if (isPast) {
                         if (myScore > enScore) scoreBgClass = "bg-brand-green text-white border-brand-green shadow-sm"; 
                         else if (myScore < enScore) scoreBgClass = "bg-brand-red text-white border-brand-red shadow-sm"; 
-                        else scoreBgClass = "bg-gray-400 dark:bg-gray-600 text-white border-gray-400 dark:border-gray-600 shadow-sm"; 
+                        else scoreBgClass = "bg-gray-100 dark:bg-brand-dark-surface text-white border-gray-100 dark:border-brand-dark-border shadow-sm"; 
                     } else if (isLive) {
                         scoreBgClass = "bg-red-50 dark:bg-red-500/10 text-brand-red border-red-200 dark:border-red-500/30 shadow-sm animate-pulse";
                     }
@@ -3242,7 +3242,7 @@
                             
                             <div class="relative w-14 h-14 md:w-16 md:h-16 mt-1">
                                 ${golBadge}
-                                <div class="w-full h-full rounded-full border-2 border-gray-400 dark:border-gray-600 bg-gray-400 dark:bg-gray-600 overflow-hidden shadow-sm group-hover:scale-105 transition-transform group-hover:border-brand-green/50">
+                                <div class="w-full h-full rounded-full border-2 border-gray-100 dark:border-brand-dark-border bg-gray-100 dark:bg-brand-dark-surface overflow-hidden shadow-sm group-hover:scale-105 transition-transform group-hover:border-brand-green/50">
                                     <img src="${f}" class="w-full h-full object-cover">
                                 </div>
                             </div>
@@ -3571,7 +3571,7 @@
                     let myScore = isKiri ? sKr : sKn;
                     let enScore = isKiri ? sKn : sKr;
                     
-                    let formChar = 'S'; let bgClass = 'bg-gray-400 dark:bg-gray-600';
+                    let formChar = 'S'; let bgClass = 'bg-gray-100 dark:bg-brand-dark-surface';
                     if (myScore > enScore) { formChar = 'M'; bgClass = 'bg-brand-green'; }
                     else if (myScore < enScore) { formChar = 'K'; bgClass = 'bg-brand-red'; }
                     
@@ -4167,7 +4167,7 @@
                             ${bottomLeftBadges}
                             ${bottomRightBadges}
                             
-                            <div class="w-full h-full rounded-full border-[1.5px] border-gray-400 dark:border-gray-600 shadow-sm overflow-hidden bg-gray-400 dark:bg-gray-600">
+                            <div class="w-full h-full rounded-full border-[1.5px] border-gray-100 dark:border-brand-dark-border shadow-sm overflow-hidden bg-gray-100 dark:bg-brand-dark-surface">
                                 <img src="${f}" class="w-full h-full object-cover">
                             </div>
                         </div>
@@ -4435,7 +4435,7 @@
                     let logo = allKlasemenCache.find(t => getProp(t, 'klub') === getProp(p, 'tim'))?.logo || getAvatar(getProp(p, 'tim'), true);
                     html += `
                     <div class="absolute -translate-x-1/2 translate-y-1/2 flex flex-col items-center cursor-pointer hover:scale-110 transition-transform z-20 w-[22%] max-w-[90px]" style="bottom:${pos.b}; left:${pos.l};" onclick="openDtPool(${i})">
-                        <div class="relative w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-yellow-400 bg-gray-400 dark:bg-gray-600 shadow-[0_5px_15px_rgba(0,0,0,0.3)]">
+                        <div class="relative w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-yellow-400 bg-gray-100 dark:bg-brand-dark-surface shadow-[0_5px_15px_rgba(0,0,0,0.3)]">
                             <img src="${getProp(p, 'foto') || getAvatar(getProp(p, 'nama'))}" class="w-full h-full rounded-full object-cover">
                             <img src="${logo}" class="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 rounded-full border border-gray-200 bg-white object-cover shadow-sm">
                         </div>
@@ -4502,7 +4502,7 @@
 
                     html += `
                     <div onclick="${isAssigned ? '' : `pilihPemainDt('${safeStr(nm)}', '${safeStr(tim)}')`}" class="flex items-center px-4 py-3 ${isAssigned ? 'opacity-30 grayscale cursor-not-allowed' : 'cursor-pointer hover:bg-gray-100 dark:hover:bg-brand-dark-surface transition-colors'} group">
-                        <div class="relative w-10 h-10 rounded-full shrink-0 border border-gray-400 dark:border-gray-600 bg-gray-400 dark:bg-gray-600">
+                        <div class="relative w-10 h-10 rounded-full shrink-0 border border-gray-100 dark:border-brand-dark-border bg-gray-100 dark:bg-brand-dark-surface">
                             <img src="${foto}" class="w-full h-full object-cover rounded-full">
                             <img src="${logo}" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border border-gray-200 bg-white object-cover">
                         </div>
