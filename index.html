@@ -3962,7 +3962,10 @@
                     midRightBadges = `<div class="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.5)] border-[1.5px] border-gray-200"><img src="https://i.ibb.co.com/pjWQBCHQ/ICON-MISS-PENALTY-T.png" class="w-[12px] h-[12px] object-contain"></div>`;
                 }
 
-                let posX = isAway ? (100 - slotDef.x) : slotDef.x; 
+                // LOGIKA KOORDINAT FOTMOB (DIKOREKSI)
+                // Home (Atas, menghadap bawah) -> X Dibalik (Kiri tubuh = Kanan layar)
+                // Away (Bawah, menghadap atas) -> X Normal (Kiri tubuh = Kiri layar)
+                let posX = isAway ? slotDef.x : (100 - slotDef.x); 
                 let absY = isAway ? (100 - (slotDef.y / 2)) : (slotDef.y / 2);
                 let posStyle = `top: ${absY}%; left: ${posX}%;`;
                 let animDelay = idx * 50;
