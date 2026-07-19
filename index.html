@@ -3647,7 +3647,7 @@
                     let pmn = pmnData.formatted; // Nama sudah rapi & Title Case
                     
                     // Badge Premium FotMob Style untuk pemain Trial
-                    let trialBadge = pmnData.isTrial ? `<span class="bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-[6px] md:text-[7px] font-black px-1.5 py-[2px] ml-1.5 rounded-sm uppercase tracking-widest shadow-sm translate-y-[-1px] inline-block">Trial</span>` : '';
+                    let trialBadge = '';
                     
                     // Rekap Nama Pencetak Gol di Header Atas (OG & Penalti Ditandai)
                     if(jnsRaw === 'GOL' || jnsRaw === 'GOLPENALTI' || jnsRaw === 'GOLBUNUHDIRI' || jnsRaw === 'OG' || jnsRaw === 'OWNGOAL') { 
@@ -3813,7 +3813,7 @@
                 let num = (pData && getProp(pData,'nomor') != null) ? getProp(pData,'nomor') : '-'; 
                 
                 // Badge Trial Terang
-                let badge = isTrial ? `<span class="bg-brand-gold text-brand-black px-1.5 py-[1px] rounded-[3px] ml-1.5 text-[6px] font-black shadow-[0_0_5px_rgba(215,182,125,0.8)] border border-brand-gold tracking-widest">TRIAL</span>` : '';
+                let badge = '';
 
                 // Filter canggih: Cuci dulu nama dari Event_Match agar cocok
                 let pEvents = matchEvents.filter(ev => {
@@ -3964,7 +3964,7 @@
                     let f = getProp(p,'foto') ? getProp(p,'foto') : getAvatar(nmClean);
                     let pos = getProp(p,'posisi')||'POS';
                     
-                    let badge = isTrial ? `<span class="bg-brand-gold text-brand-black px-1.5 py-[1px] rounded-[3px] ml-1 text-[6px] font-black shadow-[0_0_5px_rgba(215,182,125,0.8)] border border-brand-gold">TRIAL</span>` : '';
+                    let badge = '';
 
                     let pEvents = matchEvents.filter(ev => {
                         let evNameClean = formatNamaPremium(getProp(ev, 'pemain')).clean.toLowerCase();
