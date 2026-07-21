@@ -109,7 +109,10 @@
                 </div>
 
                 <div class="flex justify-between items-center mb-4">
-                    <label class="text-[10px] font-bold text-brand-gold uppercase tracking-widest">Papan Taktik</label>
+                    <div class="flex items-center gap-2">
+                        <label class="text-[10px] font-bold text-brand-gold uppercase tracking-widest">Papan Taktik</label>
+                        <button onclick="bukaModalOCR()" class="bg-brand-green/20 text-brand-green border border-brand-green/50 px-2 py-1 rounded text-[8px] font-bold uppercase hover:bg-brand-green hover:text-white transition-colors flex items-center gap-1 shadow-sm"><i data-lucide="zap" class="w-3 h-3"></i> Auto-Fill OCR</button>
+                    </div>
                     <select id="select-formasi" onchange="renderPitch()" class="bg-black border border-brand-gold/30 text-brand-gold rounded-lg px-3 py-1.5 text-[10px] font-black uppercase outline-none">
                         <option value="4-3-3">4-3-3</option>
                         <option value="4-2-3-1">4-2-3-1</option>
@@ -162,7 +165,28 @@
         </div>
         <div id="log-status" class="mt-4 text-center text-[10px] font-bold uppercase tracking-widest px-4 py-3 rounded-lg bg-black/50 border border-white/5 hidden"></div>
     </div>
-
+    <!-- MODAL OCR AUTO-FILL (SMART PARSER) -->
+    <div id="modal-ocr" class="fixed inset-0 z-[120] hidden flex-col justify-end">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="tutupModalOCR()"></div>
+        <div class="relative bg-brand-panel border-t border-white/10 rounded-t-[2rem] shadow-2xl modal-up flex flex-col h-[85vh] max-w-md mx-auto w-full pb-safe">
+            <div class="p-5 border-b border-white/10 flex justify-between items-center shrink-0">
+                <div>
+                    <h3 class="font-black text-lg uppercase text-white tracking-widest flex items-center gap-2"><i data-lucide="bot" class="w-5 h-5 text-brand-green"></i> Smart Auto-Fill</h3>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Membaca teks laporan secara otomatis</p>
+                </div>
+                <button onclick="tutupModalOCR()" class="w-8 h-8 bg-white/10 rounded-full flex justify-center items-center font-bold text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <div class="p-4 flex-1 flex flex-col gap-3">
+                <div class="bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl shadow-sm">
+                    <p class="text-[9.5px] text-blue-400 leading-relaxed font-bold"><span class="text-white uppercase"><i data-lucide="info" class="w-3 h-3 inline mb-0.5"></i> Cara Pakai:</span> Buka PDF Match Summary, <b>copy</b> seluruh teks daftar nama pemain, lalu <b>paste</b> ke kotak di bawah ini.</p>
+                </div>
+                <textarea id="ocr-input" class="w-full flex-1 bg-black border border-white/10 rounded-xl p-4 text-[10.5px] font-mono text-gray-300 outline-none focus:border-brand-green custom-scroll shadow-inner placeholder-gray-600" placeholder="Paste teks laporan di sini...&#10;&#10;Contoh format dari PDF TSL:&#10;16 | BELAKANG | Fahrezzi Wildan Pratama | | | 12&#10;3 | BELAKANG | Hazel Jaya Prakoso | | |"></textarea>
+            </div>
+            <div class="p-4 border-t border-white/5 shrink-0 flex gap-2">
+                <button onclick="eksekusiOCR()" id="btn-proses-ocr" class="flex-1 bg-brand-green text-white font-black uppercase text-xs tracking-widest py-3.5 rounded-xl flex items-center justify-center gap-2 hover:bg-green-600 transition-colors shadow-[0_0_15px_rgba(0,154,68,0.3)]"><i data-lucide="scan-line" class="w-4 h-4"></i> Analisis & Terapkan Lineup</button>
+            </div>
+        </div>
+    </div>
     <!-- LACI PEMILIH PEMAIN -->
     <div id="modal-picker" class="fixed inset-0 z-[100] hidden flex-col justify-end">
         <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closePicker()"></div>
@@ -657,7 +681,116 @@
             document.getElementById('manual-player-input').value = '';
             closePicker();
         }
+        // ==========================================
+        // SMART MATCH SUMMARY PARSER (OCR AUTO-FILL)
+        // ==========================================
+        function bukaModalOCR() {
+            if(!selectedTeamName) return alert("Pilih Pertandingan & Tim terlebih dahulu di menu atas!");
+            document.getElementById('ocr-input').value = '';
+            document.getElementById('modal-ocr').classList.remove('hidden');
+            document.getElementById('modal-ocr').classList.add('flex');
+            document.body.style.overflow = 'hidden';
+            lucide.createIcons();
+        }
 
+        function tutupModalOCR() {
+            document.getElementById('modal-ocr').classList.add('hidden');
+            document.getElementById('modal-ocr').classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+
+        function eksekusiOCR() {
+            let rawText = document.getElementById('ocr-input').value.trim();
+            if (!rawText) return alert("Teks masih kosong, silakan paste terlebih dahulu!");
+
+            let btn = document.getElementById('btn-proses-ocr');
+            let oriHtml = btn.innerHTML;
+            btn.innerHTML = `<div class="loader w-4 h-4 border-2"></div> Memproses...`; 
+            btn.disabled = true;
+
+            try {
+                let lines = rawText.split('\n').map(l => l.trim()).filter(l => l !== '');
+                let isBench = false;
+                let parsedStarters = [];
+                let parsedBench = [];
+
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i];
+                    
+                    // Deteksi Sakelar ke area Bangku Cadangan
+                    if (line.toUpperCase().includes('PEMAIN CADANGAN')) { isBench = true; continue; }
+                    
+                    // Mesin RegEx pembaca baris (Format TSL: Angka | Posisi | Nama Pemain | Kolom lain)
+                    let playerRegex = /^(\d+)\s*\|\s*([A-Z]+)\s*\|\s*([^|]+)\s*\|(.*)$/i;
+                    let match = line.match(playerRegex);
+
+                    if (match) {
+                        let nomor = match[1].trim();
+                        let posisi = match[2].trim();
+                        let namaMentah = match[3].trim().toUpperCase(); 
+                        
+                        // ENGINE PENCARI: Cocokkan dengan database tim saat ini
+                        // Jika nama OCR sedikit typo, sistem akan mencari kemiripannya (Substring match)
+                        let foundPlayer = allTeamPlayers.find(p => {
+                            let dbName = String(p.nama_pemain || p.nama || p.Pemain).toUpperCase();
+                            return dbName.includes(namaMentah) || namaMentah.includes(dbName) || dbName === namaMentah;
+                        });
+
+                        // JIKA TIDAK KETEMU: Jadikan Ghost Player (TRIAL) agar layar tidak error
+                        if (!foundPlayer) {
+                            foundPlayer = {
+                                nama_pemain: namaMentah + " (TRIAL)",
+                                posisi: posisi || "POS",
+                                nomor: nomor,
+                                foto: `https://ui-avatars.com/api/?name=${encodeURIComponent(namaMentah)}&background=000&color=fff`
+                            };
+                        }
+
+                        // Lempar ke keranjang yang tepat
+                        if (isBench) parsedBench.push(foundPlayer);
+                        else parsedStarters.push(foundPlayer);
+                    }
+                }
+
+                // EKSEKUSI PENEMPATAN KE PAPAN TAKTIK
+                if (parsedStarters.length > 0 || parsedBench.length > 0) {
+                    
+                    // Reset papan yang lama
+                    lineupState.starters = new Array(11).fill(null);
+                    lineupState.bench = [];
+                    lineupState.cedera = [];
+                    lineupState.skorsing = [];
+
+                    // Penuhi 11 slot lapangan terlebih dahulu
+                    let maxSlot = Math.min(parsedStarters.length, 11);
+                    for(let i = 0; i < maxSlot; i++) {
+                        lineupState.starters[i] = parsedStarters[i];
+                    }
+
+                    // Jika karena typo OCR terdeteksi lebih dari 11 Starter, buang sisanya ke Bench
+                    if (parsedStarters.length > 11) {
+                        for(let i = 11; i < parsedStarters.length; i++) parsedBench.push(parsedStarters[i]);
+                    }
+
+                    lineupState.bench = parsedBench;
+
+                    // Render ulang visualnya
+                    renderPitch();
+                    renderExtraRoster();
+                    showLog(`<span class="text-brand-green">Auto-Fill Berhasil! Membaca ${maxSlot} Starter dan ${parsedBench.length} Cadangan.</span>`);
+                    tutupModalOCR();
+                } else {
+                    alert("Sistem tidak mendeteksi format nama pemain. Pastikan Anda menyalin teks yang mengandung garis pembatas '|' seperti pada contoh.");
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert("Terjadi kesalahan sistem saat menganalisis teks.");
+            } finally {
+                btn.innerHTML = oriHtml; 
+                btn.disabled = false;
+            }
+        }
         window.onload = fetchData;
     </script>
 </body>
