@@ -804,7 +804,13 @@
                     </div>
                 </div>
             </div>
-            
+            <!-- TOMBOL MATCH SUMMARY PDF -->
+            <div id="mm-pdf-container" class="hidden justify-center pb-2 transition-opacity duration-300">
+                <a id="mm-pdf-btn" href="#" target="_blank" class="flex items-center gap-2 bg-white/5 border border-white/20 text-white px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-brand-green hover:border-brand-green transition-all shadow-md group">
+                    <svg class="w-4 h-4 text-brand-green group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Lihat Laporan Resmi (PDF)
+                </a>
+            </div>
             <div id="mm-goalscorers" class="hidden bg-white/5 border-t border-white/10 py-3 px-4 md:px-12 flex justify-between text-[10px] text-white/90 font-medium shadow-inner">
                 <div id="mm-scorer-kiri" class="w-[45%] text-right pr-2 space-y-1"></div>
                 <div class="w-[10%] flex justify-center items-start pt-0.5 opacity-70 text-gray-300">
@@ -3559,6 +3565,18 @@
 
             let status = String(getProp(m, 'status')||""); let isPast = status.toUpperCase().includes('FT'); let skor = getProp(m, 'skor') || "VS";
             document.getElementById('mm-skor').innerText = skor; document.getElementById('mm-skor-mini').innerText = skor;
+            // LOGIKA TOMBOL MATCH SUMMARY PDF
+            let linkPdf = getProp(m, 'link_pdf') || getProp(m, 'match_summary');
+            let pdfContainer = document.getElementById('mm-pdf-container');
+            let pdfBtn = document.getElementById('mm-pdf-btn');
+            if (linkPdf && linkPdf.trim() !== '') {
+                pdfBtn.href = linkPdf;
+                pdfContainer.classList.remove('hidden');
+                pdfContainer.classList.add('flex');
+            } else {
+                pdfContainer.classList.add('hidden');
+                pdfContainer.classList.remove('flex');
+            }    
             let elStatus = document.getElementById('mm-status');
             elStatus.className = "live-timer-badge text-[10px] md:text-xs font-heading font-bold uppercase tracking-widest mt-2 bg-gray-900/80 dark:bg-gray-900/50 rounded-full px-3 py-1 inline-block border border-gray-700 dark:border-gray-800 text-white transition-colors min-w-[80px] text-center shadow-md";
             elStatus.setAttribute('data-kickoff', parseIndoDate(getProp(m, 'waktu')));
