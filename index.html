@@ -1798,10 +1798,40 @@
 
         function renderAllData() {
             try {
+                // ==========================================
+                // AUTO-PILOT MATCH STATUS ENGINE
+                // ==========================================
+                let nowTs = Date.now();
+                (rawData.Jadwal || []).forEach(m => {
+                    let manualStatus = String(getProp(m, 'status') || '').toUpperCase();
+                    
+                    // Jangan ganggu jika operator input BATAL atau TUNDA secara manual
+                    if (manualStatus.includes('BATAL') || manualStatus.includes('TUNDA')) return;
+                    
+                    let kickoff = parseIndoDate(getProp(m, 'waktu'));
+                    if (kickoff > 0) {
+                        let durasiMenit = parseInt(getProp(m, 'durasi')) || parseInt(getProp(m, 'durasi babak')) || 30;
+                        let durasiHTMenit = parseInt(getProp(m, 'durasi ht')) || parseInt(getProp(m, 'istirahat')) || 15;
+                        let maxInjuryTime = 3; // 3 Menit injury time per babak
+                        
+                        // Hitung total detik sampai pertandingan benar-benar harus selesai (FT)
+                        let total_durasi_detik = (durasiMenit * 2 * 60) + (durasiHTMenit * 60) + (maxInjuryTime * 2 * 60);
+                        let diffSeconds = Math.floor((nowTs - kickoff) / 1000);
+                        
+                        if (diffSeconds >= 0 && diffSeconds <= total_durasi_detik) {
+                            // Waktu jalan! Paksa status jadi LIVE di memori
+                            m.status = 'LIVE'; 
+                        } else if (diffSeconds > total_durasi_detik) {
+                            // Waktu habis! Paksa status jadi FT di memori
+                            m.status = 'FT';
+                        }
+                    }
+                });
+
                 allKlasemenCache = rawData.Klasemen || []; jadwalCache = rawData.Jadwal || [];
                 document.getElementById('stat-total-tim').innerText = allKlasemenCache.length > 0 ? allKlasemenCache.length : '-';
                 
-                // FIX: Filter murni hanya pemain (Abaikan Pelatih/Manager)
+                // Filter murni hanya pemain (Abaikan Pelatih/Manager)
                 let purePlayers = (rawData.Pemain || []).filter(x => {
                     let posCek = String(getProp(x,'posisi')).toUpperCase().replace(/\s+/g,'');
                     return !['PELATIH','COACH','HEADCOACH','MANAGER'].includes(posCek);
@@ -1812,10 +1842,7 @@
                 initFotmobCalendar(); 
                 switchLigaUI(ligaAktif);
                 renderSponsors();
-                // PANGGIL MESIN STORY
                 if (typeof renderStories === 'function') renderStories();
-
-                // PANGGIL BANNER MELAYANG DI SINI
                 updateLiveHeader();
 
             } catch(e) { console.error("Render Error: ", e); }
