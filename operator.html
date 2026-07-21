@@ -558,7 +558,7 @@
                     let nmClean = nmRaw.replace(/\(TRIAL\)/i, '').trim();
                     let badge = isTrial ? `<span class="bg-brand-gold text-black px-1 rounded-[2px] ml-1.5 text-[6px]">TRIAL</span>` : '';
                     
-                    return `<div class="bg-gray-800 border border-gray-600 px-2 py-1 rounded text-[9px] font-bold text-white uppercase flex items-center">${nmClean}${badge} <button type="button" onclick="removeExtra('${type}', ${i})" class="text-red-400 hover:text-white hover:bg-red-500 w-4 h-4 flex items-center justify-center rounded-full ml-2 transition-colors cursor-pointer">&times;</button> 
+                    return `<div class="bg-gray-800 border border-gray-600 px-2 py-1 rounded text-[9px] font-bold text-white uppercase flex items-center">${nmClean}${badge} <button type="button" onclick="removeExtra('${type}',${i})" class="text-red-400 hover:text-white hover:bg-red-500 w-4 h-4 flex items-center justify-center rounded-full ml-2 transition-colors cursor-pointer">&times;</button></div>`; 
                 }).join(''); 
             };
             document.getElementById('list-bench').innerHTML = buildBadge(lineupState.bench, 'bench'); 
