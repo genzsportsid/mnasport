@@ -4267,11 +4267,10 @@
             }
         });
 
-        // FIX: MESIN TIMER LIVE & COUNTDOWN (UI/UX PREMIUM SOLID RED)
+        // FIX: MESIN TIMER LIVE & COUNTDOWN (AUTO FULL-TIME ENGINE)
         function updateLiveTimers() {
             let now = Date.now();
             
-            // 1. CABUT SEMUA EFEK GLOWING YANG MERUSAK BACKGROUND HEADER
             document.querySelectorAll('.live-glowing-effect').forEach(el => {
                 el.classList.remove('live-glowing-effect', 'rounded-b-[2rem]');
             });
@@ -4281,13 +4280,32 @@
                 let kickoff = parseInt(badge.getAttribute('data-kickoff'));
                 let idMatch = badge.getAttribute('data-matchid');
 
-                if(status.includes('FT') || kickoff === 0 || isNaN(kickoff)) {
-                    if (status.includes('FT')) badge.innerHTML = "FT";
+                let mData = jadwalCache.find(x => String(getProp(x, 'id_match')) === String(idMatch));
+                
+                // Abaikan jika status FT manual, Batal, Tunda, atau Kickoff tidak valid
+                if(status.includes('FT') || status.includes('BATAL') || status.includes('TUNDA') || kickoff === 0 || isNaN(kickoff)) {
+                    if (status.includes('FT')) {
+                        badge.innerHTML = "FT";
+                        badge.className = `live-timer-badge text-[10px] md:text-[11px] font-heading font-bold px-2 py-0.5 rounded border min-w-[50px] text-center transition-colors bg-gray-50/50 dark:bg-brand-dark-bg/50 text-gray-400 dark:text-brand-dark-muted border-transparent ${badge.id.includes('mm-status') ? 'px-3 py-1 text-xs' : ''}`;
+                    }
                     return; 
                 }
                 
                 let diffSeconds = Math.floor((now - kickoff) / 1000);
                 let displayTime = '';
+
+                // Tarik data durasi dari Google Sheets
+                let durasiMenit = mData ? (parseInt(getProp(mData, 'durasi')) || parseInt(getProp(mData, 'durasi babak')) || 30) : 30;
+                let durasiHTMenit = mData ? (parseInt(getProp(mData, 'durasi ht')) || parseInt(getProp(mData, 'istirahat')) || 15) : 15;
+                
+                let durasi_babak = durasiMenit * 60; 
+                let durasi_ht = durasiHTMenit * 60; 
+                
+                let s1 = durasi_babak; 
+                let s1_add = s1 + (3 * 60); // Maks 3 menit tambahan babak 1
+                let s_ht = s1_add + durasi_ht; 
+                let s2 = s_ht + durasi_babak; 
+                let s2_add = s2 + (3 * 60); // KILL-SWITCH: Pertandingan resmi selesai!
 
                 if (diffSeconds < 0) {
                     // BELUM MULAI (COUNTDOWN)
@@ -4303,26 +4321,16 @@
                         displayTime = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
                     }
                     
-                    // Styling Normal Countdown
                     badge.className = `live-timer-badge text-[10px] md:text-[11px] font-heading font-bold px-2 py-0.5 rounded border min-w-[50px] text-center transition-colors ${badge.id.includes('mm-status') ? 'bg-gray-100 dark:bg-brand-dark-bg text-brand-black dark:text-white border-gray-200 dark:border-brand-dark-border px-3 py-1' : 'bg-gray-50 dark:bg-brand-dark-bg text-brand-black dark:text-white border-gray-200 dark:border-brand-dark-border'}`;
                     badge.innerHTML = displayTime;
                     
+                } else if (diffSeconds > s2_add) {
+                    // AUTO FULL-TIME (Real-time di depan mata penonton)
+                    badge.innerHTML = "FT";
+                    badge.className = `live-timer-badge text-[10px] md:text-[11px] font-heading font-bold px-2 py-0.5 rounded border min-w-[50px] text-center transition-colors bg-gray-50/50 dark:bg-brand-dark-bg/50 text-gray-400 dark:text-brand-dark-muted border-transparent ${badge.id.includes('mm-status') ? 'px-3 py-1 text-xs' : ''}`;
+                    
                 } else {
-                    // SEDANG LIVE (BERJALAN MAJU) - DYNAMIC TIMER ENGINE
-                    
-                    // 1. Tarik data durasi per babak & durasi HT dari Google Sheets
-                    let mData = jadwalCache.find(x => String(getProp(x, 'id_match')) === String(idMatch));
-                    let durasiMenit = mData ? (parseInt(getProp(mData, 'durasi')) || parseInt(getProp(mData, 'durasi babak')) || 30) : 30; // Default 30 menit
-                    let durasiHTMenit = mData ? (parseInt(getProp(mData, 'durasi ht')) || parseInt(getProp(mData, 'istirahat')) || 15) : 15; // Default 15 menit
-                    
-                    let durasi_babak = durasiMenit * 60; 
-                    let durasi_ht = durasiHTMenit * 60; 
-                    
-                    let s1 = durasi_babak; 
-                    let s1_add = s1 + (3 * 60); // Maks 3 menit tambahan waktu babak 1
-                    let s_ht = s1_add + durasi_ht; 
-                    let s2 = s_ht + durasi_babak; 
-
+                    // SEDANG LIVE (BERJALAN MAJU)
                     let formatMMSS = (secs) => {
                         let m = Math.floor(secs / 60); let s = secs % 60;
                         return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
@@ -4331,20 +4339,17 @@
                     if (diffSeconds <= s1) {
                         displayTime = formatMMSS(diffSeconds);
                     } else if (diffSeconds > s1 && diffSeconds <= s1_add) {
-                        displayTime = `${durasiMenit}:00+`; // Contoh: 20:00+
+                        displayTime = `${durasiMenit}:00+`; 
                     } else if (diffSeconds > s1_add && diffSeconds <= s_ht) {
                         displayTime = "HT";
                     } else if (diffSeconds > s_ht && diffSeconds <= s2) {
-                        // Waktu babak kedua = (Waktu berjalan - durasi HT)
                         let elapsedBabak2 = diffSeconds - s_ht;
                         displayTime = formatMMSS(elapsedBabak2 + durasi_babak);
                     } else {
-                        displayTime = `${durasiMenit * 2}:00+`; // Contoh: 40:00+
+                        displayTime = `${durasiMenit * 2}:00+`;
                     }
-                    // UI/UX BARU: Badge Merah Solid, Teks Putih, Icon Play (Tanpa Kelap-Kelip)
-                    badge.innerHTML = `<span class="flex items-center justify-center gap-1.5"><svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>${displayTime}</span>`;
                     
-                    // Force styling ke Merah Solid #E63946 (Kontras Maksimal di Tema Terang maupun Gelap)
+                    badge.innerHTML = `<span class="flex items-center justify-center gap-1.5"><svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>${displayTime}</span>`;
                     badge.className = `live-timer-badge text-[10px] md:text-[11px] font-heading font-bold px-2 py-0.5 rounded-md border border-transparent text-white bg-[#E63946] shadow-sm min-w-[50px] text-center transition-all ${badge.id.includes('mm-status') ? 'px-3 py-1.5 text-xs' : ''}`;
                 }
             });
