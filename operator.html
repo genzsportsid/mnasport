@@ -94,7 +94,15 @@
                 </button>
             </div>
         </div>
-
+        <!-- PANEL DOKUMEN PDF MATCH SUMMARY -->
+        <div class="mt-6 bg-brand-panel border border-brand-gold/40 p-4 rounded-2xl shadow-lg">
+                <label class="block text-[10px] font-bold text-brand-gold uppercase tracking-widest mb-3 flex items-center gap-1.5"><i data-lucide="file-text" class="w-4 h-4"></i> Dokumen Laporan (PDF)</label>
+                <p class="text-[8.5px] text-gray-400 mb-2">Upload PDF ke Google Drive, ubah akses menjadi "Anyone with the link", lalu paste link-nya di sini.</p>
+                <input type="url" id="input-pdf-link" placeholder="Paste link Google Drive di sini..." class="w-full bg-black border border-white/20 rounded-xl px-3 py-3 text-[10px] text-white outline-none focus:border-brand-gold mb-3 transition-colors">
+                <button onclick="submitPdfLink()" id="btn-submit-pdf" class="w-full bg-brand-gold text-black font-black text-xs uppercase tracking-widest py-3 rounded-xl flex justify-center items-center gap-2 hover:bg-yellow-500 transition-colors shadow-[0_0_15px_rgba(215,182,125,0.2)]">
+                    <i data-lucide="link" class="w-4 h-4"></i> Simpan Link PDF
+                </button>
+            </div>
         <!-- ========================================== -->
         <!-- MODE 2: RAKIT LINEUP -->
         <!-- ========================================== -->
@@ -270,6 +278,9 @@
             document.getElementById('btn-tim-kiri').className = "flex-1 bg-black border border-white/10 text-gray-400 font-bold text-[11px] py-3 rounded-xl uppercase truncate px-2";
             document.getElementById('btn-tim-kanan').className = "flex-1 bg-black border border-white/10 text-gray-400 font-bold text-[11px] py-3 rounded-xl uppercase truncate px-2";
             document.getElementById('team-selectors').classList.remove('hidden'); selectedTeamName = "";
+            // Load link PDF jika sudah pernah diisi
+            let pdfInput = document.getElementById('input-pdf-link');
+            if(pdfInput) pdfInput.value = match.link_pdf || match.Link_PDF || '';
         }
 
         function handleTeamChange(posisi) {
@@ -789,6 +800,35 @@
             } finally {
                 btn.innerHTML = oriHtml; 
                 btn.disabled = false;
+            }
+        }
+        // ==========================================
+        // FUNGSI UPLOAD LINK PDF
+        // ==========================================
+        async function submitPdfLink() {
+            let link = document.getElementById('input-pdf-link').value.trim();
+            if(!selectedMatchId) return alert("Pilih pertandingan terlebih dahulu di menu atas!");
+            
+            let btn = document.getElementById('btn-submit-pdf');
+            btn.innerHTML = `<div class="loader w-4 h-4 border-2"></div> Menyimpan...`; 
+            btn.disabled = true;
+            
+            try {
+                // Pastikan Google Apps Script Anda siap menerima aksi 'update_pdf'
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'update_pdf',
+                        payload: { id_match: selectedMatchId, link_pdf: link }
+                    })
+                });
+                showLog(`Sukses! Link PDF untuk laga ${selectedMatchId} berhasil disimpan.`);
+            } catch(e) {
+                showLog("Gagal menyimpan link PDF. Cek koneksi.", true);
+            } finally {
+                btn.innerHTML = `<i data-lucide="link" class="w-4 h-4 inline"></i> Simpan Link PDF`;
+                btn.disabled = false;
+                lucide.createIcons();
             }
         }
         window.onload = fetchData;
