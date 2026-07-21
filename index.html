@@ -3863,8 +3863,7 @@
             document.getElementById('mm-pitch-info-home').innerHTML = `<div class="flex items-center gap-2"><img src="${lKiri}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"> <span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tk}</span></div><div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fHomeRaw}</span></div>`;
             document.getElementById('mm-pitch-info-away').innerHTML = `<div class="flex items-center gap-2"><span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">FORMASI</span><span class="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 px-2.5 py-0.5 rounded-md shadow-sm font-heading font-black text-xs tracking-widest">${fAwayRaw}</span></div><div class="flex items-center gap-2"><span class="text-brand-black dark:text-white transition-colors font-heading font-black text-sm uppercase">${tn}</span> <img src="${lKanan}" class="w-6 h-6 rounded-full bg-white object-cover border border-gray-200 dark:border-gray-800 shadow-sm"></div>`;
 
-            // KORDINAT SETENGAH LAPANGAN ABSOLUT
-            // Telah disinkronisasi 100% dengan urutan Index input dari operator.html
+            // KORDINAT SETENGAH LAPANGAN ABSOLUT TSL (MATCH CENTER)
             const FORMATIONS_MAPPING = {
                 '4-3-3': [
                     {x:50, y:8}, {x:12, y:28}, {x:36, y:25}, {x:64, y:25}, {x:88, y:28}, {x:50, y:42}, {x:25, y:55}, {x:75, y:55}, {x:20, y:78}, {x:80, y:78}, {x:50, y:82}
@@ -3878,17 +3877,26 @@
                 '4-1-4-1': [
                     {x:50, y:8}, {x:12, y:28}, {x:36, y:25}, {x:64, y:25}, {x:88, y:28}, {x:50, y:40}, {x:15, y:60}, {x:35, y:55}, {x:65, y:55}, {x:85, y:60}, {x:50, y:84}
                 ],
+                '4-3-2-1': [
+                    {x:50, y:8}, {x:15, y:25}, {x:36, y:22}, {x:64, y:22}, {x:88, y:25}, {x:22, y:42}, {x:50, y:44}, {x:78, y:42}, {x:35, y:62}, {x:65, y:62}, {x:50, y:84}
+                ],
                 '3-5-2': [
                     {x:50, y:8}, {x:25, y:25}, {x:50, y:25}, {x:75, y:25}, {x:35, y:45}, {x:65, y:45}, {x:12, y:55}, {x:88, y:55}, {x:50, y:60}, {x:35, y:80}, {x:65, y:80}
                 ],
                 '3-4-3': [
                     {x:50, y:8}, {x:25, y:25}, {x:50, y:25}, {x:75, y:25}, {x:15, y:50}, {x:35, y:45}, {x:65, y:45}, {x:85, y:50}, {x:20, y:78}, {x:80, y:78}, {x:50, y:82}
                 ],
+                '3-4-2-1': [
+                    {x:50, y:8}, {x:25, y:25}, {x:50, y:25}, {x:75, y:25}, {x:15, y:50}, {x:35, y:45}, {x:65, y:45}, {x:85, y:50}, {x:30, y:65}, {x:70, y:65}, {x:50, y:82}
+                ],
                 '5-3-2': [
                     {x:50, y:8}, {x:10, y:30}, {x:30, y:25}, {x:50, y:25}, {x:70, y:25}, {x:90, y:30}, {x:25, y:50}, {x:50, y:45}, {x:75, y:50}, {x:35, y:80}, {x:65, y:80}
+                ],
+                '5-2-3': [
+                    {x:50, y:8}, {x:10, y:30}, {x:30, y:25}, {x:50, y:25}, {x:70, y:25}, {x:90, y:30}, {x:35, y:50}, {x:65, y:50}, {x:20, y:78}, {x:80, y:78}, {x:50, y:82}
                 ]
             };
-
+                
             let homeNames = pHomeRaw ? pHomeRaw.split(',').map(s=>s.trim()) : new Array(11).fill('');
             let awayNames = pAwayRaw ? pAwayRaw.split(',').map(s=>s.trim()) : new Array(11).fill('');
 
