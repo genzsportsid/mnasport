@@ -4281,9 +4281,15 @@
                     badge.innerHTML = displayTime;
                     
                 } else {
-                    // SEDANG LIVE (BERJALAN MAJU) - FORMAT 2x30 MENIT
-                    let durasi_babak = 30 * 60; // 30 Menit per babak
-                    let durasi_ht = 15 * 60; // 15 Menit istirahat Half-Time
+                    // SEDANG LIVE (BERJALAN MAJU) - DYNAMIC TIMER ENGINE
+                    
+                    // 1. Tarik data durasi per babak & durasi HT dari Google Sheets
+                    let mData = jadwalCache.find(x => String(getProp(x, 'id_match')) === String(idMatch));
+                    let durasiMenit = mData ? (parseInt(getProp(mData, 'durasi')) || parseInt(getProp(mData, 'durasi babak')) || 30) : 30; // Default 30 menit
+                    let durasiHTMenit = mData ? (parseInt(getProp(mData, 'durasi ht')) || parseInt(getProp(mData, 'istirahat')) || 15) : 15; // Default 15 menit
+                    
+                    let durasi_babak = durasiMenit * 60; 
+                    let durasi_ht = durasiHTMenit * 60; 
                     
                     let s1 = durasi_babak; 
                     let s1_add = s1 + (3 * 60); // Maks 3 menit tambahan waktu babak 1
@@ -4298,16 +4304,15 @@
                     if (diffSeconds <= s1) {
                         displayTime = formatMMSS(diffSeconds);
                     } else if (diffSeconds > s1 && diffSeconds <= s1_add) {
-                        displayTime = "30:00+";
+                        displayTime = `${durasiMenit}:00+`; // Contoh: 20:00+
                     } else if (diffSeconds > s1_add && diffSeconds <= s_ht) {
                         displayTime = "HT";
                     } else if (diffSeconds > s_ht && diffSeconds <= s2) {
-                        // Mengurangi waktu yang berjalan dengan total durasi babak 1 + HT
-                        // Ditambah 30 menit (karena babak 2 dimulai dari 30:00)
+                        // Waktu babak kedua = (Waktu berjalan - durasi HT)
                         let elapsedBabak2 = diffSeconds - s_ht;
                         displayTime = formatMMSS(elapsedBabak2 + durasi_babak);
                     } else {
-                        displayTime = "60:00+";
+                        displayTime = `${durasiMenit * 2}:00+`; // Contoh: 40:00+
                     }
                     // UI/UX BARU: Badge Merah Solid, Teks Putih, Icon Play (Tanpa Kelap-Kelip)
                     badge.innerHTML = `<span class="flex items-center justify-center gap-1.5"><svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>${displayTime}</span>`;
