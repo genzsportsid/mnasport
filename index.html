@@ -4983,7 +4983,7 @@
             }
 
             // ===============================================
-            // FILTER BABAK & SMART AGGREGATOR (MESIN KALKULATOR FT)
+            // FILTER BABAK & SMART AGGREGATOR (FIFA WORLD CUP STANDARD)
             // ===============================================
             let st = {};
             
@@ -4998,10 +4998,9 @@
                     Pass_Sukses_Kiri: 0, Pass_Gagal_Kiri: 0, Pass_Sukses_Kanan: 0, Pass_Gagal_Kanan: 0 
                 };
                 
-                let countPoss = 0;
                 ds.forEach(row => {
                     let b = String(getProp(row, 'babak')).toUpperCase();
-                    if (b === 'FT') return; // Abaikan jika kebetulan ada baris FT manual nyasar
+                    if (b === 'FT') return; // Abaikan jika ada FT manual nyasar
 
                     sum.SOT_Kiri += parseInt(getProp(row, 'SOT_Kiri')||getProp(row, 'sot_kiri'))||0;
                     sum.SOT_Kanan += parseInt(getProp(row, 'SOT_Kanan')||getProp(row, 'sot_kanan'))||0;
@@ -5024,26 +5023,13 @@
                     sum.Pass_Sukses_Kanan += parseInt(getProp(row, 'Pass_Sukses_Kanan')||getProp(row, 'pass_sukses_kanan'))||0;
                     sum.Pass_Gagal_Kanan += parseInt(getProp(row, 'Pass_Gagal_Kanan')||getProp(row, 'pass_gagal_kanan'))||0;
 
-                    // Akumulasi total possession sementara
+                    // Akumulasi WAKTU MURNI (MS), Tidak dirata-rata!
                     sum.Poss_Kiri += parseInt(getProp(row, 'Poss_Kiri')||getProp(row, 'poss_kiri'))||0;
                     sum.Poss_Netral += parseInt(getProp(row, 'Poss_Netral')||getProp(row, 'poss_netral'))||0;
                     sum.Poss_Kanan += parseInt(getProp(row, 'Poss_Kanan')||getProp(row, 'poss_kanan'))||0;
-                    countPoss++;
                 });
 
-                // Khusus Penguasaan bola harus dirata-rata (Average), bukan ditambah
-                if (countPoss > 0) {
-                    sum.Poss_Kiri = Math.round(sum.Poss_Kiri / countPoss);
-                    sum.Poss_Netral = Math.round(sum.Poss_Netral / countPoss);
-                    sum.Poss_Kanan = Math.round(sum.Poss_Kanan / countPoss);
-                    
-                    // Pastikan totalnya persis 100% (kompensasi pembulatan)
-                    let totP = sum.Poss_Kiri + sum.Poss_Netral + sum.Poss_Kanan;
-                    if(totP > 0 && totP !== 100) sum.Poss_Netral += (100 - totP); 
-                }
-                
-                // Lempar hasil kalkulasi ke variabel st utama
-                st = sum;
+                st = sum; // Lempar ke state utama
             } else {
                 // Tampilkan murni babak spesifik sesuai pilihan (Babak 1 / 2)
                 st = ds.find(x => String(getProp(x, 'babak')).toUpperCase() === String(babak).toUpperCase()) || {};
@@ -5052,10 +5038,19 @@
             // 1. Ekstraksi Data (Sistem pintar pendeteksi key)
             const ext = (k1, k2) => st[k1] !== undefined ? st[k1] : (parseInt(getProp(st, k1)||getProp(st, k2))||0);
 
-            let possKiri = ext('Poss_Kiri', 'poss_kiri'); 
-            let possNetral = ext('Poss_Netral', 'poss_netral'); 
-            let possKanan = ext('Poss_Kanan', 'poss_kanan');
+            // LOGIKA FIFA STANDARD: Konversi dari Waktu (MS) ke Persentase untuk UI
+            let rawPossKiri = ext('Poss_Kiri', 'poss_kiri'); 
+            let rawPossNetral = ext('Poss_Netral', 'poss_netral'); 
+            let rawPossKanan = ext('Poss_Kanan', 'poss_kanan');
+            let totalPoss = rawPossKiri + rawPossNetral + rawPossKanan;
             
+            let possKiri = 0, possNetral = 0, possKanan = 0;
+            if (totalPoss > 0) {
+                possKiri = Math.round((rawPossKiri / totalPoss) * 100);
+                possKanan = Math.round((rawPossKanan / totalPoss) * 100);
+                possNetral = 100 - possKiri - possKanan; // Sisa persentase untuk "In Contest"
+            }
+
             let sotKiri = ext('SOT_Kiri', 'sot_kiri'); let sotKanan = ext('SOT_Kanan', 'sot_kanan');
             let missKiri = ext('Miss_Kiri', 'miss_kiri'); let missKanan = ext('Miss_Kanan', 'miss_kanan');
             let saveKiri = ext('Save_Kiri', 'save_kiri'); let saveKanan = ext('Save_Kanan', 'save_kanan');
@@ -5073,7 +5068,7 @@
             let passTotKiri = psSuksesKiri + psGagalKiri; let passTotKanan = psSuksesKanan + psGagalKanan;
             let accKiri = passTotKiri > 0 ? Math.round((psSuksesKiri/passTotKiri)*100) : 0;
             let accKanan = passTotKanan > 0 ? Math.round((psSuksesKanan/passTotKanan)*100) : 0;
-                
+
             // KALKULASI DATA BARU: Total Shot (Akurasi tembakan & tembakan meleset)
             let shotTotKiri = sotKiri + missKiri;
             let shotTotKanan = sotKanan + missKanan;
