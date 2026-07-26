@@ -1613,6 +1613,7 @@
         }
 
         // --- 1. OTAK NAVIGASI UTAMA ---
+        // --- 1. OTAK NAVIGASI UTAMA ---
         function switchTab(tabId, titleText) {
             try {
                 // 1. Tutup layar pop-up
@@ -1642,6 +1643,28 @@
                 const target = document.getElementById('tab-' + tabId);
                 if(target) { target.classList.remove('hidden'); target.classList.add('block'); }
                 
+                // ==========================================
+                // TRIGGER SMART DATE SAAT MEMBUKA JADWAL
+                // ==========================================
+                if (tabId === 'jadwal' && jadwalCache.length > 0) {
+                    let targetYMD = formatYMD(new Date());
+                    let nowTs = Date.now();
+                    
+                    let liveMatch = jadwalCache.find(m => String(getProp(m, 'status')).toUpperCase().includes('LIVE') || String(getProp(m, 'status')).toUpperCase().includes('HT'));
+                    
+                    if (liveMatch) {
+                        targetYMD = parseToYMD(getProp(liveMatch, 'waktu'));
+                    } else {
+                        let upc = jadwalCache.filter(m => !String(getProp(m, 'status')).toUpperCase().includes('FT') && !String(getProp(m, 'status')).toUpperCase().includes('BATAL') && parseIndoDate(getProp(m, 'waktu')) >= nowTs).sort((a,b) => parseIndoDate(getProp(a,'waktu')) - parseIndoDate(getProp(b,'waktu')));
+                        if (upc.length > 0) targetYMD = parseToYMD(getProp(upc[0], 'waktu'));
+                    }
+                    
+                    // Eksekusi perpindahan tanggal secara otomatis tanpa disadari user
+                    if (currentDateSelected !== targetYMD) {
+                        selectDate(targetYMD);
+                    }
+                }
+
                 setActiveNav(tabId);
                 window.scrollTo({top: 0, behavior: 'smooth'});
             } catch(e) { 
@@ -2947,29 +2970,41 @@
             jadwalCache.forEach(m => { let ymd = parseToYMD(getProp(m, 'waktu')); if(ymd) { let d = new Date(`${ymd}T00:00:00`); if(d < startDate) startDate = new Date(d); if(d > endDate) endDate = new Date(d); } });
             calendarDates = []; let curr = new Date(startDate);
             while(curr <= endDate) { calendarDates.push(formatYMD(curr)); curr.setDate(curr.getDate() + 1); }
+
+            // ==========================================
+            // SMART AUTO-FOCUS DATE ENGINE
+            // ==========================================
+            let targetYMD = formatYMD(today);
+            let nowTs = Date.now();
             
-            if (!currentDateSelected) { currentDateSelected = formatYMD(today); }
-            renderCalendarUI(); renderFotmobMatchList(currentDateSelected);
-        }
-        
-        function renderCalendarUI() {
-            let html = ''; const bulanIndoFull = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-            let selDateObj = new Date(`${currentDateSelected}T00:00:00`);
-            document.getElementById('calendar-month-year').innerText = `${bulanIndoFull[selDateObj.getMonth()]} ${selDateObj.getFullYear()}`;
-            calendarDates.forEach(ymd => {
-                let dObj = new Date(`${ymd}T00:00:00`); let isSelected = ymd === currentDateSelected; let dayLabel = getRelativeDayLabel(ymd); let dateNum = dObj.getDate();
-                let hasMatch = jadwalCache.some(m => parseToYMD(getProp(m, 'waktu')) === ymd);
-                let dotHtml = hasMatch ? `<div class="w-1 h-1 rounded-full ${isSelected ? 'bg-white dark:bg-brand-dark-bg' : 'bg-brand-red'} absolute bottom-1.5"></div>` : '';
-                let activeClasses = isSelected ? "bg-brand-black text-white dark:bg-white dark:text-brand-black shadow-md scale-105" : "bg-white dark:bg-brand-dark-surface text-gray-500 dark:text-brand-dark-muted border border-gray-100 dark:border-brand-dark-border hover:bg-gray-50 dark:hover:bg-brand-dark-surface/50";
-                let textClasses = isSelected ? "text-white dark:text-brand-black" : "text-brand-black dark:text-white";
-                let dayClasses = (dayLabel === "HARI INI" || dayLabel === "BESOK" || dayLabel === "KEMARIN") && !isSelected ? "text-brand-green" : (isSelected ? "text-gray-300 dark:text-gray-500" : "text-gray-400 dark:text-brand-dark-muted");
-                html += `<button id="cal-btn-${ymd}" onclick="selectDate('${ymd}')" class="relative flex flex-col items-center justify-center min-w-[54px] h-[60px] rounded-2xl transition-all duration-300 flex-shrink-0 snap-center ${activeClasses}"><span class="text-[8px] font-bold uppercase tracking-widest mb-0.5 ${dayClasses} transition-colors">${dayLabel}</span><span class="text-sm font-heading font-bold leading-none ${textClasses} transition-colors">${dateNum}</span>${dotHtml}</button>`;
+            // 1. Prioritas Pertama: Cari Laga LIVE / HT
+            let liveMatch = jadwalCache.find(m => {
+                let s = String(getProp(m, 'status')).toUpperCase();
+                return s.includes('LIVE') || s.includes('HT');
             });
-            document.getElementById('fotmob-calendar').innerHTML = html;
-            setTimeout(() => {
-                let btn = document.getElementById(`cal-btn-${currentDateSelected}`); let container = document.getElementById('fotmob-calendar');
-                if(btn && container) { let scrollPos = btn.offsetLeft - (container.offsetWidth / 2) + (btn.offsetWidth / 2); container.scrollTo({ left: scrollPos, behavior: 'smooth' }); }
-            }, 100);
+            
+            if (liveMatch) {
+                targetYMD = parseToYMD(getProp(liveMatch, 'waktu'));
+            } else {
+                // 2. Prioritas Kedua: Jika tidak ada LIVE, cari laga NEXT UPCOMING terdekat
+                let upcomingMatches = jadwalCache.filter(m => {
+                    let s = String(getProp(m, 'status')).toUpperCase();
+                    let w = parseIndoDate(getProp(m, 'waktu'));
+                    // Syarat: Bukan FT, bukan Batal, dan waktunya masih di masa depan
+                    return !s.includes('FT') && !s.includes('BATAL') && w >= nowTs;
+                }).sort((a,b) => parseIndoDate(getProp(a,'waktu')) - parseIndoDate(getProp(b,'waktu')));
+                
+                if (upcomingMatches.length > 0) {
+                    targetYMD = parseToYMD(getProp(upcomingMatches[0], 'waktu'));
+                }
+            }
+
+            // Jika sistem baru memuat, paksa tanggal fokus ke Smart Date
+            if (!currentDateSelected) { 
+                currentDateSelected = targetYMD; 
+            }
+            
+            renderCalendarUI(); renderFotmobMatchList(currentDateSelected);
         }
         
         function selectDate(ymd) { currentDateSelected = ymd; renderCalendarUI(); renderFotmobMatchList(ymd); }
