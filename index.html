@@ -2410,11 +2410,44 @@
             data.forEach(tim => { let g = String(getProp(tim, 'grup') || 'GLOBAL').trim().toUpperCase(); if(!groups[g]) groups[g] = []; groups[g].push(tim); });
 
             let htmlKlasemen = ''; let groupKeys = Object.keys(groups).sort();
+            
+            // LOGIKA PENCARI RUNNER-UP TERBAIK UNTUK SMP
+            let bestRunnerUpKlub = '';
+            if (ligaAktif === 'SMP') {
+                let allRunnerUps = [];
+                groupKeys.forEach(g => {
+                    if (g !== 'GLOBAL' && groups[g].length >= 2) {
+                        // Pastikan grup diurutkan secara absolut (Poin -> Selisih Gol -> Gol Memasukkan)
+                        groups[g].sort((a,b) => {
+                            let ptsA = parseInt(getProp(a,'poin'))||0; let ptsB = parseInt(getProp(b,'poin'))||0;
+                            if(ptsB !== ptsA) return ptsB - ptsA;
+                            let sgA = parseInt(getProp(a,'sg'))||0; let sgB = parseInt(getProp(b,'sg'))||0;
+                            if(sgB !== sgA) return sgB - sgA;
+                            let gmA = parseInt(getProp(a,'gm'))||0; let gmB = parseInt(getProp(b,'gm'))||0;
+                            return gmB - gmA;
+                        });
+                        allRunnerUps.push(groups[g][1]); // Index 1 adalah posisi Runner-up
+                    }
+                });
+                
+                // Adu mekanik semua Runner-up
+                if (allRunnerUps.length > 0) {
+                    allRunnerUps.sort((a,b) => {
+                        let ptsA = parseInt(getProp(a,'poin'))||0; let ptsB = parseInt(getProp(b,'poin'))||0;
+                        if(ptsB !== ptsA) return ptsB - ptsA;
+                        let sgA = parseInt(getProp(a,'sg'))||0; let sgB = parseInt(getProp(b,'sg'))||0;
+                        if(sgB !== sgA) return sgB - sgA;
+                        let gmA = parseInt(getProp(a,'gm'))||0; let gmB = parseInt(getProp(b,'gm'))||0;
+                        return gmB - gmA;
+                    });
+                    bestRunnerUpKlub = getProp(allRunnerUps[0], 'klub'); // Ambil yang paling atas
+                }
+            }
+
             groupKeys.forEach((g, index) => {
                 let timList = groups[g];
                 let tableRows = '';
                 
-                // MESIN DAFTAR TABEL REGULER (ZONA HIJAU UNTUK TOP 2)
                 for(let i = 0; i < timList.length; i++) {
                     let tim = timList[i];
                     let klub = getProp(tim, 'klub'); if(!klub) continue; 
@@ -2425,9 +2458,19 @@
                     let rowBg = 'hover:bg-gray-50 dark:hover:bg-brand-dark-surface/50';
                     let borderLeft = '';
 
-                    // FOTMOB STYLE: Kualifikasi Semi Final (Rank 1 & 2)
-                    if (rank === 1 || rank === 2) {
-                        rankHtml = `<span class="flex items-center justify-center w-5 h-5 rounded-md bg-brand-green text-white text-[10px] font-black shadow-sm">${rank}</span>`;
+                    // MESIN KUALIFIKASI FASE GUGUR (SMA vs SMP)
+                    let isQualified = false;
+                    let qualLabel = '';
+                    
+                    if (ligaAktif === 'SMA') {
+                        if (rank === 1 || rank === 2) { isQualified = true; qualLabel = 'Lolos Semi Final'; }
+                    } else if (ligaAktif === 'SMP') {
+                        if (rank === 1) { isQualified = true; qualLabel = 'Juara Grup (Semi Final)'; }
+                        else if (rank === 2 && klub === bestRunnerUpKlub) { isQualified = true; qualLabel = 'Runner-Up Terbaik (Semi Final)'; }
+                    }
+
+                    if (isQualified) {
+                        rankHtml = `<span class="flex items-center justify-center w-5 h-5 rounded-md bg-brand-green text-white text-[10px] font-black shadow-sm" title="${qualLabel}">${rank}</span>`;
                         rowBg = 'bg-brand-green/5 dark:bg-brand-green/10 hover:bg-brand-green/10 dark:hover:bg-brand-green/20';
                         borderLeft = 'border-l-4 border-l-brand-green';
                     } else {
@@ -2450,7 +2493,7 @@
                         <td class="px-2 py-3 text-center text-gray-400 dark:text-gray-600 col-detail hidden">${getProp(tim, 'gm') || 0}</td>
                         <td class="px-2 py-3 text-center text-gray-400 dark:text-gray-600 col-detail hidden">${getProp(tim, 'gk') || 0}</td>
                         <td class="px-2 py-3 text-center font-bold col-detail hidden ${parseInt(getProp(tim, 'sg'))<0 ? 'text-brand-red':'text-gray-400 dark:text-gray-600'}">${parseInt(getProp(tim, 'sg'))>0 ? '+'+getProp(tim, 'sg') : (getProp(tim, 'sg')||0)}</td>
-                        <td class="px-4 py-3 text-center font-black text-brand-black dark:text-white text-sm ${(rank === 1 || rank === 2) ? 'bg-brand-green/10' : 'bg-brand-green/5 dark:bg-brand-green/10'}">${getProp(tim, 'poin') || 0}</td>
+                        <td class="px-4 py-3 text-center font-black text-brand-black dark:text-white text-sm ${isQualified ? 'bg-brand-green/10' : 'bg-brand-green/5 dark:bg-brand-green/10'}">${getProp(tim, 'poin') || 0}</td>
                     </tr>`;
                 }
                 
@@ -2458,10 +2501,11 @@
                 let badgeColors = ['bg-brand-green', 'bg-brand-red', 'bg-blue-500', 'bg-yellow-500']; let badgeColor = badgeColors[index % badgeColors.length];
                 let colSpan = groupKeys.length === 1 ? 'lg:col-span-2' : '';
                 
-                // LEGENDA ZONA KLASIFIKASI
+                // LEGENDA DINAMIS
+                let legendText = ligaAktif === 'SMP' ? `<div class="w-2 h-2 rounded-[2px] bg-brand-green"></div> Lolos Semi Final (Juara Grup & 1 Runner-Up Terbaik)` : `<div class="w-2 h-2 rounded-[2px] bg-brand-green"></div> Lolos Semi Final`;
                 let legendHtml = `
                 <div class="bg-gray-50 dark:bg-[#111] p-3 md:px-5 text-[9px] font-bold uppercase tracking-widest flex flex-wrap gap-4 border-t border-gray-100 dark:border-gray-800">
-                    <div class="flex items-center gap-1.5 text-gray-600 dark:text-gray-400"><div class="w-2 h-2 rounded-[2px] bg-brand-green"></div> Lolos Semi Final</div>
+                    <div class="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">${legendText}</div>
                 </div>`;
 
                 htmlKlasemen += `
@@ -2469,7 +2513,6 @@
                     <div class="bg-brand-black dark:bg-[#0a0a0a] text-white py-3 px-5 text-[11px] font-bold tracking-widest uppercase flex items-center gap-2 border-b border-gray-800 shrink-0">
                         <div class="w-2 h-2 ${badgeColor} rounded-full shadow-glow animate-pulse"></div> ${groupTitle}
                     </div>
-                    
                     <div class="overflow-x-auto hide-scroll flex-1 relative">
                         <table class="w-full text-sm text-left whitespace-nowrap">
                             <thead class="bg-gray-50 dark:bg-brand-dark-bg text-[9px] text-gray-500 dark:text-brand-dark-muted uppercase font-bold tracking-[0.15em] border-b border-gray-100 dark:border-brand-dark-border transition-colors">
@@ -2498,6 +2541,7 @@
             document.getElementById('klasemen-container').innerHTML = htmlKlasemen;
             toggleKlasemen(klasemenMode);
         }
+            
         function toggleKlasemen(mode) {
             klasemenMode = mode;
             const detailCols = document.querySelectorAll('.col-detail');
@@ -2519,14 +2563,49 @@
             const container = document.getElementById('global-stats-container');
             if(!container) return;
 
-            // --- 1. PENGOLAHAN DATA ANALITIK ---
+            // --- 1. MESIN ANALITIK REAL-TIME (MURNI TANPA PRE-SEASON) ---
             
-            // A. Top Skor (Pemain)
-            dTS.sort((a,b) => (parseInt(getProp(b, 'Gol') || getProp(b, 'gol')) || 0) - (parseInt(getProp(a, 'Gol') || getProp(a, 'gol')) || 0));
+            // A. Ambil Event Match yang BUKAN Pre-Season dan SESUAI JENJANG
+            let validEvents = (rawData.Event_Match || []).filter(ev => {
+                let idM = getProp(ev, 'id_match');
+                let matchData = jadwalCache.find(m => String(getProp(m, 'id_match')) === String(idM));
+                if(!matchData) return false;
+                
+                let mJenjang = String(getProp(matchData, 'Jenjang') || getProp(matchData, 'Liga')).toUpperCase();
+                let mGrup = String(getProp(matchData, 'grup')).toUpperCase().trim();
+                
+                return mJenjang === ligaAktif && mGrup !== 'PRE-SEASON';
+            });
 
-            let currentLeaguePlayers = (rawData.Pemain || []).filter(p => dKlasemen.some(k => String(getProp(k, 'klub')).toLowerCase().trim() === String(getProp(p, 'tim')).toLowerCase().trim()));
+            // B. Kalkulasi Player Stats dari Laporan Valid Saja
+            let playerStats = {};
+            validEvents.forEach(ev => {
+                let rawPemain = getProp(ev, 'pemain');
+                if(!rawPemain) return;
+                
+                let pClean = formatNamaPremium(rawPemain).clean; 
+                let pTim = String(getProp(ev, 'tim')).trim();
+                let pKey = pClean.toLowerCase() + "_" + pTim.toLowerCase();
+                
+                if(!playerStats[pKey]) {
+                    playerStats[pKey] = {
+                        nama: pClean, tim: pTim,
+                        gol: 0, kuning: 0, merah: 0
+                    };
+                }
+                
+                let jns = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '');
+                if(jns === 'GOL' || jns === 'GOLPENALTI') playerStats[pKey].gol++;
+                else if(jns === 'KUNING') playerStats[pKey].kuning++;
+                else if(jns === 'MERAH' || jns === 'KUNINGKEDUA' || jns === 'SECONDYELLOW') playerStats[pKey].merah++;
+            });
 
-            // B. Perhitungan Clean Sheets / Nirbobol (Tim)
+            let activePlayersList = Object.values(playerStats);
+
+            // 1. TOP SKOR (Bypass database statik, gunakan hasil hitungan real-time)
+            let calcTopSkor = activePlayersList.filter(p => p.gol > 0).sort((a,b) => b.gol - a.gol);
+
+            // 2. CLEAN SHEETS (Tetap aman karena difilter by Match)
             let teamCS = {};
             dKlasemen.forEach(k => teamCS[getProp(k, 'klub')] = 0);
             
@@ -2534,7 +2613,6 @@
                 let status = String(getProp(m, 'status')).toUpperCase();
                 let jenjang = String(getProp(m, 'Jenjang') || getProp(m, 'Liga')).toUpperCase();
                 let grup = String(getProp(m, 'grup')).toUpperCase().trim();
-                // Hanya hitung FT, jenjang yang sama, dan BUKAN Pre-Season
                 return status.includes('FT') && jenjang === ligaAktif && grup !== 'PRE-SEASON';
             });
             
@@ -2543,37 +2621,42 @@
                 let skor = String(getProp(m, 'skor'));
                 if(skor.includes('-')) {
                     let p = skor.split('-'); let sKiri = parseInt(p[0].trim()); let sKanan = parseInt(p[1].trim());
-                    // Tim Kiri Clean Sheet jika Tim Kanan mencetak 0 gol
                     if(sKanan === 0 && teamCS[tk] !== undefined) teamCS[tk]++;
-                    // Tim Kanan Clean Sheet jika Tim Kiri mencetak 0 gol
                     if(sKiri === 0 && teamCS[tn] !== undefined) teamCS[tn]++;
                 }
             });
             let csArray = Object.keys(teamCS).map(k => ({ klub: k, cs: teamCS[k] })).filter(x => x.cs > 0).sort((a,b) => b.cs - a.cs);
 
-            // C. Perhitungan Kartu / Agresivitas (Tim)
+            // 3. KARTU KEKASARAN TIM
             let teamCards = {};
             dKlasemen.forEach(k => teamCards[getProp(k, 'klub')] = { y: 0, r: 0 });
-            currentLeaguePlayers.forEach(p => {
-                let t = getProp(p, 'tim');
-                if(teamCards[t]) {
-                    teamCards[t].y += parseInt(getProp(p, 'kuning')) || 0;
-                    teamCards[t].r += parseInt(getProp(p, 'merah')) || 0;
+            activePlayersList.forEach(p => {
+                let matchedTeam = Object.keys(teamCards).find(k => k.toLowerCase() === p.tim.toLowerCase());
+                if(matchedTeam) {
+                    teamCards[matchedTeam].y += p.kuning;
+                    teamCards[matchedTeam].r += p.merah;
                 }
             });
-            // Rumus Kekasaran: Merah dihitung 3 poin, Kuning 1 poin.
             let cardArray = Object.keys(teamCards).map(k => ({ klub: k, y: teamCards[k].y, r: teamCards[k].r, total: teamCards[k].y + (teamCards[k].r * 3) })).filter(x => x.total > 0).sort((a,b) => b.total - a.total);
 
-            // D. Bad Boys / Pemain Paling Kasar (Pemain)
-            let badBoys = [...currentLeaguePlayers]
+            // 4. PEMAIN TERKASAR (BAD BOYS)
+            let badBoys = activePlayersList
                 .map(p => ({
-                    nama: getProp(p, 'nama'), tim: getProp(p, 'tim'), foto: getProp(p, 'foto'),
-                    y: parseInt(getProp(p, 'kuning'))||0, r: parseInt(getProp(p, 'merah'))||0,
-                    score: (parseInt(getProp(p, 'kuning'))||0) + ((parseInt(getProp(p, 'merah'))||0)*3)
+                    nama: p.nama, tim: p.tim,
+                    y: p.kuning, r: p.merah,
+                    score: p.kuning + (p.merah * 3)
                 }))
                 .filter(x => x.score > 0)
                 .sort((a,b) => b.score - a.score);
 
+            // FUNGSI PENCARI FOTO & POSISI DARI DATABASE ASLI
+            const getPemainInfo = (nama, tim) => {
+                let pData = (rawData.Pemain || []).find(x => String(getProp(x,'nama')).toLowerCase().trim() === String(nama).toLowerCase().trim() && String(getProp(x,'tim')).toLowerCase().trim() === String(tim).toLowerCase().trim());
+                return {
+                    foto: (pData && getProp(pData,'foto')) ? getProp(pData,'foto') : getAvatar(nama),
+                    posisi: (pData && getProp(pData,'posisi')) ? getProp(pData,'posisi') : 'POS'
+                };
+            };
 
             // --- 2. PABRIK WIDGET HTML ---
             const buildWidget = (title, icon, iconColor, contentHtml) => {
@@ -2591,13 +2674,13 @@
 
             // WIDGET 1: Top Skor (Podium Vertikal)
             let htmlTopSkor = '';
-            if (dTS.length === 0) {
+            if (calcTopSkor.length === 0) {
                 htmlTopSkor = `<div class="m-auto text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest py-10">Belum ada pencetak gol</div>`;
             } else {
                 const buildTSCard = (pData, rank) => {
-                    let nama = getProp(pData, 'Nama Pemain') || getProp(pData, 'nama'); let tim = getProp(pData, 'Tim') || getProp(pData, 'sekolah'); let gol = getProp(pData, 'Gol') || getProp(pData, 'gol');
-                    let dataP = (rawData.Pemain || []).find(x => String(getProp(x, 'nama')).toLowerCase().trim() === String(nama).toLowerCase().trim() && String(getProp(x, 'tim')).toLowerCase().trim() === String(tim).toLowerCase().trim()); 
-                    let foto = (dataP && getProp(dataP, 'foto')) ? getProp(dataP, 'foto') : getAvatar(nama); let pos = (dataP && getProp(dataP,'posisi')) ? getProp(dataP,'posisi') : 'POS';
+                    let nama = pData.nama; let tim = pData.tim; let gol = pData.gol;
+                    let info = getPemainInfo(nama, tim);
+                    let foto = info.foto; let pos = info.posisi;
                     
                     let logoObj = dKlasemen.find(x => getProp(x, 'klub') === tim);
                     let logoT = (logoObj && getProp(logoObj, 'logo')) ? getProp(logoObj, 'logo') : getAvatar(tim, true);
@@ -2624,7 +2707,7 @@
                         </div>
                     </div>`;
                 };
-                dTS.slice(0, 10).forEach((p, i) => htmlTopSkor += buildTSCard(p, i+1));
+                calcTopSkor.slice(0, 10).forEach((p, i) => htmlTopSkor += buildTSCard(p, i+1));
             }
 
             // WIDGET 2: Clean Sheets (Tim)
@@ -2680,7 +2763,8 @@
                 badBoys.slice(0, 10).forEach((item, idx) => {
                     let logoObj = dKlasemen.find(x => getProp(x, 'klub') === item.tim);
                     let logo = (logoObj && getProp(logoObj, 'logo')) ? getProp(logoObj, 'logo') : getAvatar(item.tim, true);
-                    let foto = item.foto || getAvatar(item.nama);
+                    let info = getPemainInfo(item.nama, item.tim);
+                    let foto = info.foto;
                     
                     htmlPlayerCards += `
                     <div class="flex items-center justify-between p-3 rounded-2xl border border-transparent hover:border-gray-200 dark:hover:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors group" onclick="bukaModalPemain('${safeStr(item.nama)}', '${safeStr(item.tim)}')">
