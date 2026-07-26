@@ -1615,14 +1615,12 @@
         // --- 1. OTAK NAVIGASI UTAMA ---
         function switchTab(tabId, titleText) {
             try {
-                // 1. Tutup layar pop-up
                 const viewMatch = document.getElementById('view-match'); if(viewMatch) viewMatch.classList.add('hidden');
                 const viewTeam = document.getElementById('view-team'); if(viewTeam) viewTeam.classList.add('hidden');
                 
                 const viewHome = document.getElementById('view-home');
                 const topTabs = document.getElementById('tsl-top-tabs');
                 
-                // 2. Cek Sakelar Liga
                 if (!CONFIG_LIGA_AKTIF) {
                     const lockScreen = document.getElementById('tsl-lock-screen');
                     if(lockScreen) lockScreen.classList.remove('hidden');
@@ -1635,13 +1633,30 @@
                     if(topTabs) topTabs.classList.remove('hidden');
                 }
 
-                // 3. Sembunyikan semua Tab, lalu buka yang diklik (Termasuk Tab Pencarian)
                 document.querySelectorAll('#view-home .tab-content').forEach(el => { 
                     el.classList.add('hidden'); el.classList.remove('block'); 
                 });
                 const target = document.getElementById('tab-' + tabId);
                 if(target) { target.classList.remove('hidden'); target.classList.add('block'); }
                 
+                // TRIGGER SMART DATE SAAT MEMBUKA JADWAL
+                if (tabId === 'jadwal' && jadwalCache.length > 0) {
+                    let targetYMD = formatYMD(new Date());
+                    let nowTs = Date.now();
+                    let liveMatch = jadwalCache.find(m => String(getProp(m, 'status')).toUpperCase().includes('LIVE') || String(getProp(m, 'status')).toUpperCase().includes('HT'));
+                    
+                    if (liveMatch) {
+                        targetYMD = parseToYMD(getProp(liveMatch, 'waktu')) || targetYMD;
+                    } else {
+                        let upc = jadwalCache.filter(m => !String(getProp(m, 'status')).toUpperCase().includes('FT') && !String(getProp(m, 'status')).toUpperCase().includes('BATAL') && parseIndoDate(getProp(m, 'waktu')) >= nowTs).sort((a,b) => parseIndoDate(getProp(a,'waktu')) - parseIndoDate(getProp(b,'waktu')));
+                        if (upc.length > 0) targetYMD = parseToYMD(getProp(upc[0], 'waktu')) || targetYMD;
+                    }
+                    
+                    if (currentDateSelected !== targetYMD && targetYMD) {
+                        selectDate(targetYMD);
+                    }
+                }
+
                 setActiveNav(tabId);
                 window.scrollTo({top: 0, behavior: 'smooth'});
             } catch(e) { 
@@ -2947,8 +2962,33 @@
             jadwalCache.forEach(m => { let ymd = parseToYMD(getProp(m, 'waktu')); if(ymd) { let d = new Date(`${ymd}T00:00:00`); if(d < startDate) startDate = new Date(d); if(d > endDate) endDate = new Date(d); } });
             calendarDates = []; let curr = new Date(startDate);
             while(curr <= endDate) { calendarDates.push(formatYMD(curr)); curr.setDate(curr.getDate() + 1); }
+
+            // SMART AUTO-FOCUS DATE ENGINE
+            let targetYMD = formatYMD(today);
+            let nowTs = Date.now();
             
-            if (!currentDateSelected) { currentDateSelected = formatYMD(today); }
+            // Prioritas 1: Cari Laga LIVE
+            let liveMatch = jadwalCache.find(m => {
+                let s = String(getProp(m, 'status')).toUpperCase();
+                return s.includes('LIVE') || s.includes('HT');
+            });
+            
+            if (liveMatch) {
+                targetYMD = parseToYMD(getProp(liveMatch, 'waktu')) || targetYMD;
+            } else {
+                // Prioritas 2: Cari Laga Akan Datang
+                let upcomingMatches = jadwalCache.filter(m => {
+                    let s = String(getProp(m, 'status')).toUpperCase();
+                    let w = parseIndoDate(getProp(m, 'waktu'));
+                    return !s.includes('FT') && !s.includes('BATAL') && w >= nowTs;
+                }).sort((a,b) => parseIndoDate(getProp(a,'waktu')) - parseIndoDate(getProp(b,'waktu')));
+                
+                if (upcomingMatches.length > 0) {
+                    targetYMD = parseToYMD(getProp(upcomingMatches[0], 'waktu')) || targetYMD;
+                }
+            }
+
+            if (!currentDateSelected) { currentDateSelected = targetYMD; }
             renderCalendarUI(); renderFotmobMatchList(currentDateSelected);
         }
         
