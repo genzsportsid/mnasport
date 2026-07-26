@@ -4983,34 +4983,98 @@
                 return;
             }
 
-            // FILTER BERDASARKAN BABAK
-            // Mencari baris yang kolom 'babak' nya sama dengan yang dipilih (1, 2, atau FT)
-            // Jika tidak ada kolom babak (format lama), default ambil index [0]
-            let st = ds.find(x => String(getProp(x, 'babak')).toUpperCase() === String(babak).toUpperCase()) || ds[0];
+            // ===============================================
+            // FILTER BABAK & SMART AGGREGATOR (MESIN KALKULATOR FT)
+            // ===============================================
+            let st = {};
+            
+            if (babak === 'FT') {
+                // Jika FT dipilih, kita JUMLAHKAN OTOMATIS Babak 1 dan Babak 2
+                let sum = { 
+                    Poss_Kiri: 0, Poss_Netral: 0, Poss_Kanan: 0, 
+                    SOT_Kiri: 0, SOT_Kanan: 0, Miss_Kiri: 0, Miss_Kanan: 0, 
+                    Save_Kiri: 0, Save_Kanan: 0, Corner_Kiri: 0, Corner_Kanan: 0, 
+                    Offside_Kiri: 0, Offside_Kanan: 0, Fouls_Kiri: 0, Fouls_Kanan: 0, 
+                    Kuning_Kiri: 0, Kuning_Kanan: 0, Merah_Kiri: 0, Merah_Kanan: 0, 
+                    Pass_Sukses_Kiri: 0, Pass_Gagal_Kiri: 0, Pass_Sukses_Kanan: 0, Pass_Gagal_Kanan: 0 
+                };
+                
+                let countPoss = 0;
+                ds.forEach(row => {
+                    let b = String(getProp(row, 'babak')).toUpperCase();
+                    if (b === 'FT') return; // Abaikan jika kebetulan ada baris FT manual nyasar
 
-            // 1. Ekstraksi Data Mentah dari Spreadsheet
-            let possKiri = parseInt(getProp(st, 'Poss_Kiri')||getProp(st, 'poss_kiri'))||0; 
-            let possNetral = parseInt(getProp(st, 'Poss_Netral')||getProp(st, 'poss_netral'))||0; 
-            let possKanan = parseInt(getProp(st, 'Poss_Kanan')||getProp(st, 'poss_kanan'))||0;
+                    sum.SOT_Kiri += parseInt(getProp(row, 'SOT_Kiri')||getProp(row, 'sot_kiri'))||0;
+                    sum.SOT_Kanan += parseInt(getProp(row, 'SOT_Kanan')||getProp(row, 'sot_kanan'))||0;
+                    sum.Miss_Kiri += parseInt(getProp(row, 'Miss_Kiri')||getProp(row, 'miss_kiri'))||0;
+                    sum.Miss_Kanan += parseInt(getProp(row, 'Miss_Kanan')||getProp(row, 'miss_kanan'))||0;
+                    sum.Save_Kiri += parseInt(getProp(row, 'Save_Kiri')||getProp(row, 'save_kiri'))||0;
+                    sum.Save_Kanan += parseInt(getProp(row, 'Save_Kanan')||getProp(row, 'save_kanan'))||0;
+                    sum.Corner_Kiri += parseInt(getProp(row, 'Corner_Kiri')||getProp(row, 'corner_kiri'))||0;
+                    sum.Corner_Kanan += parseInt(getProp(row, 'Corner_Kanan')||getProp(row, 'corner_kanan'))||0;
+                    sum.Offside_Kiri += parseInt(getProp(row, 'Offside_Kiri')||getProp(row, 'offside_kiri'))||0;
+                    sum.Offside_Kanan += parseInt(getProp(row, 'Offside_Kanan')||getProp(row, 'offside_kanan'))||0;
+                    sum.Fouls_Kiri += parseInt(getProp(row, 'Fouls_Kiri')||getProp(row, 'fouls_kiri'))||0;
+                    sum.Fouls_Kanan += parseInt(getProp(row, 'Fouls_Kanan')||getProp(row, 'fouls_kanan'))||0;
+                    sum.Kuning_Kiri += parseInt(getProp(row, 'Kuning_Kiri')||getProp(row, 'kuning_kiri'))||0;
+                    sum.Kuning_Kanan += parseInt(getProp(row, 'Kuning_Kanan')||getProp(row, 'kuning_kanan'))||0;
+                    sum.Merah_Kiri += parseInt(getProp(row, 'Merah_Kiri')||getProp(row, 'merah_kiri'))||0;
+                    sum.Merah_Kanan += parseInt(getProp(row, 'Merah_Kanan')||getProp(row, 'merah_kanan'))||0;
+                    sum.Pass_Sukses_Kiri += parseInt(getProp(row, 'Pass_Sukses_Kiri')||getProp(row, 'pass_sukses_kiri'))||0;
+                    sum.Pass_Gagal_Kiri += parseInt(getProp(row, 'Pass_Gagal_Kiri')||getProp(row, 'pass_gagal_kiri'))||0;
+                    sum.Pass_Sukses_Kanan += parseInt(getProp(row, 'Pass_Sukses_Kanan')||getProp(row, 'pass_sukses_kanan'))||0;
+                    sum.Pass_Gagal_Kanan += parseInt(getProp(row, 'Pass_Gagal_Kanan')||getProp(row, 'pass_gagal_kanan'))||0;
+
+                    // Akumulasi total possession sementara
+                    sum.Poss_Kiri += parseInt(getProp(row, 'Poss_Kiri')||getProp(row, 'poss_kiri'))||0;
+                    sum.Poss_Netral += parseInt(getProp(row, 'Poss_Netral')||getProp(row, 'poss_netral'))||0;
+                    sum.Poss_Kanan += parseInt(getProp(row, 'Poss_Kanan')||getProp(row, 'poss_kanan'))||0;
+                    countPoss++;
+                });
+
+                // Khusus Penguasaan bola harus dirata-rata (Average), bukan ditambah
+                if (countPoss > 0) {
+                    sum.Poss_Kiri = Math.round(sum.Poss_Kiri / countPoss);
+                    sum.Poss_Netral = Math.round(sum.Poss_Netral / countPoss);
+                    sum.Poss_Kanan = Math.round(sum.Poss_Kanan / countPoss);
+                    
+                    // Pastikan totalnya persis 100% (kompensasi pembulatan)
+                    let totP = sum.Poss_Kiri + sum.Poss_Netral + sum.Poss_Kanan;
+                    if(totP > 0 && totP !== 100) sum.Poss_Netral += (100 - totP); 
+                }
+                
+                // Lempar hasil kalkulasi ke variabel st utama
+                st = sum;
+            } else {
+                // Tampilkan murni babak spesifik sesuai pilihan (Babak 1 / 2)
+                st = ds.find(x => String(getProp(x, 'babak')).toUpperCase() === String(babak).toUpperCase()) || {};
+            }
+
+            // 1. Ekstraksi Data (Sistem pintar pendeteksi key)
+            const ext = (k1, k2) => st[k1] !== undefined ? st[k1] : (parseInt(getProp(st, k1)||getProp(st, k2))||0);
+
+            let possKiri = ext('Poss_Kiri', 'poss_kiri'); 
+            let possNetral = ext('Poss_Netral', 'poss_netral'); 
+            let possKanan = ext('Poss_Kanan', 'poss_kanan');
             
-            let sotKiri = parseInt(getProp(st, 'SOT_Kiri')||getProp(st, 'sot_kiri'))||0; let sotKanan = parseInt(getProp(st, 'SOT_Kanan')||getProp(st, 'sot_kanan'))||0;
-            let missKiri = parseInt(getProp(st, 'Miss_Kiri')||getProp(st, 'miss_kiri'))||0; let missKanan = parseInt(getProp(st, 'Miss_Kanan')||getProp(st, 'miss_kanan'))||0;
-            let saveKiri = parseInt(getProp(st, 'Save_Kiri')||getProp(st, 'save_kiri'))||0; let saveKanan = parseInt(getProp(st, 'Save_Kanan')||getProp(st, 'save_kanan'))||0;
+            let sotKiri = ext('SOT_Kiri', 'sot_kiri'); let sotKanan = ext('SOT_Kanan', 'sot_kanan');
+            let missKiri = ext('Miss_Kiri', 'miss_kiri'); let missKanan = ext('Miss_Kanan', 'miss_kanan');
+            let saveKiri = ext('Save_Kiri', 'save_kiri'); let saveKanan = ext('Save_Kanan', 'save_kanan');
             
-            let cornerKiri = parseInt(getProp(st, 'Corner_Kiri')||getProp(st, 'corner_kiri'))||0; let cornerKanan = parseInt(getProp(st, 'Corner_Kanan')||getProp(st, 'corner_kanan'))||0;
-            let offKiri = parseInt(getProp(st, 'Offside_Kiri')||getProp(st, 'offside_kiri'))||0; let offKanan = parseInt(getProp(st, 'Offside_Kanan')||getProp(st, 'offside_kanan'))||0;
-            let foulsKiri = parseInt(getProp(st, 'Fouls_Kiri')||getProp(st, 'fouls_kiri'))||0; let foulsKanan = parseInt(getProp(st, 'Fouls_Kanan')||getProp(st, 'fouls_kanan'))||0;
+            let cornerKiri = ext('Corner_Kiri', 'corner_kiri'); let cornerKanan = ext('Corner_Kanan', 'corner_kanan');
+            let offKiri = ext('Offside_Kiri', 'offside_kiri'); let offKanan = ext('Offside_Kanan', 'offside_kanan');
+            let foulsKiri = ext('Fouls_Kiri', 'fouls_kiri'); let foulsKanan = ext('Fouls_Kanan', 'fouls_kanan');
             
-            let kunKiri = parseInt(getProp(st, 'Kuning_Kiri')||getProp(st, 'kuning_kiri'))||0; let kunKanan = parseInt(getProp(st, 'Kuning_Kanan')||getProp(st, 'kuning_kanan'))||0;
-            let merKiri = parseInt(getProp(st, 'Merah_Kiri')||getProp(st, 'merah_kiri'))||0; let merKanan = parseInt(getProp(st, 'Merah_Kanan')||getProp(st, 'merah_kanan'))||0;
+            let kunKiri = ext('Kuning_Kiri', 'kuning_kiri'); let kunKanan = ext('Kuning_Kanan', 'kuning_kanan');
+            let merKiri = ext('Merah_Kiri', 'merah_kiri'); let merKanan = ext('Merah_Kanan', 'merah_kanan');
             
-            let psSuksesKiri = parseInt(getProp(st, 'Pass_Sukses_Kiri')||getProp(st, 'pass_sukses_kiri'))||0; let psGagalKiri = parseInt(getProp(st, 'Pass_Gagal_Kiri')||getProp(st, 'pass_gagal_kiri'))||0;
-            let psSuksesKanan = parseInt(getProp(st, 'Pass_Sukses_Kanan')||getProp(st, 'pass_sukses_kanan'))||0; let psGagalKanan = parseInt(getProp(st, 'Pass_Gagal_Kanan')||getProp(st, 'pass_gagal_kanan'))||0;
+            let psSuksesKiri = ext('Pass_Sukses_Kiri', 'pass_sukses_kiri'); let psGagalKiri = ext('Pass_Gagal_Kiri', 'pass_gagal_kiri');
+            let psSuksesKanan = ext('Pass_Sukses_Kanan', 'pass_sukses_kanan'); let psGagalKanan = ext('Pass_Gagal_Kanan', 'pass_gagal_kanan');
 
             let passTotKiri = psSuksesKiri + psGagalKiri; let passTotKanan = psSuksesKanan + psGagalKanan;
             let accKiri = passTotKiri > 0 ? Math.round((psSuksesKiri/passTotKiri)*100) : 0;
             let accKanan = passTotKanan > 0 ? Math.round((psSuksesKanan/passTotKanan)*100) : 0;
-
+                
             // KALKULASI DATA BARU: Total Shot (Akurasi tembakan & tembakan meleset)
             let shotTotKiri = sotKiri + missKiri;
             let shotTotKanan = sotKanan + missKanan;
