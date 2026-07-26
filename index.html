@@ -528,6 +528,12 @@
                     <div class="text-[10px] font-bold tracking-widest text-gray-400 py-4">Memuat Kalender...</div>
                 </div>
             </div>
+            <!-- QUICK LEAGUE FILTER -->
+            <div class="bg-gray-50 dark:bg-[#111] border-b border-gray-200 dark:border-brand-dark-border py-2 px-4 flex justify-center gap-2 z-30 relative shadow-inner">
+                <button onclick="setJadwalFilter('SEMUA')" id="jfilter-SEMUA" class="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-full bg-brand-green text-white shadow-md transition-all">Semua Laga</button>
+                <button onclick="setJadwalFilter('SMP')" id="jfilter-SMP" class="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-full bg-white dark:bg-brand-dark-surface text-gray-500 border border-gray-200 dark:border-gray-800 hover:text-brand-green transition-all">SMP</button>
+                <button onclick="setJadwalFilter('SMA')" id="jfilter-SMA" class="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-full bg-white dark:bg-brand-dark-surface text-gray-500 border border-gray-200 dark:border-gray-800 hover:text-brand-green transition-all">SMA</button>
+            </div>    
             <div class="px-0 md:px-8 mt-0 md:mt-4 pb-20">
                 <div class="bg-white dark:bg-brand-dark-surface md:rounded-[2rem] shadow-soft border-t md:border border-gray-100 dark:border-brand-dark-border overflow-hidden flex flex-col transition-colors duration-500">
                     <div id="fotmob-match-list" class="divide-y divide-gray-50 dark:divide-brand-dark-border flex-1 relative transition-colors">
@@ -2969,23 +2975,87 @@
         function selectDate(ymd) { currentDateSelected = ymd; renderCalendarUI(); renderFotmobMatchList(ymd); }
         function scrollToToday() { selectDate(formatYMD(new Date())); }
 
+        // ==========================================
+        // MESIN RENDER JADWAL (GROUPING & FILTER UX)
+        // ==========================================
+        let jadwalFilterLiga = 'SEMUA';
+
+        function setJadwalFilter(liga) {
+            jadwalFilterLiga = liga;
+            // Update UI Tombol
+            ['SEMUA', 'SMP', 'SMA'].forEach(id => {
+                let btn = document.getElementById('jfilter-' + id);
+                if(btn) {
+                    if(id === liga) {
+                        btn.className = "px-4 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-full bg-brand-green text-white shadow-md transition-all";
+                    } else {
+                        btn.className = "px-4 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-full bg-white dark:bg-brand-dark-surface text-gray-500 border border-gray-200 dark:border-gray-800 hover:text-brand-green transition-all";
+                    }
+                }
+            });
+            // Render ulang layar jadwal
+            renderFotmobMatchList(currentDateSelected);
+        }
+
         function renderFotmobMatchList(ymd) {
-            let filteredMatches = jadwalCache.filter(m => parseToYMD(getProp(m, 'waktu')) === ymd);
-            let html = `<div class="px-5 py-3 bg-gray-100/90 dark:bg-[#18181b]/95 backdrop-blur-md border-b border-gray-200 dark:border-brand-dark-border text-[10px] md:text-[11px] font-bold text-brand-black dark:text-white uppercase tracking-widest sticky top-0 z-10 transition-colors duration-500 shadow-sm">${getFullDateHeader(ymd)}</div>`;
-            if(filteredMatches.length === 0) {
+            // 1. Ambil data hari ini
+            let matches = jadwalCache.filter(m => parseToYMD(getProp(m, 'waktu')) === ymd);
+            
+            // 2. Terapkan Filter Liga (Jika user menekan tombol SMP/SMA)
+            if (jadwalFilterLiga !== 'SEMUA') {
+                matches = matches.filter(m => String(getProp(m, 'Jenjang') || getProp(m, 'Liga')).toUpperCase() === jadwalFilterLiga);
+            }
+
+            let html = `<div class="flex justify-between items-center px-5 py-3 bg-gray-100/90 dark:bg-[#18181b]/95 backdrop-blur-md border-b border-gray-200 dark:border-brand-dark-border sticky top-0 z-10 transition-colors duration-500 shadow-sm">
+                <span class="text-[10px] md:text-[11px] font-bold text-brand-black dark:text-white uppercase tracking-widest">${getFullDateHeader(ymd)}</span>
+                <span class="text-[8px] font-black bg-brand-green/10 text-brand-green px-2 py-0.5 rounded border border-brand-green/20">${matches.length} LAGA</span>
+            </div>`;
+
+            if(matches.length === 0) {
                 html += `<div class="p-16 flex flex-col items-center justify-center text-center"><div class="w-16 h-16 bg-gray-50 dark:bg-brand-dark-bg rounded-full flex items-center justify-center mb-4 border border-gray-100 dark:border-brand-dark-border shadow-sm transition-colors"><svg class="w-6 h-6 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div><div class="text-[10px] text-gray-400 dark:text-brand-dark-muted font-bold uppercase tracking-widest transition-colors">Tidak ada pertandingan</div></div>`;
-            } else {
-                filteredMatches.sort((a,b) => parseIndoDate(getProp(a,'waktu')) - parseIndoDate(getProp(b,'waktu')));
-                filteredMatches.forEach(m => {
+                document.getElementById('fotmob-match-list').innerHTML = html;
+                return;
+            }
+
+            // 3. KLASTERISASI DATA (Grouping)
+            let liveMatches = [];
+            let upcomingMatches = [];
+            let finishedMatches = [];
+
+            matches.forEach(m => {
+                let status = String(getProp(m, 'status') || '').toUpperCase();
+                if (status.includes('LIVE') || status.includes('HT')) liveMatches.push(m);
+                else if (status.includes('FT')) finishedMatches.push(m);
+                else upcomingMatches.push(m);
+            });
+
+            // Urutkan Masing-masing Klaster berdasarkan Waktu
+            const sortByTime = (a, b) => parseIndoDate(getProp(a,'waktu')) - parseIndoDate(getProp(b,'waktu'));
+            liveMatches.sort(sortByTime);
+            upcomingMatches.sort(sortByTime);
+            finishedMatches.sort((a, b) => parseIndoDate(getProp(b,'waktu')) - parseIndoDate(getProp(a,'waktu'))); // Yang terbaru selesai di atas
+
+            // 4. PABRIK RENDER KARTU
+            const renderGroup = (title, arrData, headerColorClass, icon) => {
+                if (arrData.length === 0) return '';
+                
+                let groupHtml = `<div class="${headerColorClass} px-4 py-2 border-y border-gray-100 dark:border-white/5 flex items-center gap-2 sticky top-[41px] z-10 shadow-sm backdrop-blur-md">
+                    <span class="text-xs">${icon}</span>
+                    <span class="text-[9px] font-black uppercase tracking-widest text-brand-black dark:text-white drop-shadow-sm">${title}</span>
+                </div>`;
+
+                arrData.forEach(m => {
                     let tk = getProp(m, 'tim_kiri'); let tn = getProp(m, 'tim_kanan');
-                    let lKiri = allKlasemenCache.find(t => getProp(t,'klub') === tk)?.logo || getAvatar(tk, true); let lKanan = allKlasemenCache.find(t => getProp(t,'klub') === tn)?.logo || getAvatar(tn, true);
+                    let lKiri = allKlasemenCache.find(t => getProp(t,'klub') === tk)?.logo || getAvatar(tk, true); 
+                    let lKanan = allKlasemenCache.find(t => getProp(t,'klub') === tn)?.logo || getAvatar(tn, true);
+                    
                     let w = String(getProp(m, 'waktu')); let timeOnly = "TBA";
                     if (w.includes("T")) { let dateObj = new Date(w); if(!isNaN(dateObj.getTime())) timeOnly = String(dateObj.getHours()).padStart(2, '0') + ":" + String(dateObj.getMinutes()).padStart(2, '0'); } 
                     else { timeOnly = w.split(" - ")[1] || "TBA"; }
+                    
                     let jenjang = getProp(m, 'Jenjang') || ''; let colorJ = jenjang.toUpperCase() === 'SMP' ? 'bg-blue-600 dark:bg-blue-500/20 dark:text-blue-400' : 'bg-brand-red dark:bg-brand-red/20 dark:text-red-400';
                     let badgeJenjang = jenjang ? `<div class="${colorJ} text-white px-1.5 py-0.5 rounded text-[7px] font-bold mt-1 uppercase tracking-widest transition-colors">${jenjang}</div>` : '';
                     
-                    // LOGIKA SKOR BARU (Muncul Saat LIVE)
                     let status = String(getProp(m, 'status')||"").toUpperCase(); 
                     let isPast = status.includes('FT'); 
                     let isLive = status.includes('LIVE') || status.includes('HT');
@@ -2996,7 +3066,7 @@
                     let isWinA = isPast && parseInt(sKiri) > parseInt(sKanan); let isWinB = isPast && parseInt(sKanan) > parseInt(sKiri);
                     let idM = safeStr(getProp(m, 'id_match'));
 
-                    html += `<div id="match-card-${idM}" onclick="bukaHalamanMatch('${idM}')" class="flex items-center p-4 hover:bg-gray-50 dark:hover:bg-brand-dark-bg transition-colors cursor-pointer group bg-white dark:bg-brand-dark-surface border-b border-gray-100 dark:border-brand-dark-border last:border-none">
+                    groupHtml += `<div id="match-card-${idM}" onclick="bukaHalamanMatch('${idM}')" class="flex items-center p-4 hover:bg-gray-50 dark:hover:bg-brand-dark-bg transition-colors cursor-pointer group bg-white dark:bg-brand-dark-surface border-b border-gray-100 dark:border-brand-dark-border last:border-none">
                         <div class="w-[60px] md:w-[70px] flex flex-col items-center justify-center border-r border-gray-100 dark:border-brand-dark-border pr-4 mr-4 shrink-0 transition-colors">
                             <span data-matchid="${idM}" data-kickoff="${parseIndoDate(getProp(m, 'waktu'))}" data-status="${status}" class="live-timer-badge text-[11px] md:text-[12px] font-heading font-bold px-2 py-1 rounded-lg border transition-colors min-w-[60px] text-center ${isPast ? 'text-gray-400 dark:text-brand-dark-muted border-transparent bg-gray-50/50 dark:bg-brand-dark-bg/50' : 'text-brand-black dark:text-white border-gray-200 dark:border-brand-dark-border bg-gray-50 dark:bg-brand-dark-bg'}">${isPast ? 'FT' : timeOnly}</span>
                             ${badgeJenjang}
@@ -3019,7 +3089,14 @@
                         </div>
                     </div>`;
                 });
-            }
+                return groupHtml;
+            };
+
+            // Gabungkan Klaster secara berurutan
+            html += renderGroup('Sedang Berlangsung', liveMatches, 'bg-red-500/10 dark:bg-red-500/20', '🔥');
+            html += renderGroup('Akan Datang', upcomingMatches, 'bg-gray-100/90 dark:bg-[#111]/90', '🕒');
+            html += renderGroup('Selesai', finishedMatches, 'bg-gray-100/50 dark:bg-[#0a0a0a]/80', '✅');
+
             document.getElementById('fotmob-match-list').innerHTML = html;
         }
 
