@@ -4964,12 +4964,11 @@
             let container = document.getElementById('premium-stats-container');
             if(!container) return;
 
-            // Simpan ke global jika dipanggil pertama kali dari bukaHalamanMatch
+            // Simpan ke global HANYA jika dipanggil dari luar dengan data Array baru
             if (Array.isArray(statDataArray)) {
                 window.currentMatchStats = statDataArray;
-            } else if (statDataArray === null) {
-                window.currentMatchStats = [];
             }
+            // HAPUS logika "else if (statDataArray === null)" agar memori tidak bocor/kereset saat tombol ditekan!
 
             let ds = window.currentMatchStats;
 
