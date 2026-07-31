@@ -2567,35 +2567,6 @@
             }
 
             groupKeys.forEach((g, index) => {
-                    if (g !== 'GLOBAL' && groups[g].length >= 2) {
-                        // Pastikan grup diurutkan secara absolut (Poin -> Selisih Gol -> Gol Memasukkan)
-                        groups[g].sort((a,b) => {
-                            let ptsA = parseInt(getProp(a,'poin'))||0; let ptsB = parseInt(getProp(b,'poin'))||0;
-                            if(ptsB !== ptsA) return ptsB - ptsA;
-                            let sgA = parseInt(getProp(a,'sg'))||0; let sgB = parseInt(getProp(b,'sg'))||0;
-                            if(sgB !== sgA) return sgB - sgA;
-                            let gmA = parseInt(getProp(a,'gm'))||0; let gmB = parseInt(getProp(b,'gm'))||0;
-                            return gmB - gmA;
-                        });
-                        allRunnerUps.push(groups[g][1]); // Index 1 adalah posisi Runner-up
-                    }
-                });
-                
-                // Adu mekanik semua Runner-up
-                if (allRunnerUps.length > 0) {
-                    allRunnerUps.sort((a,b) => {
-                        let ptsA = parseInt(getProp(a,'poin'))||0; let ptsB = parseInt(getProp(b,'poin'))||0;
-                        if(ptsB !== ptsA) return ptsB - ptsA;
-                        let sgA = parseInt(getProp(a,'sg'))||0; let sgB = parseInt(getProp(b,'sg'))||0;
-                        if(sgB !== sgA) return sgB - sgA;
-                        let gmA = parseInt(getProp(a,'gm'))||0; let gmB = parseInt(getProp(b,'gm'))||0;
-                        return gmB - gmA;
-                    });
-                    bestRunnerUpKlub = getProp(allRunnerUps[0], 'klub'); // Ambil yang paling atas
-                }
-            }
-
-            groupKeys.forEach((g, index) => {
                 let timList = groups[g];
                 let tableRows = '';
                 
