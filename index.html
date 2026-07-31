@@ -2492,7 +2492,51 @@
                 if(typeof renderLiveHeroCarousel === 'function') renderLiveHeroCarousel();
                 if(typeof renderHomePlayerDir === 'function') renderHomePlayerDir();
         }
-
+        // ==========================================
+        // MESIN PENGURUTAN KLASEMEN (H2H FIRST)
+        // ==========================================
+        function sortStandingsArray(timArray) {
+            return timArray.sort((a, b) => {
+                let ptsA = parseInt(getProp(a,'poin'))||0; let ptsB = parseInt(getProp(b,'poin'))||0;
+                if(ptsB !== ptsA) return ptsB - ptsA; // 1. Poin Terbanyak
+                
+                // 2. Head-to-Head (H2H)
+                let klubA = getProp(a, 'klub'); let klubB = getProp(b, 'klub');
+                let h2hMatches = jadwalCache.filter(m => String(getProp(m, 'status')).toUpperCase().includes('FT') && ((getProp(m, 'tim_kiri') === klubA && getProp(m, 'tim_kanan') === klubB) || (getProp(m, 'tim_kiri') === klubB && getProp(m, 'tim_kanan') === klubA)));
+                
+                if(h2hMatches.length > 0) {
+                    let ptsH2HA = 0; let ptsH2HB = 0;
+                    let sgH2HA = 0; let sgH2HB = 0;
+                    h2hMatches.forEach(m => {
+                        let skorStr = String(getProp(m, 'skor')||"");
+                        if(skorStr.includes('-')) {
+                            let p = skorStr.split('-'); let sKiri = parseInt(p[0]); let sKanan = parseInt(p[1]);
+                            let isAKiri = getProp(m, 'tim_kiri') === klubA;
+                            let scoreA = isAKiri ? sKiri : sKanan; let scoreB = isAKiri ? sKanan : sKiri;
+                            
+                            // Hitung Poin Duel Langsung
+                            if(scoreA > scoreB) ptsH2HA += 3; 
+                            else if(scoreA < scoreB) ptsH2HB += 3; 
+                            else { ptsH2HA += 1; ptsH2HB += 1; }
+                            
+                            // Hitung Selisih Gol Duel Langsung
+                            sgH2HA += (scoreA - scoreB);
+                            sgH2HB += (scoreB - scoreA);
+                        }
+                    });
+                    if(ptsH2HA !== ptsH2HB) return ptsH2HB - ptsH2HA; // Poin H2H
+                    if(sgH2HA !== sgH2HB) return sgH2HB - sgH2HA; // Selisih Gol H2H
+                }
+                
+                // 3. Selisih Gol Keseluruhan
+                let sgA = parseInt(getProp(a,'sg'))||0; let sgB = parseInt(getProp(b,'sg'))||0;
+                if(sgB !== sgA) return sgB - sgA;
+                
+                // 4. Gol Memasukkan Keseluruhan (GM)
+                let gmA = parseInt(getProp(a,'gm'))||0; let gmB = parseInt(getProp(b,'gm'))||0;
+                return gmB - gmA;
+            });
+        }
         let klasemenMode = 'simple';
         function renderKlasemen(data) {
             let groups = {};
@@ -2500,11 +2544,29 @@
 
             let htmlKlasemen = ''; let groupKeys = Object.keys(groups).sort();
             
+            // Urutkan semua tim di masing-masing grup dengan aturan H2H
+            groupKeys.forEach(g => {
+                groups[g] = sortStandingsArray(groups[g]);
+            });
+
             // LOGIKA PENCARI RUNNER-UP TERBAIK UNTUK SMP
             let bestRunnerUpKlub = '';
             if (ligaAktif === 'SMP') {
                 let allRunnerUps = [];
                 groupKeys.forEach(g => {
+                    if (g !== 'GLOBAL' && groups[g].length >= 2) {
+                        allRunnerUps.push(groups[g][1]); // Index 1 adalah posisi Runner-up setelah diurutkan
+                    }
+                });
+                
+                // Adu mekanik semua Runner-up dengan aturan H2H
+                if (allRunnerUps.length > 0) {
+                    allRunnerUps = sortStandingsArray(allRunnerUps);
+                    bestRunnerUpKlub = getProp(allRunnerUps[0], 'klub'); // Ambil yang paling atas
+                }
+            }
+
+            groupKeys.forEach((g, index) => {
                     if (g !== 'GLOBAL' && groups[g].length >= 2) {
                         // Pastikan grup diurutkan secara absolut (Poin -> Selisih Gol -> Gol Memasukkan)
                         groups[g].sort((a,b) => {
@@ -3491,6 +3553,8 @@
             let grup = getProp(timData, 'grup'); let jenjang = getProp(timData, 'Jenjang') || getProp(timData, 'Liga'); let stdHtml = ''; let stdData = [];
             if (grup) { stdData = allKlasemenCache.filter(t => String(getProp(t, 'Jenjang')||getProp(t, 'Liga')).toUpperCase() === String(jenjang).toUpperCase() && String(getProp(t, 'grup')).toUpperCase() === String(grup).toUpperCase()); } 
             else { stdData = allKlasemenCache.filter(t => String(getProp(t, 'Jenjang')||getProp(t, 'Liga')).toUpperCase() === String(jenjang).toUpperCase()); }
+
+            stdData = sortStandingsArray(stdData); // TERAPKAN ATURAN H2H
 
             if(stdData.length > 0) {
                 stdData.forEach((t, i) => {
