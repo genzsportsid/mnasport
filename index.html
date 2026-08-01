@@ -1904,6 +1904,62 @@
                 });
 
                 allKlasemenCache = rawData.Klasemen || []; jadwalCache = rawData.Jadwal || [];
+                // ----------------------------------------------------
+                // KLASEMEN AUTO-CORRECTION ENGINE (MENGABAIKAN FASE GUGUR)
+                // ----------------------------------------------------
+                allKlasemenCache.forEach(tim => {
+                    let klub = String(getProp(tim, 'klub')).trim();
+                    let jenjangTim = String(getProp(tim, 'Jenjang') || getProp(tim, 'Liga')).toUpperCase().trim();
+                    
+                    let mng = 0, sri = 0, klh = 0, gm = 0, gk = 0;
+                    
+                    jadwalCache.forEach(m => {
+                        let mStatus = String(getProp(m, 'status')).toUpperCase();
+                        let mJenjang = String(getProp(m, 'Jenjang') || getProp(m, 'Liga')).toUpperCase().trim();
+                        let mGrup = String(getProp(m, 'grup') || getProp(m, 'jenis_match')).toUpperCase().replace(/\s+/g, '');
+                        
+                        // BUKAN Knockout dan BUKAN Pre-Season
+                        let isFaseGrup = !mGrup.includes('FINAL') && !mGrup.includes('SF') && !mGrup.includes('SEMIFINAL') && !mGrup.includes('THIRD') && !mGrup.includes('PRE-SEASON') && mGrup !== '3RD';
+                        
+                        // HANYA hitung pertandingan FT di jenjang yang sama
+                        if (mStatus.includes('FT') && mJenjang === jenjangTim && isFaseGrup) {
+                            let timKiri = String(getProp(m, 'tim_kiri')).trim();
+                            let timKanan = String(getProp(m, 'tim_kanan')).trim();
+                            
+                            if (timKiri === klub || timKanan === klub) {
+                                let skorStr = String(getProp(m, 'skor')||"");
+                                if(skorStr.includes('-')) {
+                                    let p = skorStr.split('-'); 
+                                    let sKiri = parseInt(p[0]); 
+                                    let sKanan = parseInt(p[1]);
+                                    
+                                    let myScore = (timKiri === klub) ? sKiri : sKanan;
+                                    let enScore = (timKiri === klub) ? sKanan : sKiri;
+                                    
+                                    if (!isNaN(myScore) && !isNaN(enScore)) {
+                                        if (myScore > enScore) mng++;
+                                        else if (myScore < enScore) klh++;
+                                        else sri++;
+                                        
+                                        gm += myScore;
+                                        gk += enScore;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Overwrite properti dari Google Sheets dengan hasil hitungan absolut mesin JS
+                    tim.main = mng + sri + klh;
+                    tim.menang = mng;
+                    tim.seri = sri;
+                    tim.kalah = klh;
+                    tim.gm = gm;
+                    tim.gk = gk;
+                    tim.sg = gm - gk;
+                    tim.poin = (mng * 3) + (sri * 1);
+                });
+                // ----------------------------------------------------    
                 document.getElementById('stat-total-tim').innerText = allKlasemenCache.length > 0 ? allKlasemenCache.length : '-';
                 
                 // Filter murni hanya pemain (Abaikan Pelatih/Manager)
@@ -2520,8 +2576,16 @@
                 let klubA = String(getProp(a, 'klub')).trim(); 
                 let klubB = String(getProp(b, 'klub')).trim();
                 
-                // 2. Head-to-Head (H2H)
-                let h2hMatches = jadwalCache.filter(m => String(getProp(m, 'status')).toUpperCase().includes('FT') && ((getProp(m, 'tim_kiri') === klubA && getProp(m, 'tim_kanan') === klubB) || (getProp(m, 'tim_kiri') === klubB && getProp(m, 'tim_kanan') === klubA)));
+                // 2. Head-to-Head (H2H) - HANYA DI BABAK GRUP
+                let h2hMatches = jadwalCache.filter(m => {
+                    let grupMatch = String(getProp(m, 'grup') || getProp(m, 'jenis_match')).toUpperCase().replace(/\s+/g, '');
+                    let isKnockout = grupMatch.includes('FINAL') || grupMatch.includes('SF') || grupMatch.includes('SEMIFINAL') || grupMatch.includes('THIRD') || grupMatch === '3RD';
+                    
+                    return String(getProp(m, 'status')).toUpperCase().includes('FT') && 
+                           !isKnockout &&
+                           ((getProp(m, 'tim_kiri') === klubA && getProp(m, 'tim_kanan') === klubB) || 
+                            (getProp(m, 'tim_kiri') === klubB && getProp(m, 'tim_kanan') === klubA));
+                });
                 
                 if(h2hMatches.length > 0) {
                     let ptsH2HA = 0; let ptsH2HB = 0;
@@ -2533,12 +2597,10 @@
                             let isAKiri = getProp(m, 'tim_kiri') === klubA;
                             let scoreA = isAKiri ? sKiri : sKanan; let scoreB = isAKiri ? sKanan : sKiri;
                             
-                            // Hitung Poin Duel Langsung
                             if(scoreA > scoreB) ptsH2HA += 3; 
                             else if(scoreA < scoreB) ptsH2HB += 3; 
                             else { ptsH2HA += 1; ptsH2HB += 1; }
                             
-                            // Hitung Selisih Gol Duel Langsung
                             sgH2HA += (scoreA - scoreB);
                             sgH2HB += (scoreB - scoreA);
                         }
@@ -2555,27 +2617,29 @@
                 let gmA = parseInt(getProp(a,'gm'))||0; let gmB = parseInt(getProp(b,'gm'))||0;
                 if(gmB !== gmA) return gmB - gmA;
                 
-                // 5. FAIRPLAY (Disiplin Tim) - Otomatis Baca dari Event_Match
+                // 5. FAIRPLAY (Disiplin Tim) - HANYA KARTU DI BABAK GRUP
                 let calcFP = (teamName) => {
                     let poinKasar = 0;
                     (rawData.Event_Match || []).forEach(ev => {
-                        if (String(getProp(ev, 'tim')).toLowerCase().trim() === String(teamName).toLowerCase().trim()) {
+                        let idM = getProp(ev, 'id_match');
+                        let matchData = jadwalCache.find(m => String(getProp(m, 'id_match')) === String(idM));
+                        
+                        let grupMatch = matchData ? String(getProp(matchData, 'grup') || getProp(matchData, 'jenis_match')).toUpperCase().replace(/\s+/g, '') : '';
+                        let isKnockout = grupMatch.includes('FINAL') || grupMatch.includes('SF') || grupMatch.includes('SEMIFINAL') || grupMatch.includes('THIRD') || grupMatch === '3RD';
+                        
+                        if (!isKnockout && String(getProp(ev, 'tim')).toLowerCase().trim() === String(teamName).toLowerCase().trim()) {
                             let jns = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '');
-                            // 1 Kartu Kuning = 1 Poin Penalti Kasar
                             if (jns === 'KUNING') poinKasar += 1; 
-                            // 1 Kartu Merah = 3 Poin Penalti Kasar
                             else if (jns === 'MERAH' || jns === 'KUNINGKEDUA' || jns === 'SECONDYELLOW') poinKasar += 3; 
                         }
                     });
                     return poinKasar;
                 };
                 
-                // Jika operator mengisi manual kolom "Fairplay" di sheet Klasemen, pakai itu. Jika tidak, mesin akan berhitung sendiri.
                 let fpA = parseInt(getProp(a, 'fairplay')); if(isNaN(fpA)) fpA = calcFP(klubA);
                 let fpB = parseInt(getProp(b, 'fairplay')); if(isNaN(fpB)) fpB = calcFP(klubB);
                 
-                // Poin Penalti Semakin KECIL (Lebih bersih) = Semakin TINGGI posisinya di klasemen
-                return fpA - fpB;
+                return fpA - fpB; // Poin Pelanggaran terkecil = Terbaik
             });
         }
         let klasemenMode = 'simple';
