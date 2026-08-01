@@ -819,16 +819,25 @@
 
         <div id="match-header-expanded" class="bg-brand-black dark:bg-black text-white transition-colors pt-2 pb-4">
             <div id="match-header-expanded-info" class="text-center relative z-10 pb-4 transition-opacity duration-75">
+                
+                <!-- INJEKSI LENCANA FASE GUGUR -->
+                <div id="mm-stage-container" class="flex justify-center mb-2 mt-1 hidden">
+                    <span id="mm-stage-badge" class=""></span>
+                </div>
+                
                 <div class="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-4 flex justify-center items-center gap-2">
                     <span id="mm-liga" class="bg-white/10 px-2 py-0.5 rounded border border-white/10 shadow-sm">LIGA</span> &bull; <span id="mm-waktu" class="text-brand-green drop-shadow-sm">WAKTU</span>
                 </div>
                 <div class="flex justify-between items-center px-4 md:px-12 max-w-2xl mx-auto">
-                    <div id="mm-btn-kiri" class="flex flex-col items-center gap-3 w-[35%] cursor-pointer group">
                         <img id="mm-logo-kiri" src="" class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white p-1 object-cover shadow-xl group-hover:scale-105 transition">
                         <h3 class="font-bold text-[10px] md:text-xs text-center leading-tight uppercase tracking-wide group-hover:text-brand-green drop-shadow-sm line-clamp-2" id="mm-nama-kiri">Tim Kiri</h3>
                     </div>
-                    <div class="w-[30%] text-center">
-                        <div class="text-4xl md:text-5xl font-heading font-bold text-white tracking-widest drop-shadow-lg" id="mm-skor">VS</div>
+                    <div class="w-[30%] text-center flex flex-col items-center justify-center">
+                        <div class="text-4xl md:text-5xl font-heading font-bold text-white tracking-widest drop-shadow-lg leading-none" id="mm-skor">VS</div>
+                        
+                        <!-- INJEKSI SKOR ADU PENALTI -->
+                        <div id="mm-skor-penalti" class="hidden font-heading font-black text-[10px] md:text-xs text-brand-gold tracking-widest mt-1.5 drop-shadow-[0_0_8px_rgba(215,182,125,0.6)]"></div>
+                        
                         <div class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mt-2 bg-gray-900/50 rounded-full px-2 py-0.5 inline-block border border-gray-800" id="mm-status">BELUM MULAI</div>
                     </div>
                     <div id="mm-btn-kanan" class="flex flex-col items-center gap-3 w-[35%] cursor-pointer group">
@@ -3950,7 +3959,50 @@
             let btnKanan = document.getElementById('mm-btn-kanan'); if(btnKanan) btnKanan.setAttribute('onclick', `bukaHalamanTim('${safeStr(tn)}')`);
 
             let status = String(getProp(m, 'status')||""); let isPast = status.toUpperCase().includes('FT'); let skor = getProp(m, 'skor') || "VS";
-            document.getElementById('mm-skor').innerText = skor; document.getElementById('mm-skor-mini').innerText = skor;
+            document.getElementById('mm-skor').innerText = skor;
+            
+            // ----------------------------------------------------
+            // LOGIKA FASE GUGUR (DYNAMIC STAGE BADGE)
+            // ----------------------------------------------------
+            let grupMatch = String(getProp(m, 'grup') || getProp(m, 'jenis_match')).toUpperCase().replace(/\s+/g, '');
+            let stageContainer = document.getElementById('mm-stage-container');
+            let stageBadge = document.getElementById('mm-stage-badge');
+            
+            if (stageContainer && stageBadge) {
+                if (grupMatch.includes('FINAL') || grupMatch === 'F' || grupMatch === 'GRANDFINAL') {
+                    stageBadge.innerHTML = '🏆 GRAND FINAL';
+                    stageBadge.className = 'bg-gradient-to-r from-brand-gold/20 to-yellow-600/20 border border-brand-gold/50 text-brand-gold px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] shadow-[0_0_15px_rgba(215,182,125,0.4)] flex items-center gap-1.5 backdrop-blur-sm';
+                    stageContainer.classList.remove('hidden');
+                } else if (grupMatch.includes('SF') || grupMatch.includes('SEMIFINAL')) {
+                    stageBadge.innerHTML = '⚔️ SEMI FINAL';
+                    stageBadge.className = 'bg-gradient-to-r from-brand-green/20 to-emerald-600/20 border border-brand-green/50 text-brand-green px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] shadow-[0_0_15px_rgba(0,154,68,0.4)] flex items-center gap-1.5 backdrop-blur-sm';
+                    stageContainer.classList.remove('hidden');
+                } else {
+                    stageContainer.classList.add('hidden');
+                }
+            }
+
+            // ----------------------------------------------------
+            // LOGIKA SKOR ADU PENALTI (SHOOTOUT)
+            // ----------------------------------------------------
+            let skorPenalti = String(getProp(m, 'skor_penalti') || getProp(m, 'penalti') || '').trim();
+            let elSkorPenalti = document.getElementById('mm-skor-penalti');
+            let elSkorMini = document.getElementById('mm-skor-mini');
+            
+            if (skorPenalti !== '' && skorPenalti !== '-') {
+                // Munculkan di layar utama
+                if (elSkorPenalti) {
+                    elSkorPenalti.innerText = `(PSO ${skorPenalti})`;
+                    elSkorPenalti.classList.remove('hidden');
+                }
+                // Tempelkan di sticky header mini saat user scroll ke bawah
+                if (elSkorMini) {
+                    elSkorMini.innerHTML = `<div class="flex flex-col items-center leading-none mt-1"><span>${skor}</span><span class="text-[7px] text-brand-gold tracking-[0.2em] mt-0.5">(P ${skorPenalti})</span></div>`;
+                }
+            } else {
+                if (elSkorPenalti) elSkorPenalti.classList.add('hidden');
+                if (elSkorMini) elSkorMini.innerText = skor;
+            }
             // LOGIKA TOMBOL MATCH SUMMARY PDF & GALERI FOTO
             let linkPdf = getProp(m, 'link_pdf') || getProp(m, 'match_summary');
             let linkFoto = getProp(m, 'link_foto') || getProp(m, 'galeri');
