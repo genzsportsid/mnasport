@@ -824,14 +824,19 @@
                 <div id="mm-stage-container" class="flex justify-center mb-2 mt-1 hidden">
                     <span id="mm-stage-badge" class=""></span>
                 </div>
-                
+
                 <div class="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-4 flex justify-center items-center gap-2">
                     <span id="mm-liga" class="bg-white/10 px-2 py-0.5 rounded border border-white/10 shadow-sm">LIGA</span> &bull; <span id="mm-waktu" class="text-brand-green drop-shadow-sm">WAKTU</span>
                 </div>
                 <div class="flex justify-between items-center px-4 md:px-12 max-w-2xl mx-auto">
+                    
+                    <!-- AREA TIM KIRI YANG SEBELUMNYA HILANG -->
+                    <div id="mm-btn-kiri" class="flex flex-col items-center gap-3 w-[35%] cursor-pointer group">
                         <img id="mm-logo-kiri" src="" class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white p-1 object-cover shadow-xl group-hover:scale-105 transition">
                         <h3 class="font-bold text-[10px] md:text-xs text-center leading-tight uppercase tracking-wide group-hover:text-brand-green drop-shadow-sm line-clamp-2" id="mm-nama-kiri">Tim Kiri</h3>
                     </div>
+                    
+                    <!-- AREA SKOR & PENALTI -->
                     <div class="w-[30%] text-center flex flex-col items-center justify-center">
                         <div class="text-4xl md:text-5xl font-heading font-bold text-white tracking-widest drop-shadow-lg leading-none" id="mm-skor">VS</div>
                         
@@ -840,10 +845,13 @@
                         
                         <div class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mt-2 bg-gray-900/50 rounded-full px-2 py-0.5 inline-block border border-gray-800" id="mm-status">BELUM MULAI</div>
                     </div>
+                    
+                    <!-- AREA TIM KANAN -->
                     <div id="mm-btn-kanan" class="flex flex-col items-center gap-3 w-[35%] cursor-pointer group">
                         <img id="mm-logo-kanan" src="" class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white p-1 object-cover shadow-xl group-hover:scale-105 transition">
                         <h3 class="font-bold text-[10px] md:text-xs text-center leading-tight uppercase tracking-wide group-hover:text-brand-red drop-shadow-sm line-clamp-2" id="mm-nama-kanan">Tim Kanan</h3>
                     </div>
+                    
                 </div>
             </div>
             <!-- TOMBOL MATCH SUMMARY & GALERI FOTO -->
