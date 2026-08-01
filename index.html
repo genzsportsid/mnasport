@@ -2493,15 +2493,17 @@
                 if(typeof renderHomePlayerDir === 'function') renderHomePlayerDir();
         }
         // ==========================================
-        // MESIN PENGURUTAN KLASEMEN (H2H FIRST)
+        // MESIN PENGURUTAN KLASEMEN (H2H & FAIRPLAY)
         // ==========================================
         function sortStandingsArray(timArray) {
             return timArray.sort((a, b) => {
                 let ptsA = parseInt(getProp(a,'poin'))||0; let ptsB = parseInt(getProp(b,'poin'))||0;
                 if(ptsB !== ptsA) return ptsB - ptsA; // 1. Poin Terbanyak
                 
+                let klubA = String(getProp(a, 'klub')).trim(); 
+                let klubB = String(getProp(b, 'klub')).trim();
+                
                 // 2. Head-to-Head (H2H)
-                let klubA = getProp(a, 'klub'); let klubB = getProp(b, 'klub');
                 let h2hMatches = jadwalCache.filter(m => String(getProp(m, 'status')).toUpperCase().includes('FT') && ((getProp(m, 'tim_kiri') === klubA && getProp(m, 'tim_kanan') === klubB) || (getProp(m, 'tim_kiri') === klubB && getProp(m, 'tim_kanan') === klubA)));
                 
                 if(h2hMatches.length > 0) {
@@ -2534,7 +2536,29 @@
                 
                 // 4. Gol Memasukkan Keseluruhan (GM)
                 let gmA = parseInt(getProp(a,'gm'))||0; let gmB = parseInt(getProp(b,'gm'))||0;
-                return gmB - gmA;
+                if(gmB !== gmA) return gmB - gmA;
+                
+                // 5. FAIRPLAY (Disiplin Tim) - Otomatis Baca dari Event_Match
+                let calcFP = (teamName) => {
+                    let poinKasar = 0;
+                    (rawData.Event_Match || []).forEach(ev => {
+                        if (String(getProp(ev, 'tim')).toLowerCase().trim() === String(teamName).toLowerCase().trim()) {
+                            let jns = String(getProp(ev, 'jenis')).toUpperCase().replace(/\s+/g, '');
+                            // 1 Kartu Kuning = 1 Poin Penalti Kasar
+                            if (jns === 'KUNING') poinKasar += 1; 
+                            // 1 Kartu Merah = 3 Poin Penalti Kasar
+                            else if (jns === 'MERAH' || jns === 'KUNINGKEDUA' || jns === 'SECONDYELLOW') poinKasar += 3; 
+                        }
+                    });
+                    return poinKasar;
+                };
+                
+                // Jika operator mengisi manual kolom "Fairplay" di sheet Klasemen, pakai itu. Jika tidak, mesin akan berhitung sendiri.
+                let fpA = parseInt(getProp(a, 'fairplay')); if(isNaN(fpA)) fpA = calcFP(klubA);
+                let fpB = parseInt(getProp(b, 'fairplay')); if(isNaN(fpB)) fpB = calcFP(klubB);
+                
+                // Poin Penalti Semakin KECIL (Lebih bersih) = Semakin TINGGI posisinya di klasemen
+                return fpA - fpB;
             });
         }
         let klasemenMode = 'simple';
